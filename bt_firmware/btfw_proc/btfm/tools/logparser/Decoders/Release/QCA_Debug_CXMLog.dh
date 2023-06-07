@@ -1,0 +1,1912 @@
+/************************************************
+ * File: QCA_Debug_CXMLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) 2015-2021 Qualcomm Technologies, Inc.
+ * 2015-2017 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+************************************************/
+
+/************************************************
+ * CXM log main table
+************************************************/
+TABLE tQca_CXMLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0400 "LOG_ID_CXM_MCI_INT_RAW"                "LOG_ID_CXM_MCI_INT_RAW"                0 gQca_CXM_MciIntRaw}
+    {0x0410 "LOG_ID_CXM_MCI_RX"                     "LOG_ID_CXM_MCI_RX"                     0 gQca_CXM_MciMsg}
+    {0x0420 "LOG_ID_CXM_MCI_TX"                     "LOG_ID_CXM_MCI_TX"                     0 gQca_CXM_MciMsg}
+    {0x0430 "LOG_ID_CXM_MWS_INT_RAW"                "LOG_ID_CXM_MWS_INT_RAW"                0 gQca_CXM_MwsIntRaw}
+    {0x0440 "LOG_ID_CXM_MWS_RX"                     "LOG_ID_CXM_MWS_RX"                     0 gQca_CXM_MwsMsg}
+    {0x0450 "LOG_ID_CXM_MWS_TX"                     "LOG_ID_CXM_MWS_TX"                     0 gQca_CXM_MwsMsg}
+    {0x0460 "LOG_ID_CXM_MCI_STATS"                  "LOG_ID_CXM_MCI_STATS"                  0 gQca_CXM_MciStats}
+    {0x04E0 "LOG_ID_CXM_INFO_MCI_SERVER"            "LOG_ID_CXM_INFO_MCI_SERVER"            0 gQca_CXM_Info}
+    {0x04E1 "LOG_ID_CXM_INFO_PFAL_COEX_MCI"         "LOG_ID_CXM_INFO_PFAL_COEX_MCI"         0 gQca_CXM_Info}
+    {0x04E2 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_HW"      "LOG_ID_CXM_INFO_PFAL_COEX_MCI_HW"      0 gQca_CXM_Info}
+    {0x04E3 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_SCHED"   "LOG_ID_CXM_INFO_PFAL_COEX_MCI_SCHED"   0 gQca_CXM_Info}
+    {0x04E4 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_VI"      "LOG_ID_CXM_INFO_PFAL_COEX_MCI_VI"      0 gQca_CXM_Info}
+    {0x04E5 "LOG_ID_CXM_INFO_LLM_RMCDCOMMAND"       "LOG_ID_CXM_INFO_LLM_RMCDCOMMAND"       0 gQca_CXM_Info}
+    {0x04E6 "LOG_ID_CXM_INFO_SLC_DISPATCHER"        "LOG_ID_CXM_INFO_SLC_DISPATCHER"        0 gQca_CXM_Info}
+    {0x04E7 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_GPM"     "LOG_ID_CXM_INFO_PFAL_COEX_MCI_GPM"     0 gQca_CXM_Info}
+    {0x04E8 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_CONT"    "LOG_ID_CXM_INFO_PFAL_COEX_MCI_CONT"    0 gQca_CXM_Info}
+    {0x04E9 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_UTIL"    "LOG_ID_CXM_INFO_PFAL_COEX_MCI_UTIL"    0 gQca_CXM_Info}
+    {0x04EA "LOG_ID_CXM_INFO_PFAL_LC_STATE"         "LOG_ID_CXM_INFO_PFAL_LC_STATE"         0 gQca_CXM_Info}
+    {0x04EB "LOG_ID_CXM_INFO_PFAL_HCI_VENDOR"       "LOG_ID_CXM_INFO_PFAL_HCI_VENDOR"       0 gQca_CXM_Info}
+    {0x04F0 "LOG_ID_CXM_INFO_MWS_SERVER"            "LOG_ID_CXM_INFO_MWS_SERVER"            0 gQca_CXM_Info}
+    {0x04F1 "LOG_ID_CXM_INFO_PFAL_COEX_MWS"         "LOG_ID_CXM_INFO_PFAL_COEX_MWS"         0 gQca_CXM_Info}
+    {0x04F2 "LOG_ID_CXM_INFO_PFAL_COEX_MWS_HW"      "LOG_ID_CXM_INFO_PFAL_COEX_MWS_HW"      0 gQca_CXM_Info}
+    {0x04F3 "LOG_ID_CXM_INFO_QMI_IDL_ACCESSOR"      "LOG_ID_CXM_INFO_QMI_IDL_ACCESSOR"      0 gQca_CXM_Info}
+    {0x04F4 "LOG_ID_CXM_INFO_QMI_IDL_LIB"           "LOG_ID_CXM_INFO_QMI_IDL_LIB"           0 gQca_CXM_Info}
+    {0x04F5 "LOG_ID_CXM_INFO_WCI2_HDLC"             "LOG_ID_CXM_INFO_WCI2_HDLC"             0 gQca_CXM_Info}
+    {0x04F6 "LOG_ID_CXM_INFO_COEXISTENCE_SERVICE"   "LOG_ID_CXM_INFO_COEXISTENCE_SERVICE"   0 gQca_CXM_Info}
+    {0x04F7 "LOG_ID_CXM_INFO_COMMON"                "LOG_ID_CXM_INFO_COMMON"                0 gQca_CXM_Info}
+    {0x04F8 "LOG_ID_CXM_MWS_WWAN_STATE_INFO"        "LOG_ID_CXM_MWS_WWAN_STATE_INFO"        0 gQca_CXM_MwsQmiInfo}
+    {0x04F9 "LOG_ID_CXM_INFO_PFAL_COEX_MWS_RTSAR"   "LOG_ID_CXM_INFO_PFAL_COEX_MWS_RTSAR"   0 gQca_CXM_MwsRtsarInfo}
+    {0x04FA "LOG_ID_CXM_LE_TX_DUTY_CYCLE"           "LOG_ID_CXM_LE_TX_DUTY_CYCLE"           0 gQca_CXM_LeTxDutyCycle}
+    {0x04FB "LOG_ID_CXM_QMI_IDL_LIB_ERROR_MSG"      "LOG_ID_CXM_QMI_IDL_LIB_ERROR_MSG"      0 gQca_CXM_QmiIdlLibErrorMsg}
+    {0x04FC "LOG_ID_CXM_CXM_REG_ACCESS_FAIL"        "LOG_ID_CXM_CXM_REG_ACCESS_FAIL"        0 gQca_CXM_RegAccessFailInfo}
+    {0x04FD "LOG_ID_CXM_SCHED_INFO"                 "LOG_ID_CXM_SCHED_INFO"                 0 gQca_CXM_schedInfo}
+    {0x04FE "LOG_ID_CXM_MCI_RX_GPM_NO_POOL"         "LOG_ID_CXM_MCI_RX_GPM_NO_POOL"         0 gQca_CXM_MciMsg}
+    {0x04FF "CXM End"}
+ENDTABLE
+
+/************************************************
+ * 0x0400 "LOG_ID_CXM_MCI_INT_RAW"
+************************************************/
+GROUP gQca_CXM_MciIntRaw "MCI Int Raw"
+{
+    FIELD fQca_MciIntRawBit7                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_HW_MSG_FAIL"
+    FIELD fQca_MciIntRawBit6                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "N/A"
+    FIELD fQca_MciIntRawBit5                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_SW_MSG_FAIL"
+    FIELD fQca_MciIntRawBit4                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_HW_MSG_FAIL"
+    FIELD fQca_MciIntRawBit3                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_INVALID_HDR"
+    FIELD fQca_MciIntRawBit2                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_CRC8_FAIL"
+    FIELD fQca_MciIntRawBit1                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CPU_INT_MSG"
+    FIELD fQca_MciIntRawBit0                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "SW_MSG_DONE"
+
+    FIELD fQca_MciIntRawBit15               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_CMD_FULL_ERR"
+    FIELD fQca_MciIntRawBit14               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "STRUCT_ERR"
+    FIELD fQca_MciIntRawBit13               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "PARITY_ERR"
+    FIELD fQca_MciIntRawBit12               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_ILLEGAL_HDR"
+    FIELD fQca_MciIntRawBit11               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_TIMEOUT_RST"
+    FIELD fQca_MciIntRawBit10               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "REMOTE_SLEEP_UPDATE"
+    FIELD fQca_MciIntRawBit9                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_MSG"
+    FIELD fQca_MciIntRawBit8                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_SW_MSG_FAIL"
+
+    FIELD fQca_MciIntRawBit19   START_BIT   (Move 4 Bits)            (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)       "WSIS_OUT_SYNC"
+    FIELD fQca_MciIntRawBit18               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "WSIS_IN_SYNC"
+    FIELD fQca_MciIntRawBit17               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_AHB_ERR"
+    FIELD fQca_MciIntRawBit16               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_DATA_FULL_ERR"
+
+    FIELD fQca_MciIntRawBit24               (Fixed 8 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+}
+
+TABLE tQca_CXM_EnabledBit
+    {0 "DIS"}
+    {1 "EN"}
+ENDTABLE
+
+/************************************************
+ * 0x0410 "LOG_ID_CXM_MCI_RX"
+ * 0x0420 "LOG_ID_CXM_MCI_TX"
+************************************************/
+TABLE tQca_CXMMciMsgType                                    //Header
+    {0x00 "MCI_RESERVED"}
+    {0x10 "MCI_BT_LNA_LOCK"}
+    {0x20 "MCI_CONT_NACK"}
+    {0x30 "MCI_CONT_INFO"}
+    {0x40 "MCI_CONT_RST"}
+    {0x50 "MCI_SCHED_INFO" "MCI_SCHED_INFO" 0 gQca_CXM_MciSchedInfo}
+    {0x60 "MCI_CPU_INT"}
+    {0x70 "MCI_SYS_WAKING"}
+    {0x80 "MCI_GPM" "MCI_GPM" 0 gQca_CXM_MciGpm}
+    {0x90 "MCI_LNA_INFO"}
+    {0x94 "MCI_LNA_STATE"}
+    {0x98 "MCI_LNA_TAKE"}
+    {0x9C "MCI_LNA_TRANS"}
+    {0xA0 "MCI_SYS_SLEEPING"}
+    {0xC0 "MCI_REQ_WAKE"}
+    {0xD0 "MCI_WCI2"}
+    {0xD4 "MCI_WCI2_TYPE0"}
+    {0xFE "MCI_DEBUG_16"}
+    {0xFF "MCI_REMOTE_RESET"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_CXM_MciMsg "MCI"
+{
+    FIELD fQca_MciMsg_Header                (Fixed 1 Byte)      (TABLE tQca_CXMMciMsgType)          "MciType"   //Header
+    GROUP gQca_MciMsg_more IF (MoreBytes)
+    {
+        FIELD fQca_MciMsg_Header_pad        (Fixed 3 Bytes)     (Hex) SUPPRESS_DETAIL                           //Header padding
+        BRANCH (FromTable   tQca_CXMMciMsgType   fQca_MciMsg_Header)
+        FIELD fQca_MciMsg_pad (ToEndOfLayer) IF(MoreBytes) (Hex) SUPPRESS_DETAIL                                //Padding if any
+    }
+}
+
+/* 0x50 "MCI_SCHED_INFO" */
+GROUP gQca_CXM_MciSchedInfo "MCI SCHED INFO"
+{
+    FIELD fQca_MciSchedInfoType_Start       (Fixed 4 Bytes)     (Hex)           "Start"
+    FIELD fQca_MciSchedInfoType_End         (Fixed 4 Bytes)     (Hex)           "End"
+    FIELD fQca_MciSchedInfoType_Rsvd        (Fixed 2 Bits)      (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciSchedInfoType_LinkID      (Fixed 1 Byte)      (Binary)        "LinkID"
+    FIELD fQca_MciSchedInfoType_Le          (Fixed 1 Bit)       (TABLE tQca_CXM_LeBit)  "ConnType"
+    FIELD fQca_MciSchedInfoType_Priority    (Fixed 1 Byte)      (Binary)        "Priority"
+    FIELD fQca_MciSchedInfoType_RSSI_TxPwr  (Fixed 1 Byte)      (Binary)        "RSSI/TxPwr"
+    FIELD fQca_MciSchedInfoType_Direction   (Fixed 1 Bit)       (TABLE tQca_CXM_Direction)       "Direction"
+    FIELD fQca_MciSchedInfoType_Tag         (Fixed 4 Bits)      (Binary)        "Tag"
+    FIELD fQca_MciSchedInfoType_LatchCurCLK (Fixed 4 Bytes)     (Hex)           "LatchCurCLK"
+}
+
+TABLE tQca_CXM_LeBit
+    {0 "BR/EDR"}
+    {1 "LE"}
+ENDTABLE
+
+TABLE tQca_CXM_Direction
+    {0 "Rx"}
+    {1 "Tx"}
+ENDTABLE
+
+/* 0x80 "MCI_GPM" */
+GROUP gQca_CXM_MciGpm "MCI GPM"
+{
+    FIELD fQca_MciTxGpm_T1                  (Fixed 4 Bytes)     (Hex)                               "T1"            //B0-B3
+    FIELD fQca_MciTxGpm_SubType             (Fixed 1 Byte)      (TABLE tQca_CXMMciGPMType)          "GpmType"       //B4-GPM Type
+    BRANCH (FromTable   tQca_CXMMciGPMType   fQca_MciTxGpm_SubType)
+}
+
+TABLE tQca_CXMMciGPMType                            //B4-GPM Type
+    {0x00 "MCI_GPM_BT_CAL_REQ"}
+    {0x01 "MCI_GPM_BT_CAL_GRANT"}
+    {0x02 "MCI_GPM_BT_CAL_DONE"}
+    {0x03 "MCI_GPM_WLAN_CAL_REQ"}
+    {0x04 "MCI_GPM_WLAN_CAL_GRANT"}
+    {0x05 "MCI_GPM_WLAN_CAL_DONE"}
+    {0x06 "MCI_GPM_WLAN_CLK"}
+    {0x08 "MCI_GPM_WLAN_SYNC" "MCI_GPM_WLAN_SYNC" 0 gQca_CXM_MciGpm_WLAN_SYNC}
+    {0x0C "MCI_GPM_COEX_AGENT" "MCI_GPM_COEX_AGENT" 0 gQca_CXM_MciGpm_COEX_AGENT}
+    {0x0D "MCI_GPM_ANT"}
+    {0xFF "MCI_GPM_BT_DEBUG" "MCI_GPM_BT_DEBUG" 0 gQca_CXM_MciGpm_BT_DEBUG}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0xFF "MCI_GPM_BT_DEBUG" */
+GROUP gQca_CXM_MciGpm_BT_DEBUG "BT DEBUG"
+{
+    FIELD fQca_CXM_MciGpmBtDebug_ASCIIArray                     (Fixed 7 Bytes) (StringOfAscii) "ASCII"
+    FIELD fQca_CXM_MciGpmBtDebug_ValueArray                     (Fixed 4 Bytes) (Hex)           "Value"
+}
+
+/* 0x08 "MCI_GPM_WLAN_SYNC" */
+GROUP gQca_CXM_MciGpm_WLAN_SYNC "WLAN SYNC"
+{
+    FIELD fQca_CXM_MciGpmWlanSync             (Fixed 1 Byte)      (TABLE tQca_CXMMciGPMWlanSyncType)     "Opcode"
+    BRANCH (FromTable   tQca_CXMMciGPMWlanSyncType   fQca_CXM_MciGpmWlanSync)
+}
+
+/* 0x0C "MCI_GPM_COEX_AGENT" */
+GROUP gQca_CXM_MciGpm_COEX_AGENT "COEX AGENT"
+{
+    FIELD fQca_CXM_MciGpm             (Fixed 1 Byte)      (TABLE tQca_CXMMciGPMAgentType)     "Opcode"
+    BRANCH (FromTable   tQca_CXMMciGPMAgentType   fQca_CXM_MciGpm)
+}
+
+TABLE tQca_CXMMciGPMWlanSyncType                       //B5-MCI_GPM_WLAN_SYNC Opcode
+    {0x01 "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_TRIGGER" "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_TRIGGER" 0 gQca_CXM_MciGpmWlanSync_TMT}
+    {0x02 "BT/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG" "BT/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG" 0 gQca_CXM_MciGpmWlanSync_TM}
+    {0x03 "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_END" "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_END" 0 gQca_CXM_MciGpmWlanSync_TME}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x01 "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_TRIGGER" */
+GROUP gQca_CXM_MciGpmWlanSync_TMT "TIMESTAMP MSG TRIGGER"
+{
+    FIELD fQca_MciGpmWlanSync_TMT_Reserved              (Fixed 10 Byte)  (Hex)   SUPPRESS_DETAIL
+}
+
+/* 0x02 "BT/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG" */
+GROUP gQca_CXM_MciGpmWlanSync_TM "TIMESTAMP MSG"
+{
+    FIELD fQca_MciGpmWlanSync_TM_Duration          (Fixed 2 Byte)  (Hex)   "Duration"
+    FIELD fQca_MciGpmWlanSync_TM_Timestamp         (Fixed 4 Byte)  (Hex)   "Timestamp"
+/*    FIELD fQca_MciGpmWlanSync_TM_RSP_Reserved      (Fixed 4 Byte)  (Hex)   SUPPRESS_DETAIL */
+}
+
+/* 0x03 "WL/MCI_GPM_WLAN_SYNC_TIMESTAMP_MSG_END" */
+GROUP gQca_CXM_MciGpmWlanSync_TME "TIMESTAMP MSG END"
+{
+    FIELD fQca_MciGpmWlanSync_TME_Reserved          (Fixed 10 Byte)  (Hex)   SUPPRESS_DETAIL
+}
+
+TABLE tQca_CXMMciGPMAgentType                       //B5-MCI_GPM_COEX_AGENT Opcode
+    {0x00 "BI/MCI_AGENT_COEX_VER_QUERY" "BI/MCI_AGENT_COEX_VER_QUERY" 0 gQca_CXM_MciGpmAgent_COEX_VER_QUERY}
+    {0x01 "BI/MCI_AGENT_COEX_VER_RESP" "BI/MCI_AGENT_COEX_VER_RESP" 0 gQca_CXM_MciGpmAgent_COEX_VER_RESP}
+    {0x02 "BI/MCI_AGENT_STATUS_QUERY" "BI/MCI_AGENT_STATUS_QUERY" 0 gQca_CXM_MciGpmAgent_STATUS_QUERY}
+    {0x03 "WL/MCI_AGENT_DISABLE_BT_GPM" "WL/MCI_AGENT_DISABLE_BT_GPM" 0 gQca_CXM_MciGpmAgent_DISABLE_BT_GPM}
+    {0x04 "WL/MCI_AGENT_WLAN_UNUSED_CH_MAP" "WL/MCI_AGENT_WLAN_UNUSED_CH_MAP" 0 gQca_CXM_MciGpmAgent_WLAN_UNUSED_CH_MAP}
+    {0x05 "BT/MCI_AGENT_BT_PROFILE_INFO" "BT/MCI_AGENT_BT_PROFILE_INFO" 0 gQca_CXM_MciGpmAgent_BT_PROFILE_INFO}
+    {0x06 "BT/MCI_AGENT_BT_STATUS_UPDATE" "BT/MCI_AGENT_BT_STATUS_UPDATE" 0 gQca_CXM_MciGpmAgent_BT_STATUS_UPDATE}
+    {0x07 "WL/MCI_AGENT_BT_UPDATE_FLAGS" "WL/MCI_AGENT_BT_UPDATE_FLAGS" 0 gQca_CXM_MciGpmAgent_BT_UPDATE_FLAGS}
+    {0x08 "BT/MCI_AGENT_BT_SCAN_UPDATE" "BT/MCI_AGENT_BT_SCAN_UPDATE" 0 gQca_CXM_MciGpmAgent_BT_SCAN_UPDATE}
+    {0x09 "WL/MCI_AGENT_WLAN_RW_BT_PRIO" "WL/MCI_AGENT_WLAN_RW_BT_PRIO" 0 gQca_CXM_MciGpmAgent_WLAN_RW_BT_PRIO}
+    {0x0A "WL/MCI_AGENT_BT_PAUSE_PROFILE"}
+    {0x0B "BT/MCI_AGENT_BT_SCAN_ACTIVITY_REPORT" "BT/MCI_AGENT_BT_SCAN_ACTIVITY_REPORT" 0 gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_REPORT}
+    {0x0C "BT/MCI_AGENT_BT_ACL_INACTIVITY_REPORT" "BT/MCI_AGENT_BT_ACL_INACTIVITY_REPORT" 0 gQca_CXM_MciGpmAgent_BT_ACL_INACTIVITY_REPORT}
+    {0x0D "WL/MCI_AGENT_WLAN_SET_ACL_INACTIVITY_REPORT" "WL/MCI_AGENT_WLAN_SET_ACL_INACTIVITY_REPORT" 0 gQca_CXM_MciGpmAgent_WLAN_SET_ACL_INACTIVITY_REPORT}
+    {0x0E "WL/MCI_AGENT_BT_TX_POWER_QUERY" "WL/MCI_AGENT_BT_TX_POWER_QUERY" 0 gQca_CXM_MciGpmAgent_BT_TX_POWER_QUERY}
+    {0x0F "BT/MCI_AGENT_BT_TX_POWER_REPORT" "BT/MCI_AGENT_BT_TX_POWER_REPORT" 0 gQca_CXM_MciGpmAgent_BT_TX_POWER_REPORT}
+    {0x10 "WL/MCI_AGENT_SET_BT_RXSS_MIN_THRESHOLD" "WL/MCI_AGENT_SET_BT_RXSS_MIN_THRESHOLD" 0 gQca_CXM_MciGpmAgent_SET_BT_RXSS_MIN_THRESHOLD}
+    {0x11 "WL/MCI_AGENT_QUERY_BT_RXSS_MIN_THRESHOLD"}
+    {0x12 "BT/MCI_AGENT_RXSS_MIN_THRESHOLD" "BT/MCI_AGENT_RXSS_MIN_THRESHOLD" 0 gQca_CXM_MciGpmAgent_RXSS_MIN_THRESHOLD}
+    {0x13 "WL/MCI_AGENT_SCHED_MSG_TRIGGER" "WL/MCI_AGENT_SCHED_MSG_TRIGGER" 0 gQca_CXM_MciGpmAgent_SCHED_MSG_TRIGGER}
+    {0x14 "BT/MCI_AGENT_SCHED_MSG_TRIGGER_RESP" "BT/MCI_AGENT_SCHED_MSG_TRIGGER_RESP" 0 gQca_CXM_MciGpmAgent_SCHED_MSG_TRIGGER_RESP}
+    {0x15 "BT/MCI_AGENT_SCAN_OP"}
+    {0x16 "BI/MCI_AGENT_PAUSE_GPM_TX"}
+    {0x17 "BT/MCI_AGENT_BT_CONNECT_STATUS" "BT/MCI_AGENT_BT_CONNECT_STATUS" 0 gQca_CXM_MciGpmAgent_BT_CONNECT_STATUS}
+    {0x18 "BT/MCI_AGENT_BT_SCAN_ACTIVITY_BITMAP" "BT/MCI_AGENT_BT_SCAN_ACTIVITY_BITMAP" 0 gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP}
+    {0x19 "BT/MCI_AGENT_BT_SYSTEM_RESET" "BT/MCI_AGENT_BT_SYSTEM_RESET" 0 gQca_CXM_MciGpmAgent_BT_SYSTEM_RESET}
+    {0x1A "BT/MCI_AGENT_BT_GPM_QUEUE_OVERFLOW"}
+    {0x1B "BT/MCI_AGENT_BT_REMOTE_REGISTRY"}
+    {0x1C "BI/MCI_AGENT_REPORT_REGISTER"}
+    {0x1D "WL/MCI_AGENT_PAUSE_BT_CALIBRATION"}
+    {0x1E "BT/MCI_AGENT_REQUEST_WLAN_UPDATE_BT_FLAGS"}
+    {0x1F "BT/MCI_AGENT_ADDITIONAL_BT_LINK_INFO" "BT/MCI_AGENT_ADDITIONAL_BT_LINK_INFO" 0 gQca_CXM_MciGpmAgent_ADDITIONAL_BT_LINK_INFO}
+    {0x20 "WL/MCI_AGENT_RW_A2DP_STATUS_THRESHOLDS"}
+    {0x21 "BT/MCI_AGENT_BT_REPORT_A2DP_STATUS_THRESHOLDS"}
+    {0x22 "BT/MCI_AGENT_BT_LE_CONN_POINT_NOTIFICATION"}
+    {0x23 "WL/MCI_AGENT_BT_POWER_MEASURE_REQ" "WL/MCI_AGENT_BT_POWER_MEASURE_REQ" 0 gQca_CXM_MciGpmAgent_BT_POWER_MEASURE_REQ}
+    {0x24 "BT/MCI_AGENT_BT_POWER_MEASURE_RESP"}
+    {0x25 "BT/MCI_AGENT_BT_POWER_MEASURE_STATUS" "BT/MCI_AGENT_BT_POWER_MEASURE_STATUS" 0 gQca_CXM_MciGpmAgent_BT_POWER_MEASURE_STATUS}
+    {0x26 "WL/MCI_AGENT_WLAN_CONNECTION_STATUS_REPORT" "WL/MCI_AGENT_WLAN_CONNECTION_STATUS_REPORT" 0 gQca_CXM_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT}
+    {0x27 "WL/MCI_AGENT_BT_LE_DATA_LEN_REQ" "WL/MCI_AGENT_BT_LE_DATA_LEN_REQ" 0 gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_REQ}
+    {0x28 "WL/MCI_AGENT_BT_LE_DATA_LEN_RES" "WL/MCI_AGENT_BT_LE_DATA_LEN_RES" 0 gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_RES}
+    {0x2E "BT/MCI_AGENT_BT_ACL_INTERACTIVE_STATUS" "BT/MCI_AGENT_BT_ACL_INTERACTIVE_STATUS" 0 gQca_CXM_MciAclInteractiveInfo}
+    {0x2F "BT/MCI_AGENT_ADV_BT_PROF_INFO" "BT/MCI_AGENT_ADV_BT_PROF_INFO" 0 qQca_CXM_MciGpmAgent_ADV_BT_PROF_INFO}
+    {0x30 "BT/MCI_AGENT_ADV_BT_CONNECT_STATUS" "BT/MCI_AGENT_ADV_BT_CONNECT_STATUS" 0 qQca_CXM_MciGpmAgent_ADV_BT_CONNECT_STATUS}
+    {0x31 "BT/MCI_AGENT_ADV_BT_STATUS_UPDATE" "BT/MCI_AGENT_ADV_BT_STATUS_UPDATE" 0 qQca_CXM_MciGpmAgent_ADV_BT_STATUS_UPDATE}
+    {0x32 "BT/MCI_AGENT_WLAN_STATUS_UPDATE" "BT/MCI_AGENT_WLAN_STATUS_UPDATE" 0 qQca_CXM_MciGpmAgent_WLAN_STATUS_UPDATE}
+    {0x33 "BT/MCI_AGENT_BT_BANDWIDTH_USAGE_UPDATE" "BT/MCI_AGENT_BT_BANDWIDTH_USAGE_UPDATE" 0 qQca_CXM_MciGpmAgent_BT_BW_UPDATE}
+    {0x38 "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_REQ" "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_REQ" 0 qQca_CXM_MciGpmAgent_BT_RSSI_REPORT_REQ}
+    {0x39 "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_UPDATE" "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_UPDATE" 0 qQca_CXM_MciGpmAgent_BT_RSSI_REPORT_UPDATE}
+    {0x3A "BT/MCI_Hlr_AGENT_BT_DELAY_REPORT" "BT/MCI_Hlr_AGENT_BT_DELAY_REPORT" 0 qQca_CXM_MciGpmAgent_BT_DELAY_REPORT}
+    {0x3C "BI/MCI_AGENT_CAPABILITY_INFO" "BI/MCI_AGENT_CAPABILITY_INFO" 0 qQca_CXM_MciGpmAgent_CAPABILITY_INFO}
+    {0x3D "BT/MCI_AGENT_BT_WRITE_GROUP_PRIO"}
+    {0x3E "BT/MCI_AGENT_BT_READ_GROUP_PRIO"}
+    {0x3F "BT/MCI_AGENT_MPTA_PRIORITY_CONFIG"}
+    {0x40 "BT/MCI_AGENT_MPTA_PRIORITY_CONFIG_RESPONSE"}
+    {0x41 "BT/MCI_AGENT_ASD_STATUS_SYNC" "BT/MCI_AGENT_ASD_STATUS_SYNC" 0 qQca_CXM_MciGpmAgent_ASD_STATUS_SYNC}
+    {0x42 "WLAN/MCI_AGENT_ASD_STATUS_INDICATION" "WLAN/MCI_AGENT_ASD_STATUS_INDICATION" 0 qQca_CXM_MciGpmAgent_ASD_STATUS_IND}
+    {0x43 "BT/MCI_AGENT_LE_ADV_RX_INDICATION" "BT/MCI_AGENT_LE_ADV_RX_INDICATION" 0 qQca_CXM_MciGpmAgent_LE_ADV_RX_INDICATION}
+    {0x44 "BT/MCI_AGENT_ACL_RX_STATE_INDICATION" "BT/MCI_AGENT_ACL_RX_STATE_INDICATION" 0 qQca_CXM_MciGpmAgent_ACL_RX_STATE_INDICATION}
+    {0x45 "BT/MCI_AGENT_BT_RX_GAIN_INDICATION" "BT/MCI_AGENT_BT_RX_GAIN_INDICATION" 0 qQca_CXM_MciGpmAgent_BT_RX_GAIN_INDICATION}
+    {0x47 "BT/MCI_AGENT_BT_SLEEP_INFO"}
+    {0x48 "BT/MCI_AGENT_BT_HCI_INFO"}
+    {0x49 "BT/MCI_AGENT_BT_SLC_INFO"}
+    {0x4A "BT/MCI_AGENT_BT_CRASH_INFO"}   
+    {0x4B "BT/MCI_AGENT_UPDATE_LE_ISO_QOS"}
+    {0x4C "BT/MCI_AGENT_UPDATE_LE_ISO_PRIO_MASK" "BT/MCI_AGENT_UPDATE_LE_ISO_PRIO_MASK" 0 gQca_CXM_MCIAgentPrioMaskUpdate}
+    {0x4D "BT/MCI_AGENT_ADV_GROUP_CONN_UPDATE"}
+    {0x4E "BT/MCI_AGENT_ADV_STREAM_CONN_UPDATE"}
+    {0x4F "WL/MCI_AGENT_WLAN_COEX_POLICY_INDICATION" "WL/MCI_AGENT_WLAN_COEX_POLICY_INDICATION" 0 qQca_CXM_MciGpmAgent_Wlan_Policy_Indication}
+    {0x51 "BT/MCI_AGENT_BT_CALIBRATION_INFO" "BT/MCI_AGENT_BT_CALIBRATION_INFO" 0 qQca_CXM_MciGpmAgent_BtCalibrationInfo}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_CXM_MCIAgentPrioMaskUpdate "Priority Mask GPM"
+{
+    FIELD fQca_cxmPrioMaskLinkID          (Fixed 1 Byte)           (Hex)        "Stream Handle"
+    FIELD fQca_cxmPrioMaskReasonCode      (Fixed 1 Byte)           (Hex)        "Debug point"
+    FIELD fQca_cxmPrioMaskPiconetClk      (Fixed 2 Bytes)          (Hex)        "piconet clock"
+    FIELD fQca_cxmPrioMaskSteamID         (Fixed 1 Byte)           (Decimal)    "Stream ID"
+    Reserved                              (Fixed 1 Byte) 
+    FIELD fQca_cxmPrioMaskBitMap          (Fixed 4 Bytes)          (Hex)        "priority Mask"
+}
+
+/* 0x00 "BI/MCI_AGENT_COEX_VER_QUERY" */
+GROUP gQca_CXM_MciGpmAgent_COEX_VER_QUERY "COEX VER QUERY"
+{
+    FIELD fQca_MciGpmAgent_COEX_VER_QUERY_MajorVersion              (Fixed 1 Byte)  (Hex)   "MajorVersion"
+    FIELD fQca_MciGpmAgent_COEX_VER_QUERY_MinorVersion              (Fixed 1 Byte)  (Hex)   "MinorVersion"
+    FIELD fQca_MciGpmAgent_COEX_VER_QUERY_CapabilityRequest         (Fixed 1 Bit)   (Hex)   "CapabilityRequest"
+    FIELD fQca_MciGpmAgent_COEX_VER_QUERY_Reserved                  (Fixed 3 Bits)  (Hex)   SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_COEX_VER_QUERY_TotalPages                (Fixed 4 Bits)  (Hex)   "TotalPages"
+}
+
+/* 0x01 "BI/MCI_AGENT_COEX_VER_RESP" */
+GROUP gQca_CXM_MciGpmAgent_COEX_VER_RESP "COEX VER RESP"
+{
+    FIELD fQca_MciGpmAgent_COEX_VER_RESP_MajorVersion               (Fixed 1 Byte)  (Decimal)   "MajorVersion"
+    FIELD fQca_MciGpmAgent_COEX_VER_RESP_MinorVersion               (Fixed 1 Byte)  (Decimal)   "MinorVersion"
+    FIELD fQca_MciGpmAgent_COEX_VER_RESP_CapabilityRequest          (Fixed 1 Bit)   (Decimal)   "CapabilityRequest"
+    FIELD fQca_MciGpmAgent_COEX_VER_RESP_Reserved                   (Fixed 3 Bits)  (Hex)       SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_COEX_VER_RESP_TotalPages                 (Fixed 4 Bits)  (Hex)       "TotalPages"
+
+}
+
+/* 0x02 "BI/MCI_AGENT_STATUS_QUERY" */
+GROUP gQca_CXM_MciGpmAgent_STATUS_QUERY "STATUS QUERY"
+{
+    FIELD fQca_MciGpmAgent_STATUS_QUERY_BTBitmap            (Fixed 1 Byte)  (Hex)       "BTBitmap"
+    FIELD fQca_MciGpmAgent_STATUS_QUERY_WLANBitmap          (Fixed 1 Byte)  (Hex)       "WLANBitmap"
+}
+
+/* 0x03 "WL/MCI_AGENT_DISABLE_BT_GPM" */
+GROUP gQca_CXM_MciGpmAgent_DISABLE_BT_GPM "DISABLE BT GPM"
+{
+    FIELD fQca_MciGpmAgent_DISABLE_BT_GPM_State             (Fixed 1 Byte)  (Table tQca_CXM_DisableByte)       "State"
+}
+
+TABLE tQca_CXM_DisableByte
+    {0x00 "ENABLE"}
+    {0x01 "DISABLE"}
+ENDTABLE
+
+/* 0x04 "WL/MCI_AGENT_WLAN_UNUSED_CH_MAP" */
+GROUP gQca_CXM_MciGpmAgent_WLAN_UNUSED_CH_MAP "WLAN UNUSED CH MAP"
+{
+    FIELD fQca_MciGpmAgent_WLAN_UNUSED_CH_MAP_ChMap         (Fixed 10 Bytes)    (Hex)       "ChMap"
+}
+
+/* 0x05 "BT/MCI_AGENT_BT_PROFILE_INFO" */
+GROUP gQca_CXM_MciGpmAgent_BT_PROFILE_INFO "BT PROFILE INFO"
+{
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_ProfileType      (Fixed 1 Byte)  (Table tQca_CXM_ProfileType)    "ProfileType"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_LinkId           (Fixed 1 Byte)  (Decimal)   "LinkId"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_LinkState        (Fixed 1 Byte)  (Table tQca_CXM_LinkState)      "LinkState"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_LinkRole         (Fixed 1 Byte)  (Table tQca_CXM_LinkRoleProfileInfo)       "LinkRole"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_LinkRate         (Fixed 1 Byte)  (Table tQca_CXM_LinkRate)       "LinkRate"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_VoiceType        (Fixed 1 Byte)  (Table tQca_CXM_VoiceType)      "VoiceType"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_TInterval        (Fixed 2 Bytes) (Decimal)   "TInterval"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_WRetrx           (Fixed 1 Byte)  (Decimal)   "WRetrx"
+    FIELD fQca_MciGpmAgent_BT_PROFILE_INFO_Attempts         (Fixed 1 Byte)  (Decimal)   "Attempts/ThroughputLevel"
+}
+
+TABLE tQca_CXM_ProfileType
+    {0x00 "Unknown"}
+    {0x01 "RFCOMM"}
+    {0x02 "A2DP"}
+    {0x03 "HID"}
+    {0x04 "BNEP"}
+    {0x05 "Voice"}
+    {0x06 "A2DP+Voice"}
+    {0x07 "Broadcast_DUP"}
+    {0x08 "Apdaptive APTX LL"}
+    {0x09 "VSCODEC1"}
+    {0x0A "Broadcast"}
+ENDTABLE
+
+TABLE tQca_CXM_LinkState
+    {0x00 "End"}
+    {0x01 "Start"}
+ENDTABLE
+
+TABLE tQca_CXM_LinkRoleProfileInfo
+    {0x00 "Slave-ProfileInfo"}
+    {0x01 "Master-ProfileInfo"}
+ENDTABLE
+
+TABLE tQca_CXM_LinkRate
+    {0x00 "BR"}
+    {0x01 "EDR"}
+ENDTABLE
+
+TABLE tQca_CXM_VoiceType
+    {0x00 "HV1"}
+    {0x01 "HV2"}
+    {0x02 "HV3"}
+    {0x03 "EV3"}
+    {0x04 "EV4"}
+    {0x05 "EV5"}
+    {0x06 "2EV3"}
+    {0x07 "2EV5"}
+    {0x08 "3EV3"}
+    {0x09 "3EV5"}
+ENDTABLE
+
+/* 0x06 "BT/MCI_AGENT_BT_STATUS_UPDATE" */
+GROUP gQca_CXM_MciGpmAgent_BT_STATUS_UPDATE "BT STATUS UPDATE"
+{
+    FIELD fQca_MciGpmAgent_BT_STATUS_UPDATE_LinkType    (Fixed 1 Byte)  (Table tQca_CXM_LinkType)  "LinkType"
+    FIELD fQca_MciGpmAgent_BT_STATUS_UPDATE_LinkId      (Fixed 1 Byte)  (Decimal)          "LinkId"
+    FIELD fQca_MciGpmAgent_BT_STATUS_UPDATE_PerformanceState   (Fixed 1 Byte)  (Table tQca_CXM_PerformanceState)  "PerformanceState"
+    FIELD fQca_MciGpmAgent_BT_STATUS_UPDATE_OpType      (Fixed 1 Byte)  (Table tQca_CXM_OpType)    "OpType"
+    FIELD fQca_MciGpmAgent_BT_STATUS_UPDATE_Reason      (Fixed 1 Byte)  (Hex)  "Reason"
+}
+
+TABLE tQca_CXM_LinkType
+    {0x00 "NON-LINK"}
+    {0x01 "LINK-BASED"}
+ENDTABLE
+
+TABLE tQca_CXM_PerformanceState
+    {0x00 "NORMAL"}
+    {0x01 "CRITICAL"}
+ENDTABLE
+
+TABLE tQca_CXM_OpType
+    {0x00 "None"}
+    {0x01 "Paging"}
+    {0x02 "Inquiry"}
+ENDTABLE
+
+/* 0x07 "WL/MCI_AGENT_BT_UPDATE_FLAGS" */
+GROUP gQca_CXM_MciGpmAgent_BT_UPDATE_FLAGS "BT UPDATE FLAGS"
+{
+    GROUP gQca_CXM_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags;
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_UpdateOpcode (Fixed 1 Byte)  (Table tQca_CXM_UpdateOpcode)   "UpdateOpcode"
+}
+
+GROUP gQca_CXM_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags "NewBTFlags"
+{
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit7  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CONT_MSG_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit6  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "SCHED_MSG_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit5  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_DEBUG_MODE_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit4  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "LNA_CTRL_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit3  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "UPDATE_PLD_HDR_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit2  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "UPDATE_HDR_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit1  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "UPDATE_CORR_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit0  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_MODE_EN"
+
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit15 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "N/A"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit14 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "N/A"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit13 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_CLK_DIV_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit12 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "JUP_MODE_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit11 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "EGRET_MODE_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit10 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_MODE_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit9  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_CPU_INT_MSG_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit8  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "COEX_GPM_EN"
+
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit21   START_BIT   (Move 2 Bits)            (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)       "COEX_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit20 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_SYS_MSG_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit19 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_ACL_CRITICAL_POLL_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit18 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_CAL_RECOVERY_DIS"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit17 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_CAL_SEQ_ERROR_EN"
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit16 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MCI_INVALID_GPM_EN"
+
+    FIELD fQca_MciGpmAgent_BT_UPDATE_FLAGS_NewBTFlags_Bit24 (Fixed 8 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+}
+
+TABLE tQca_CXM_UpdateOpcode
+    {0x00 "FLAGS_READ"}
+    {0x01 "FLAGS_SET"}
+    {0x02 "FLAGS_CLEAR"}
+ENDTABLE
+
+/* 0x08 "BT/MCI_AGENT_BT_SCAN_UPDATE" */
+GROUP gQca_CXM_MciGpmAgent_BT_SCAN_UPDATE "BT SCAN UPDATE"
+{
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_PageScan          (Fixed 1 Byte)  (Table tQca_CXM_YesNo)      "IsPageScan"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_ScanType          (Fixed 1 Byte)  (Table tQca_CXM_ScanType)   "ScanType"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_Interval          (Fixed 2 Bytes) (Decimal)   "Interval"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_Window            (Fixed 2 Bytes) (Decimal)   "Window"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_LinkId            (Fixed 1 Byte)  (Decimal)   "LinkId"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_Status            (Fixed 1 Byte)  (Table tQca_CXM_EnableByte) "Status"
+    FIELD fQca_MciGpmAgent_BT_SCAN_UPDATE_Timeout           (Fixed 2 Bytes) (Decimal)   "Timeout/LeAdvEvtType"
+}
+
+TABLE tQca_CXM_YesNo
+    {0x00 "NO"}
+    {0x01 "YES"}
+ENDTABLE
+
+TABLE tQca_CXM_ScanType
+    {0x00 "PageScan_Standard"}
+    {0x01 "PageScan_Interleaved"}
+    {0x02 "InqScan_Standard"}
+    {0x03 "InqScan_Interleaved"}
+    {0x04 "LE_Scanner"}
+    {0x05 "LE_Scanner_Background"}
+    {0x06 "LE_Initiator"}
+    {0x07 "LE_Advertisor"}
+    {0x08 "ANT_Search"}
+    {0x09 "ANT_CriticalSearch"}
+    {0x0A "SyncTrain"}
+    {0x0B "SyncTrainScan"}
+    {0x0C "CSB_Tx"}
+    {0x0D "CSB_Rx"}
+    {0x0E "LE_Ext_Scanner"}
+    {0x0F "LE_Ext_Initiator"}
+    {0x10 "LE_Ext_Advertisor"}
+ENDTABLE
+
+TABLE tQca_CXM_EnableByte
+    {0x00 "DISABLE"}
+    {0x01 "ENABLE"}
+ENDTABLE
+
+/* 0x09 "WL/MCI_AGENT_WLAN_RW_BT_PRIO" */
+GROUP gQca_CXM_MciGpmAgent_WLAN_RW_BT_PRIO "WLAN RW BT PRIO"
+{
+    FIELD fQca_MciGpmAgent_WLAN_RW_BT_PRIO_ScanType (Fixed 1 Byte)  (Decimal)   "CoexOp"
+    FIELD fQca_MciGpmAgent_WLAN_RW_BT_PRIO_IsStart  (Fixed 1 Byte)  (Decimal)   "Priority"
+    FIELD fQca_MciGpmAgent_WLAN_RW_BT_PRIO_LinkId   (Fixed 1 Byte)  (Decimal)   "OpType"
+}
+
+/* 0x0B "BT/MCI_AGENT_BT_SCAN_ACTIVITY_REPORT" */
+GROUP gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_REPORT "BT SCAN ACTIVITY REPORT"
+{
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_REPORT_ScanType (Fixed 1 Byte)  (Table tQca_CXM_ScanType2)   "ScanType"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_REPORT_IsStart  (Fixed 1 Byte)  (Table tQca_CXM_LinkState)  "IsStart"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_REPORT_LinkId   (Fixed 1 Byte)  (Decimal)   "LinkId"
+}
+
+TABLE tQca_CXM_ScanType2
+    {0x00 "ASSESSMENT"}
+    {0x01 "PSCAN"}
+    {0x02 "INQSCAN"}
+    {0x03 "LESCAN_SCANNER"}
+    {0x04 "LESCAN_INITIATOR"}
+    {0x05 "LE_ADVERTISOR"}
+    {0x06 "ANT_SEARCH"}
+    {0x07 "ANT_CRITICAL_SEARCH"}
+    {0x08 "SYNC_TRAIN"}
+    {0x09 "SYNC_TRAIN_SCAN"}
+    {0x0A "CSB_TX"}
+    {0x0B "CSB_RX"}
+ENDTABLE
+
+/* 0x0C "BT/MCI_AGENT_BT_ACL_INACTIVITY_REPORT" */
+GROUP gQca_CXM_MciGpmAgent_BT_ACL_INACTIVITY_REPORT "BT ACL INACTIVITY REPORT"
+{
+    FIELD fQca_MciGpmAgent_BT_ACL_INACTIVITY_REPORT_LinkId   (Fixed 1 Byte)  (Decimal)  "LinkId"
+    FIELD fQca_MciGpmAgent_BT_ACL_INACTIVITY_REPORT_Reserved (Fixed 1 Byte)  (Hex)      "Reserved"
+    FIELD fQca_MciGpmAgent_BT_ACL_INACTIVITY_REPORT_ExpiredSlots  (Fixed 4 Bytes)  (Decimal)    "ExpiredSlots"
+}
+
+/* 0x0D "WL/MCI_AGENT_WLAN_SET_ACL_INACTIVITY_REPORT" */
+GROUP gQca_CXM_MciGpmAgent_WLAN_SET_ACL_INACTIVITY_REPORT "WLAN SET ACL INACTIVITY REPORT"
+{
+    FIELD fQca_MciGpmAgent_WLAN_SET_ACL_INACTIVITY_REPORT_InactivityThreshold   (Fixed 2 Bytes)  (Decimal)  "InactivityThreshold"
+    FIELD fQca_MciGpmAgent_WLAN_SET_ACL_INACTIVITY_REPORT_AclInactivity         (Fixed 1 Byte)   (Table tQca_CXM_EnableByte)    "InactivityEnable"
+    FIELD fQca_MciGpmAgent_WLAN_SET_ACL_INACTIVITY_REPORT_LinkId   (Fixed 1 Byte)  (Decimal)  "LinkId"
+}
+
+/* 0x0E "WL/MCI_AGENT_BT_TX_POWER_QUERY" */
+GROUP gQca_CXM_MciGpmAgent_BT_TX_POWER_QUERY "WLAN QUERY BT TX POWER"
+{
+    FIELD fQca_MciGpmAgent_BT_TX_POWER_QUERY_LinkId   (Fixed 1 Byte)  (Decimal)  "LinkId"
+}
+
+/* 0x0F "BT/MCI_AGENT_BT_TX_POWER_REPORT" */
+GROUP gQca_CXM_MciGpmAgent_BT_TX_POWER_REPORT "BT TX POWER REPORT"
+{
+    FIELD fQca_MciGpmAgent_BT_TX_POWER_REPORT_LinkId   (Fixed 1 Byte)  (Decimal)  "LinkId"
+    FIELD fQca_MciGpmAgent_BT_TX_POWER_REPORT_RxPower  (Fixed 1 Byte)  (Decimal)  "TxPower (dBm)"
+}
+
+/* 0x10 "WL/MCI_AGENT_SET_BT_RXSS_MIN_THRESHOLD" */
+GROUP gQca_CXM_MciGpmAgent_SET_BT_RXSS_MIN_THRESHOLD "SET BT RXSS MIN THRESHOLD"
+{
+    FIELD fQca_MciGpmAgent_SET_BT_RXSS_MIN_THRESHOLD_RXSSLowerThreshold   (Fixed 1 Byte)  (Decimal)  "RXSSLowerThreshold"
+}
+
+/* 0x12 "BT/MCI_AGENT_RXSS_MIN_THRESHOLD" */
+GROUP gQca_CXM_MciGpmAgent_RXSS_MIN_THRESHOLD "RXSS MIN THRESHOLD"
+{
+    FIELD fQca_MciGpmAgent_RXSS_MIN_THRESHOLD_RXSSLowerThreshold   (Fixed 1 Byte)  (Decimal)  "RXSSLowerThreshold"
+}
+
+/* 0x13 "WL/MCI_AGENT_SCHED_MSG_TRIGGER" */
+GROUP gQca_CXM_MciGpmAgent_SCHED_MSG_TRIGGER "SCHED MSG TRIGGER"
+{
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_TrigEnaCount   (Fixed 1 Byte)  (Decimal)   "TrigEnaCount"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_TriggerType    (Fixed 1 Byte)  (Table tQca_CXM_TriggerType)    "TriggerType"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_LowerBound     (Fixed 4 Bytes) (Decimal)   "LowerBound"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_UpperBound     (Fixed 4 Bytes) (Decimal)   "UpperBound"
+}
+
+TABLE tQca_CXM_TriggerType
+    {0x00 "PRIORITY"}
+    {0x01 "LINKID"}
+    {0x02 "NONE"}
+ENDTABLE
+
+/* 0x14 "BT/MCI_AGENT_SCHED_MSG_TRIGGER_RESP" */
+GROUP gQca_CXM_MciGpmAgent_SCHED_MSG_TRIGGER_RESP "SCHED MSG TRIGGER RESP"
+{
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_RESP_TriggerType   (Fixed 1 Byte)  (Table tQca_CXM_TriggerType)    "TriggerType"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_RESP_LinkId        (Fixed 1 Byte)  (Decimal)   "LinkId"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_RESP_Priority      (Fixed 1 Byte)  (Decimal)   "Priority"
+    FIELD fQca_MciGpmAgent_SCHED_MSG_TRIGGER_RESP_StartTime     (Fixed 4 Bytes) (Decimal)   "StartTime"
+}
+
+/* 0x17 "BT/MCI_AGENT_BT_CONNECT_STATUS" */
+GROUP gQca_CXM_MciGpmAgent_BT_CONNECT_STATUS "BT CONNECT STATUS"
+{
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_ConnStatus     (Fixed 1 Byte)  (Table tQca_CXM_ConnStatus)    "ConnStatus"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_LinkID         (Fixed 1 Byte)  (Decimal)       "LinkID"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_DataRateTx     (Fixed 2 Bits)  (Table tQca_CXM_PhyType)   "DataRateTx"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_RDataRateRx    (Fixed 2 Bits)  (Table tQca_CXM_PhyType)   "DataRateRx"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_Role           (Fixed 4 Bits)  (Table tQca_CXM_LinkRole)   "Role"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_WinSize        (Fixed 1 Byte)  (Decimal)       "WinSize"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_TO_WinOffset   (Fixed 2 Bytes) (Decimal)       "TO/WinOffset"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_Interval       (Fixed 2 Bytes) (Decimal)       "Interval (x1.25ms)"
+    FIELD fQca_MciGpmAgent_BT_CONNECT_STATUS_ConnLatency    (Fixed 2 Bytes) (Decimal)       "ConnLatency/SchedOffset"
+}
+
+TABLE tQca_CXM_ConnStatus
+    {0x00 "BT_Connection_Update_Active"}
+    {0x01 "BT_Connection_Update_Hold_Sniff"}
+    {0x10 "BTLE_Connection"}
+    {0x11 "BTLE_Connection_Establish"}
+    {0x12 "BTLE_Disconnected"}
+    {0x13 "BTLE_ISO_Connection"}
+    {0x14 "BTLE_ISO_Connection_Establish"}
+    {0x15 "BTLE_ISO_Disconnected"}
+    {0x16 "BTLE_ASHA_Connection"}
+    {0x17 "BTLE_ASHA_Connection_Establish"}
+    {0x18 "BTLE_ASHA_Disconnected"}
+    {0x20 "ANT_ChannelOpen"}
+    {0x21 "ANT_ChannelClose"}
+    {0x22 "ANT_ChannelParametersUpdate"}
+    {0x23 "ANT_BurstStart"}
+    {0x24 "ANT_BurstStop"}
+    {0x25 "ANT_AckStart"}
+    {0x26 "ANT_AckStop"}
+    {0x27 "ANT_BurstDataQueued"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_CXM_LinkRole
+    {0x00 "Master"}
+    {0x01 "Slave"}
+ENDTABLE
+
+TABLE tQca_CXM_PhyType
+    {0x00 "BREDR_OR_LE_1M"}
+    {0x01 "LE_2M"}
+    {0x02 "LE_CODED_125K_OR_500K"}
+    {0x03 "RFU"}
+ENDTABLE
+
+/* 0x18 "BT/MCI_AGENT_BT_SCAN_ACTIVITY_BITMAP" */
+GROUP gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP "BT SCAN ACTIVITY BITMAP"
+{
+    GROUP gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap;
+}
+
+GROUP gQca_CXM_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap "ScanBitMap"
+{
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit7  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ANT_CRITICAL_SEARCH"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit6  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ANT_SEARCH"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit5  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "LE_ADVERTISOR"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit4  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "LESCAN_INITIATOR"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit3  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "LESCAN_SCANNER"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit2  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "INQSCAN"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit1  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "PSCAN"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit0  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ASSESSMENT"
+
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit11 START_BIT   (Move 4 Bits) (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CSB_RX"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit10 (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CSB_TX"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit9  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "SYNC_TRAIN_SCAN"
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit8  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "SYNC_TRAIN"
+
+    FIELD fQca_MciGpmAgent_BT_SCAN_ACTIVITY_BITMAP_ScanBitMap_Bit31 (Fixed 8 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+}
+
+/* 0x19 "BT/MCI_AGENT_BT_SYSTEM_RESET" */
+GROUP gQca_CXM_MciGpmAgent_BT_SYSTEM_RESET "BT SYSTEM RESET"
+{
+    GROUP gQca_CXM_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap;
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_ResetType    (Fixed 2 Bytes)  (Hex)    "ResetType/AntLinkIdStart"
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_usHalfWord1  (Fixed 2 Bytes)  (Hex)    "usHalfWord1"
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_uwWord0      (Fixed 4 Bytes)  (Hex)    "uwWord0"
+}
+
+GROUP gQca_CXM_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap "SubSystemBitmap"
+{
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap_Bit2  START_BIT   (Move 5 Bits) (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ANT"
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap_Bit1  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "BTLE"
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap_Bit0  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "BREDR"
+
+    FIELD fQca_MciGpmAgent_BT_SYSTEM_RESET_SubSystemBitmap_Bit15 (Fixed 8 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+}
+
+/* 0x1F "BT/MCI_AGENT_ADDITIONAL_BT_LINK_INFO" */
+GROUP gQca_CXM_MciGpmAgent_ADDITIONAL_BT_LINK_INFO "ADDITIONAL BT LINK INFO"
+{
+    FIELD fQca_MciGpmAgent_ADDITIONAL_BT_LINK_INFO_LinkId           (Fixed 1 Byte)  (Decimal)    "LinkId"
+    FIELD fQca_MciGpmAgent_ADDITIONAL_BT_LINK_INFO_A2DP_Role        (Fixed 1 Byte)  (Table tQca_CXM_A2DP_Role)    "A2DP_Role"
+}
+
+TABLE tQca_CXM_A2DP_Role
+    {0x00 "SRC"}
+    {0x01 "SNK"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x23 "WL/MCI_AGENT_BT_POWER_MEASURE_REQ" */
+GROUP gQca_CXM_MciGpmAgent_BT_POWER_MEASURE_REQ "BT POWER MEASURE REQ"
+{
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_REQ_Freq            (Fixed 2 Bytes) (Decimal)    "Freq"
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_REQ_FreqOffset      (Fixed 1 Byte)  (Decimal)    "FreqOffset"
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_REQ_TxPower         (Fixed 1 Byte)  (Decimal)    "TxPower"
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_REQ_TestDuration    (Fixed 2 Bytes) (Decimal)    "TestDuration"
+}
+
+/* 0x25 "BT/MCI_AGENT_BT_POWER_MEASURE_STATUS" */
+GROUP gQca_CXM_MciGpmAgent_BT_POWER_MEASURE_STATUS "BT POWER MEASURE STATUS"
+{
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_STATUS_TimingStatus     (Fixed 1 Byte)  (Table tQca_CXM_TimingStatus)    "TimingStatus"
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_STATUS_PowerStatus      (Fixed 4 Bytes) (Hex)    "PowerStatus"
+    FIELD fQca_MciGpmAgent_BT_POWER_MEASURE_STATUS_PowerStatusRsvd  (Fixed 4 Bytes) (Hex)    "PowerStatusRsvd"
+}
+
+TABLE tQca_CXM_TimingStatus
+    {0x00 "OffTime"}
+    {0x01 "OnTime"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x26 "WL/MCI_AGENT_WLAN_CONNECTION_STATUS_REPORT" */
+GROUP gQca_CXM_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT "WLAN CONNECTION STATUS REPORT"
+{
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_5gStatus_Bit3To7 (Fixed 5 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_5gStatus_Bit2   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "Chain0_5gStatus_Connecting"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_5gStatus_Bit1   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "Chain0_5gStatus_Scanning"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_5gStatus_Bit0   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "Chain0_5gStatus_Connected"
+ 
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_2gStatus_Bit11To15 (Fixed 5 Bits)PRINT_IF (FieldIs EqualTo 1) (Hex) SUPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_2gStatus_Bit10   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1) (Table tQca_CXM_WlanConnectionStatus)   "Chain0_2gStatus_Connecting"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_Chain0_2gStatus_Bit9   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "Chain0_2gStatus_Scanning"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain0_2gStatus_Bit8   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "Chain0_2gStatus_Connected"
+
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_5gStatus_Bit19To23 (Fixed 5 Bits)PRINT_IF (FieldIs EqualTo 1)  (Hex) SUPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_5gStatus_Bit18   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "chain1_5gStatus_Connecting"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_5gStatus_Bit17   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "chain1_5gStatus_Scanning"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_5gStatus_Bit16   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "chain1_5gStatus_Connected"
+ 
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_2gStatus_Bit27To31 (Fixed 5 Bits)PRINT_IF (FieldIs EqualTo 1) (Hex) SUPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_2gStatus_Bit26   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1) (Table tQca_CXM_WlanConnectionStatus)   "chain1_2gStatus_Connecting"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_2gStatus_Bit25   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "chain1_2gStatus_Scanning"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain1_2gStatus_Bit24   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)  (Table tQca_CXM_WlanConnectionStatus)   "chain1_2gStatus_Connected"
+
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlan_ftm_mode   (Fixed 1 Byte)  (Hex)                                            "WLAN FTM"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_5g_mode     (Fixed 2 Bits)  (Hex) SUPPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_reserved1   (Fixed 2 Bits)  (Table tQca_CXM_WlanConnectionStatus_WLM_Mode)   "WLM 5G Mode"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_2g_mode     (Fixed 2 Bits)  (Hex) SUPPRESS_DETAIL
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_reserved0   (Fixed 2 Bits)  (Table tQca_CXM_WlanConnectionStatus_WLM_Mode)   "WLM 2G Mode"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlan_ll_granted (Fixed 1 Byte)  (Hex)                                            "WLAN LL Granted"
+}
+
+TABLE tQca_CXM_WlanConnectionStatus
+    {0 "No"}
+    {1 "Yes"}
+ENDTABLE
+
+TABLE tQca_CXM_WlanConnectionStatus_WLM_Mode
+    {0 "WMI_WLM_LL_NORMAL"}
+    {1 "WMI_WLM_LL_MODERATE"}
+    {2 "WMI_WLM_LL_LOW"}
+    {3 "WMI_WLM_LL_ULTRA_LOW"}
+ENDTABLE
+
+/* 0x27 "WL/MCI_AGENT_BT_LE_DATA_LEN_REQ" */
+GROUP gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_REQ "BT LE DATA LENGTH REQUEST"
+{
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_REQ_LinkOp    (Fixed 1 Byte)  (Table tQca_CXM_BtLeDataLenReqLinkOp)   "LinkOp"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_REQ_LinkId    (Fixed 1 Byte)  (Decimal)                               "LinkId"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_REQ_MaxTxTime (Fixed 2 Bytes) (Decimal)                               "MaxTxTime"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_REQ_MaxRxTime (Fixed 2 Bytes) (Decimal)                               "MaxRxTime"
+}
+
+TABLE tQca_CXM_BtLeDataLenReqLinkOp
+    {0x00 "Read"}
+    {0x01 "Write"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x28 "WL/MCI_AGENT_BT_LE_DATA_LEN_RES" */
+GROUP gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_RES "BT LE DATA LENGTH RESPONSE"
+{
+    GROUP gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus;
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_LinkId    (Fixed 1 Byte)  (Decimal)                               "LinkId"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_MaxTxTime (Fixed 2 Bytes) (Decimal)                               "MaxTxTime"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_MaxRxTime (Fixed 2 Bytes) (Decimal)                               "MaxRxTime"
+}
+
+GROUP gQca_CXM_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus "CmdStatus"
+{
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit7  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_TIME_EVAL"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit6  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_NO_SAVED_TIME"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit5  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_ALREADY_IN_PROGRESS"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit4  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_LE_NOT_ACTIVE_OR_NO_LEN_EXT_SUPPORT"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit3  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_MAXTIME"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit2  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_LINKID"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit1  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ERR_LINKOP"
+    FIELD fQca_MciGpmAgent_BT_LE_DATA_LEN_RES_CmdStatus_Bit0  (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "FAIL"
+}
+
+/* 0x2E ACL_INTERACTIVE GPM */
+TABLE tQca_aclIntReson
+{0x00 "Incoming Conn"}
+{0x01 "Outgoing Conn"}
+{0x02 "Status Query"}
+{0x03 "ACL DISCON"}
+ENDTABLE
+
+TABLE tQca_aclIntStatus
+{0x00 "STOP"}
+{0x01 "START"}
+ENDTABLE
+
+GROUP gQca_CXM_MciAclInteractiveInfo       "ACL INTERACTIVE INFO"
+{
+    FIELD fQca_aclInteractiveHciHandle              (Fixed 1 Byte)               (Decimal)                 "HCI HANDLE"
+    FIELD fQca_aclInteractiveReason                 (Fixed 1 Byte)               (Table tQca_aclIntReson)  "Reason"
+    FIELD fQca_aclInteractiveTimeslice              (Fixed 4 Bytes)              (Decimal)                 "Acl Timeslice"
+    FIELD fQca_aclInteractiveStatus                 (Fixed 1 Byte)               (Table tQca_aclIntStatus) "status"
+}
+
+/* 0x2F "BT/MCI_AGENT_ADV_BT_PROF_INFO" */
+GROUP qQca_CXM_MciGpmAgent_ADV_BT_PROF_INFO "ADV BT PROFILE INFO"
+{
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_TypeProfile_Type             (Fixed 4 Bits)  (Table tQca_CXM_Type)                  "Type"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_TypeProfile_Profile          (Fixed 4 Bits)  (Table tQca_CXM_ProfileType)           "Profile"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Rsvd                         (Fixed 1 Byte)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_GroupIdLSB_LinkIdRight       (Fixed 1 Byte)  (Decimal)                              "LinkIdRight(LSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_GroupIdMSB_LinkIdLeft        (Fixed 1 Byte)  (Decimal)                              "LinkIdLeft(MSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Config_VoicePacketType       (Fixed 4 Bits)  (Table tQca_CXM_VoiceType)             "VoiceType"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Config_Bit3                  (Fixed 1 Bit)   (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Config_HDCapability          (Fixed 1 Bit)   (Table tQca_CXM_Throughput)            "HDCapability"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Config_Rate                  (Fixed 1 Bit)   (Table tQca_CXM_LinkRate)              "Rate"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Config_Role                  (Fixed 1 Bit)   (Table tQca_CXM_LinkRole)              "Role"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Connect_Bit2_to_Bit7         (Fixed 6 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Connect_Right                (Fixed 1 Bit)   (Table tQca_CXM_ConnectionStatus)      "Connected_Right(Bit1)"
+    FIELD fQca_MciGpmAgent_ADV_BT_PROF_INFO_Connect_Left                 (Fixed 1 Bit)   (Table tQca_CXM_ConnectionStatus)      "Connected_Left(Bit0)"
+}
+
+TABLE tQca_CXM_Type
+    {0x00 "TWS"}
+ENDTABLE
+
+TABLE tQca_CXM_Throughput
+    {0 "NORMAL(<400kbps)"}
+    {1 "HIGH(>=400kbps)"}
+ENDTABLE
+
+TABLE tQca_CXM_ConnectionStatus
+    {0x00 "Disconnected"}
+    {0x01 "Connected"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x30 "BT/MCI_AGENT_ADV_BT_CONNECT_STATUS" */
+GROUP qQca_CXM_MciGpmAgent_ADV_BT_CONNECT_STATUS "ADV BT CONNECT STATUS"
+{
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_TypeProfile_Type           (Fixed 4 Bits)  (Table tQca_CXM_Type)                   "Type"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_TypeProfile_Profile        (Fixed 4 Bits)  (Table tQca_CXM_ProfileType)            "Profile"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Rsvd                       (Fixed 1 Byte)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_GroupIdLSB_LinkIdRight     (Fixed 1 Byte)  (Decimal)                               "LinkIdRight(LSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_GroupIdMSB_LinkIdLeft      (Fixed 1 Byte)  (Decimal)                               "LinkIdLeft(MSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Config_Bit1_to_Bit7        (Fixed 7 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Config_Role                (Fixed 1 Bit)   (Table tQca_CXM_LinkRole)               "Role"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Connect_Bit2_to_Bit7       (Fixed 6 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Connect_Right              (Fixed 1 Bit)   (Table tQca_CXM_ConnectionStatus)       "Connected_Right(Bit1)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Connect_Left               (Fixed 1 Bit)   (Table tQca_CXM_ConnectionStatus)       "Connected_Left(Bit0)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Sniff_Bit2_to_Bit7         (Fixed 6 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Sniff_Right                (Fixed 1 Bit)   (Table tQca_CXM_Sniff)                  "Sniff_Right(Bit1)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Sniff_Left                 (Fixed 1 Bit)   (Table tQca_CXM_Sniff)                  "Sniff_Left(Bit0)"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_WinSize                    (Fixed 1 Byte)  (Decimal)                               "WinSize"
+    FIELD fQca_MciGpmAgent_ADV_BT_CONNECT_STATUS_Interval                   (Fixed 2 Bytes) (Decimal)                               "Interval"
+}
+
+TABLE tQca_CXM_Sniff
+    {0 "No Sniff(Active)"}
+    {1 "Sniff"}
+ENDTABLE
+
+/* 0x31 "BT/MCI_AGENT_ADV_BT_STATUS_UPDATE" */
+GROUP qQca_CXM_MciGpmAgent_ADV_BT_STATUS_UPDATE "ADV BT STATUS UPDATE"
+{
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_TypeProfile_Type            (Fixed 4 Bits)  (Table tQca_CXM_Type)                   "Type"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_TypeProfile_Profile         (Fixed 4 Bits)  (Table tQca_CXM_ProfileType)            "Profile"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_Rsvd                        (Fixed 1 Byte)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_GroupIdLSB_LinkIdRight      (Fixed 1 Byte)  (Decimal)                               "LinkIdRight(LSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_GroupIdMSB_LinkIdLeft       (Fixed 1 Byte)  (Decimal)                               "LinkIdLeft(MSB of GroupID)"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_PerfStatus_Bit2_to_Bit7     (Fixed 6 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_PerfStatus_Right            (Fixed 1 Bit)   (Table tQca_CXM_PerformanceState)       "PerfStatus_Right(Bit1)"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_PerfStatus_Left             (Fixed 1 Bit)   (Table tQca_CXM_PerformanceState)       "PerfStatus_Left(Bit0)"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_Reason                      (Fixed 1 Byte)  (Table tQca_CXM_PerfReason)             "Reason"
+    FIELD fQca_MciGpmAgent_ADV_BT_STATUS_UPDATE_ShortPiconetClk             (Fixed 2 Byte)  (Hex)                                   "ShortPiconetClk"
+}
+
+/* 0x38 "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_REQ" */
+GROUP qQca_CXM_MciGpmAgent_BT_RSSI_REPORT_REQ "BT MCI RSSI DURATION REQ"
+{
+    FIELD fQca_MciGpmAgent_BT_MCI_RSSI_DURATION                             (Fixed 1 Byte)  (Decimal)                               "MciBtWlanRssiDuration"
+}
+
+/* 0x39 "BT/MCI_Hlr_AGENT_BT_RSSI_REPORT_UPDATE" */
+GROUP qQca_CXM_MciGpmAgent_BT_RSSI_REPORT_UPDATE "BT RSSI REPORT UPDATE"
+{
+    FIELD fQca_MciGpmAgent_BT_RSSI_LINK_ID                                  (Fixed 1 Byte)  (Decimal)                               "LinkId"
+    FIELD fQca_MciGpmAgent_BT_RSSI_VALUE                                    (Fixed 1 Byte)  (Decimal)                               "RssiValue"
+}
+
+/* 0x3A "BT/MCI_Hlr_AGENT_BT_DELAY_REPORT" */
+GROUP qQca_CXM_MciGpmAgent_BT_DELAY_REPORT "BT DELAY REPORT"
+{
+    FIELD fQca_MciGpmAgent_BT_LINK_ID                                       (Fixed 1 Byte)  (Hex)                                   "LinkID"                                    
+    FIELD fQca_MciGpmAgent_BT_PACKET_DELAY                                  (Fixed 1 Byte)  (Decimal)                               "DelayInMs"
+    FIELD fQca_MciGpmAgent_BT_PICONET_CLK                                   (Fixed 4 Byte)  (Hex)                                   "PiconetClk"
+}
+
+TABLE tQca_CXM_PerfReason
+    {00 "SLC_HLR_RXPROC_NONRT_A2DP_STATE_A2DP_TX_CONFIGURED_CRITICAL"}
+    {01 "SLC_HLR_RXPROC_NONRT_A2DP_STATE_A2DP_TX_NOT_CONFIGURED_CRITICAL"}
+    {02 "SLC_ONCONN_HDRRX_CRITICAL"}
+    {03 "SLC_ONCONN_HDRRX_NOT_GOOD_LTR_ADDR_CRITICAL"}
+    {04 "SLC_ONCONN_HDRRX_GOOD_LTR_ADDR_CRITICAL"}
+    {05 "SLC_ONCONN_HDRRX_NOT_GOOD_LTR_ADDR_HISTORY_SYNCED_CRITICAL"}
+    {06 "SLC_ONCONN_HDRRX_SDB_TASK_TYPE_A2DP_CRITICAL"}
+    {07 "SLC_ONCONN_HDRRX_NOT_SDB_TASK_TYPE_A2DP_SYNCHISTORY_CRITICAL"}
+    {08 "SLC_ONCONN_HDRRX_NOT_SDB_TASK_TYPE_A2DP_NOT_SYNCHISTORY_CRITICAL"}
+    {09 "SLC_ONCONN_HDRRX_SDB_TASK_FLAG_SYNCED_CRITICAL"}
+    {10 "SLC_ONCONN_HDRRX_BT_CONN_COUNT_ONE_CRITICAL"}
+    {11 "SLC_UPDATE_ACL_STATUS_CRITICAL"}
+    {12 "SLC_UPDATE_ACL_STATUS_A2DP_ROLE_DETECTED_CRITICAL"}
+    {13 "SLC_UPDATE_ACL_STATUS_BB_LOGICAL_TRANS_TYPE_ACL_CRITICAL"}
+    {14 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_CONFIGURED_CRITICAL"}
+    {15 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_NOT_CONFIGURED_CRITICAL"}
+    {16 "SLC_UPDATE_ACL_STATUS_ACL_TX_QUEUE_CRITICAL"}
+    {17 "SLC_UPDATE_ACL_STATUS_TOTAL_BT_CONN_COUNT_CRITICAL"}
+    {18 "SLC_UPDATE_ACL_STATUS_A2DP_CONN_NOT_ESTABLISHED_CHECK_CRITICAL"}
+    {19 "SLC_UPDATE_ACL_STATUS_BT_CLK_IS_NOT_REF_PAST_CRITICAL"}
+    {20 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_CONFIGURED_BT_CLK_IS_NOT_REF_PAST_CRITICAL"}
+    {21 "SLC_UPDATE_ACL_STATUS_A2DP_BT_CLK_IS_NOT_REF_PAST_SLC_IS_ROLE_SWITCH_PND_CRITICAL"}
+    {22 "SLC_HLR_RXPROC_NONRT_A2DP_STATE_A2DP_TX_CONFIGURED_NORMAL"}
+    {23 "SLC_HLR_RXPROC_NONRT_A2DP_STATE_A2DP_TX_NOT_CONFIGURED_NORMAL"}
+    {24 "SLC_ONCONN_HDRRX_NORMAL"}
+    {25 "SLC_ONCONN_HDRRX_NOT_GOOD_LTR_ADDR_NORMAL"}
+    {26 "SLC_ONCONN_HDRRX_GOOD_LTR_ADDR_NORMAL"}
+    {27 "SLC_ONCONN_HDRRX_NOT_GOOD_LTR_ADDR_HISTORY_SYNCED_NORMAL"}
+    {28 "SLC_ONCONN_HDRRX_SDB_TASK_TYPE_A2DP_NORMAL"}
+    {29 "SLC_ONCONN_HDRRX_NOT_SDB_TASK_TYPE_A2DP_SYNCHISTORY_NORMAL"}
+    {30 "SLC_ONCONN_HDRRX_NOT_SDB_TASK_TYPE_A2DP_NOT_SYNCHISTORY_NORMAL"}
+    {31 "SLC_ONCONN_HDRRX_SDB_TASK_FLAG_SYNCED_NORMAL"}
+    {32 "SLC_ONCONN_HDRRX_BT_CONN_COUNT_ONE_NORMAL"}
+    {33 "SLC_UPDATE_ACL_STATUS_NORMAL"}
+    {34 "SLC_UPDATE_ACL_STATUS_A2DP_ROLE_DETECTED_NORMAL"}
+    {35 "SLC_UPDATE_ACL_STATUS_BB_LOGICAL_TRANS_TYPE_ACL_NORMAL"}
+    {36 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_CONFIGURED_NORMAL"}
+    {37 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_NOT_CONFIGURED_NORMAL"}
+    {38 "SLC_UPDATE_ACL_STATUS_ACL_TX_QUEUE_NORMAL"}
+    {39 "SLC_UPDATE_ACL_STATUS_TOTAL_BT_CONN_COUNT_NORMAL"}
+    {40 "SLC_UPDATE_ACL_STATUS_A2DP_CONN_NOT_ESTABLISHED_CHECK_NORMAL"}
+    {41 "SLC_UPDATE_ACL_STATUS_BT_CLK_IS_NOT_REF_PAST_NORMAL"}
+    {42 "SLC_UPDATE_ACL_STATUS_A2DP_IS_A2DP_TX_CONFIGURED_BT_CLK_IS_NOT_REF_PAST_NORMAL"}
+    {43 "SLC_UPDATE_ACL_STATUS_A2DP_BT_CLK_IS_NOT_REF_PAST_SLC_IS_ROLE_SWITCH_PND_NORMAL"}
+ENDTABLE
+
+/* 0x32 "BT/MCI_AGENT_WLAN_STATUS_UPDATE" */
+GROUP qQca_CXM_MciGpmAgent_WLAN_STATUS_UPDATE "WLAN STATUS UPDATE"
+{
+    FIELD fQca_MciGpmAgent_WLAN_STATUS_UPDATE_WlanStatus_Bit1_to_Bit7       (Fixed 7 Bits)  (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_WLAN_STATUS_UPDATE_WlanStatus                    (Fixed 1 Bit)   (Table tQca_CXM_WlanStatus)   "WlanStatus"
+}
+
+/* 0x33 "BT/MCI_AGENT_BT_BANDWIDTH_USAGE_UPDATE" */
+GROUP qQca_CXM_MciGpmAgent_BT_BW_UPDATE "BT Bandwidth Update"
+{
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_linkID                           (Fixed 1 Byte)     (Hex)           "LinkID"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_percentageBW                     (Fixed 1 Byte)     (Decimal)       "Required BT Bandwidth"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_sniffLinkCount                   (Fixed 4 Bits)     (Decimal)       "sniffLinkCount"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_debug                            (Fixed 4 Bits)     (Decimal)       "debug"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_a2dpPrevBWPercentage             (Fixed 1 Byte)     (Decimal)       "a2dpPrevBWPercentage"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_nonA2dpAclLink                   (Fixed 1 Byte)     (Decimal)       "nonA2dpAclLink"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_a2dpLink                         (Fixed 1 Byte)     (Decimal)       "a2dpLink"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_a2dpMaxQlength                   (Fixed 1 Byte)     (Decimal)       "a2dpMaxQlength"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_A2DPTxQueue_len                  (Fixed 1 Byte)     (Decimal)       "A2DPTxQueue_len"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_syncLink                         (Fixed 1 Byte)     (Decimal)       "syncLink"
+    FIELD fQca_CXM_MciGpmAgent_BT_BW_UPDATE_additionalBW                     (Fixed 1 Byte)     (Decimal)       "additionalBW"
+}
+
+TABLE tQca_CXM_WlanStatus
+    {0 "Idle"}
+    {1 "Active"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x3C "BI/MCI_AGENT_CAPABILITY_INFO" */
+GROUP qQca_CXM_MciGpmAgent_CAPABILITY_INFO "CAPABILITY INFO"
+{
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_More                (Fixed 1 Bit)     (Decimal)                               "More"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_Bit6_to_Bit4        (Fixed 3 Bit)     (Decimal)                               SUPPRESS_DETAIL
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_Page                (Fixed 4 Bits)    (Decimal)                               "CurPage"
+    GROUP gQca_CXM_MciGpmAgent_CAPABILITY_INFO_Bitmap;
+}
+
+GROUP gQca_CXM_MciGpmAgent_CAPABILITY_INFO_Bitmap "Bitmap"
+{
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit7         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_7"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit6         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_6"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit5         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_5"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit4         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_4"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit3         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_3"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit2         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_2"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit1         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_1"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit0         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_0"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit15        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_15"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit14        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_14"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit13        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_13"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit12        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_12"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit11        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_11"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit10        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_10"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit9         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_9"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit8         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_8"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit23        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_23"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit22        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_22"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit21        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_21"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit20        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_20"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit19        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_19"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit18        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_18"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit17        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_17"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit16        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_16"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit31        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_31"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit30        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_30"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit29        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_29"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit28        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_28"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit27        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_27"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit26        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_26"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit25        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_25"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit24        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_24"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit39        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_39"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit38        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_38"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit37        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_37"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit36        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_36"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit35        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_35"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit34        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_34"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit33        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_33"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit32        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_32"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit47        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_47"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit46        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_46"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit45        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_45"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit44        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_44"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit43        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_43"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit42        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_42"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit41        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_41"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit40        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_40"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit55        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_55"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit54        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_54"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit53        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_53"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit52        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_52"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit51        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_51"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit50        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_50"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit49        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_49"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit48        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_48"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit63        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_63"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit62        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_62"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit61        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_61"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit60        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_60"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit59        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_59"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit58        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_58"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit57        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_57"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit56        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_56"
+
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit71        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_71"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit70        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_70"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit69        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_69"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit68        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_68"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit67        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_67"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit66        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_66"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit65        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_65"
+    FIELD fQca_MciGpmAgent_CAPABILITY_INFO_BitmapBit64        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Feature_64"
+}
+
+/* 0x41 "BT/MCI_AGENT_ASD_STATUS_SYNC" */
+GROUP qQca_CXM_MciGpmAgent_ASD_STATUS_SYNC "ASD STATUS SYNC"
+{
+    GROUP gQca_MciGpmAgent_ASD_STATUS_SYNC_Status;              
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Priority         (Fixed 1 Byte)    (Decimal)                               "Priority"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_ReasonCode       (Fixed 1 Byte)    (Decimal)                               "ReasonCode"
+}
+
+GROUP gQca_MciGpmAgent_ASD_STATUS_SYNC_Status "Status"
+{
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RsvdBit7          (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RsvdBit7"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RsvdBit6          (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RsvdBit6"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RsvdBit5          (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RsvdBit5"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RsvdBit4          (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RsvdBit4"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RxPrevGrantStatus (Fixed 1 Bit)   (Table tQca_CXM_EnabledBit)     "Rx ASD PrevGrantStatus"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_RxRequest         (Fixed 1 Bit)   (Table tQca_CXM_EnabledBit)     "Rx ASD Request"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_TxPrevGrantStatus (Fixed 1 Bit)   (Table tQca_CXM_EnabledBit)     "Tx ASD PrevGrantStatus"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_SYNC_Status_TxRequest         (Fixed 1 Bit)   (Table tQca_CXM_EnabledBit)     "Tx ASD Request"
+}
+
+/* 0x42 "WLAN/MCI_AGENT_ASD_STATUS_IND" */
+GROUP qQca_CXM_MciGpmAgent_ASD_STATUS_IND "ASD STATUS INDICATION"
+{
+    GROUP gQca_MciGpmAgent_ASD_STATUS_IND_Status;              
+    FIELD fQca_MciGpmAgent_ASD_STATUS_IND_ReasonCode       (Fixed 1 Byte)    (Decimal)                               "ReasonCode"
+}
+
+GROUP gQca_MciGpmAgent_ASD_STATUS_IND_Status "Status"
+{
+    FIELD fQca_MciGpmAgent_ASD_STATUS_IND_Status_TxGrant         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Tx ASD Grant"
+    FIELD fQca_MciGpmAgent_ASD_STATUS_IND_Status_RxGrant         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "Rx ASD Grant"
+}
+
+/* 0x43 "BT/MCI_AGENT_LE_ADV_RX_INDICATION" */
+GROUP qQca_CXM_MciGpmAgent_LE_ADV_RX_INDICATION "LE Adv Indication"
+{
+    FIELD qQca_CXM_MciGpmAgent_IND_THR                         (Fixed 2 Bytes)  (Decimal)                               "BTLEAdvRxIndThreshold"
+    FIELD qQca_CXM_MciGpmAgent_IND_RxAdvCnt                    (Fixed 2 Bytes)  (Decimal)                               "RxAdvCnt"
+    FIELD qQca_CXM_MciGpmAgent_IND_TxScanRsqCnt                (Fixed 2 Bytes)  (Decimal)                               "TxScanReqCnt"
+    FIELD qQca_CXM_MciGpmAgent_IND_RxScanRespCnt               (Fixed 2 Bytes)  (Decimal)                               "RxScanRespCnt"
+    FIELD qQca_CXM_MciGpmAgent_IND_Reserved                    (Fixed 2 Bytes)  (Hex)                                   SUPPRESS_DETAIL
+}
+
+/* 0x44 "BT/MCI_AGENT_ACL_RX_STATE_INDICATION" */
+GROUP qQca_CXM_MciGpmAgent_ACL_RX_STATE_INDICATION   "Acl Rx State Indication"
+{
+    FIELD Qca_Cxm_AclRx_HecErrCnt             (Fixed 1 Bytes)  (Decimal)   "HecErrCnt "
+    FIELD Qca_Cxm_AclRx_CrcErrCnt             (Fixed 1 Bytes)  (Decimal)   "CrcErrCnt"
+	FIELD Qca_Cxm_AclRx_HzCmd0RxAgcRssi       (Fixed 4 Bytes)  (Hex)       "HzCmd0RxAgcRssi"
+	FIELD Qca_Cxm_AclRx_HzCmd1RxAgcRssi       (Fixed 4 Bytes)  (Hex)       "HzCmd1RxAgcRssi"
+}
+
+/* 0x45 "BT/MCI_AGENT_LE_ADV_RX_INDICATION" */
+TABLE tQca_CXM_NOTIFY_BT_GAIN_SELECT
+   {0x00 "DEFAULT GAIN"}
+   {0x01 "LOW GAIN"}
+ENDTABLE
+
+GROUP qQca_CXM_MciGpmAgent_BT_RX_GAIN_INDICATION "BT RX Gain Indication"
+{
+    FIELD fQca_CXM_BTGainSelect    (Fixed 1 Bytes)        (TABLE tQca_CXM_NOTIFY_BT_GAIN_SELECT)     "BT_GainSelect"
+}
+
+/* 0x51 "BT/MCI_AGENT_BT_CALIBRATION_INFO" */
+TABLE tQca_CXM_BT_CALI_RESULT
+   {0x00 "CALIBRATION_SUCCESS"}
+   {0x01 "CALIBRATION_FAIL"}
+ENDTABLE
+
+TABLE tQca_CXM_BT_CALI_STATUS
+   {0x00 "MCI_BT_CAL_IDLE"}
+   {0x01 "MCI_BT_CAL_WAIT_FOR_GRANT"}
+   {0x02 "MCI_BT_CAL_WAIT_FOR_CAL_DONE"}
+   {0x03 "MCI_BT_CAL_WAIT_FOR_CAL_DONE_OFFLINE"}
+   {0x04 "MCI_BT_CAL_COMPLETE"}
+ENDTABLE
+
+GROUP qQca_CXM_MciGpmAgent_BtCalibrationInfo "BT Calibration Info"
+{
+    FIELD fQca_CXM_BTCaliInfoResult    (Fixed 1 Bytes)        (TABLE tQca_CXM_BT_CALI_RESULT)     "BT Calibration Result"
+    FIELD fQca_CXM_BTCaliInfoStatus    (Fixed 1 Bytes)        (TABLE tQca_CXM_BT_CALI_STATUS)     "BT Calibration Status"
+    FIELD fQca_CXM_BTCaliInfoStartClk  (Fixed 4 Bytes)        (Hex)                               "BT Cali Req Start CLK"
+    FIELD fQca_CXM_BTCaliInfoEndClk    (Fixed 4 Bytes)        (Hex)                               "BT Wait Grant End CLK"
+}
+
+/************************************************
+ * 0x0430 "LOG_ID_CXM_MWS_INT_RAW"
+************************************************/
+GROUP gQca_CXM_MwsIntRaw "MWS Int Raw"
+{
+    FIELD fQca_MwsIntRawBit7                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_FIFO_OVFL_INT"
+    FIELD fQca_MwsIntRawBit6                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_FIFO_READY_INT"
+    FIELD fQca_MwsIntRawBit5                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_FIFO_UDFL_INT"
+    FIELD fQca_MwsIntRawBit4                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_FIFO_OVFL_INT"
+    FIELD fQca_MwsIntRawBit3                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_FIFO_READY_INT"
+    FIELD fQca_MwsIntRawBit2                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_BREAK_OFF_INT"
+    FIELD fQca_MwsIntRawBit1                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_BREAK_ON_INT"
+    FIELD fQca_MwsIntRawBit0                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "RX_FRAMING_ERR_INT"
+
+    FIELD fQca_MwsIntRawBit15               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CXM_TIMER0_INT"
+    FIELD fQca_MwsIntRawBit14               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MWS_RX_FE_INT"
+    FIELD fQca_MwsIntRawBit13               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MWS_RX_RE_INT"
+    FIELD fQca_MwsIntRawBit12               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MWS_TX_FE_INT"
+    FIELD fQca_MwsIntRawBit11               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "MWS_TX_RE_INT"
+    FIELD fQca_MwsIntRawBit10               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ACTIVE_FE_INT"
+    FIELD fQca_MwsIntRawBit9                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "ACTIVE_RE_INT"
+    FIELD fQca_MwsIntRawBit8                (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "FSYNC_RE_INT"
+
+    FIELD fQca_MwsIntRawBit23               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE6_MSG_RXED"
+    FIELD fQca_MwsIntRawBit22               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE5_MSG_RXED"
+    FIELD fQca_MwsIntRawBit21               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE4_MSG_RXED"
+    FIELD fQca_MwsIntRawBit20               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE3_MSG_RXED"
+    FIELD fQca_MwsIntRawBit19               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE2_MSG_RXED"
+    FIELD fQca_MwsIntRawBit18               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE1_MSG_RXED"
+    FIELD fQca_MwsIntRawBit17               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE0_MSG_RXED"
+    FIELD fQca_MwsIntRawBit16               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "CXM_TIMER1_INT"
+
+    FIELD fQca_MciIntRawBit31               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "HOST_INT"
+    FIELD fQca_MwsIntRawBit30               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_ENA_RE"
+    FIELD fQca_MwsIntRawBit29               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TX_ENA_FE"
+    FIELD fQca_MwsIntRawBit28               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "DIRECT_MSG_TXED"
+    FIELD fQca_MwsIntRawBit27               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TCM_NACK"
+    FIELD fQca_MwsIntRawBit26               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TCM_ACK"
+    FIELD fQca_MwsIntRawBit25               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TDM_MISALIGN"
+    FIELD fQca_MwsIntRawBit24               (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_EnabledBit)     "TYPE7_MSG_RXED"
+}
+
+/************************************************
+ * 0x0440 "LOG_ID_CXM_MWS_RX"
+ * 0x0450 "LOG_ID_CXM_MWS_TX"
+************************************************/
+GROUP gQca_CXM_MwsMsg "MWS"
+{
+    FIELD fQca_MwsMsg_Type                  (Fixed 1 Byte)      (TABLE tQca_CXM_MwsMsgType)             "MwsType"   //MWS type
+    GROUP gQca_MwsMsg_more IF (MoreBytes)
+    {
+        FIELD fQca_MwsMsg_Header_pad        (Fixed 3 Bytes)     (Hex) SUPPRESS_DETAIL                               //MWS type padding
+        BRANCH (FromTable   tQca_CXM_MwsMsgType   fQca_MwsMsg_Type)
+        FIELD fQca_MwsMsg_pad (ToEndOfLayer) IF(MoreBytes) (Hex) SUPPRESS_DETAIL                                    //Padding if any
+    }
+}
+
+TABLE tQca_CXM_MwsMsgType
+    {0x00 "MWS_MSG_TYPE_0"}
+    {0x01 "MWS_MSG_TYPE_1"}
+    {0x02 "MWS_MSG_TYPE_2" "MWS_MSG_TYPE_2" 0 gQca_CXM_MwsType2}
+    {0x03 "MWS_MSG_TYPE_3"}
+    {0x04 "MWS_MSG_TYPE_4"}
+    {0x05 "MWS_MSG_TYPE_5"}
+    {0x06 "MWS_MSG_TYPE_6" "MWS_MSG_TYPE_6" 0 gQca_CXM_MwsType6}
+    {0x07 "MWS_MSG_TYPE_7"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x02 "MWS_MSG_TYPE_2" */
+GROUP gQca_CXM_MwsType2 "MWS Type 2"
+{
+    FIELD fQca_MwsType2_MsgId               (Fixed 2 Bytes)     (Table tQca_CXM_MwsType2MsgId)                      "MessageId"
+    BRANCH (FromTable   tQca_CXM_MwsType2MsgId   fQca_MwsType2_MsgId)
+    FIELD fQca_MwsType2_pad (ToEndOfLayer) IF(MoreBytes) (Hex) SUPPRESS_DETAIL                                      //Padding if any
+}
+
+TABLE tQca_CXM_MwsType2MsgId
+    {0x0020 "QMI_COEX_TECH_SYNC_REQ_V02" "QMI_COEX_TECH_SYNC_REQ_V02" 0 gQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02}
+    {0x0021 "QMI_COEX_TECH_SYNC_RESP_V02" "QMI_COEX_TECH_SYNC_RESP_V02" 0 gQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02}
+    {0x0022 "QMI_COEX_TECH_SYNC_UPDATE_IND_V02" "QMI_COEX_TECH_SYNC_UPDATE_IND_V02" 0 gQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02}
+    {0x0023 "QMI_COEX_TECH_STATE_UPDATE_REQ_V02" "QMI_COEX_TECH_STATE_UPDATE_REQ_V02" 0 gQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02}
+    {0x0024 "QMI_COEX_WWAN_LTE_STATE_IND_V02" "QMI_COEX_WWAN_LTE_STATE_IND_V02" 0 gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02}
+    {0x0025 "QMI_COEX_WWAN_TDSCDMA_STATE_IND_V02"}
+    {0x0026 "QMI_COEX_WWAN_GSM_STATE_IND_V02"}
+    {0x0027 "QMI_COEX_WWAN_ONEX_STATE_IND_V02"}
+    {0x0028 "QMI_COEX_WWAN_HDR_STATE_IND_V02"}
+    {0x0029 "QMI_COEX_WWAN_WCDMA_STATE_IND_V02"}
+    {0x002A "QMI_COEX_WLAN_WIFI_STATE_IND_V02"}
+    {0x002B "QMI_COEX_WLAN_BT_STATE_IND_V02"}
+    {0x002C "QMI_COEX_DIVERSITY_ANTENNA_STATE_IND_V02"}
+    {0x002D "QMI_COEX_METRICS_LTE_SINR_START_IND_V02"}
+    {0x002E "QMI_COEX_METRICS_LTE_SINR_READ_REQ_V02"}
+    {0x002F "QMI_COEX_METRICS_LTE_SINR_READ_RESP_V02"}
+    {0x0030 "QMI_COEX_METRICS_LTE_SINR_STOP_IND_V02"}
+    {0x0031 "QMI_COEX_WWAN_GSM2_STATE_IND_V02"}
+    {0x0032 "QMI_COEX_WWAN_GSM3_STATE_IND_V02"}
+    {0x0033 "QMI_COEX_CONFLICT_PARAMS_REQ_V02"}
+    {0x0034 "QMI_COEX_CONFLICT_PARAMS_RESP_V02"}
+    {0x0035 "QMI_COEX_WWAN_WCDMA2_STATE_IND_V02"}
+    {0x0036 "QMI_COEX_ACTIVE_CONFLICT_IND_V02"}
+    {0x0037 "QMI_COEX_ACTIVE_CONFLICT_REQ_V02"}
+    {0x0038 "QMI_COEX_POTENTIAL_CONFLICT_IND_V02"}
+    {0x0039 "QMI_COEX_RAT_ID_UPDATE_IND_V02" "QMI_COEX_RAT_ID_UPDATE_IND_V02" 0 gQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02}
+    {0x003A "QMI_COEX_RAT_ID_UPDATE_REQ_V02"}
+    {0x003B "QMI_COEX_WWAN_LTE2_STATE_IND_V02"}
+    {0x003C "QMI_COEX_METRICS_LTE2_SINR_START_IND_V02"}
+    {0x003D "QMI_COEX_METRICS_LTE2_SINR_READ_REQ_V02"}
+    {0x003E "QMI_COEX_METRICS_LTE2_SINR_READ_RESP_V02"}
+    {0x003F "QMI_COEX_METRICS_LTE2_SINR_STOP_IND_V02"}
+    {0x0040 "QMI_COEX_METRICS_LTE_BLER_START_REQ_V02"}
+    {0x0041 "QMI_COEX_METRICS_LTE_BLER_IND_V02"}
+    {0x0042 "QMI_COEX_METRICS_LTE_BLER_READ_REQ_V02"}
+    {0x0043 "QMI_COEX_METRICS_LTE_BLER_STOP_REQ_V02"}
+    {0x0044 "QMI_COEX_METRICS_LTE2_BLER_START_REQ_V02"}
+    {0x0045 "QMI_COEX_METRICS_LTE2_BLER_IND_V02"}
+    {0x0046 "QMI_COEX_METRICS_LTE2_BLER_READ_REQ_V02"}
+    {0x0047 "QMI_COEX_METRICS_LTE2_BLER_STOP_REQ_V02"}
+    {0x0048 "QMI_COEX_WWAN_NR5G_STATE_IND_V02"}
+    {0x0049 "QMI_COEX_BT_CONN_INFO_IND_V02" "QMI_COEX_BT_CONN_INFO_IND_V02" 0 gQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02}
+    {0x004A "QMI_COEX_WWAN_NR5G2_STATE_IND_V02"}
+    {0x004B "QMI_COEX_GNSS_CRIT_DEMOD_STATE_IND_V02"}
+    {0x004C "QMI_COEX_TECH_SLEEP_WAKEUP_IND_V02"}
+    {0x004D "QMI_COEX_2G_WLAN_MODE_CHNL_MAP_IND_V02"} 
+    {0x004E "QMI_COEX_RTSAR_WLAN_CFG_IND_V02"}
+    {0x004F "QMI_COEX_RTSAR_WLAN_INFO_IND_V02"}
+    {0x0050 "QMI_COEX_RTSAR_WLAN_PWR_REPORT_IND_V02"}
+    {0x0051 "QMI_COEX_RTSAR_WLAN_PWR_LIMIT_IND_V02"}
+    {0x0052 "QMI_COEX_TECH_VOLTE_CDRX_STATE_IND_V02"}
+    {0x0053 "QMI_COEX_RTSAR_WLAN_PWR_REPORT_REQ_V02"}
+    {0x0054 "QMI_COEX_RTSAR_WLAN_PWR_REPORT_ACK_IND_V02"}
+    {0x0055 "QMI_COEX_RTSAR_BT_CFG_IND_V02" "QMI_COEX_RTSAR_BT_CFG_IND_V02" 0 gQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02}
+    {0x0056 "QMI_COEX_RTSAR_BT_PWR_LIMIT_IND_V02" "QMI_COEX_RTSAR_BT_PWR_LIMIT_IND_V02" 0 gQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x0020 "QMI_COEX_TECH_SYNC_REQ_V02" */
+/* 0x0021 "QMI_COEX_TECH_SYNC_RESP_V02" */
+GROUP gQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02 "QMI_COEX_TECH_SYNC_REQ_RES_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_QmiType      (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_QmiLength    (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_tech_len     (Fixed 1 Byte)     (Decimal)                "TechLengh"
+    GROUP gQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_sync_state REPEAT COUNT (FromField Times fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_tech_len)
+    {
+        FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_Id               (Fixed 1 Byte)     (Table tQca_CXM_MwsType2MsgId_TechType)  "Id"
+        FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_REQ_RES_V02_SyncStateToken   (Fixed 1 Byte)     (Hex)                                    "SyncStateToken"
+    }
+}
+
+TABLE tQca_CXM_MwsType2MsgId_TechType
+    {0x00 "COEX_TECH_TYPE_UNINIT_V02"}
+    {0x01 "COEX_TECH_TYPE_WWAN_LTE_V02"}
+    {0x02 "COEX_TECH_TYPE_WWAN_TDSCDMA_V02"}
+    {0x03 "COEX_TECH_TYPE_WWAN_GSM_V02"}
+    {0x04 "COEX_TECH_TYPE_WWAN_ONEX_V02"}
+    {0x05 "COEX_TECH_TYPE_WWAN_HDR_V02"}
+    {0x06 "COEX_TECH_TYPE_WWAN_WCDMA_V02"}
+    {0x07 "COEX_TECH_TYPE_WLAN_WIFI_V02"}
+    {0x08 "COEX_TECH_TYPE_WLAN_BT_V02"}
+    {0x09 "COEX_TECH_TYPE_SPECIAL_DIVERSITY_ANTENNA_V02"}
+    {0x0A "COEX_TECH_TYPE_WWAN_GSM2_V02"}
+    {0x0B "COEX_TECH_TYPE_WWAN_GSM3_V02"}
+    {0x0C "COEX_TECH_TYPE_WWAN_WCDMA2_V02"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x0022 "QMI_COEX_TECH_SYNC_UPDATE_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02 "QMI_COEX_TECH_SYNC_UPDATE_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02_QmiType           (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02_QmiLength         (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02_Id                (Fixed 1 Byte)     (Table tQca_CXM_MwsType2MsgId_TechType)  "Id"
+    FIELD fQca_CXM_MwsType2MsgId_TECH_SYNC_UPDATE_IND_V02_SyncStateToken    (Fixed 1 Byte)     (Hex)                                    "SyncStateToken"
+}
+
+/* 0x0023 "QMI_COEX_TECH_STATE_UPDATE_REQ_V02" */
+GROUP gQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02 "QMI_COEX_TECH_STATE_UPDATE_REQ_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_QmiType          (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_QmiLength        (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_tech_ids_len     (Fixed 1 Byte)     (Decimal)                "TechLengh"
+    GROUP gQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_sync_state REPEAT COUNT (FromField Times fQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_tech_ids_len)
+    {
+        FIELD fQca_CXM_MwsType2MsgId_TECH_STATE_UPDATE_REQ_V02_Id               (Fixed 1 Byte)     (Table tQca_CXM_MwsType2MsgId_TechType)  "Id"
+    }
+}
+
+/* 0x0024 "QMI_COEX_WWAN_LTE_STATE_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02 "QMI_COEX_WWAN_LTE_STATE_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_QmiType                 (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_QmiLength               (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_band_info_len           (Fixed 1 Byte)     (Decimal)                                            "BandInfoLengh"
+    GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_band_info REPEAT COUNT  (FromField Times fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_band_info_len)
+    {
+        FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_frequency           (Fixed 2 Bytes)    (Decimal)                                            "Frequency"
+        FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_band_direction      (Fixed 2 Bits)     (Table tQca_CXM_MwsType2MsgId_BandDirection)         "BandDirection"
+        FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_band_bandwidth      (Fixed 14 Bits)    (Decimal)                                            "Bandwidth"
+    }
+    GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_sync_state_token                                                                                 "TechState"
+    {
+        FIELD gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_sync_state_IDLE     (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1) (Hex)                          "IDLE"
+        FIELD gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_sync_state_CONN     (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1) (Hex)                          "CONN"
+        FIELD gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_sync_state_ACTIVE   (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1) (Hex)                          "ACTIVE"
+    }
+    FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_cc_info_len             (Fixed 1 Byte)     (Decimal)                                             "CCInfoLengh"
+    GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_cc_info REPEAT COUNT    (FromField Times fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_cc_info_len)
+    {
+        GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_bands 
+        {
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_bands_UL_index      (Fixed 4 Bits)    (Hex)                                                "UL Band Index"
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_bands_DL_index      (Fixed 4 Bits)    (Hex)                                                "DL Band Index"
+        }
+        GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_data
+        {
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_LTE_dimension       (Fixed 1 Bit)     (Table tQca_CXM_MwsType2MsgId_LTE_Dimension)         "LTE Dimension"
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_LTE_reserved        (Fixed 5 Bits)    (Hex)                                                SUPPRESS_DETAIL
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_LTE_frame_offset    (Fixed 10 Bits)   (Decimal)                                            "Frame Offset"
+        }
+        GROUP gQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_tdd_info
+        {
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_reserved                (Fixed 4 Bits)    (Hex)                                                SUPPRESS_DETAIL
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_uplink_tdd_config       (Fixed 2 Bits)    (Hex)                                                "Uplink Config"
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_downlink_tdd_config     (Fixed 2 Bits)    (Hex)                                                "Downlink Config"
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_tdd_config              (Fixed 4 Bits)    (Hex)                                                "TDD Config"
+            FIELD fQca_CXM_MwsType2MsgId_WWAN_LTE_STATE_IND_V02_tdd__subframe_config    (Fixed 4 Bits)    (Hex)                                                "TDD Subframe Config"
+        }
+    }
+}
+
+TABLE tQca_CXM_MwsType2MsgId_LTE_Dimension
+    {0 "FDD"}
+    {1 "TDD"}
+ENDTABLE
+
+TABLE tQca_CXM_MwsType2MsgId_BandDirection
+    {0x00 "COEX_BAND_DIRECTION_DONT_CARE"}
+    {0x01 "COEX_BAND_DIRECTION_DOWNLINK"}
+    {0x02 "COEX_BAND_DIRECTION_UPLINK"}
+    {0x03 "COEX_BAND_DIRECTION_BOTH"}
+ENDTABLE
+
+/* 0x0039 "QMI_COEX_RAT_ID_UPDATE_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02 "QMI_COEX_RAT_ID_UPDATE_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_QmiType          (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_QmiLength        (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_behavior         (Fixed 1 Byte)     (Table tQca_CXM_MwsType2_RatIdBehavior)     "Behavior"
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_QmiType1         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_QmiLength1       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_rat_ids_len      (Fixed 1 Byte)     (Decimal)                "TechLengh"
+    GROUP gQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_rat_ids_state REPEAT COUNT (FromField Times fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_rat_ids_len)
+    {
+        FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_tech_and_carrier (Fixed 1 Byte)     (Table tQca_CXM_MwsType2MsgId_TechType)  "Id"
+        FIELD fQca_CXM_MwsType2MsgId_RAT_ID_UPDATE_IND_V02_rat_id           (Fixed 1 Byte)     (Decimal)                                "RatId"
+    }
+}
+
+TABLE tQca_CXM_MwsType2_RatIdBehavior
+    {0x00 "COEX_RAT_ID_DISABLED_V02"}
+    {0x01 "COEX_RAT_ID_ENABLED_SINGLE_V02"}
+    {0x02 "COEX_RAT_ID_ENABLED_DYNAMIC_MAP_V02"}
+    {Default "Invalid"}
+ENDTABLE
+
+/* 0x0049 "QMI_COEX_BT_CONN_INFO_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02 "QMI_COEX_BT_CONN_INFO_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_valid          (Fixed 1 Byte)         (Hex)                           "Valid"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_len           (Fixed 1 Byte)     (Table tQca_CXM_MwsType2_RatIdBehavior)     "Behavior"
+    GROUP gQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map;
+}
+
+GROUP gQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map "Channel Map"
+{
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit7         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_7"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit6         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_6"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit5         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_5"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit4         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_4"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit3         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_3"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit2         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_2"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit1         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_1"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit0         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_0"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit15        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_15"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit14        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_14"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit13        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_13"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit12        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_12"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit11        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_11"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit10        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_10"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit9         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_9"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit8         (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_8"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit23        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_23"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit22        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_22"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit21        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_21"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit20        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_20"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit19        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_19"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit18        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_18"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit17        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_17"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit16        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_16"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit31        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_31"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit30        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_30"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit29        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_29"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit28        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_28"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit27        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_27"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit26        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_26"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit25        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_25"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit24        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_24"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit39        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_39"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit38        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_38"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit37        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_37"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit36        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_36"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit35        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_35"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit34        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_34"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit33        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_33"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit32        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_32"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit47        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_47"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit46        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_46"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit45        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_45"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit44        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_44"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit43        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_43"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit42        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_42"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit41        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_41"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit40        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_40"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit55        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_55"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit54        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_54"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit53        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_53"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit52        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_52"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit51        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_51"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit50        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_50"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit49        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_49"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit48        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_48"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit63        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_63"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit62        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_62"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit61        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_61"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit60        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_60"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit59        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_59"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit58        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_58"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit57        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_57"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit56        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_56"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit71        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_71"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit70        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_70"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit69        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_69"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit68        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_68"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit67        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_67"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit66        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_66"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit65        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_65"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit64        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_64"
+
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit79        (Fixed 1 Bit)  (Hex)        "SUPPRESS DETAIL"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit78        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_78"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit77        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_77"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit76        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_76"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit75        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_75"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit74        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_74"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit73        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_73"
+    FIELD fQca_CXM_MwsType2MsgId_BT_CONN_INFO_IND_V02_channel_map_Bit72        (Fixed 1 Bit)PRINT_IF (FieldIs EqualTo 1)   (Table tQca_CXM_MwsType2_ChannelBit)     "Channel_72"
+}
+
+TABLE tQca_CXM_MwsType2_ChannelBit
+    {0 "CHANNEL_UNUSED"}
+    {1 "CHANNEL_USED"}
+ENDTABLE
+
+/* 0x0055 "QMI_COEX_RTSAR_BT_CFG_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02 "QMI_COEX_RTSAR_BT_CFG_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiType0         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiLength0       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_Enable           (Fixed 4 Byte)     (Table tQca_CXM_EnabledBit)     "RTSAR BT"
+ 
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiType1         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiLength1       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_ReportPeriod     (Fixed 2 Bytes)    (Decimal) "Report Period (ms)"
+ 
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiType2         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiLength2       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_FallbackPeriod   (Fixed 2 Bytes)    (Decimal) "Fallback Period (ms)"
+ 
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiType3         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_QmiLength3       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_CFG_IND_V02_FallbackPowerIdx (Fixed 1 Bytes)    (Hex) "Fallback Power Index"
+}
+ 
+/* 0x0056 "QMI_COEX_RTSAR_BT_PWR_LIMIT_IND_V02" */
+GROUP gQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02 "QMI_COEX_RTSAR_BT_PWR_LIMIT_IND_V02"
+{
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_QmiType0         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_QmiLength0       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_PwrLimit         (Fixed 1 Bytes)    (Hex) "Power Limit Index"
+ 
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_QmiType1         (Fixed 1 Byte)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_QmiLength1       (Fixed 2 Bytes)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_MwsType2MsgId_RTSAR_BT_PWR_LIMIT_IND_V02_dbm10            (Fixed 2 Bytes)    (Hex) "dbm10"
+}
+
+/* 0x06 "MWS_MSG_TYPE_6" */
+GROUP gQca_CXM_MwsType6 "MWS Type 6"
+{
+    FIELD fQca_MwsType6_MsgId               (Fixed 5 Bits)     (Table tQca_CXM_MwsType6MsgId)                      "MessageId"
+    FIELD fQca_MwsType6_Low3B               (Fixed 3 Bits)     (Hex) SUPPRESS_DETAIL
+    FIELD fQca_MwsType6_pad (ToEndOfLayer)  IF(MoreBytes) (Hex) SUPPRESS_DETAIL                                      //Padding if any
+}
+ 
+TABLE tQca_CXM_MwsType6MsgId
+    { 0x0  "Reserved for future use" }
+    { 0x1  "Reserved for future use" }
+    { 0x2  "PwrIdx 2, -15.00dbm,  0.03mW" }
+    { 0x3  "PwrIdx 3, -10.00dbm,  0.10mW" }
+    { 0x4  "PwrIdx 4, -5.00dbm,   0.31mW" }
+    { 0x5  "PwrIdx 5,  0.00dbm,   1.00mW" }
+    { 0x6  "PwrIdx 6,  3.00dbm,   1.99mW" }
+    { 0x7  "PwrIdx 7,  6.00dbm,   3.98mW" }
+    { 0x8  "PwrIdx 8,  9.00dbm,   7.94mW" }
+    { 0x9  "PwrIdx 9, 11.00dbm,  12.59mW" }
+    { 0xa "PwrIdx 10, 12.25dbm,  16.79mW" }
+    { 0xb "PwrIdx 11, 13.25dbm,  21.13mW" }
+    { 0xc "PwrIdx 12, 14.00dbm,  25.12mW" }
+    { 0xd "PwrIdx 13, 14.75dbm,  29.85mW" }
+    { 0xe "PwrIdx 14, 15.25dbm,  33.49mW" }
+    { 0xf "PwrIdx 15, 15.75dbm,  37.58mW" }
+    {0x10 "PwrIdx 16, 16.25dbm,  42.16mW" }
+    {0x11 "PwrIdx 17, 16.75dbm,  47.32mW" }
+    {0x12 "PwrIdx 18, 17.00dbm,  50.12mW" }
+    {0x13 "PwrIdx 19, 17.25dbm,  53.09mW" }
+    {0x14 "PwrIdx 20, 17.50dbm,  56.23mW" }
+    {0x15 "PwrIdx 21, 17.75dbm,  59.57mW" }
+    {0x16 "PwrIdx 22, 18.00dbm,  63.09mW" }
+    {0x17 "PwrIdx 23, 18.25dbm,  66.83mW" }
+    {0x18 "PwrIdx 24, 18.50dbm,  70.79mW" }
+    {0x19 "PwrIdx 25, 18.75dbm,  74.99mW" }
+    {0x1a "PwrIdx 26, 19.00dbm,  79.43mW" }
+    {0x1b "PwrIdx 27, 19.25dbm,  84.14mW" }
+    {0x1c "PwrIdx 28, 19.50dbm,  89.12mW" }
+    {0x1d "PwrIdx 29, 19.75dbm,  94.40mW" }
+    {0x1e "PwrIdx 30, 20.00dbm, 100.00mW" }
+    {0x1f "SAR ACK" }
+    {Default "Invalid"}
+ENDTABLE
+
+/************************************************
+ * 0x0460 "LOG_ID_CXM_MCI_STATS"
+************************************************/
+GROUP gQca_CXM_MciStats "MCI Stats"
+{
+    FIELD fQca_CXM_MciStats_WlanTxBtRxCh1       (Fixed 1 Byte)     (Decimal)           "Wlan Tx BT Rx CH1"
+    FIELD fQca_CXM_MciStats_Rsvd                (Fixed 1 Byte)     (Decimal)           SUPPRESS_DETAIL  
+    FIELD fQca_CXM_MciStats_WlanTxBtRxCh0       (Fixed 1 Byte)     (Decimal)           "Wlan Tx BT Rx CH0"
+    FIELD fQca_CXM_MciStats_WlanTxBtTxCh0       (Fixed 1 Byte)     (Decimal)           "Wlan Tx BT Tx CH0"
+    FIELD qQca_CXM_MciStats_ContNackCount       (Fixed 4 Bytes)    (Decimal)           "Cont NACK Count"
+    FIELD qQca_CXM_MciStats_MciState            (Fixed 1 Byte)     (Table tQca_CXM_CoexMciState_Type)  "MCI STATE"
+    FIELD fQca_CXM_MciStats_isInitialBoot       (Fixed 1 Byte)     (Decimal)           "isMciInitialBootDoneWithLowPowerMode"
+    FIELD fQca_CXM_MciStats_isLowPowerModeApplied    (Fixed 1 Byte)     (Decimal)      "isLowPowerModeApplied"
+    FIELD fQca_CXM_MciStats_Rsvd2               (Fixed 1 Byte)     (Table tQca_CXM_CoexMciDtimPri_Type)	"dtimWifiPri"
+    FIELD qQca_CXM_MciStats_RFARegValue         (Fixed 4 Bytes)    (Hex)               "RFA_AON_REG_COEX_COEX Register Value"
+    GROUP qQca_CXM_MciStats_RSSIInfo;
+}
+
+GROUP qQca_CXM_MciStats_RSSIInfo "RSSI INFO"
+{
+    FIELD fQca_CXM_MciStats_RSSIInfo_RSSI2       (Fixed 1 Byte)     RETRIEVE (SignExtension 8) (Decimal) "RSSI 2"
+    FIELD fQca_CXM_MciStats_RSSIInfo_Handle2     (Fixed 1 Byte)     (Decimal)                            "Handle 2"
+    FIELD fQca_CXM_MciStats_RSSIInfo_RSSI1       (Fixed 1 Byte)     RETRIEVE (SignExtension 8) (Decimal) "RSSI 1"
+    FIELD fQca_CXM_MciStats_RSSIInfo_Handle1     (Fixed 1 Byte)     (Decimal)                            "Handle 1"
+}
+
+TABLE tQca_CXM_CoexMciState_Type
+    {0x00 "MCI_STATE_UNINITIALIZED"}
+    {0x01 "MCI_STATE_STARTING"}
+    {0x02 "MCI_STATE_ACTIVE_GPM_DISABLED"}
+    {0x03 "MCI_STATE_ACTIVE_GPM_ENABLED"}
+    {0x04 "MCI_STATE_REMOTE_SLEEP"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_CXM_CoexMciDtimPri_Type
+    {0x00 "PFAL_COEX_MCI_DTIM_BT_PRI"}
+    {0x01 "PFAL_COEX_MCI_DTIM_WIFI_PRI"}
+    {Default "Invalid"}
+ENDTABLE
+
+/************************************************
+ * 0x04E0 "LOG_ID_CXM_INFO_MCI_SERVER"
+ * 0x04E1 "LOG_ID_CXM_INFO_PFAL_COEX_MCI"
+ * 0x04E2 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_HW"
+ * 0x04E3 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_SCHED"
+ * 0x04E4 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_VI"
+ * 0x04E5 "LOG_ID_CXM_INFO_LLM_RMCDCOMMAND"
+ * 0x04E6 "LOG_ID_CXM_INFO_SLC_DISPATCHER"
+ * 0x04E7 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_GPM"
+ * 0x04E8 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_CONT"
+ * 0x04E9 "LOG_ID_CXM_INFO_PFAL_COEX_MCI_UTIL"
+ * 0x04EA "LOG_ID_CXM_INFO_PFAL_LC_STATE"
+ * 0x04EB "LOG_ID_CXM_INFO_PFAL_HCI_VENDOR"
+ * 0x04F0 "LOG_ID_CXM_INFO_MWS_SERVER"
+ * 0x04F1 "LOG_ID_CXM_INFO_PFAL_COEX_MWS"
+ * 0x04F2 "LOG_ID_CXM_INFO_PFAL_COEX_MWS_HW"
+ * 0x04F3 "LOG_ID_CXM_INFO_QMI_IDL_ACCESSOR"
+ * 0x04F4 "LOG_ID_CXM_INFO_QMI_IDL_LIB"
+ * 0x04F5 "LOG_ID_CXM_INFO_WCI2_HDLC"
+ * 0x04F6 "LOG_ID_CXM_INFO_COEXISTENCE_SERVICE"
+ * 0x04F7 "LOG_ID_CXM_INFO_COMMON"
+************************************************/
+GROUP gQca_CXM_Info "CXM Info"
+{
+    FIELD fQca_CXM_Info_LineNum                 (Fixed 2 Bytes)     (Decimal)                           "LineNum"
+    FIELD fQca_CXM_Info_Rsvd                    (Fixed 2 Bytes)     (Table tQca_CXM_CoexMsgEnum_Type)   "Msg"
+    FIELD fQca_CXM_Info_Value                   (Fixed 4 Bytes) IF(MoreBytes)    (Hex)                  "Value"
+}
+
+TABLE tQca_CXM_CoexMsgEnum_Type
+    {0x0000 "PFAL_COEX_MCI_ERR_NONE"}
+    {0x0001 "PFAL_COEX_MCI_ERR_INVALID_PARAM"}
+    {0x0002 "PFAL_COEX_MCI_ERR_PREV_CMD_IN_PROGRESS"}
+    {0x0003 "PFAL_COEX_MCI_ERR_MEMORY_FULL"}
+    {0x0004 "PFAL_COEX_MCI_ERR_LATE"}
+    {0x0005 "PFAL_COEX_MCI_SKIP_RECV_GPM"}
+    {0x0006 "PFAL_COEX_MCI_SEND_REMOTE_RESET_IF_WARRANTED"}
+    {0x0007 "PFAL_COEX_MCI_ISR_BUT_NO_PROCESS"}
+    {0x0008 "PFAL_COEX_MCI_ERR_ISR_BUT_DISABLED"}
+    {0x0009 "PFAL_COEX_MCI_MCI_RECOVERY_REQ_WAKE_SENT"}
+    {0x000A "PFAL_COEX_MCI_MCI_RX_MSG_NOT_CONSUMED"}
+    {0x000B "PFAL_COEX_MCI_SEND_WRONG_MSG_TYPE"}
+    {0x000C "PFAL_COEX_MCI_ERR_LATE_STARTWBTIME"}
+    {0x000D "PFAL_COEX_MCI_ERR_LATE_LEAST_STARTWBTIME"}
+    {0x000E "PFAL_COEX_MCI_BUS_RECOVERY_SINCE_RECOVERY_REQ_WAKE_SENT"}
+    {0x000F "PFAL_COEX_MCI_DO_NOTHING_FOR_RX_MSG"}
+    {0x0010 "PFAL_COEX_MCI_DTIM_WIFI_PRI_HIGH"}
+    {0x0011 "PFAL_COEX_MCI_ERR_MCI_BT_CONN_INFO_STALE_DATA"}
+    {0x0012 "PFAL_COEX_MCI_SDB_LE_CONN_DATA_LENGTH_CHANGED_NOT_CHECKED"}
+    {0x0013 "PFAL_COEX_MCI_ERR_NO_LE_LINK_WITH_GIVEN_ID"}
+    {0x0014 "PFAL_COEX_MCI_ERR_LLM_LE_DEFERRED_COMMANDENQUEUE"}
+    {0x0015 "PFAL_COEX_MCI_WLAN_CAL_RECEIVED_WHILE_BT_CAL"}
+    {0x0016 "PFAL_COEX_MCI_RECEIVED_WLAN_CAL_DONE"}
+    {0x0017 "PFAL_COEX_MCI_SENT_CAL_GRANT_TO_WLAN"}
+    {0x0018 "PFAL_COEX_MCI_STATE_FROM_UNINITIALIZED_TO_STARTING"}
+    {0x0019 "PFAL_COEX_MCI_STATE_FROM_STARTING_TO_GPM_DISABLED"}
+    {0x001A "PFAL_COEX_MCI_STATE_FROM_STARTING_TO_GPM_ENABLED"}
+    {0x001B "PFAL_COEX_MCI_STATE_FROM_GPM_ENABLED_TO_GPM_DISABLED"}
+    {0x001C "PFAL_COEX_MCI_STATE_FROM_GPM_DISABED_TO_GPM_ENABLED"}
+    {0x001D "PFAL_COEX_MCI_ERR_ALL_ZERO_MAP_RECEIVED"}
+    {0x001E "PFAL_COEX_MCI_BT_WAIT_CAL_REQ_GRANT_PAST_LONG_TIME"}
+    {0x7000 "PFAL_COEX_MCI_WSIM_BUS_SYNC_FAIL"}
+    {0x7001 "PFAL_COEX_MCI_WSIM_BUS_SYNC_SUCCESS"}
+    {0x7002 "PFAL_COEX_MCI_WSIM_GPM_FIFO_DATA_0"}
+    {0x7003 "PFAL_COEX_MCI_WSIM_GPM_FIFO_DATA_1"}
+    {0x7004 "PFAL_COEX_MCI_WSIM_GPM_FIFO_DATA_2"}
+    {0x7005 "PFAL_COEX_MCI_WSIM_GPM_FIFO_DATA_3"}
+    {0x7006 "PFAL_COEX_MCI_WSIM_NON_GPM_FIFO_DATA_0"}
+    {0x7007 "PFAL_COEX_MCI_WSIM_NON_GPM_FIFO_DATA_1"}
+    {0x7008 "PFAL_COEX_MCI_WSIM_NON_GPM_FIFO_DATA_2"}
+    {0x7009 "PFAL_COEX_MCI_WSIM_NON_GPM_FIFO_DATA_3"}
+    {0x700A "PFAL_COEX_MCI_WSIM_NON_GPM_FIFO_DATA"}
+    {0x700B "PFAL_COEX_MCI_WSIM_REMOTE_ASLEEP"}
+    {0x700C "PFAL_COEX_MCI_WSIM_REMOTE_AWAKE"}
+    {0x7FFF "PFAL_COEX_MCI_MSG_MAX"}
+    {0x8000 "PFAL_COEX_MWS_ERR_NONE"}
+    {0x8001 "PFAL_COEX_MWS_LTE_STATE"}
+    {0x8002 "PFAL_COEX_MWS_SEND_AWAKE_EVENT_MSG"}
+    {0x8003 "PFAL_COEX_MWS_DO_NOTHING_FOR_RX_MSG"}
+    {0x8004 "PFAL_COEX_MWS_ERR_MSG_LENGTH"}
+    {0xFFFF "PFAL_COEX_MWS_MSG_MAX"}
+    {Default "Invalid"}
+ENDTABLE
+
+/************************************************
+0x04F8 "LOG_ID_CXM_MWS_WWAN_STATE_INFO"
+************************************************/
+GROUP gQca_CXM_MwsQmiInfo "WWAN State Info"
+{
+    FIELD fQca_CXM_Info_null                    (Fixed 4 Bytes)     (Hex)                               SUPPRESS_DETAIL
+    FIELD fQca_CXM_Info_CHMap1                  (Fixed 4 Bytes)     (Hex)                               "ChannelMap[0]"
+    FIELD fQca_CXM_Info_CHMap2                  (Fixed 4 Bytes)     (Hex)                               "ChannelMap[1]"
+    FIELD fQca_CXM_Info_CHMap3                  (Fixed 4 Bytes)     (Hex)                               "ChannelMap[2]"
+    FIELD fQca_CXM_Info_WwanState               (Fixed 2 Bytes)     (Table tQCA_CXM_WwanState)          "WWANstate"
+    FIELD fQca_CXM_Info_MaxPwr                  (Fixed 1 Bytes)     (Table tQCA_CXM_MaxPwr)             "IsRemoteMaxPower"
+    FIELD fQca_CXM_Info_BandInfo                (Fixed 1 Bytes)     (Table tQca_CXM_BandType)           "Band"
+}
+
+TABLE tQCA_CXM_WwanState
+   {0x00 "OFF_V02"}
+   {0x01 "IDLE_V02"}
+   {0x02 "CONN_V02"}
+   {0x03 "CONN_V02 | IDLE_V02"}
+   {0x04 "ACTIVE_V02"}
+   {0x05 "ACTIVE_V02 | IDLE_V02"}
+   {0x06 "ACTIVE_V02 | CONN_V02"}
+   {0x07 "IDLE_V02 | ACTIVE_V02 | CONN_V02"}
+   {Default "Invalid"}
+ENDTABLE
+
+TABLE tQCA_CXM_MaxPwr
+   {0x00 "FALSE"}
+   {0x01 "TRUE"}
+   {Default "FALSE"}
+ENDTABLE
+
+TABLE tQca_CXM_BandType
+   {0x07 "LTE_BAND_7"}
+   {0x26 "LTE_BAND_38"}
+   {0x28 "LTE_BAND_40"}
+   {0x29 "LTE_BAND_41"}
+   {Default "Invalid"}
+ENDTABLE
+
+/************************************************
+0x04F9 "LOG_ID_CXM_INFO_PFAL_COEX_MWS_RTSAR"
+************************************************/
+GROUP gQca_CXM_MwsRtsarInfo "MWS RTSAR Info"
+{
+    FIELD fQca_CXM_Rtsar_enable                    (Fixed 1 Bytes)     (Decimal)                 "RTSAR State"
+    FIELD fQca_CXM_Rtsar_fallback_limit            (Fixed 1 Bytes)     RETRIEVE (SignExtension 8) (Decimal)                 "fallback limit"
+    FIELD fQca_CXM_Rtsar_report_period             (Fixed 2 Bytes)     (Decimal)                 "report period"
+    FIELD fQca_CXM_Rtsar_fallback_period           (Fixed 2 Bytes)     (Decimal)                 "fallback period"
+    FIELD fQca_CXM_Rtsar_power_limit_idx           (Fixed 1 Bytes)     RETRIEVE (SignExtension 8) (Decimal)                 "limit power idx"
+    FIELD fQca_CXM_Rtsar_sar_limit_dbm10           (Fixed 1 Bytes)     (Decimal)                 "limit power dbm10"
+    FIELD fQca_CXM_Rtsar_limitPowerLevelMax        (Fixed 1 Bytes)     (Decimal)                 "limit power level"
+    FIELD fQca_CXM_Rtsar_limitFinePower            (Fixed 1 Bytes)     (Decimal)                 "limit fine power"
+    FIELD fQca_CXM_Rtsar_curPowerLevel             (Fixed 1 Bytes)     (Decimal)                 "cur power level"
+    FIELD fQca_CXM_Rtsar_curFinePower              (Fixed 1 Bytes)     (Decimal)                 "cur fine power"
+    FIELD fQca_CXM_Rtsar_curPktType                (Fixed 1 Bytes)     (Table tQca_CXM_pktType)  "cur packet type"
+    FIELD fQca_CXM_Rtsar_Rsvd1                     (Fixed 1 Byte)      (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_Rtsar_totalTxSlot               (Fixed 2 Bytes)     (Decimal)                 "total tx slot"
+    FIELD fQca_CXM_Rtsar_lastTotalSlot             (Fixed 2 Bytes)     (Decimal)                 "last total slot"	
+    FIELD fQca_CXM_Rtsar_Rsvd2                     (Fixed 2 Byte)      (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CXM_Rtsar_lastAvgPowerInuWatt       (Fixed 4 Bytes)     (Decimal)                 "last avg power in uWatt"
+    FIELD fQca_CXM_Rtsar_totalPowerInuWatt         (Fixed 4 Bytes)     (Decimal)                 "total power in uWatt"
+    FIELD fQca_CXM_Rtsar_lastReportCLK             (Fixed 4 Bytes)     (Hex)                     "last report CLK"
+    FIELD fQca_CXM_Rtsar_lastApplyPwrLimitClk      (Fixed 4 Bytes)     (Hex)                     "last apply limit CLK"
+}
+
+TABLE tQca_CXM_pktType
+   {0x00 "TX_BR_PKT"}
+   {0x01 "TX_EDR_PKT"}
+   {0x02 "TX_LE_PKT"}
+   {0x03 "TX_LEHS_PKT"}
+   {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_CXM_NOTIFY_WLAN_RF_STATE
+   {0x00 "2x2"}
+   {0x01 "1x2"}
+ENDTABLE
+
+TABLE tQca_CXM_MCI_STATE
+   {0x00 "MCI_STATE_UNINITIALIZED"}
+   {0x01 "MCI_STATE_STARTING"}
+   {0x02 "MCI_STATE_ACTIVE_GPM_DISABLED"}
+   {0x03 "MCI_STATE_ACTIVE_GPM_ENABLED"}
+   {0x04 "MCI_STATE_REMOTE_SLEEP"}
+ENDTABLE
+
+GROUP gQca_CXM_LeTxDutyCycle "MCI_LE_Tx_Duty_Cycle"
+{
+    FIELD fQca_CXM_LeTxDutyCycle_wlanRfState        (Fixed 1 Bytes)     (TABLE tQca_CXM_NOTIFY_WLAN_RF_STATE)   "NotifyWlanRfState"
+    FIELD fQca_CXM_LeTxDutyCycle_dutyCycle          (Fixed 1 Bytes)     (Decimal)                               "dutyCycle"
+    FIELD fQca_CXM_LeTxDutyCycle_threshold          (Fixed 1 Bytes)     (Decimal)                               "threshold"
+    FIELD fQca_CXM_LeTxDutyCycle_isFTM              (Fixed 1 Bytes)     (Decimal)                               "isFTM"
+    FIELD fQca_CXM_LeTxDutyCycle_forceNotify        (Fixed 1 Bytes)     (Decimal)                               "forceNotify"
+    FIELD fQca_CXM_LeTxDutyCycle_mci_state          (Fixed 1 Bytes)     (TABLE tQca_CXM_MCI_STATE)              "mci_state"
+    Reserved (fixed 2 bytes)
+    FIELD fQca_CXM_LeTxDutyCycle_lastLeTxUsec       (Fixed 4 Bytes)     (Decimal)                               "lastLeTxUsec"
+}
+
+GROUP gQca_CXM_QmiIdlLibErrorMsg "QMI_LIB_Error_Msg"
+{
+    FIELD fQca_Qmi_LibErrorMsg                      (Fixed 4 Bytes)     (Decimal)                               "Qmi Lib Error msg"
+}
+
+GROUP gQca_CXM_RegAccessFailInfo "Cxm Reg Access Fail Info"
+{
+    FIELD gQca_CXM_RegAccessFailInfo_FailCnt            (Fixed 4 Bytes)     (Decimal)                           "Reg Access Fail Cnt"
+    FIELD gQca_CXM_RegAccessFailInfo_Addr               (Fixed 4 Bytes)     (Hex)                               "Reg Access Fail Addr"
+    FIELD gQca_CXM_RegAccessFailInfo_Val                (Fixed 4 Bytes)     (Hex)                               "Reg Access Fail Val"
+}
+
+TABLE tQca_CXM_Policy
+    {0x00 "COEX_TRF_MGMT_FREERUN"}
+    {0x01 "COEX_TRF_MGMT_SHAPE_PM"}
+    {0x02 "COEX_TRF_MGMT_SHAPE_PSP"}
+    {0x03 "COEX_TRF_MGMT_SHAPE_S_CTS"}
+    {0x04 "COEX_TRF_MGMT_SHAPE_OCS"}
+    {0x05 "COEX_TRF_MGMT_SHAPE_FIXED_TIME"}
+    {0x06 "COEX_TRF_MGMT_SHAPE_NOA"}
+    {0x07 "COEX_TRF_MGMT_SHAPE_OCS_CRITICAL"}
+    {0x0A "COEX_TRF_MGMT_SHAPE_DYNAMIC"}
+    {0xFF "COEX_TRF_MGMT_NONE"}
+ENDTABLE
+
+GROUP qQca_CXM_MciGpmAgent_Wlan_Policy_Indication   "WLAN COEX Policy Indication"
+{
+    FIELD Qca_Cxm_WlanPolicyMode            (Fixed 1 Bytes)  (TABLE tQca_CXM_Policy)      "PolicyMode "
+    FIELD Qca_Cxm_WlanPolicyGrant           (Fixed 1 Bytes)  (Decimal)       "PolicyGrant"
+    FIELD Qca_Cxm_WlanInterval              (Fixed 1 Bytes)  (Decimal)       "WlanInterval"
+    FIELD Qca_Cxm_BtInterval                (Fixed 1 Bytes)  (Decimal)       "BtInterval"
+}
+
+/************************************************
+ * 0x04FD "LOG_ID_CXM_SCHED_INFO"
+************************************************/
+GROUP gQca_CXM_schedInfo "coex sched info"
+{
+    FIELD fQca_cxmSchedStartTime            (Fixed 4 Bytes)            (Hex)        "StartTime in us"
+    FIELD fQca_cxmSchedEndTime              (Fixed 4 Bytes)            (Hex)        "EndTime in us"
+    FIELD fQca_cxmSchedInfoParse            (Fixed 4 Bytes)             (Hex)       SUPPRESS_DETAIL
+
+    FIELD fQca_cxmtrafficType               (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 0)  ALSO (AndMask 0x07)  (Decimal)   SUPPRESS_DETAIL
+    FIELD fQca_cxmSchedLink                 (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 3)  ALSO (AndMask 0xFF)  (Decimal)    "LinkID"
+    FIELD fQca_cxmSchedPrio                 (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 11)  ALSO (AndMask 0xFF)  (Decimal)    "MCI PRIO"
+    FIELD fQca_cxmSchedtxPower              (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 19)  ALSO (AndMask 0xFF)  (Decimal)    "TxPower/AVGRSSI"
+    FIELD fQca_cxmSchedDirection            (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 27)  ALSO (AndMask 0x1)  (Decimal)    "Direction"
+    FIELD fQca_cxmSchedTag                  (Fixed 0)  RETRIEVE (StoreField fQca_cxmSchedInfoParse) ALSO (ShiftRight 28)  ALSO (AndMask 0x0f)  (Decimal)    "Tag"
+    FIELD fQca_cxmCurrTime                  (Fixed 4 Bytes)            (Hex)        "current time us"
+    FIELD fQca_cxmSchedDur                  (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_cxmSchedEndTime fQca_cxmSchedStartTime) (Decimal) "Duration"
+}

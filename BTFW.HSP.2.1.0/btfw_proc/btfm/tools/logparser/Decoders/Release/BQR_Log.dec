@@ -1,0 +1,402 @@
+/************************************************
+ * File: BQR_Log.dec
+ * BQR Logging Parser.
+ *
+ * Copyright (c) 2019-2020 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+************************************************/
+
+
+"BQR Logs" 0x1f000004 HOST_DATA_ORDER
+PAYLOAD_IS_BYTE_STREAM
+
+PREPROCESSING (InitField sQca_TraversalOverride -1)
+PREPROCESSING (InitField sQca_PduType -1)
+PREPROCESSING (InitField sQca_Traversal -1)
+
+SUMMARY_COLUMNS
+{
+    "BQR Report Sub ID"     100
+    "Handle"                100
+    "TimeStamp" 			100	
+    "Log ID"    			150
+    "Log Level" 			100
+    "Length"    			100
+    "seq"                   0
+    "profile"               0
+    "init"                  0
+    "shadow"                0
+    "curhdl"                0
+    "txAnt"                 0
+    "SelAnt"                0
+    "CalcAnt"               0
+    "type"                  0
+    "RSSI"                  0
+    "IIRAck0(%)"            0
+    "IIRAck1(%)"            0
+    "IIRRSSI0"              0
+    "IIRRSSI1"              0
+    "Alloc0(%)"             0
+    "DsrAlloc(%)"           0
+    "DsrAllocAck(%)"        0
+    "DsrAllocRssi(%)"       0
+    "weightAck(%)"          0
+    "dsrAlloc0B4Skew(%)"    0
+    "penX"                  0
+    "penY"                  0
+    "contNoRssi0"           0
+    "contNoRssi1"           0
+    "contSel0"              0
+    "contSel1"              0
+    "FrameAnt0"             0
+    "FrameAnt1"             0
+    "FrameAnt2"             0
+    "CalcAnt0"              0
+    "CalcAnt1"              0
+    "CalcAnt2"              0
+    "DecCnt0"               0
+    "DecCnt1"               0
+    "DecCnt2"               0
+}
+
+/*
+** This identifies the next protocol.
+*/
+NEXT_PROTOCOL (FromField sQca_Traversal)
+
+/*
+** Start of Decoding the Protocol
+*/
+DECODE
+
+FIELD fBQR_InitTraversalOverride    (Fixed 0) RETRIEVE(StoreInteger 0) (HEX) SUPPRESS_DETAIL Store sQca_TraversalOverride
+FIELD fBQR_InitPduType    (Fixed 0) RETRIEVE(StoreInteger 0) (HEX) SUPPRESS_DETAIL Store sQca_PduType
+FIELD fBQR_InitTraversal    (Fixed 0) RETRIEVE(StoreInteger 0) (HEX) SUPPRESS_DETAIL Store sQca_Traversal
+
+GROUP gBQR_Log
+{
+    GROUP gBQR_LogHeader;
+}
+GROUP gBQR_ChangeTraversal;
+
+END_MAIN_PATH
+
+
+INCLUDE_IF_EXISTS QCA_Debug_LogTables.dh
+/*INCLUDE_IF_EXISTS QCA_Shared_Groups.dh*/
+INCLUDE_IF_EXISTS QCA_Debug_ENHLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_LLMLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_CXMLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_STATLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_A2DPLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_OTALog.dh
+/****************************************************************************************
+** Tables for BQR Events
+*/
+
+TABLE tVSE_BQR_ID
+{0x58 "BQR_Host_Report_Event"             "BQR_Host_Report_Event" 0 }
+
+ENDTABLE
+
+TABLE tBQR_ReportSubID
+    {0x01 "Quality Monitor Report"              "Quality Monitor Report"                0   gBQRQualityReport}
+    {0x02 "LSTO Report"                         "LSTO Report"                           0   gBQRLSTOReport}
+    {0x03 "A2DP Glitch Report"                  "A2DP Glitch Report"                    0   gBQRA2DPReport}
+    {0x04 "SCO Choppy Report"                   "SCO Choppy Report"                     0   gBQRSCOReport}
+    {0x05 "Root Inflammation Report"            "Root Inflammation Report"              0   gBQRRootInflammation}
+    {0x11 "LMP Msg Trace"                       "LMP Msg Trace"                         0   gBQRLmpMsgTrace}
+    {0x12 "Multi-link/Coex Schedule Report"     "Multi-link/Coex Schedule Report"       0   gBQRMultiLinkMsgTrace}
+    {0x1F "TX PL Change Event"                  "TX PL Change Event"                    0   gBQRTxPLChangeEvent}
+    {0x20 "Conn Fail"                           "Conn Fail"                             0   gBQRConnFailReport}
+ENDTABLE
+
+GROUP gBQRQualityReport "Quality Monitor"
+{
+    GROUP gBQRReportEvtCommonParameter;
+    FIELD fBQR_Quality_TxPL                 (Fixed 1 Bytes)        (Hex)                                  "Tx Power Level"
+}
+
+TABLE tBQR_pktType
+        {0x00 "BQR_INVALID"}
+        {0x01 "BQR_ID"}
+        {0x02 "BQR_NULL"}
+        {0x03 "BQR_POLL"}
+        {0x04 "BQR_FHS"}
+        {0x05 "BQR_HV1"}
+        {0x06 "BQR_HV2"}
+        {0x07 "BQR_HV3"}
+        {0x08 "BQR_DV"}
+        {0x09 "BQR_EV3"}
+        {0x0A "BQR_EV4"}
+        {0x0B "BQR_EV5"}
+        {0x0C "BQR_2EV3"}
+        {0x0D "BQR_2EV5"}
+        {0x0E "BQR_3EV3"}
+        {0x0F "BQR_3EV5"}
+        {0x10 "BQR_DM1"}
+        {0x11 "BQR_DH1"}
+        {0x12 "BQR_DM3"}
+        {0x13 "BQR_DH3"}
+        {0x14 "BQR_DM5"}
+        {0x15 "BQR_DH5"}
+        {0x16 "BQR_AUX1"}
+        {0x17 "BQR_2DH1"}
+        {0x18 "BQR_2DH3"}
+        {0x19 "BQR_2DH5"}
+        {0x1A "BQR_3DH1"}
+        {0x1B "BQR_3DH3"}
+        {0x1C "BQR_3DH5"}
+        {0x1D "BQR_INVALID"}
+ENDTABLE
+
+TABLE tAIRMODE
+    {0x00 "uLaw"}
+    {0x01 "aLaw"}
+    {0x02 "CVSD"}
+    {0x03 "Transparent(msbc)"}
+ENDTABLE
+
+TABLE tQca_LinkQualityValues
+    {0x00 "Invalid"}
+    {0x01 "Low"}
+    {0x02 "Medium"}
+    {0x03 "Standard"}
+    {0x04 "High"}
+    {0x05 "Ultra High"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tBQR_MultiLinkMsgType
+    {0x01 "ACT_CONN_STAT"   "ACT_CONN_STAT"   0  gQca_STAT_ActiveConnSummary}
+    {0x02 "SCO_STAT"        "SCO_STAT"        0  gQca_STAT_ScoConnStats}
+    {0x03 "GEN_STAT"        "GEN_STAT"        0  gQca_STAT_GenStats}
+ENDTABLE
+
+
+/****************************************************************************************
+** Groups for BQR Events
+*/
+
+/***
+** Group for common Fields
+*/
+GROUP gBQR_Common_Fields
+{
+    FIELD fBQR_ConnHandle           (Fixed 2 Byte)          (Decimal)               IN_SUMMARY "Handle"     "Handle"
+}
+
+
+GROUP gBQR_LogHeader "BQR Host Report Event"
+{
+    FIELD fBQR_Event_Code           (Fixed 1 Byte)          (Hex)                       "Event Code"
+    FIELD fBQR_Event_Len            (Fixed 1 Byte)     	    (Decimal)                   "BQR Log Length"
+    FIELD fBQR_Event_SubID          (Fixed 1 Byte)          (Table tVSE_BQR_ID)         "VSE Sub ID"
+    FIELD fBQR_ReportSubID          (Fixed 1 Byte)          (Table tBQR_ReportSubID)    IN_SUMMARY "BQR Report Sub ID""BQR Report Sub ID"    
+    
+    BRANCH (FromTable tBQR_ReportSubID fBQR_ReportSubID)
+    
+}
+
+GROUP gBQRA2DPReport "BQR A2DP PARAMS"
+{
+    GROUP gBQRReportEvtCommonParameter;
+    FIELD fBQR_A2dp_arrivalTime                 (Fixed 4 Bytes)        (Hex)                              "Arrival Time"
+    FIELD fBQR_A2dp_schedInstant                (Fixed 4 Bytes)        (Hex)                              "Sched Instant"
+    FIELD fBQR_A2dp_glitch                      (Fixed 2 Bytes)        (Decimal)                          "Glitch Count"
+    FIELD fBQR_A2dp_TXCxm                       (Fixed 2 Bytes)        (Decimal)                          "TX CXM Denials"
+    FIELD fBQR_A2dp_RXCxm                       (Fixed 2 Bytes)        (Decimal)                          "RX CXM Denials"
+    FIELD fBQR_A2dp_aclQLen                     (Fixed 1 Byte)         (Decimal)                          "Acl Tx Queue Len"
+    FIELD fBQR_A2dp_linkQuality                 (Fixed 1 Byte)         (TABLE tQca_LinkQualityValues)     "Link Quality"
+    FIELD fBQR_A2dp_DiffAckInstPrevAck          (Fixed 0) RETRIEVE (SubtractFieldMinusField fBQR_piconetClock fBQR_lastTxAck) (Decimal) SUPPRESS_DETAIL
+    FIELD fBQR_A2dp_DiffAckInstPrevAckInmicroSec(Fixed 0) RETRIEVE (MultiplyFieldByInteger fBQR_A2dp_DiffAckInstPrevAck 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fBQR_A2dp_DiffAckInstPrevAckINmsec    (Fixed 0) RETRIEVE (DivideFieldByInteger fBQR_A2dp_DiffAckInstPrevAckInmicroSec 2000) (Decimal) "Delay_from_PrevACK_ms"
+    FIELD fBQR_A2dp_TxPL                        (Fixed 1 Bytes)        (Hex)                              "Tx Power Level"
+}
+
+GROUP gBQRSCOReport "BQR SCO PARAMS"
+{
+    GROUP gBQRReportEvtCommonParameter;
+    FIELD fBQR_SCO_ScoGlitchCount      (Fixed 2 Byte)          IF(MoreBytes) (Decimal)       "Glitch Count"
+    FIELD fBQR_SCO_TeSco               (Fixed 1 Byte)          IF(MoreBytes) (Decimal)       "TeSco"
+    FIELD fBQR_SCO_WeSco               (Fixed 1 Byte)          IF(MoreBytes) (Decimal)       "WeSco"
+    FIELD fBQR_SCO_airFormat           (Fixed 1 Byte)          (TABLE tAIRMODE)              "Airformat"
+    FIELD fBQR_Sco_InstanceCnt         (Fixed 2 Bytes)         (Decimal)                     "InstanceCnt"
+    FIELD fBQR_Sco_TxCxmDenied         (Fixed 2 Bytes)         (Decimal)                     "TxCxmDenied"
+    FIELD fBQR_Sco_RxCxmDenied         (Fixed 2 Bytes)         (Decimal)                     "RxCxmDenied"
+    FIELD fBQR_Sco_TxAbortCnt          (Fixed 2 Bytes)         (Decimal)                     "TxAbortCnt"
+    FIELD fBQR_Sco_lateDispatch        (Fixed 2 Bytes)         (Decimal)                     "lateDispatch"
+    FIELD fBQR_Sco_MicIntrMiss         (Fixed 2 Bytes)         (Decimal)                     "MicIntrMiss"
+    FIELD fBQR_Sco_LpaIntrMiss         (Fixed 2 Bytes)         (Decimal)                     "LpaIntrMiss"
+    FIELD fBQR_Sco_SpkrIntrMiss        (Fixed 2 Bytes)         (Decimal)                     "SpkrIntrMiss"
+    FIELD fBQR_Sco_PLCFillCnt          (Fixed 2 Bytes)         (Decimal)                     "PLCFillCnt"
+    FIELD fBQR_Sco_PLCDiscardCnt       (Fixed 2 Bytes)         (Decimal)                     "PLCDiscardCnt"
+    FIELD fBQR_Sco_missedInstCnt       (Fixed 2 Bytes)         (Decimal)                     "MissedInstanceCnt"
+    FIELD fBQR_Sco_TxRetxCnt           (Fixed 2 Bytes)         (Decimal)                     "Tx Retrans slot Cnt"
+    FIELD fBQR_Sco_RxRetxCnt           (Fixed 2 Bytes)         (Decimal)                     "Rx Retrans slot Cnt"
+    FIELD fBQR_Sco_GoodRxFrameCnt      (Fixed 2 Bytes)         (Decimal)                     "Good RX Frame Cnt"
+    FIELD fBQR_Sco_TxPL                (Fixed 1 Bytes)         (Hex)                         "Tx Power Level"
+}
+
+GROUP gBQRLSTOReport "BQR LSTO PARAMS"
+{
+    GROUP gBQRReportEvtCommonParameter;
+    FIELD fBQR_LSTO_ConnState            (Fixed 1 Bytes)        (TABLE tQca_ConnState)                       "State"
+    FIELD fBQR_LSTO_BBStats              (Fixed 4 Bytes)        (Hex)                                        "BBStats"
+    FIELD fBQR_LSTO_SlotsUsed            (Fixed 4 Bytes)        (Decimal)                                    "SlotsUsed"
+    FIELD fBQR_LSTO_CxmDenials           (Fixed 2 Bytes)        (Decimal)                                    "CxmDenials"
+    FIELD fBQR_LSTO_Skip                 (Fixed 2 Bytes)        (Decimal)                                    "Skip"
+    FIELD fBQR_LSTO_Rfloss               (Fixed 2 Bytes)        (Decimal)                                    "RFLoss"
+    FIELD fBQR_LSTO_NativeClock          (Fixed 4 Bytes)        (Hex)                                        SUPPRESS_DETAIL
+    FIELD fBQR_LSTO_LastTxAckTimestamp   (Fixed 4 Bytes)        (Hex)                                        SUPPRESS_DETAIL
+    FIELD fBQR_LSTO_TimeSinceSync        (Fixed 0) RETRIEVE (SubtractFieldMinusField fBQR_LSTO_NativeClock fBQR_LSTO_LastTxAckTimestamp) (Hex) "Time Since Sync"
+    FIELD fBQR_LSTO_TxPL                 (Fixed 1 Bytes)        (Hex)                                        "Tx Power Level"
+}
+
+GROUP gBQRReportEvtCommonParameter "BQR Quality Monitor PARAMS"
+{
+    FIELD fBQR_pktType              (Fixed 1 Byte)         (Table tBQR_pktType)                  "Packet Type"
+    FIELD fBQR_ConnHandle;
+    FIELD fBQR_role                 (Fixed 1 Bytes)        (TABLE tQca_DeviceRole)               "Role"
+    FIELD fBQR_txPowerLevel         (Fixed 1 Bytes)        RETRIEVE (SignExtension 8) (Decimal)  "Tx Power (dBm)"
+    FIELD fBQR_avgRssi              (Fixed 1 Byte)         RETRIEVE (SignExtension 8) (Decimal)  "Avg RSSI"
+    FIELD fBQR_snr                  (Fixed 1 Bytes)        (Decimal)                                 "Signal to Noise Ratio(in dB)"
+    FIELD fBQR_afh                  (Fixed 1 Byte)         (Decimal)                              "Unused AFH Channel Count"
+    FIELD fBQR_afhUnideal           (Fixed 1 Byte)         (Decimal)                              "AFH Unideal Channel Count"
+    FIELD fBQR_LSTO                 (Fixed 2 Bytes)        (Decimal)                              "LSTO"
+    FIELD fBQR_piconetClock         (Fixed 4 Bytes)        (Hex)                                  "Piconet Clock"
+    FIELD fBQR_Retran               (Fixed 4 Bytes)        (Decimal)                              "Retran Count"
+    FIELD fBQR_NoRx                 (Fixed 4 Bytes)        (Decimal)                              "No Rx Count"
+    FIELD fBQR_Nak                  (Fixed 4 Bytes)        (Decimal)                              "NAK Count"
+    FIELD fBQR_lastTxAck            (Fixed 4 Bytes)        (Hex)                                  "Last TX Ack Timestamp"
+    FIELD fBQR_FlowOff              (Fixed 4 Bytes)        (Decimal)                              "Flow Off Count"
+    FIELD fBQR_LastFlwoOn           (Fixed 4 Bytes)        (Hex)                                  "Last FlowOn Timestamp"
+    FIELD fBQR_OverflowCnt          (Fixed 4 Bytes)        (Decimal)                              "Overflow Count"
+    FIELD fBQR_UnderflowCnt         (Fixed 4 Bytes)        (Decimal)                              "Underflow Count"
+    FIELD fBQR_DeviceAddr           (Fixed 6 Bytes)        (Hex)                                  "Remote Addr"
+    FIELD fBQR_TxdcCnt              (Fixed 1 Bytes)        (Decimal)                              "TXDC Failed count"
+}
+
+GROUP gBQRRootInflammation "BQR Root Inflammation PARAMS"
+{
+    FIELD fBQR_ErrorCode            (Fixed 1 Byte)          (Decimal)              "ErrorCode"
+    FIELD fBQR_VendorErrorCode      (Fixed 1 Bytes)         (Decimal)              "Vendor_ErrorCode"
+}
+
+TABLE tBQR_LmpMsgType
+    {0x00 "LMP Rx"       "LMP Rx"        0    gBQR_OTA_LMPRxPDU}
+    {0x01 "LMP Tx"       "LMP Tx"        0    gBQR_OTA_LMPTxPDU}
+    {0x02 "LE Ctrl Rx"   "LE Ctrl Rx"    0    gBQR_OTA_LECtrlRxPDU}
+    {0x03 "LE Ctrl Tx"   "LE Ctrl Tx"    0    gBQR_OTA_LECtrlTxPDU}
+ENDTABLE
+
+GROUP gBQRLmpMsgTrace "BQR LMP Msg Trace PARAMS"
+{
+    FIELD fBQR_ConnHandle;
+    FIELD fBQR_MsgType                  (Fixed 1 Bytes)         (TABLE tBQR_LmpMsgType)     "Msg Type"
+    BRANCH (FromTable tBQR_LmpMsgType fBQR_MsgType)
+}
+
+GROUP gBQR_OTA_LMPTxPDU "LMP Tx PDU Info"
+{
+    FIELD fBQR_OTA_LMPTxAck             (Fixed 1 Bit)       (Decimal)           "TxACK Req"
+    FIELD fBQR_OTA_LMPPduLen            (Fixed 7 Bits)       (Decimal)           "PDU Length"
+    FIELD fBQR_OTA_LMPPDU_Type          (Fixed 0) RETRIEVE(StoreInteger 0) (Decimal) SUPPRESS_DETAIL	STORE sQca_PduType
+    FIELD fBQR_SetTraversalOverride     (Fixed 0) RETRIEVE(StoreInteger 1) (HEX) SUPPRESS_DETAIL Store sQca_TraversalOverride
+}
+
+GROUP gBQR_OTA_LMPRxPDU "LMP Rx PDU Info"
+{
+    FIELD fBQR_OTA_LMPTxAck;
+    FIELD fBQR_OTA_LMPPduLen;
+    FIELD fBQR_OTA_LMPPDU_Type;
+    FIELD fBQR_SetTraversalOverride;
+}
+
+GROUP gBQR_OTA_LECtrlRxPDU "LE Ctrl Rx PDU Info"
+{
+    FIELD fBQR_OTA_LETxAck              (Fixed 1 Bit)       (Decimal)                   "TxACK Req"
+    FIELD fBQR_OTA_LEPduLen             (Fixed 7 Bits)      (Decimal)                   "PDU Length" 
+    FIELD fBQR_OTA_LEPDU_Type           (Fixed 0) RETRIEVE(StoreInteger 1) (Decimal) SUPPRESS_DETAIL	STORE sQca_PduType
+    FIELD fBQR_SetTraversalOverride;
+    FIELD fBQR_OTA_LERxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 2) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gBQR_OTA_LECtrlTxPDU "LE Ctrl Tx PDU Info"
+{
+    FIELD fBQR_OTA_LETxAck;
+    FIELD fBQR_OTA_LEPduLen;
+    FIELD fBQR_OTA_LEPDU_Type;
+    FIELD fBQR_SetTraversalOverride;
+    FIELD fBQR_OTA_LETxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 1) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL    
+}
+
+GROUP gBQRMultiLinkMsgTrace "BQR Multi-link/Coex scheduling PARAMS"
+{
+    FIELD fBQR_ConnHandle;
+    FIELD fBQR_MultiLinkMsgType              (Fixed 1 Bytes)         (TABLE tBQR_MultiLinkMsgType)   "Msg_Type"
+    
+    BRANCH (FromTable tBQR_MultiLinkMsgType fBQR_MultiLinkMsgType)
+}
+
+TABLE tBQR_ConnFailReason
+    {0x00 "NoError"}
+    {0x04 "PageTimeout"}
+    {0x05 "AuthFailure"}
+    {0x08 "ConnectionTimeout"}
+    {0x0b "AclAlreadyExist"}
+    {0x22 "LmpRespTimeout"}
+    {0x3a "ControllerBusy"}
+ENDTABLE
+
+GROUP gBQRConnFailReport "ConnFail VSE PARAM"
+{
+    GROUP gBQRReportEvtCommonParameter;
+    FIELD fBQR_Conn_FailReason            (Fixed 1 Byte)        (Table tBQR_ConnFailReason)                 "FailReason"
+}
+
+TABLE tBQR_PLChangeSource
+    {0x00 "Remote"}
+    {0x80 "Local"}
+    {0x81 "Local Conn Init`"}
+    {0x82 "Local Dynamic Control"}
+    {0x83 "Local HPA Reset"}
+    {0x84 "Local HPA Eval"}
+    {0x85 "Local LPA Eval"}
+    {0x86 "Local Set to COnstant PL"}
+    {0x87 "Local LPA Reset"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gBQRTxPLChangeEvent "TX PL Change Event VSE PARAM"
+{
+    FIELD fBQR_TxPL_Change_ConnHandle     (Fixed 2 Bytes)         (Hex)                                 "Handle"
+    FIELD fBQR_TxPL_Change_Source         (Fixed 1 Bytes)         (TABLE tBQR_PLChangeSource)           "Power change source"
+    FIELD fBQR_TxPL_Change_PrevTxPL       (Fixed 1 Bytes)         (Hex)                                 "Prev Tx Power level"
+    FIELD fBQR_TxPL_Change_NewTxPL        (Fixed 1 Bytes)         (Hex)                                 "New Tx Power level"
+    FIELD fBQR_TxPL_Change_avgRssi        (Fixed 1 Bytes)          RETRIEVE (SignExtension 8) (Decimal) "Avg RSSI"
+}
+
+GROUP gBQR_ChangeTraversal  if(FieldIs Equalto 1 sQca_TraversalOverride) 
+{
+    GROUP gBQR_TraverseToLMP IF (FieldIs EqualTo 0 sQca_PduType)
+    {
+        FIELD fBQR_LMPTraverse  (Fixed 0) RETRIEVE(StoreInteger 0xf1)   (hex)   SUPPRESS_DETAIL Store sQca_Traversal
+    }
+    GROUP gBQR_TraverseToLLCtrl IF (FieldIs EqualTo 1 sQca_PduType)
+    {
+        FIELD fBQR_LLCtrlTraverse  (Fixed 0) RETRIEVE(StoreInteger 0xf2)   (hex)   SUPPRESS_DETAIL Store sQca_Traversal
+    }
+    
+    // We are traversing to LMP and it expects to see the values below.  Put something there to suppress errors.
+    FIELD SatisfyClock;
+    FIELD SatisfyAddress;
+    
+    //LE LL 
+    FIELD SatisfyAccessAddr;
+    FIELD SatisfyEventCtr;
+    FIELD SatisfyEncrInfo;
+    //FIELD SatisfySide;
+}
+

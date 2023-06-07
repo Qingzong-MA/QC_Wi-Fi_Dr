@@ -1,0 +1,114 @@
+From fe9a8596c7a034ebc0bac27329394d8cb0a8d096 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Tue, 26 Nov 2019 18:08:32 +0800
+Subject: [PATCH 2/2] wcnss_filter: Add support for BT_SOC_GNO_UART on X86
+
+Add support for BT_SOC_GNO_UART on X86.
+---
+ inc/uart_utils.h |  4 ++++
+ inc/utils.h      |  2 ++
+ src/main.c       | 15 +++++++++++++--
+ src/utils.c      |  3 +++
+ 4 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/inc/uart_utils.h b/inc/uart_utils.h
+index 79b725d..55fca42 100644
+--- a/inc/uart_utils.h
++++ b/inc/uart_utils.h
+@@ -33,7 +33,11 @@
+ #define TRUE           1
+ #define FALSE          0
+ 
++#if defined(X86_BUILD)
++#define BT_HS_UART_DEVICE "/dev/ttyUSB0"
++#else
+ #define BT_HS_UART_DEVICE "/dev/ttyHS0"
++#endif
+ 
+ /* HCI Packet types */
+ #define HCI_COMMAND_PKT     0x01
+diff --git a/inc/utils.h b/inc/utils.h
+index be15994..f451100 100644
+--- a/inc/utils.h
++++ b/inc/utils.h
+@@ -18,6 +18,8 @@ typedef enum {
+     BT_SOC_AR3K,
+     BT_SOC_ROME,
+     BT_SOC_CHEROKEE,
++    BT_SOC_GNO_USB,
++    BT_SOC_GNO_UART,
+     /* Add chipset type here */
+     BT_SOC_RESERVED
+ }bt_soc_type;
+diff --git a/src/main.c b/src/main.c
+index 8e5bc0b..def9204 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -121,7 +121,13 @@ Description
+ #define FM_SOCK "/data/misc/bluetooth/fm_sock"
+ #define SOCKETNAME  "/data/misc/bluetooth/btprop"
+ #endif
++
++#if defined(X86_BUILD)
++#define BT_HS_UART_DEVICE "/dev/ttyUSB0"
++#else
+ #define BT_HS_UART_DEVICE "/dev/ttyHS0"
++#endif
++
+ #define PROC_PANIC_PATH     "/proc/sysrq-trigger"
+ #define UART_IPC_LOG_PATH     "/sys/module/msm_serial_hs/parameters/debug_mask"
+ 
+@@ -1884,7 +1890,7 @@ static int start_reader_thread() {
+     int n = 0, retval;
+     ALOGV("%s: Entry ", __func__);
+ 
+-    if (soc_type == BT_SOC_ROME) {
++    if ((soc_type == BT_SOC_ROME) || (BT_SOC_GNO_UART == soc_type)) {
+         if ((fd_transport = init_hci_transport()) == -1)
+         {
+             ALOGE("unable to initialize transport %s", BT_HS_UART_DEVICE);
+@@ -1966,6 +1972,7 @@ int deinit_hci_transport() {
+     ALOGV("%s:> soc_type: %d", __func__, soc_type);
+ 
+     switch (soc_type) {
++        case BT_SOC_GNO_UART:
+         case BT_SOC_ROME: {
+             userial_clock_operation(fd_transport, USERIAL_OP_CLK_OFF);
+             wcnss_stop_idle_timeout_timer();
+@@ -2047,6 +2054,7 @@ int init_hci_transport() {
+     ALOGV("%s:> soc_type: %d", __func__, soc_type);
+ 
+     switch (soc_type) {
++        case BT_SOC_GNO_UART:
+         case BT_SOC_ROME: {
+             /* As this is being already initialized and opened for
+              * normal operation, open in 3 MBPS for rome*/
+@@ -2139,7 +2147,10 @@ int main() {
+         exit(1);
+     }
+ 
+-#if BT_SOC_TYPE_ROME
++#if defined(BT_CONTROLLER_TYPE_GNO_UART)
++    property_set_bt("qcom.bluetooth.soc", "gno_uart");
++    ALOGI("%s: property_set_bt(%s, %s)", __func__, "qcom.bluetooth.soc", "gno_uart");
++#elif BT_SOC_TYPE_ROME
+     property_set_bt("qcom.bluetooth.soc", "rome");
+ #elif BT_SOC_TYPE_CHEROKEE
+     property_set_bt("qcom.bluetooth.soc", "cherokee");
+diff --git a/src/utils.c b/src/utils.c
+index 5a83193..e9c7aa8 100644
+--- a/src/utils.c
++++ b/src/utils.c
+@@ -40,6 +40,9 @@ int get_bt_soc_type()
+         if (!strncasecmp(bt_soc_type, "rome", sizeof("rome"))) {
+             return BT_SOC_ROME;
+         }
++        else if (!strncasecmp(bt_soc_type, "gno_uart", sizeof("gno_uart"))) {
++            return BT_SOC_GNO_UART;
++        }
+         else if (!strncasecmp(bt_soc_type, "cherokee", sizeof("cherokee"))) {
+             return BT_SOC_CHEROKEE;
+         }
+-- 
+2.7.4
+

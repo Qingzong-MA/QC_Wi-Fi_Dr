@@ -1,0 +1,38 @@
+#How to build athdiag
+cd athdiag/athdiag/
+make
+#binary is athdiag/athdiag/athdiag
+
+#How to build myftm
+cd myftm2/
+make
+#binary is myftm2/myftm/myftm
+
+#how to build cnssdiag_lite
+cd cnssdiag_lite
+make
+#binary is cnssdiag_lite/cnssdiag_lite
+
+#how to build vendorcmdtool
+cd vendorcmdtool
+cp Makefile.x86 Makefile
+make
+#binary is vendorcmdtool/vendorcmdtool
+
+#How to build Qcmbr
+cd Qcmbr/
+make
+#binary is Qcmbr/Qcmbr
+
+#How to build sigma_dut
+cd ../AIO/build
+make sigmadut_build
+#binary is ../AIO/apps/sigma_dut/sigma_dut
+
+#how to build nantool
+cd nantool/lib
+make to build libwifi-hal-qcom.so
+cd nantool
+make to build Nandemotool
+#binary is nantool/lib/libwifi-hal-qcom.so
+# and nantool/Nandemotool

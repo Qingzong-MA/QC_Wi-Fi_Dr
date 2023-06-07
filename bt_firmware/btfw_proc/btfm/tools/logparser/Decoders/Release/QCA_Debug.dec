@@ -1,0 +1,122 @@
+/************************************************
+ * File: QCA_Debug.dec
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) 2015-2017 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+************************************************/
+
+
+"QCA Debug" 0x1f000000 HOST_DATA_ORDER
+PAYLOAD_IS_BYTE_STREAM
+
+SUMMARY_COLUMNS
+{
+    "Seq Num"            100
+    "Logs Lost"          100
+    "Log ID"             150
+    "TimeStamp"          100
+    "Length"             100
+    "Log Level"          150
+    "SLC Clock"          0
+    "seq"                0
+    "profile"            0
+    "init"               0
+    "shadow"             0
+    "curhdl"             0
+    "txAnt"              0
+    "SelAnt"             0
+    "CalcAnt"            0
+    "type"               0
+    "RSSI"               0
+    "IIRAck0(%)"         0
+    "IIRAck1(%)"         0
+    "IIRRSSI0"           0
+    "IIRRSSI1"           0
+    "Alloc0(%)"          0
+    "DsrAlloc(%)"        0
+    "DsrAllocAck(%)"     0
+    "DsrAllocRssi(%)"    0
+    "weightAck(%)"       0
+    "dsrAlloc0B4Skew(%)" 0
+    "penX"               0
+    "penY"               0
+    "contNoRssi0"        0
+    "contNoRssi1"        0
+    "contSel0"           0
+    "contSel1"           0
+    "FrameAnt0"          0
+    "FrameAnt1"          0
+    "FrameAnt2"          0
+    "CalcAnt0"           0
+    "CalcAnt1"           0
+    "CalcAnt2"           0
+    "DecCnt0"            0
+    "DecCnt1"            0
+    "DecCnt2"            0
+}
+
+/*
+** This identifies the next protocol.
+*/
+NEXT_PROTOCOL (FromField sQca_Proto)
+
+/*
+** The length for the next protocol.
+*/
+//NEXT_PROTOCOL_SIZE (ThisLayerLength fQca_ProtoLen)
+
+/*
+** Start of Decoding the Protocol
+*/
+DECODE
+
+/* Decode the Enh Log Header */
+GROUP gQca_LogHeader;
+/* Check for SLC or Task Level Logging */
+GROUP gQca_ProtoCheck;
+
+END_MAIN_PATH
+
+
+/* Group of Fields for Enhanced Log Header */
+GROUP gQca_LogHeader "Enh Log Header"
+{
+    FIELD fQca_Hdr_LogHdl       (Fixed 2 Bytes)     (Hex)                                   "Log Handle"
+    FIELD fQca_Hdr_LogLen       (Fixed 2 Bytes)     (Hex)                                   "Log Length"
+    FIELD fQca_Hdr_L2CAPLen     (Fixed 2 Bytes)     (Hex)                                   "L2CAP Length"
+	FIELD fQca_Hdr_CID          (Fixed 1 Byte)      (Hex)                                   "CID"
+    FIELD fQca_Hdr_SeqNum       (Fixed 1 Byte)      (Decimal)       IN_SUMMARY "Seq Num"    "Seq Num"
+    FIELD fQca_Hdr_LogsLost     (Fixed 1 Byte)      (Decimal)       IN_SUMMARY "Logs Lost"  "Logs Lost/Drop"
+    FIELD fQca_Hdr_QcaVer       (Fixed 1 Byte)  RETRIEVE (StoreIntraframeField sQcaMainVer)   (Hex) "Prod ID"
+}
+
+/* Group of Fields for Packet Info Header */
+GROUP gQca_ProtoCheck
+{
+    /* Just Read the Log ID without moving the parsing pointer */
+    FIELD fQca_Pkt_ProtoID      (Fixed 2 Bytes)     (TABLE tQca_EnhLogID)       IN_SUMMARY "Log ID"     SUPPRESS_DETAIL NO_MOVE
+    /* Get the Timestamp info to display in this Protocol */
+    FIELD fQca_ProtoTS      START_BIT (Move 4 Bytes)   (Fixed 4 Bytes) (Hex)  IN_SUMMARY "TimeStamp" SUPPRESS_DETAIL NO_MOVE
+
+    /* Set the sQca_Proto type value to route to the next level of Protocol. Refer Personality file for proto type values supported */
+    FIELD fQca_Proto    (Fixed 0) IF NOT (Fieldis EqualTo 0 fQca_Pkt_ProtoID)   RETRIEVE(StoreInteger 1) (Hex) SUPPRESS_DETAIL Store sQca_Proto
+    FIELD fQca_ProtoSLC (Fixed 0) IF     (Fieldis EqualTo 0 fQca_Pkt_ProtoID)   RETRIEVE(StoreInteger 2) (Hex) SUPPRESS_DETAIL Store sQca_Proto
+    FIELD fQca_ProtoASD (Fixed 0) IF     (Fieldis EqualTo 0x0619 fQca_Pkt_ProtoID)   RETRIEVE(StoreInteger 5) (Hex) SUPPRESS_DETAIL Store sQca_Proto
+}
+
+INCLUDE_IF_EXISTS QCA_Debug_LogTables.dh
+INCLUDE_IF_EXISTS QCA_Debug_ENHLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_SLCLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_OTALog.dh
+INCLUDE_IF_EXISTS QCA_Debug_LLMLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_QHSLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_STATLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_CXMLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_Strings.dh
+INCLUDE_IF_EXISTS QCA_Debug_PFALLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_FMLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_A2DPLog.dh
+INCLUDE_IF_EXISTS QCA_Debug_APPLog.dh
+

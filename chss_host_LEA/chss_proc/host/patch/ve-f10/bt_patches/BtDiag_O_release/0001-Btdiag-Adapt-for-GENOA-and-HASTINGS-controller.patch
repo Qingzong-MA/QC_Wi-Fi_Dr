@@ -1,0 +1,261 @@
+From 7fb30bf7862d7f2ae2cceee216deed1b540083c2 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Fri, 5 Jun 2020 13:39:17 +0800
+Subject: [PATCH] Btdiag: Adapt for GENOA and HASTINGS controller
+
+Adapt for GENOA and HASTINGS controller with UART
+interface.
+---
+ Makefile.cc      |   9 +++
+ connection.c     |   4 ++
+ hciattach_rome.c | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hciattach_rome.h |   5 ++
+ 4 files changed, 190 insertions(+)
+
+diff --git a/Makefile.cc b/Makefile.cc
+index 1718fab3b50a..ddc21cacbf5f 100755
+--- a/Makefile.cc
++++ b/Makefile.cc
+@@ -9,6 +9,15 @@ CFLAGS += -g -DDEBUG
+ CFLAGS += -DCSP_BUILD
+ CFLAGS += -DBT_HCI_UART
+ 
++MY_DIR := $(realpath $(dir $(lastword ${MAKEFILE_LIST})))
++TOP_DIR := $(realpath ${MY_DIR}/../)
++FLUORIDE_DIR := ${TOP_DIR}/fluoride
++ifeq "${USE_VENDOR_LIB}" "y"
++CFLAGS += -DUSE_VENDOR_LIB
++CFLAGS += -I${FLUORIDE_DIR}/hci/include
++LDLIBS += -ldl
++endif
++
+ ifeq "$(strip ${CONFIG_BT_STACK})" "fluoride"
+     CFLAGS += -DFLUORIDE_STACK
+ else ifeq "$(strip ${CONFIG_BT_STACK})" "bludroid"
+diff --git a/connection.c b/connection.c
+index 0fe658b1a8c4..a592cde01131 100755
+--- a/connection.c
++++ b/connection.c
+@@ -453,7 +453,11 @@ int SerialConnection(char *dev_path, char *baudrate)
+ 	/* 10 seconds should be enough for initialization */
+ 	alarm(to);
+ 
++#if USE_VENDOR_LIB
++	n = bc_download_fw();
++#else
+ 	n = initport(dev, u, sendbreak);
++#endif
+ 	if (n < 0) {
+ 		perror("Can't initialize device");
+ 		exit(-1);
+diff --git a/hciattach_rome.c b/hciattach_rome.c
+index 5bd610ecb0e5..f1f3f86c48f8 100755
+--- a/hciattach_rome.c
++++ b/hciattach_rome.c
+@@ -37,6 +37,8 @@
+ 
+ #define LOG_TAG "bt_vendor"
+ #include <stdio.h>
++#include <stdbool.h>
++#include <sys/un.h>
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -61,6 +63,28 @@
+ }
+ #endif
+ 
++#ifdef USE_VENDOR_LIB
++#include <dlfcn.h>
++#include "bt_vendor_lib.h"
++
++#ifdef ANDROID
++static const char *VENDOR_LIBRARY_NAME = "libbt-vendor.so";
++#else
++#ifdef CSP_BUILD
++static const char *VENDOR_LIBRARY_NAME = "libbt-vendor_qca.so";
++#else
++static const char *VENDOR_LIBRARY_NAME = "libbt-vendor.so.0";
++#endif
++#endif
++
++static const char *VENDOR_LIBRARY_SYMBOL_NAME = "BLUETOOTH_VENDOR_LIB_INTERFACE";
++static unsigned char bc_bt_address[] = {0x8c, 0xfd, 0xf0, 0x89, 0x36, 0x77};
++
++static void *bc_lib_handle;
++static bt_vendor_interface_t *bc_lib_interface;
++#endif
++#define BT_PROP_NAME  "/data/misc/bluetooth/btprop"
++#define ENABLE_IBS_PROPERTY "bluetooth.qca.enable_ibs"
+ 
+ /******************************************************************************
+ **  Variables
+@@ -1853,3 +1877,151 @@ out_fw:
+ error:
+     return err;
+ }
++
++static int bt_prop_init(void)
++{
++	int fd;
++	int size;
++	int res;
++	struct sockaddr_un name;
++
++	fd = socket(PF_LOCAL, SOCK_STREAM, 0);
++	if (fd < 0) {
++		perror ("socket");
++		return -1;
++	}
++
++	memset(&name, 0x00, sizeof(name));
++	name.sun_family = AF_LOCAL;
++	snprintf(name.sun_path, sizeof(name.sun_path), "%s", BT_PROP_NAME);
++	size = (unsigned)((void *)&name.sun_path - (void*)&name);
++	size += strlen(name.sun_path);
++	res = connect(fd, (struct sockaddr *)&name, size);
++	if (res < 0) {
++		perror ("connect");
++		return -2;
++	}
++
++	fprintf(stdout, "%s: bt_prop_fd = %d\n", __func__, fd);
++	return fd;
++}
++
++static int set_bt_prop(int fd, const char *key, const char *value)
++{
++	int ret;
++	int size;
++	char prop_val[256];
++
++	memset(prop_val, 0x00, sizeof(prop_val));
++	snprintf(prop_val, sizeof(prop_val), "set_property %s %s,", key, value);
++	size = strlen(prop_val);
++
++	ret = send(fd, prop_val, size, 0);
++	ret = (ret == size ? 0 : -1);
++
++	fprintf(stdout, "%s(%d, %s, %s) = %d\n", __func__, fd, key, value, ret);
++	return ret;
++}
++
++#ifdef USE_VENDOR_LIB
++static void bc_vendor_lib_dummy_cb(bt_vendor_op_result_t result)
++{
++	fprintf(stdout, "%s(%d)\n", __func__, (int)result);
++}
++
++static void bc_firmware_config_cb(bt_vendor_op_result_t result)
++{
++	fprintf(stdout, "%s(%d)\n", __func__, (int)result);
++}
++
++static void *bc_buffer_alloc_cb(int size)
++{
++	void *ret;
++	ret = calloc(size, 1);
++	return ret;
++}
++
++static void bc_buffer_free_cb(void *buffer)
++{
++	free(buffer);
++}
++
++static uint8_t bc_transmit_cb(uint16_t opcode, void *buffer,
++			      tINT_CMD_CBACK callback)
++{
++	fprintf(stdout, "%s(%#x, ...)\n", __func__, opcode);
++	return true;
++}
++
++static void bc_a2dp_offload_cb(bt_vendor_op_result_t result,
++			       bt_vendor_opcode_t op, uint8_t bta_av_handle)
++{
++	fprintf(stdout, "%s(%d, %#x, %#x)\n", __func__, (int)result,
++		(int)op, bta_av_handle);
++}
++
++static const bt_vendor_callbacks_t bc_lib_callbacks = {
++	sizeof(bc_lib_callbacks),
++	bc_firmware_config_cb,
++	bc_vendor_lib_dummy_cb,
++	bc_vendor_lib_dummy_cb,
++	bc_vendor_lib_dummy_cb,
++	bc_buffer_alloc_cb,
++	bc_buffer_free_cb,
++	bc_transmit_cb,
++	bc_vendor_lib_dummy_cb,
++	bc_a2dp_offload_cb
++};
++
++int bc_download_fw(void)
++{
++	int status;
++	int ret = -1;
++	int bt_prop_fd;
++	int pwr = BT_VND_PWR_ON;
++	int fd_array[CH_MAX] = {-1};
++
++	bt_prop_fd = bt_prop_init();
++	if (bt_prop_fd < 0)
++		return ret;
++
++	ret = -2;
++	status = set_bt_prop(bt_prop_fd, ENABLE_IBS_PROPERTY, "false");
++	if (status < 0)
++		return ret;
++	usleep(40000);
++
++	ret = -3;
++	bc_lib_handle = dlopen(VENDOR_LIBRARY_NAME, RTLD_NOW);
++	fprintf(stdout, "%s: dlopen(%s, ...) = %#lx\n", __func__, VENDOR_LIBRARY_NAME, (unsigned long)bc_lib_handle);
++	if (!bc_lib_handle)
++		return ret;
++
++	ret = -4;
++	bc_lib_interface = (bt_vendor_interface_t *)dlsym(bc_lib_handle, VENDOR_LIBRARY_SYMBOL_NAME);
++	fprintf(stdout, "%s: dlsym() = %#lx\n", __func__, (unsigned long)bc_lib_interface);
++	if (!bc_lib_interface)
++		return ret;
++
++	ret = -5;
++	status = bc_lib_interface->init(&bc_lib_callbacks, bc_bt_address);
++	fprintf(stdout, "%s: lib_interface->init() = %d\n", __func__, status);
++	if (status)
++		return ret;
++
++	ret =-6;
++	status = bc_lib_interface->op(BT_VND_OP_POWER_CTRL, &pwr);
++	fprintf(stdout, "%s: BT_VND_OP_POWER_CTRL: %d\n", __func__, status);
++
++	ret = -7;
++	status = bc_lib_interface->op(BT_VND_OP_USERIAL_OPEN, &fd_array);
++	fprintf(stdout, "%s: BT_VND_OP_USERIAL_OPEN: %d\n", __func__, status);
++	if (status != 1)
++		return ret;
++
++	ret = fd_array[0];
++	fprintf(stdout, "%s: ret = %d\n", __func__, ret);
++	return ret;
++}
++#endif
++
+diff --git a/hciattach_rome.h b/hciattach_rome.h
+index ff29dd256339..93096dd9ec2d 100755
+--- a/hciattach_rome.h
++++ b/hciattach_rome.h
+@@ -387,4 +387,9 @@ enum{
+     TUFELLO_VER_1_1 = ((ROME_PATCH_VER_0302 << 16 ) | ROME_SOC_ID_23 ),
+     NAPLES_VER_1_0  = (0x01000015)
+ };
++
++#ifdef USE_VENDOR_LIB
++int bc_download_fw(void);
++#endif
++
+ #endif /* HW_ROME_H */
+-- 
+2.7.4
+

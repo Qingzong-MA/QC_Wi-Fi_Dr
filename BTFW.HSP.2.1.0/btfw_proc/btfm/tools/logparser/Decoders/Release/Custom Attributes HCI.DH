@@ -1,0 +1,43 @@
+/************************************************
+ * File: Custom Attributes HCI.DH
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2015-2020 Qualcomm Technologies, Inc.
+ * 2015, 2017 Qualcomm Atheros, Inc.
+ * All Rights Reserved. 
+ * Qualcomm Atheros Confidential and Proprietary.
+************************************************/
+
+INCLUDE_IF_EXISTS QCA_VS_Commands.dh
+INCLUDE_IF_EXISTS LA_VS_Commands.dh
+
+TABLE qualcommPacketType APPENDS_ONLY hci_packet_types 
+    { 0xf0    "QCA Debug Info"      "QCA Debug Info"        0   gQca_DebugInfo }
+    { 0xf1    "QCA Legacy Logs"     "QCA Legacy Logs"       0   gQca_LegacyLog }
+    { 0xf2    "BQR Logs"            "BQR Logs"              0   gBQR_Log }
+    { 0xf3    "QCA Memdump Logs"    "QCA Memdump Logs"      0   gQca_MemdumpLog }
+ENDTABLE
+
+/* ACL Log Packet Parsing Method */
+GROUP gQca_DebugInfo "QCA Debug Info"
+{
+    FIELD fQca_PacketTraversal  (Fixed 0)   RETRIEVE(StoreInteger 1)    (Hex) SUPPRESS_DETAIL Store sQca_PacketTraversal
+}
+
+/* ACL Log Packet Parsing Method */
+GROUP gQca_LegacyLog "QCA Legacy Logs"
+{
+    FIELD fQca_PacketTraversal_Legacy  (Fixed 0)   RETRIEVE(StoreInteger 2)    (Hex) SUPPRESS_DETAIL Store sQca_PacketTraversal
+}
+
+/* BQR Log Packet Parsing Method */
+GROUP gBQR_Log "BQR Logs"
+{
+    FIELD fBQR_PacketTraversal  (Fixed 0)   RETRIEVE(StoreInteger 3)    (Hex) SUPPRESS_DETAIL Store sQca_PacketTraversal
+}
+
+/* Memdump Log Packet Parsing Method */
+GROUP gQca_MemdumpLog "QCA Memdump Logs"
+{
+    FIELD fQCA_PacketTraversal_Memdump  (Fixed 0)   RETRIEVE(StoreInteger 4)    (Hex) SUPPRESS_DETAIL Store sQca_PacketTraversal
+}

@@ -1,0 +1,1824 @@
+/************************************************
+ * File: QCA_Debug_STATLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) 2015-2021 Qualcomm Technologies, Inc.
+ * 2015-2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only
+ ************************************************/
+
+TABLE tQca_StatLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0600 "LOG_ID_STATS_A2DP_SRC_STALL"   "LOG_ID_STATS_A2DP_SRC_STALL"  0 gQca_STAT_A2dpConnStats}
+    {0x0601 "LOG_ID_STATS_SCO"              "LOG_ID_STATS_SCO"             0 gQca_STAT_3990_ScoConnStats}
+    {0x0602 "LOG_ID_STATS_ACT_CONN"         "LOG_ID_STATS_ACT_CONN"        0 gQca_STAT_ActiveConnSummary}
+    {0x0603 "LOG_ID_STATS_GEN"              "LOG_ID_STATS_GEN"             0 gQca_STAT_GenStats}
+    {0x0604 "LOG_ID_STATS_INQ"              "LOG_ID_STATS_INQ"             0 gQca_STAT_InquiryPerfStats}
+    {0x0605 "LOG_ID_STATS_PAGE"             "LOG_ID_STATS_PAGE"            0 gQca_STAT_PagePerfStats}
+    {0x0606 "LOG_ID_STATS_LATE_DISP"        "LOG_ID_STATS_LATE_DISP"       0 gQca_STAT_LateDispatchStats}
+    {0x0607 "LOG_ID_STATS_PREF_RATE"        "LOG_ID_STATS_PREF_RATE"       0 gQca_STAT_PrefRateStats}
+    {0x0608 "LOG_ID_STATS_HALF_LSTO"        "LOG_ID_STATS_HALF_LSTO"       0 gQca_STAT_HalfLstoStats}
+    {0x0609 "LOG_ID_STATS_XSCO"             "LOG_ID_STATS_XSCO"            0 gQca_STAT_ScoConnStats}
+    {0x060A "LOG_ID_STATS_POLL_MNGR"        "LOG_ID_STATS_POLL_MNGR"       0 gQca_STAT_PollMngrStats}
+    {0x060B "LOG_ID_STATS_SNIFF"            "LOG_ID_STATS_SNIFF"           0 gQca_STAT_SniffStats}
+    {0x060C "LOG_ID_STATS_XSCO_TOTAL"       "LOG_ID_STATS_XSCO_TOTAL"      0 gQca_STAT_ScoConnStats}
+    {0x060D "LOG_ID_STATS_ROLESWITCH"       "LOG_ID_STATS_ROLESWITCH"      0 gQca_STAT_RoleSwitchStats}
+    {0x060E "LOG_ID_STATS_BCAUD"            "LOG_ID_STATS_BCAUD"           0 gQca_STAT_BCAUD}
+    {0x060F "LOG_ID_STATS_QHS_PREF_RATE"    "LOG_ID_STATS_QHS_PREF_RATE"   0 gQca_LLM_QhsPrefRate}
+    {0x0610 "LOG_ID_STATS_WAR_DEVICE"       "LOG_ID_STATS_WAR_DEVICE"      0 gQca_STAT_WarDevice}
+    {0x0611 "LOG_ID_STATS_TPO"              "LOG_ID_STATS_TPO"             0 gQca_TruncPageStats}
+    {0x0612 "LOG_ID_STATS_FRA"              "LOG_ID_STATS_FRA"             0 gQca_FRAStats}
+    {0x0613 "LOG_ID_STATS_3MNACK"           "LOG_ID_STATS_3MNACK"          0 gQca_3mNACKStats}
+    {0x0614 "LOG_ID_STATS_ISO"              "LOG_ID_STATS_ISO"             0 gQca_STAT_IsoConnStats}
+    {0x0615 "LOG_ID_STATS_RETRANS_PKT"      "LOG_ID_STATS_RETRANS_PKT"     0 gQca_StatRetranPktStatus}
+    {0x0616 "LOG_ID_STATS_OBEX_BB_BW_REPORT" "LOG_ID_STATS_OBEX_BB_BW_REPORT" 0 gQca_OBEX_bbBwReport}
+	{0x0617 "LOG_ID_STATS_LE_SCAN"          "LOG_ID_STATS_LE_SCAN"         0  gQca_STAT_leScan}
+    {0x0618 "LOG_ID_STATS_ISO_AL_DBG"      "LOG_ID_STATS_ISO_AL_DBG"       0 gQca_STAT_IsoalDbg}
+    {0x0619 "LOG_ID_STATS_ASD"              "LOG_ID_STATS_ASD"             0 gQca_STAT_AsdStats}
+    {0x061A "LOG_ID_STATS_A2DP_SINK_STALL"  "LOG_ID_STATS_A2DP_SINK_STALL" 0 gQca_STAT_A2dpSinkConnStats}
+    {0x061E "LOG_ID_STATS_VOICE_GROUP"      "LOG_ID_STATS_VOICE_GROUP"     0 gQca_STAT_VoiceGroup}
+    {0x061F "LOG_ID_STATS_VOICE_STREAM"     "LOG_ID_STATS_VOICE_STREAM"    0 gQca_STAT_VoiceStream}
+    {0x061D "LOG_ID_STATS_VOICE_TRANSPARENT_SAMP_BUF"  "LOG_ID_STATS_VOICE_TRANSPARENT_SAMP_BUF"   0   gQca_STAT_VoiceTransparent_SB}
+    {0x0622 "LOG_ID_STATS_RTSC_CNTS"        "LOG_ID_STATS_RTSC_CNTS"       0 gQca_STAT_RtscAclStats}
+    {0x0623 "LOG_ID_STATS_ACL_RX_STATE"     "LOG_ID_STATS_ACL_RX_STATE"    0 gQca_STAT_AclRxState}
+    {0x0626 "LOG_ID_STATS_ASHA_STALL"       "LOG_ID_STATS_ASHA_STALL"      0 gQca_STAT_AshaStallStats}
+    {0x0627 "LOG_ID_STATS_PKT_HEC_ERR_RAW"  "LOG_ID_STATS_PKT_HEC_ERR_RAW"   0 gQca_STATS_HecErrRaw}
+    {0x0628 "LOG_ID_STATS_PKT_CRC_ERR_RAW"  "LOG_ID_STATS_PKT_CRC_ERR_RAW"   0 gQca_STATS_CrcRaw}
+    {0x0629 "LOG_ID_STATS_PKT_CRC_GOOD_RAW" "LOG_ID_STATS_PKT_CRC_GOOD_RAW"  0 gQca_STATS_CrcRaw}
+    {0x0630 "LOG_ID_STATS_RX_PKT_AGC_REG_INFO"    "LOG_ID_STATS_RX_PKT_AGC_REG_INFO"     0 gQca_STAT_RxAgcRegInfo}
+
+    {0x0631 "LOG_ID_STATS_EDPH_START"       "LOG_ID_STATS_EDPH_START"       0 gQca_EDPHStart}
+    {0x0632 "LOG_ID_STATS_EDPH_HISTORY"     "LOG_ID_STATS_EDPH_HISTORY"     0 gQca_EDPHHist}
+    {0x0633 "LOG_ID_STATS_ISO_SDU_TX_DBG"   "LOG_ID_STATS_ISO_SDU_TX_DBG"   0 gQca_STAT_IsoSduTxDbg}
+    {0x0634 "LOG_ID_STATS_ISO_SDU_RX_DBG"   "LOG_ID_STATS_ISO_SDU_RX_DBG"   0 gQca_STAT_IsoSduRxDbg}
+    
+    {0x0635 "LOG_ID_STATS_XSCO_RTSC"        "LOG_ID_STATS_XSCO_RTSC"        0 gQca_qbmXscoStats}
+    {0x0636 "LOG_ID_STATS_ACL_FLUSH"        "LOG_ID_STATS_ACL_FLUSH"        0 gQca_STAT_ACLFlushStats}
+    {0x0637 "LOG_ID_STATS_WAR_PWR_CTRL_DEVICE"       "LOG_ID_STATS_WAR_PWR_CTRL_DEVICE"      0 gQca_STAT_PwrCtrl_WarDevice}
+    {0x0638 "LOG_ID_STATS_RSSI_UNSET_LUT"    "LOG_ID_STATS_RSSI_UNSET_LUT"     0 gQca_STAT_RssiUnsetLut}
+    {0x0645 "LOG_ID_LE_SCAN_INFO"           "LOG_ID_LE_SCAN_INFO"          0 gQca_STAT_leScanInfo}
+    {0x0646 "LOG_ID_ISO_RETRANS_RATE_STATS"  "LOG_ID_ISO_RETRANS_RATE_STATS"         0 gQca_STAT_isoRetransRate}
+    {0x0647 "LOG_ID_STATS_LE_RX_AGC_INFO"   "LOG_ID_STATS_LE_RX_AGC_INFO"  0 gQca_STAT_LERxAgcInfo}
+    {0x0648 "LOG_ID_STATS_A2DP_CXM_DENIAL_STATS"   "LOG_ID_STATS_A2DP_CXM_DENIAL_STATS"  0 gQca_STAT_A2DPCxmDenialStats}
+    {0x06F1 "LOG_ID_STATS_DBFW_FRAG_INIT_BUFF_INDEX"  "LOG_ID_STATS_DBFW_FRAG_INIT_BUFF_INDEX"     0 gQca_STATS_FragBuffIndex}
+    {0x06FF "STATS End"}
+ENDTABLE
+
+GROUP gQca_STAT_leScanInfo "LE SCAN STATS"
+{
+    FIELD fQca_f1   (Fixed 4 Bytes)          (Decimal)              "window in slots "
+    FIELD fQca_f2   (Fixed 4 Bytes)          (Decimal)              "Interval in slots "
+    FIELD fQca_f3   (Fixed 4 Bytes)          (Decimal)              "High Prio percent (%)"
+    FIELD fQca_f4   (Fixed 4 Bytes)          (Decimal)              "High prio slots"
+    FIELD fQca_f5   (Fixed 4 Bytes)          (Decimal)              "Low Prio slots"
+    FIELD fQca_f6   (Fixed 4 Bytes)          (Decimal)              "total slots scanned "
+    FIELD fQca_f7   (Fixed 4 Bytes)          (Decimal)              "High prio slots scanned"
+    FIELD fQca_f8   (Fixed 4 Bytes)          (Decimal)              "Low Prio slots scanned"
+    FIELD fQca_f9   (Fixed 4 Bytes)          (Decimal)              "High Prio slots Cxm Deny "
+    FIELD fQca_f10  (Fixed 4 Bytes)          (Decimal)              "Low Prio Slots Cxm Deny "
+}
+
+GROUP gQca_STAT_isoRetransRate "ISO RETRANS RATE STATS "
+{
+    FIELD fQca_f11   (Fixed 4 Bytes)          (Decimal)              "Stream Handle "
+    FIELD fQca_f12   (Fixed 4 Bytes)          (Decimal)              "backUp retrans "
+    FIELD fQca_f13   (Fixed 4 Bytes)          (Hex)                  "cal clk (native clk)"
+    FIELD fQca_f14   (Fixed 4 Bytes)          (Decimal)              "MA"
+    FIELD fQca_f15   (Fixed 4 Bytes)          (Decimal)              "High Prio SE "
+    FIELD fQca_f16   (Fixed 4 Bytes)          (Decimal)              "Cur RetransCount "
+    FIELD fQca_f17   (Fixed 4 Bytes)          (Decimal)              "Total RetransCount "
+    FIELD fQca_f18   (Fixed 4 Bytes)          (Decimal)              "Max Retrans Per Eval"
+    FIELD fQca_f19   (Fixed 4 Bytes)          (Decimal)              "Max Retrans Per Interval"
+}
+
+GROUP gQca_3mNACKStats "3M Nack Status"
+{
+    FIELD fQca_3mAverageNakrate             (Fixed 4 Bytes)          (Decimal)                      "average nack rate"
+    FIELD fQca_3mNaks                       (Fixed 2 Bytes)          (Decimal)                      "3M NACKS"
+    FIELD fQca_3mtotalTx                    (Fixed 2 Bytes)          (Decimal)                      "total 3M packets"
+    FIELD fQca_hcihandleOf3M                (Fixed 2 Bytes)          (Decimal)                      "Conn Handle"
+}
+
+TABLE tFRAState
+    {0x00 "3M PACKETS CAN USE"}
+    {0x01 "NO 3M PACKETS"}
+ENDTABLE
+
+GROUP gQca_FRAStats "FRA Stats"
+{
+    FIELD fQca_frafilteredARQN                   (Fixed 4 Bytes)        (Hex)                         "filteredARQN"
+	FIELD fQca_frafilteredARQNt	                 (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_frafilteredARQN 100)    (Decimal) SUPPRESS_DETAIL
+	FIELD fQca_frafilteredARQNf 	             (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger   fQca_frafilteredARQNt 32768) (Decimal) "filteredARQN(%)"
+    FIELD fQca_frasCurtate                       (Fixed 1 Byte)         (TABLE tFRAState)             "Current FRA state"
+    FIELD fQca_frasNewtate                       (Fixed 1 Byte)         (TABLE tFRAState)             "New FRA state"
+    FIELD fQca_frasNumTran                       (Fixed 1 Byte)         (Decimal)                     "NumTrans"
+    FIELD fQca_frasTxStatus                      (Fixed 1 Byte)         (Decimal)                     "TxStatus"
+}
+
+TABLE EDPH_RUN_STATUS
+    {0 "STOP"}
+    {1 "START"}
+    {2 "RUN"}
+ENDTABLE
+
+GROUP gQca_EDPHHist "EDPH history"
+{
+    FIELD fQca_EDPH_HisthciHandle               (Fixed 1 Byte)      (Hex)            "hciHandle"
+    FIELD fQca_EDPH_status                      (Fixed 1 Bytes)     (TABLE EDPH_RUN_STATUS) "status"    
+    FIELD fQca_EDPH_totalEnCnt                  (Fixed 2 Bytes)     (Decimal)        "totalEnCnt"
+    FIELD fQca_EDPH_hecGoodnCnt                 (Fixed 2 Bytes)     (Decimal)        "hecGoodCnt"
+    FIELD fQca_EDPH_nakCnt                      (Fixed 2 Bytes)     (Decimal)        "nakCnt"
+    FIELD fQca_EDPH_noRspCnt                    (Fixed 2 Bytes)     (Decimal)        "noRspCnt"
+    FIELD fQca_EDPH_succCnt                     (Fixed 2 Bytes)     (Decimal)        "succCnt"
+    FIELD fQca_EDPH_failCnt                     (Fixed 2 Bytes)     (Decimal)        "failCnt"
+    GROUP fQca_EDPH_errTypeCnt   "errTypeCnt"
+    {
+    FIELD fQca_EDPH_errHEC                      (Fixed 2 Bytes)     (Decimal)        "errHecCnt"
+    FIELD fQca_EDPH_errSeq                      (Fixed 2 Bytes)     (Decimal)        "errSeqCnt"
+    FIELD fQca_EDPH_errArq                      (Fixed 2 Bytes)     (Decimal)        "errArqCnt"
+    FIELD fQca_EDPH_errFlow                     (Fixed 2 Bytes)     (Decimal)        "errFlowCnt"
+    FIELD fQca_EDPH_errType                     (Fixed 2 Bytes)     (Decimal)        "errPktTypeCnt"
+    FIELD fQca_EDPH_errLtaddr                   (Fixed 2 Bytes)     (Decimal)        "errLtaddrCnt"
+    }
+    FIELD fQca_edphErrIdxCntr0 (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE IdxCntr
+    GROUP gQCA_EDPHErrcntRecords REPEAT COUNT (Fixed 19 Times)
+    {
+    FIELD fQca_EDPH_errCnti                     (Fixed 2 Bytes)     (DecimalWithFieldLabel IdxCntr)       "ERR"
+    FIELD fQca_edphErrIdxCntrIncr (Fixed 0) RETRIEVE (StoreField IdxCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE IdxCntr
+    }
+    FIELD fQca_EDPH_abortCfg                    (Fixed 4 Bytes)     (Hex)           "abortRegCfg. 0-abort;0x0f-notAbort"
+    FIELD fQca_EDPH_RSSI                        (Fixed 1 Bytes)     RETRIEVE (SignExtension 8) (Decimal) "RSSI"      
+    FIELD fQca_EDPH_TxPowerLevel                (Fixed 1 Bytes)     (Decimal)       "txPowerLevel"
+}
+
+GROUP gQca_EDPHStart "EDPH start"
+{
+    FIELD fQca_EDPH_hciHandle                       (Fixed 1 Byte)     (Hex)            "hciHandle"
+    FIELD fQca_EDPHCfg_Classic_MV_Threshold         (Fixed 1 Byte)     (Hex)            "Classic_MV_Threshold"
+    FIELD fQca_EDPHCfg_Difference_Threshold         (Fixed 1 Byte)     (Hex)            "Cfg_Difference_Threshold"
+    RESERVED                                        (Fixed 1 Byte)
+    FIELD fQca_EDPHCfg_Packet_Header_Mask           (Fixed 4 Bytes)    (Hex)            "Cfg_Packet_Header_Mask"    
+    
+    FIELD fQca_EDPH_UAP                             (Fixed 1 Byte)     (Hex)            "UAP"
+    FIELD fQca_EDPH_lt_addr                         (Fixed 1 Byte)     (Decimal)        "lt_addr"
+    RESERVED                                        (Fixed 2 Bytes)
+    FIELD fQca_EDPH_expHdr0                         (Fixed 4 Bytes)    (Hex)            "expSeq0"
+    FIELD fQca_EDPH_expHdr1                         (Fixed 4 Bytes)    (Hex)            "expSeq1"
+    RESERVED                                        (Fixed 8 Bytes)
+}
+
+GROUP gQca_STAT_WarDevice "War Device Info"
+{
+    FIELD fQca_manufacture        (Fixed 2 Bytes)    (Hex)            "manufacturer"
+    FIELD fQca_lmpSubversion      (Fixed 2 Bytes)    (Hex)            "lmp sub version"
+    FIELD fQca_lmpVesion          (Fixed 1 Byte)     (Hex)            "lmp version"
+    FIELD fQca_attribute0         (Fixed 1 Byte)     (Hex)            "Attribute0"
+    FIELD fQca_attribute1         (Fixed 1 Byte)     (Hex)            "Attribute1"
+    FIELD fQca_attribute2         (Fixed 1 Byte)     (Hex)            "Attribute2"
+}
+
+GROUP gQca_STAT_PwrCtrl_WarDevice "power control War Device Info"
+{
+    FIELD fQca_manufacture;
+    FIELD fQca_Subversion         (Fixed 2 Bytes)    (Hex)            "sub version"
+    FIELD fQca_Version            (Fixed 1 Byte)     (Hex)            "version"
+    FIELD fQca_minPowerlevel      (Fixed 1 Byte)     (Hex)            "min power level"
+    FIELD fQca_maxPowerlevel      (Fixed 1 Byte)     (Hex)            "max power level"
+    FIELD fQca_connectionType     (Fixed 1 bit)      (TABLE tQca_connectionType)     "connection Type"
+    Reserved (fixed 7 bits)
+}
+
+TABLE tQca_connectionType
+    {0, "BR/EDR link"}
+    {1, "LE link"}
+ENDTABLE
+
+TABLE tQca_RSWType
+    {0x00 "LOG_RSW_TYPE_SLAVE_TO_MASTER"            "LOG_RSW_TYPE_SLAVE_TO_MASTER"       0 }
+    {0x01 "LOG_RSW_TYPE_MASTER_TO_SLAVE"            "LOG_RSW_TYPE_MASTER_TO_SLAVE"       0 }
+ENDTABLE
+
+TABLE tQca_RSWStatus
+    {0x00 "LOG_RSW_STATUS_INVALID"                  "LOG_RSW_STATUS_INVALID"                  0 }
+    {0x01 "LOG_RSW_STATUS_TDD_SWITCH_TIMEOUT"       "LOG_RSW_STATUS_TDD_SWITCH_TIMEOUT"       0 }
+    {0x02 "LOG_RSW_STATUS_PSW_SWITCH_TIMEOUT"       "LOG_RSW_STATUS_PSW_SWITCH_TIMEOUT"       0 }
+    {0x03 "LOG_RSW_STATUS_ROLESWITCH_SUCESSFUL"     "LOG_RSW_STATUS_ROLESWITCH_SUCESSFUL"     0 }
+ENDTABLE
+
+GROUP gQca_STAT_RoleSwitchStats "Role Switch Stats"
+{
+    FIELD fQca_TDDClk              (Fixed 4 Bytes)     (Hex)                            "TDD Clock"
+    FIELD fQca_PSWClk              (Fixed 4 Bytes)     (Hex)                            "PSW Clock"
+    FIELD fQca_BBStat              (Fixed 4 Bytes)     (Hex)                            "BB Stats"
+    FIELD fQca_SchMiss             (Fixed 1 Byte)      (Decimal)                        "Scheduler Miss"
+    FIELD fQca_TDDFrameCount       (Fixed 1 Byte)      (Decimal)                        "TDD Frame Scheduled"
+    FIELD fQca_PSWFrameCount       (Fixed 1 Byte)      (Decimal)                        "PSW Frame Scheduled"
+    FIELD fQca_rxError             (Fixed 1 Byte)      (Decimal)                        "No-RX Error"
+    FIELD fQca_pktError            (Fixed 1 Byte)      (Decimal)                        "Packet Type Error"
+    FIELD fQca_nakError            (Fixed 1 Byte)      (Decimal)                        "NAK Error"
+    FIELD fQca_cxmDenial           (Fixed 1 Byte)      (Decimal)                        "CXM Denial"
+    FIELD fQca_RSWType             (Fixed 1 Byte)      (TABLE tQca_RSWType)             "RoleSwitch Type"
+    FIELD fQca_RSWStatus           (Fixed 1 Byte)      (TABLE tQca_RSWStatus)           "RoleSwitch Status"
+}
+
+TABLE tQca_STATConnType
+    {0x00 "SCO"     "SCO"       0   gQca_STAT_DummyPktStats}
+    {0x01 "ACL"     "ACL"       0   gQca_STAT_ACLPktStats}
+    {0x02 "eSCO"    "eSCO"      0   gQca_STAT_DummyPktStats}
+    {0x03 "LE"      "LE"        0   gQca_STAT_LEPktStats}
+    {0x04 "ANT"     "ANT"       0   gQca_STAT_DummyPktStats}
+    {Default "Invalid" "Invalid" 0  gQca_STAT_DummyPktStats}
+ENDTABLE
+
+TABLE tQca_PrefRateType
+    {0x00 "REMOTE_REQ" }
+    {0x01 "LOCAL_CQDDR_EVAL"  }
+    {0x02 "LOCAL_CQDDR_INIT"  }
+ENDTABLE
+
+GROUP gQca_STAT_LateDispatchStats "Late Dispatch Stats"
+{
+    FIELD fQca_LateDispatchDispClock        (Fixed 4 Bytes)     (Hex)           "DispClock"
+    FIELD fQca_LateDispatchCurrClock        (Fixed 4 Bytes)     (Hex)           "CurrClock"
+    FIELD fQca_LateDispatchConnHandle       (Fixed 2 Bytes)     (Decimal)       "ConnHandle"
+    FIELD fQca_LateDispatchPriority         (Fixed 2 Bytes)     (Decimal)       "Priority"
+    FIELD fQca_LateDispatchOpcode           (Fixed 1 Byte)      (Decimal)       "Opcode"
+}
+
+GROUP gQca_STAT_PagePerfStats "Page Performance Stats"
+{
+    FIELD fQca_PageSlotsReq                 (Fixed 2 Bytes)     (Decimal)       "SlotsReq"
+    FIELD fQca_PageSLotsTx                  (Fixed 2 Bytes)     (Decimal)       "SLotsTx"
+    FIELD fQca_PageSlotsCxmDenied           (Fixed 2 Bytes)     (Decimal)       "SlotsCxmDenied"
+    FIELD fQca_PagePageTime                 (Fixed 2 Bytes)     (Decimal)       "PageTime"
+    FIELD fQCA_FHSSlotsCxmDenied            (FIXED 2 BYTES)     (Decimal)       "FHSSlotsCxmDenied"
+    FIELD fQCA_PollSlotsCxmDenied           (FIXED 2 BYTES)     (Decimal)       "PollSlotsCxmDenied"
+    FIELD fQCA_FHSSlotsTx                   (FIXED 1 BYTES)     (Decimal)       "FHSSlotsTx"
+    FIELD fQCA_PollSlotsTx                  (FIXED 1 BYTES)     (Decimal)       "PollSlotsTx"
+    FIELD fQCA_countFHStoIDState            (FIXED 1 BYTES)     (Decimal)       "countFHStoIDState"
+    FIELD fQCA_countPollToIDState           (FIXED 1 BYTES)     (Decimal)       "countPollToIDState"
+}
+
+GROUP gQca_STAT_InquiryPerfStats "Inquiry Performance Stats"
+{
+    FIELD fQca_InquirySlotsReq              (Fixed 2 Bytes)     (Decimal)       "SlotsReq"
+    FIELD fQca_InquirySLotsTx               (Fixed 2 Bytes)     (Decimal)       "SLotsTx"
+    FIELD fQca_InquirySlotsCxmDenied        (Fixed 2 Bytes)     (Decimal)       "SlotsCxmDenied"
+    FIELD fQca_InquiryNoDevicesFound        (Fixed 2 Bytes)     (Decimal)       "NoDevicesFound"
+    FIELD fQca_InquiryNoDroppedInqEvents    (Fixed 2 Bytes)     (Decimal)       "NoDroppedInqEvents"
+}
+
+GROUP gQca_STAT_GenStats "General Stats"
+{
+    FIELD fQca_GenInqIDsTx                  (Fixed 2 Bytes)     (Decimal)       "InqIDsTx"
+    FIELD fQca_GenInqIDsCxmDenied           (Fixed 2 Bytes)     (Decimal)       "InqIDsCxmDenied"
+    FIELD fQca_GenPageIDsTx                 (Fixed 2 Bytes)     (Decimal)       "PageIDsTx"
+    FIELD fQca_GenPageIDsCxmDenied          (Fixed 2 Bytes)     (Decimal)       "PageIDsCxmDenied"
+    FIELD fQca_GenPScanSlots                (Fixed 2 Bytes)     (Decimal)       "PScanSlots"
+    FIELD fQca_GenPScanCxmDenied            (Fixed 2 Bytes)     (Decimal)       "PScanCxmDenied"
+    FIELD fQca_GenIScanSlots                (Fixed 2 Bytes)     (Decimal)       "IScanSlots"
+    FIELD fQca_GenIScanCxmDenied            (Fixed 2 Bytes)     (Decimal)       "IScanCxmDenied"
+    FIELD fQca_GenLEScanSlots               (Fixed 2 Bytes)     (Decimal)       "LEScanSlots"
+    FIELD fQca_GenLEScanCxmDenied           (Fixed 2 Bytes)     (Decimal)       "LEScanCxmDenied"
+    FIELD fQca_GenLEAdvSlots                (Fixed 2 Bytes)     (Decimal)       "LEAdvSlots"
+    FIELD fQca_GenLEAdvCxmDenied            (Fixed 2 Bytes)     (Decimal)       "LEAdvCxmDenied"
+    FIELD fQca_GenACLConnCount              (Fixed 1 Byte)      (Decimal)       "ACLConnCount"
+    FIELD fQca_GenLEConnCount               (Fixed 1 Byte)      (Decimal)       "LEConnCount"
+    FIELD fQca_GenANTConnCount              (Fixed 1 Byte)      (Decimal)       "ANTConnCount"
+    FIELD fQca_GenSCOConnCount              (Fixed 1 Byte)      (Decimal)       "SCOConnCount"
+    FIELD fQca_TxCalInProgressDenied        (Fixed 2 Bytes)     (Decimal)       "TxCalInProgressDenied"
+    FIELD fQca_RxCalInProgressDenied        (Fixed 2 Bytes)     (Decimal)       "RxCalInProgressDenied"
+}
+
+GROUP gQca_STAT_ActiveConnSummary "Active Connection Summary"
+{
+    GROUP gQca_STAT_ConnStats;
+    FIELD fQca_ActiveConnPiconetClock       (Fixed 4 Bytes)     (Hex)           "PiconetClock"
+    FIELD fQca_ActiveConnLastAckClk         (Fixed 4 Bytes)     (Hex)           "LastAckClk"
+    FIELD fQca_ActiveConnConnHandle         (Fixed 2 Bytes)     (Decimal)       "ConnHandle"
+    FIELD fQca_ActiveConnLSTO               (Fixed 2 Bytes)     (Decimal)       "LSTO"
+    FIELD fQca_ActiveConnConnInterval       (Fixed 2 Bytes)     (Decimal)       "ConnInterval"
+    FIELD fQca_ActiveConnConnType           (Fixed 1 Byte)      (TABLE tQca_STATConnType)    "ConnType"
+    FIELD fQca_ActiveConnRole               (Fixed 1 Byte)      (TABLE tQca_DeviceRole)      "Role"
+    FIELD fQca_ActiveConnState              (Fixed 1 Byte)      (TABLE tQca_ConnState)       "State"
+    RESERVED                                (Fixed 3 Bytes)
+}
+
+GROUP gQca_STAT_CoexAbortReason "Coex Abort Reason Stats"
+{
+    FIELD fQca_LTE_Count                    (Fixed 2 Bytes)     (Decimal)       "LTECount"
+    FIELD fQca_sPTA_Count                   (Fixed 2 Bytes)     (Decimal)       "sPTACount"
+	FIELD fQca_WLAN_Count                   (Fixed 2 Bytes)     (Decimal)       "WLANCount"
+    FIELD fQca_internalarbitration_Count    (Fixed 2 Bytes)     (Decimal)       "internalarbitrationCount"
+}
+
+GROUP gQca_STAT_ActiveConnStats "Active Connection Stats"
+{
+    FIELD fQca_ActiveSlotsAlloc             (Fixed 4 Bytes)     (Decimal)       "SlotsAlloc"
+    FIELD fQca_ActiveSlotsUsed              (Fixed 4 Bytes)     (Decimal)       "SlotsUsed"
+    FIELD fQca_ActiveCxmDenials             (Fixed 2 Bytes)     (Decimal)       "CxmDenials"
+    FIELD fQca_ActiveLocalRetrans           (Fixed 2 Bytes)     (Decimal)       "LocalRetrans"
+    FIELD fQca_ActiveRemoteRetrans          (Fixed 2 Bytes) IF NOT (FieldIs EqualTo 5 fQca_sMainVer)  (Decimal)  "RemoteRetrans"
+    FIELD fQca_ActiveTxSkip                 (Fixed 2 Bytes)     (Decimal)       "TxSkip"
+    FIELD fQca_ActiveRfloss                 (Fixed 2 Bytes) IF NOT (FieldIs EqualTo 5 fQca_sMainVer)  (Decimal)  "RFLoss"
+    FIELD fQca_ActiveDispatcherMisses       (Fixed 1 Bytes)     (Decimal)       "DispatcherMisses"
+    FIELD fQca_ActiveReserved               (Fixed 1 Bytes)     (Decimal)       "Reserved"
+    GROUP gQca_STAT_CoexAbortReason;
+    GROUP gQca_STAT_CoexAbortReason;
+    GROUP gQca_STAT_CoexAbortReason;
+    FIELD fQca_LnaChangedAfterLockCh0       (Fixed 2 Bytes)     (Decimal)       "LnaChangedAfterLockCh0"
+    RESERVED                                (Fixed 2 Bytes)
+}
+
+TABLE tQca_BBStats
+    {0x0001 "Sync"}
+    {0x0002 "Rx Data"}
+    {0x0003 "Tx Success"}
+    {0x0004 "Tx Abort"}
+    {0x0005 "Cxm Denial"}
+    {0x0006 "Tx Cmd late"}
+    {0x0007 "Rx Cmd Late"}
+    {0x0008 "Rx HEC"}
+    {0x0009 "Rx CRC"}
+    {0x000A "LE MIC Fail"}
+    {0x000B "Rx Abort"}
+    {0x000C "No Rx"}
+    {0x000D "Abort Connection"}
+    {0x000E "SW Late"}
+    {0x000F "Max"}
+ENDTABLE
+
+GROUP gQca_STAT_ConnStats "Connection Stats"
+{
+    GROUP gQca_STAT_ActiveConnStats;
+    /* Get Packet Stats Based on the ConnType */
+    /* Read the Connection Type ahead to dynamically select the proper group for packet stats */
+    /* When you are updating make sure all the Connection type groups are updated to same size */
+    FIELD fQca_ActiveConnType   START_BIT (Move 118 Bytes)   (Fixed 1 Byte) (Hex) SUPPRESS_DETAIL NO_MOVE
+    BRANCH (FromTable   tQca_STATConnType   fQca_ActiveConnType)
+    FIELD fQca_ActiveConnBBStat         (Fixed 4 Bytes)   (Hex)      "BBStats"
+
+    FIELD fQca_ActiveConnBBStat_parse1  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 0)  ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_1"
+    FIELD fQca_ActiveConnBBStat_parse2  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 4)  ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_2"
+    FIELD fQca_ActiveConnBBStat_parse3  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 8)  ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_3"
+    FIELD fQca_ActiveConnBBStat_parse4  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 12) ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_4"
+    FIELD fQca_ActiveConnBBStat_parse5  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 16) ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_5"
+    FIELD fQca_ActiveConnBBStat_parse6  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 20) ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_6"
+    FIELD fQca_ActiveConnBBStat_parse7  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 24) ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_7"
+    FIELD fQca_ActiveConnBBStat_parse8  (Fixed 0)  RETRIEVE (StoreField fQca_ActiveConnBBStat) ALSO (ShiftRight 28) ALSO (AndMask 0x000f)  (Table tQca_BBStats)   "BBStatus_8"
+}
+
+GROUP gQca_STAT_3990_ScoConnStats "Synchronous Connection Stats"
+{
+    FIELD fQca_3990_ScoPiconetClock         (Fixed 4 Bytes)     (Hex)           "PiconetClock"
+    FIELD fQca_3990_ScoConnHandle           (Fixed 2 Bytes)     (Decimal)       "ConnHandle"
+    FIELD fQca_3990_ScoRole                 (Fixed 1 Byte)      (Decimal)       "Role"
+    FIELD fQca_3990_ScoTesco                (Fixed 1 Byte)      (Decimal)       "Tesco"
+    FIELD fQca_3990_ScoWesco                (Fixed 1 Byte)      (Decimal)       "Wesco"
+    FIELD fQca_3990_ScoPktType              (Fixed 1 Byte)      (Decimal)       "PktType"
+    RESERVED                                (Fixed 2 Bytes)
+    GROUP gQca_STAT_3990_ScoStats;
+}
+
+GROUP gQca_STAT_3990_ScoStats "Synchronous Stats"
+{
+    FIELD fQca_3990_ScoInstanceCnt          (Fixed 2 Bytes)     (Decimal)       "InstanceCnt"
+    FIELD fQca_3990_ScoTxCxmDenied          (Fixed 2 Bytes)     (Decimal)       "TxCxmDenied"
+    FIELD fQca_3990_ScoRxCxmDenied          (Fixed 2 Bytes)     (Decimal)       "RxCxmDenied"
+    FIELD fQca_3990_ScoTxAbortCnt           (Fixed 2 Bytes)     (Decimal)       "TxAbortCnt"
+    FIELD fQca_3990_ScolateDispatch         (Fixed 2 Bytes)     (Decimal)       "lateDispatch"
+    FIELD fQca_3990_ScoMicIntrMiss          (Fixed 2 Bytes)     (Decimal)       "MicIntrMiss"
+    FIELD fQca_3990_ScoLpaIntrMiss          (Fixed 2 Bytes)     (Decimal)       "LpaIntrMiss"
+    FIELD fQca_3990_ScoSpkrIntrMiss         (Fixed 2 Bytes)     (Decimal)       "SpkrIntrMiss"
+    FIELD fQca_3990_ScoPLCFillCnt           (Fixed 2 Bytes)     (Decimal)       "PLCFillCnt"
+    FIELD fQca_3990_ScoPLCDiscardCnt        (Fixed 2 Bytes)     (Decimal)       "PLCDiscardCnt"
+}
+
+TABLE tQca_ScoPktType
+    {0x05 "HV1" }
+    {0x06 "HV2" }
+    {0x07 "HV3" }
+    {0x08 "DV" }
+    {0x27 "EV3" }
+    {0x2C "EV4" }
+    {0x2D "EV5" }
+    {0x36 "2_EV3" }
+    {0x37 "3_EV3" }
+    {0x3C "2_EV5" }
+    {0x3D "3_EV5" }
+    {0xFF "3Q_EV3" }
+ENDTABLE
+
+TABLE tQhsPhy
+    { 2 "QHS_2M"}
+    { 3 "QHS_3M"}
+    { 4 "QHS_4M"}
+    { 5 "QHS_5M"}
+    { 6 "QHS_6M"}
+    {default "Not QHS"}
+ENDTABLE
+
+TABLE tQca_Airformat
+    {0x00 "SDB_VOICE_CODING_FORMAT_MULAW"}
+    {0x01 "SDB_VOICE_CODING_FORMAT_ALAW"}
+    {0x02 "SDB_VOICE_CODING_FORMAT_CVSD"}
+    {0x03 "SDB_VOICE_CODING_FORMAT_TRANSPARENT"}
+    {0x04 "SDB_VOICE_CODING_FORMAT_LINEAR"}
+    {0x05 "SDB_VOICE_CODING_FORMAT_MSBC"}
+    {default "Vendor Codec"}
+ENDTABLE
+
+GROUP gQca_STAT_ScoConnStats "Synchronous Connection Stats"
+{
+    FIELD fQca_ScoPiconetClockS        	(Fixed 4 Bytes) (Hex)                   		"PiconetStartClock"
+    FIELD fQca_ScoPiconetClockE        	(Fixed 4 Bytes) (Hex)                   		"PiconetEndClock"
+    FIELD fQca_ScoConnHandle           	(Fixed 2 Bytes) (Decimal)                		"ConnHandle"
+    FIELD fQca_ScoInstanceCnt           (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "InstantCnt"
+    FIELD fQca_ScoFrameCnt           	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "FrameCnt"
+    FIELD fQca_ScoMissedInstanceCnt   	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "MissedInstantCnt"
+    FIELD fQca_ScoTxRetransmitSlotCnt 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "TxRetransmitCnt"
+    FIELD fQca_ScoRxRetransmitSlotCnt 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "RxRetransmitCnt"
+    FIELD fQca_ScoTxCoexCritical 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexCriticalTxDenialCnt"
+    FIELD fQca_ScoTxCoexNormal 		(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexNormalTxDenialCnt"
+    FIELD fQca_ScoRxCoexCritical 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexCriticalRxDenialCnt"
+    FIELD fQca_ScoRxCoexNormal 		(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexNormalRxDenialCnt"
+    FIELD fQca_ScoCoexTxAbortCnt 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexTxAbortCnt"
+    FIELD fQca_ScoCoexRxAbortCnt 	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "CoexRxAbortCnt"
+    FIELD fQca_ScoLateTxCmdCnt 		(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "LateTxCmdCnt"
+    FIELD fQca_ScoLateRxCmdCnt 		(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "LateRxCmdCnt"
+    FIELD fQca_ScoLateDispCnt 		(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "LateDispatchCnt"
+    
+    FIELD fQca_ScoGoodRxFrameCnt      	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "RxGoodRxFrameCnt"
+    FIELD fQca_ScoGoodRxReservedCnt     (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "GoodRxReservedCnt"
+    FIELD fQca_ScoGoodRxRetxCnt      	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "GoodRxRetxCnt"
+    FIELD fQca_ScoGoodRxRelayCnt      	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "GoodRxRelayCnt"
+    FIELD fQca_ScoGoodPeerAckCnt      	(Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "GoodPeerAckCnt"
+    FIELD fQca_ScoReclaimedRetransCnt   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "ReclaimedRetransCnt"
+    
+    FIELD fQca_ScoPktLen              	(Fixed 2 Bytes) (Decimal)               "Pakcet Length"
+    
+    FIELD fQca_ScoTesco               	(Fixed 1 Byte)  (Decimal)               "Tesco"
+    FIELD fQca_ScoWesco               	(Fixed 1 Byte)  (Decimal)               "Wesco"
+    FIELD fQca_ScoPktType             	(Fixed 1 Byte)  (TABLE tQca_ScoPktType) "PktType"
+    
+    /* LSB of the PacketTypes from BIT7 to BIT0*/
+    RESERVED               		        (Fixed 3 Bit)  
+    FIELD fQca_qhsPhy                 	(Fixed 3 Bit)  (TABLE tQhsPhy)         "QHS Rate"
+    FIELD fQca_ScoparentACLLinkStatus   (Fixed 1 Bit)  (TABLE tSniffSta)       "Sniff Status"
+    FIELD fQca_ScoRole                	(Fixed 1 Bit)  (TABLE t_linkRole)      "ACL Role"
+	
+    FIELD fQca_scoStats_airCodeFormat (Fixed 1 Bytes) (TABLE tQca_Airformat)  "Air Code Format"
+    FIELD fQca_ScoTxPowerLevel        (Fixed 1 Bytes) (Decimal)               "TxPowerLevel" 
+    FIELD fQca_scoStats_avgRSSI       (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal) "Avg RSSI in DBM"
+    
+    RESERVED                          (Fixed 2 Bytes)
+}
+
+GROUP gQca_qbmXscoStats "QBM Periodic Stats"
+{
+    FIELD fQca_nPktsCGood         (Fixed 2 Bytes) (Decimal)               "Good Pkt C Count"
+    FIELD fQca_nPktsCorrected     (Fixed 2 Bytes) (Decimal)               "Corrected Pkts"
+    FIELD fQca_nPktGood           (Fixed 2 Bytes) (Decimal)               "Good Pkt Count"
+    FIELD fQca_nPktBad            (Fixed 2 Bytes) (Decimal)               "Bad Pkts"
+}
+
+TABLE ACL_PACKETTYPE
+    {0x00 "NULL"}
+    {0x01 "POLL"}
+    {0x02 "FHS"}
+    {0x03 "DM1"}
+    {0x04 "DH1"}
+    {0x05 "0x05"}
+    {0x06 "0x06"}
+    {0x07 "0x07"}
+    {0x08 "0x08"}
+    {0x09 "0x09"}
+    {0x0A "DM3"}
+    {0x0B "DH3"}
+    {0x0C "0x0C"}
+    {0x0D "0x0D"}
+    {0x0E "DM5"}
+    {0x0F "DH5"}
+    {0x10 "0x10"}
+    {0x11 "0x11"}
+    {0x12 "0x12"}
+    {0x13 "0x13"}
+    {0x14 "2-DH1"}
+    {0x15 "0x15"}
+    {0x16 "0x16"}
+    {0x17 "0x17"}
+    {0x18 "3-DH1"}
+    {0x19 "0x19"}
+    {0x1A "2-DH3"}
+    {0x1B "3-DH3"}
+    {0x1C "0x1C"}
+    {0x1D "0x1D"}
+    {0x1E "2-DH5"}
+    {0x1F "3-DH5"}
+ENDTABLE
+
+/*QHS packets stats*/
+GROUP gQca_STAT_QHSPerPktStats "QHS Per Packets Stats"
+{
+    FIELD fQca_ACLTxQHS2M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS2M"
+    FIELD fQca_ACLTxQHS3M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS3M"
+    FIELD fQca_ACLTxQHS4M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS4M"
+    FIELD fQca_ACLTxQHS5M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS5M"
+    FIELD fQca_ACLTxQHS6M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS6M"
+    FIELD fQca_ACLRxQHS2M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS2M"
+    FIELD fQca_ACLRxQHS3M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS3M"
+    FIELD fQca_ACLRxQHS4M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS4M"
+    FIELD fQca_ACLRxQHS5M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS5M"
+    FIELD fQca_ACLRxQHS6M                 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS6M"
+    FIELD fQca_ACLTxTypeEmpty             (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts Empty"
+    FIELD fQca_ACLTxTypeACL               (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts ACL"
+    FIELD fQca_ACLTxTypeVoice             (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts Voice"
+    FIELD fQca_ACLRxTypeEmpty             (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts Empty"
+    FIELD fQca_ACLRxTypeACL               (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts ACL"
+    FIELD fQca_ACLRxTypeVoice             (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts Voice"
+    FIELD fQca_ACLRxUndetHecErr           (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts Undetected hec error"
+    Reserved                              (Fixed 2 Bytes)
+}
+
+GROUP gQca_STAT_ACLPerPktStats "ACL Per Packet Stats"
+{
+    FIELD fQca_ACLNoRxCount               (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "NoRxCount"
+    FIELD fQca_ACLCxMTxDenials            (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "CxMTxDenials"
+    FIELD fQca_ACLCxMTxCriticalDenials    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "CxMTxCriticalDenials"
+    FIELD fQca_ACLCxMRxDenials            (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "CxMRxDenials"
+    FIELD fQca_ACLCxMRxCriticalDenials    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "CxMRxCriticalDenials"
+    FIELD fQca_ACLFlowOffCount            (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "FlowOffCount"
+    FIELD fQca_ACLRetransCount            (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "RetransCount"
+    FIELD fQca_ACLBBNakCount              (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "BBNakCount"
+    FIELD fQca_ACLaclTxQueueLen           (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "aclTxQueueLen"
+    FIELD fQca_ACLLateCommands            (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "LateCommands"
+    FIELD fQca_ACLPktAbort                (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "PktAbort"
+    FIELD fQca_ACLPayloadFlowOffCount     (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "PayloadFlowOffCount"
+    FIELD fQca_ACLCRCErrors               (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "CRCErrors"
+    FIELD fQca_ACLHECErrors               (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "HECErrors"
+    FIELD fQca_ACLPHYErrors               (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "PHYErrors"
+    FIELD fQca_ACLflushCount              (Fixed 1 Byte)   PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "ACL pkt Flush Count"
+    GROUP gQca_STAT_QHSPerPktStats;
+}
+
+GROUP gQca_STAT_AclRxState  "Acl Rx State"
+{
+    FIELD Qca_STAT_AclRxState_HecErrCnt             (Fixed 1 Bytes)  (Decimal)   "HecErrCnt "
+    FIELD Qca_STAT_AclRxState_CrcErrCnt             (Fixed 1 Bytes)  (Decimal)   "CrcErrCnt"
+    RESERVED                                        (Fixed 2 Bytes)
+    FIELD Qca_STAT_AclRxState_HzCmd0RxAgcRssi       (Fixed 4 Bytes)  (Hex)       "HzCmd0RxAgcRssi"
+    FIELD Qca_STAT_AclRxState_HzCmd1RxAgcRssi       (Fixed 4 Bytes)  (Hex)       "HzCmd1RxAgcRssi"
+    FIELD Qca_STAT_AclRxState_LastIndClk            (Fixed 4 Bytes)  (Hex)       "LastIndClk "
+} 
+
+/* Length of this should align with LE Packet Stats */
+GROUP gQca_STAT_ACLPktStats "ACL Packet Stats"
+{
+    FIELD fQca_ACLPktNo                   (Fixed 1 Byte)      (Decimal)     "PktNo"
+    FIELD fQca_ACLpktType                 (Fixed 1 Byte)      (Decimal)     SUPPRESS_DETAIL
+    FIELD fQca_ACLpltType                 (Fixed 1 Byte)      RETRIEVE      (MultiplyInteger 16) ALSO (AddField fQca_ACLpktType) (Table ACL_PACKETTYPE) "pktType"
+    RESERVED                              (Fixed 1 Byte)
+
+    FIELD fQca_ACLAclAckInstant           (Fixed 4 Bytes)     (Hex)         SUPPRESS_DETAIL
+    FIELD fQca_ACLA2DPAckInstant          (Fixed 4 Bytes)     (Hex)         SUPPRESS_DETAIL
+
+    GROUP gQca_STAT_ACLPerPktStats;
+
+    FIELD fQca_ACLCoexNormalPriorityClk   (Fixed 4 Bytes)     (Hex)         SUPPRESS_DETAIL
+    FIELD fQca_ACLCoexCriticalPriorityClk (Fixed 4 Bytes)     (Hex)         SUPPRESS_DETAIL
+    FIELD fQca_LastACLFlushCount          (Fixed 4 Bytes)     (Hex)         "LastACLFlushCount"
+
+    GROUP gQca_STAT_AclRxState; 
+}
+
+GROUP gQca_STAT_LEHSPerPktStats "LEHS Per Packets Stats"
+{
+    FIELD fQca_ACLTxLEHS2M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS2M"
+    FIELD fQca_ACLTxLEHS3M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS3M"
+    FIELD fQca_ACLTxLEHS4M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS4M"
+    FIELD fQca_ACLTxLEHS5M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS5M"
+    FIELD fQca_ACLTxLEHS6M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Tx Counts HS6M"
+    FIELD fQca_ACLRxLEHS2M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS2M"
+    FIELD fQca_ACLRxLEHS3M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS3M"
+    FIELD fQca_ACLRxLEHS4M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS4M"
+    FIELD fQca_ACLRxLEHS5M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS5M"
+    FIELD fQca_ACLRxLEHS6M                (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)   (Decimal)   "Rx Counts HS6M"
+}
+
+/* Length of this should align with ACL Packet Stats */
+GROUP gQca_STAT_LEPktStats "LE Packet Stats"
+{
+    FIELD fQca_LELastSuccessEvent         (Fixed 2 Bytes)     (Hex)           "LastSuccessEvent"
+    FIELD fQca_LEPriorityEvent            (Fixed 2 Byte)      (Hex)           "PriorityEvent"
+    FIELD fQca_LECxmDenials               (Fixed 1 Byte)      (Decimal)       "CxmDenials"
+    FIELD fQca_LERxMiss                   (Fixed 1 Byte)      (Decimal)       "RxMiss"
+    FIELD fQca_LELateCommands             (Fixed 1 Byte)      (Decimal)       "LateCommands"
+    FIELD fQca_LEPktAbort                 (Fixed 1 Byte)      (Decimal)       "PktAbort"
+    FIELD fQca_LEMdEndReasPktMiss         (Fixed 2 Bytes)     (Decimal)       "ConnEvtEndPktMiss"
+    FIELD fQca_LEMdEndReasCrcErr          (Fixed 2 Bytes)     (Decimal)       "ConnEvtEndCrcErr"
+    FIELD fQca_LEMdEndReasRxBlkNotAvail   (Fixed 2 Bytes)     (Decimal)       "ConnEvtEndRxBlkNotAvail"
+    FIELD fQca_SynclinkLength             (Fixed 1 Byte)      (Hex)           "SynclinkLength"
+    FIELD fQca_maxCELength                (Fixed 1 Byte)      (Hex)           "MaxCELength"
+    FIELD fQca_LERxTotal                  (Fixed 4 Bytes)     (Decimal)       "RxTotal"
+    GROUP gQca_STAT_LEHSPerPktStats;
+    FIELD fQca_AshaTimestamp              (Fixed 4 Bytes)     (Hex)           "ASHA Tx Timestamp"
+    RESERVED                              (Fixed 56 Bytes)
+}
+
+GROUP gQca_STAT_DummyPktStats "No Packet Stats"
+{
+    RESERVED                              (Fixed 100 Bytes)
+}
+
+TABLE t_truefalse
+    {0, "false"}
+    {1, "true"}
+ENDTABLE
+
+TABLE t_linkRole
+    {0, "Master"}
+    {1, "Slave"}
+ENDTABLE
+
+TABLE t_a2dpRole
+    {0, "SNK"}
+    {1, "SRC"}
+ENDTABLE
+
+TABLE tSniffSta
+    {0, "unactive"}
+    {1, "active"}
+ENDTABLE
+
+GROUP gQca_STAT_A2dpConnStats "A2DP Stall Connection Stats"
+{
+    FIELD fQca_A2DPPktNo                (Fixed 1 Byte)  (Decimal)  "PktNo"
+    FIELD fQca_A2DPConnHandle           (Fixed 1 Byte)  (Decimal)  "ConnHandle"
+    FIELD fQca_A2DPpktType              (Fixed 1 Byte)  (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2DPltType               (Fixed 1 Byte)  RETRIEVE   (MultiplyInteger 16) ALSO (AddField fQca_A2DPpktType) (Table ACL_PACKETTYPE) "pktType"
+
+    FIELD fQca_A2DPTxPowerLevel         (Fixed 1 Byte)  (Decimal)  "TxPowerLevel"
+    FIELD fQca_A2DPAvgRSSI              (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "avgRSSIdBm"
+    GROUP fQCA_A2DPFlags "flags"
+    {
+        Reserved (fixed 4 bits)
+        FIELD fQCA_A2DPFlags_BIT3_delayDetected  (Fixed 1 bit)  (TABLE t_truefalse)     "delayDetected"
+        FIELD fQCA_A2DPFlags_BIT2_a2dpRole       (Fixed 1 bit)  (TABLE t_a2dpRole)      "a2dpRole"
+        FIELD fQCA_A2DPFlags_BIT1_a2dpRoleDetect (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 1) (TABLE t_truefalse)     "a2dpRoleDetected"
+        FIELD fQCA_A2DPFlags_BIT0_linkRole       (Fixed 1 bit)  (TABLE t_linkRole)      "linkRole"
+    }
+    RESERVED                            (Fixed 1 Bytes)
+
+    GROUP gQca_STAT_ACLPerPktStats;
+    FIELD fQca_A2dpOverflowCount        (Fixed 2 Bytes) (Decimal) "OverflowCount"
+    FIELD fQca_A2dpFlushCount           (Fixed 2 Bytes) (Decimal) "FlushCount"
+    FIELD fQca_A2dpPiconetClock         (Fixed 4 Bytes) (Hex)      "PiconetClock"
+    FIELD fQca_A2dpClockOffset          (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpAckInstant           (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpAckInstantPnet       (Fixed 0)       RETRIEVE   (AddFieldToField fQca_A2dpAckInstant fQca_A2dpClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "AckInstant"
+    FIELD fQca_A2dpArrivalTime          (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpArrivalTimePnet      (Fixed 0)       RETRIEVE   (AddFieldToField fQca_A2dpArrivalTime fQca_A2dpClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "ArrivalTime"
+    FIELD fQca_A2dpSchedInstant         (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedInstantPnet     (Fixed 0)       RETRIEVE   (AddFieldToField fQca_A2dpSchedInstant fQca_A2dpClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "SchedInstant"
+    FIELD fQca_A2dpLastTxAckInstant     (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpLastTxAckInstantPnet (Fixed 0)       RETRIEVE   (AddFieldToField fQca_A2dpLastTxAckInstant fQca_A2dpClockOffset)ALSO (AndMask 0xFFFFFFF) (Hex) "LastTxAckInstant"
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_A2dpLastFlowOffClk       (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_A2dpLastFlowOnClk        (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+
+    FIELD fQca_A2dpAckInstantPnetROMask (Fixed 0)       RETRIEVE (StoreField fQca_A2dpAckInstantPnet) ALSO (OrMask 0x10000000)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpPrevtoCurrAckDelay   (Fixed 0)       RETRIEVE (SubtractFieldMinusField fQca_A2dpAckInstantPnetROMask fQca_A2dpLastTxAckInstantPnet) ALSO (AndMask 0xFFFFFFF)   (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2dpPrevtoCurrAckDelay1  (Fixed 0)       RETRIEVE (MultiplyFieldByInteger fQca_A2dpPrevtoCurrAckDelay 625)           (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2dpPrevtoCurrAckDelay2  (Fixed 0)       RETRIEVE (DivideFieldByInteger fQca_A2dpPrevtoCurrAckDelay1 2000)           (Decimal)  "PrevToCurrPktAckDelay(ms)"
+
+    FIELD fQca_A2dpLastFlowOffClkPnet   (Fixed 0)       IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpLastFlowOffClk) ELSE_SKIP (FIXED 0) RETRIEVE (AddFieldToField fQca_A2dpLastFlowOffClk fQca_A2dpClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "LastFlowOffClk"
+    FIELD fQca_A2dpLastFlowOnPnet       (Fixed 0)       IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE (AddFieldToField fQca_A2dpLastFlowOnClk fQca_A2dpClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "LastFlowOnClk"
+
+    /* Do no display if the clock values are invalid */
+    FIELD fQca_A2dpCoexCriticalPriorityClk (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "CoexCriticalPriorityClk"
+    FIELD fQca_A2dpCoexNormalPriorityClk   (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "CoexNormalPriorityClk"
+    FIELD fQca_A2dpWBtime                  (Fixed 4 Bytes) (Hex)      "WBtime"
+    FIELD fQca_LastA2dpPktFlushClk         (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "Last ACL PKT FLush CLK"
+    FIELD fQca_TxAbortByCoexAbortCntr      (Fixed 4 Bytes) (Hex)      "TxCoexAbortCounterAfterCoexGrantedFirst"
+    GROUP gQca_SegmentLatency;
+    /*FIELD fQca_A2dpSequenceNumber       (Fixed 2 Bytes)                                                                              (Decimal)  "SequenceNumber"
+    RESERVED                            (Fixed 2 Bytes)
+    */
+}
+
+GROUP gQca_SegmentLatency "SegmentationLatency"
+{
+    FIELD fQca_A2dpArrivePacketLatency              (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpArrivalTimePnet fQca_A2dpLastTxAckInstantPnet) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpArrivePacketLatencyTemp          (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpArrivePacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpPacketArriveLatencyInMicrosec    (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpArrivePacketLatencyTemp 2) (Decimal) "L1. Arrival Latency from PrevAck(usec)"
+
+    FIELD fQca_A2dpSchedInstantPnetROMask           (Fixed 0) RETRIEVE (StoreField fQca_A2dpSchedInstantPnet) ALSO (OrMask 0x10000000)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpSchedInstantPnetROMask fQca_A2dpArrivalTimePnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpSchedulePacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpSchedulePacketLatencyTemp 2) (Decimal) "L2. Schedule Latency from Arrival(usec)"
+
+    FIELD fQca_A2dpSchedulePacketLatency1            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpSchedInstantPnetROMask fQca_A2dpLastTxAckInstantPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyTemp1        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpSchedulePacketLatency1 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyInMicrosec1  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpSchedulePacketLatencyTemp1 2) (Decimal) "L2-1. Schedule Latency from LastAck(usec)"
+
+    FIELD fQca_A2dpSchedulePacketLatency2            (Fixed 0) IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpSchedInstantPnetROMask fQca_A2dpLastFlowOnPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyTemp2        (Fixed 0) IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpSchedulePacketLatency2 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSchedulePacketLatencyInMicrosec2  (Fixed 0) IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE (DivideFieldByInteger fQca_A2dpSchedulePacketLatencyTemp2 2) (Decimal) "L2-2. Schedule Latency from LastFlowOnClk(usec)"
+    
+    FIELD fQca_A2dpTxPacketLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpAckInstantPnetROMask fQca_A2dpSchedInstantPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpTxPacketLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpTxPacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpTxPacketLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpTxPacketLatencyTemp 2) (Decimal) "L3. OTA Latency from Schedule(usec)"
+
+    FIELD fQca_A2dpToPrevPacketLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpAckInstantPnetROMask fQca_A2dpLastTxAckInstantPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpToPrevPacketLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpToPrevPacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpToPrevPacketLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpToPrevPacketLatencyTemp 2) (Decimal) "Latency(L1 + L2 + L3) (usec)"
+
+    FIELD fQca_A2dpPacketLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpAckInstantPnetROMask fQca_A2dpArrivalTimePnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpPacketLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpPacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpPacketLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpPacketLatencyTemp 2) (Decimal) "A2DP Packet Latency(L2 + L3) (usec)"
+
+}
+
+
+GROUP gQca_STAT_PrefRateStats "Pref Rate Stats"
+{
+    FIELD fQca_PrefRateConnHandle                               (Fixed 2 Bytes)     (Hex)           "ConnHandle"
+    GROUP gQca_STAT_PrefPacketTypes;
+    FIELD fQca_MaxSlots                                         (Fixed 1 Byte)      (Hex)           "MaxSlots"
+    FIELD fQca_PrefRateReason                                   (Fixed 1 Byte)      (TABLE tQca_PrefRateType)    "Reason"
+}
+
+TABLE tQca_BtQhsRate
+    { 0x02 2QHD }
+    { 0x03 3QHD }
+    { 0x04 4QHD }
+    { 0x05 5QHD }
+    { 0x06 6QHD }
+ENDTABLE
+
+GROUP gQca_LLM_QhsPrefRate "QHS Pref Rate Stats"
+{
+    FIELD fQca_QhsConnHandle       (Fixed 2 Bytes)   (Hex)                        "ConnHandle"
+    FIELD fQca_QhsPrefRate         (Fixed 1 Bytes)   (TABLE tQca_BtQhsRate)       "QHS Rate"
+    FIELD fQca_QhsPrefPktLen       (Fixed 1 Bytes)   (Decimal)                    "Pkt Len in slots "
+    FIELD fQca_QhsPrefRateReason   (Fixed 2 Byte)    (TABLE tQca_PrefRateType)    "Reason"
+    FIELD fQca_QhsCqddrPer         (Fixed 2 Bytes)   (Decimal)                    "PER"
+}
+
+GROUP gQca_STAT_PrefPacketTypes "Local Tx Preferred PacketType"
+{
+/* LSB of the PacketTypes from BIT7 to BIT0*/
+    RESERVED            (Fixed 1 Bit)
+    FIELD fQca_AUX      (Fixed 1 Bit)   (Binary)        "AUX  "
+    FIELD fQca_DV       (Fixed 1 Bit)   (Binary)        "DV   "
+    FIELD fQca_DH1      (Fixed 1 Bit)   (Binary)        "DH1  "
+    FIELD fQca_DM1      (Fixed 1 Bit)   (Binary)        "DM1  "
+    FIELD fQca_3DH1     (Fixed 1 Bit)   (Binary)        "3-DH1"
+    FIELD fQca_2DH1     (Fixed 1 Bit)   (Binary)        "2-DH1"
+    RESERVED            (Fixed 1 Bit)
+
+/* MSB of the PacketTypes from BIT15 to BIT8 */
+    FIELD fQca_DH5      (Fixed 1 Bit)   (Binary)        "DH5  "
+    FIELD fQca_DM5      (Fixed 1 Bit)   (Binary)        "DM5  "
+    FIELD fQca_3DH5     (Fixed 1 Bit)   (Binary)        "3-DH5"
+    FIELD fQca_2DH5     (Fixed 1 Bit)   (Binary)        "2-DH5"
+    FIELD fQca_DH3      (Fixed 1 Bit)   (Binary)        "DH3  "
+    FIELD fQca_DM3      (Fixed 1 Bit)   (Binary)        "DM3  "
+    FIELD fQca_3DH3     (Fixed 1 Bit)   (Binary)        "3-DH3"
+    FIELD fQca_2DH3     (Fixed 1 Bit)   (Binary)        "2-DH3"
+}
+
+GROUP gQca_STAT_PollMngrStats "Poll Manager Stats"
+{
+    FIELD fQca_ACLSlots             (Fixed 2 Bytes) (Decimal)   "ACL Slots"
+    FIELD fQca_A2DPSlots            (Fixed 2 Bytes) (Decimal)   "A2DP Slots"
+    FIELD fQca_PageSlots            (Fixed 2 Bytes) (Decimal)   "Page Slots"
+    FIELD fQca_InquirySlots         (Fixed 2 Bytes) (Decimal)   "Inquiry Slots"
+    FIELD fQca_AdvSlots             (Fixed 2 Bytes) (Decimal)   "Advertising Slots"
+    FIELD fQca_ScanSlots            (Fixed 2 Bytes) (Decimal)   "Scanning Slots"
+    FIELD fQca_initSlots            (Fixed 2 Bytes) (Decimal)   "inittating Slots"
+    FIELD fQca_TotalSlots           (Fixed 2 Bytes) (Decimal)   "Total Slots"
+}
+
+/******************** Half LSTO Stats ********************/
+
+GROUP gQca_STAT_HalfLstoStats "Half LSTO Stats"
+{
+    FIELD  fQca_StatConnHandle              (Fixed 2 bytes)      (Decimal)     "Connection Handle"
+    FIELD  fQca_StatTimeSinceSync           (Fixed 2 bytes)      (Hex)         "Time since sync"
+}
+
+
+/* Sniff stats */
+GROUP gQca_STAT_SniffStats "Sync History in Sniff Mode"
+{
+    FIELD fQca_Sniffhandle                  (Fixed 1 Byte)      (Hex)           "Handle"
+    RESERVED                                (Fixed 1 Byte)
+    RESERVED                                (Fixed 1 Byte)
+    RESERVED                                (Fixed 1 Byte)
+    FIELD fQca_SniffParamLSTO               (Fixed 2 Bytes)     (Hex)           "LSTO(slots)"
+    FIELD fQca_SniffParamInterval           (Fixed 2 Bytes)     (Hex)           "Tsniff(slots)"
+    FIELD fQca_SniffParamAttempt            (Fixed 2 Bytes)     (Hex)           "N_Attempt(slots)"
+    FIELD fQca_SniffParamTimeout            (Fixed 2 Bytes)     (Hex)           "N_Timeout(slots)"
+    FIELD fQca_SniffwindowDrift_uS          (Fixed 2 Bytes)     (Hex)           "windowDrift(uS)"
+    FIELD fQca_SniffLastSyncEvent           (Fixed 2 Bytes)     (Hex)           "LastSyncEvent"
+    FIELD fQca_SniffStartInstant            (Fixed 4 Bytes)     (Hex)           "StartInstant(clk)"
+    GROUP gQca_STAT_SniffMissEvtCounter;
+    GROUP gQca_STAT_SniffMissBBStat;
+}
+
+GROUP gQca_STAT_SniffMissEvtCounter "Sync Miss Sniff Event Counter"
+{
+    FIELD fQca_Sniffindex1evtCnt          (Fixed 2 Bytes)    (Hex)           "index1:evtCnt:"
+    FIELD fQca_Sniffindex2evtCnt          (Fixed 2 Bytes)    (Hex)           "index2:evtCnt:"
+    FIELD fQca_Sniffindex3evtCnt          (Fixed 2 Bytes)    (Hex)           "index3:evtCnt:"
+    FIELD fQca_Sniffindex4evtCnt          (Fixed 2 Bytes)    (Hex)           "index4:evtCnt:"
+    FIELD fQca_Sniffindex5evtCnt          (Fixed 2 Bytes)    (Hex)           "index5:evtCnt:"
+    FIELD fQca_Sniffindex6evtCnt          (Fixed 2 Bytes)    (Hex)           "index6:evtCnt:"
+    FIELD fQca_Sniffindex7evtCnt          (Fixed 2 Bytes)    (Hex)           "index7:evtCnt:"
+    FIELD fQca_Sniffindex8evtCnt          (Fixed 2 Bytes)    (Hex)           "index8:evtCnt:"
+}
+
+GROUP gQca_STAT_SniffMissBBStat "Sync Miss BBStats"
+{
+    FIELD fQca_Sniffindex1BBStat          (Fixed 4 Bytes)    (Hex)           "index1:BBStats:"
+    FIELD fQca_Sniffindex2BBStat          (Fixed 4 Bytes)    (Hex)           "index2:BBStats:"
+    FIELD fQca_Sniffindex3BBStat          (Fixed 4 Bytes)    (Hex)           "index3:BBStats:"
+    FIELD fQca_Sniffindex4BBStat          (Fixed 4 Bytes)    (Hex)           "index4:BBStats:"
+    FIELD fQca_Sniffindex5BBStat          (Fixed 4 Bytes)    (Hex)           "index5:BBStats:"
+    FIELD fQca_Sniffindex6BBStat          (Fixed 4 Bytes)    (Hex)           "index6:BBStats:"
+    FIELD fQca_Sniffindex7BBStat          (Fixed 4 Bytes)    (Hex)           "index7:BBStats:"
+    FIELD fQca_Sniffindex8BBStat          (Fixed 4 Bytes)    (Hex)           "index8:BBStats:"
+}
+
+
+/* CSB audio stats */
+GROUP gQca_STAT_BCAUD "CSB Audio Stats"
+{
+    FIELD fQca_BCAECSegmentsQueued     (Fixed 2 Bytes)      (Decimal)          "EC Queued"
+    FIELD fQca_BCAECSegmentsTx         (Fixed 2 Bytes)      (Decimal)          "EC Tx"
+    FIELD fQca_BCAECSegmentsDrop       (Fixed 2 Bytes)      (Decimal)          "EC Dropped"
+    FIELD fQca_BCAAudioFrameOverflow   (Fixed 2 Bytes)      (Decimal)          "Frame Dropped"
+    FIELD fQca_BCAFMBUnavailable       (Fixed 2 Bytes)      (Decimal)          "FMB unavailable"
+    FIELD fQca_BCASmallerBAPakcet      (Fixed 2 Bytes)      (Decimal)          "Small BA Pakcets"
+    FIELD fQca_BCAAudioFrameTimeout    (Fixed 2 Bytes)      (Decimal)          "Audio Frame Timout"
+    FIELD fQca_BCAFullBAPacket         (Fixed 2 Bytes)      (Decimal)          "Full BA Packet"
+    FIELD fQca_BCAAudioFramesReceived  (Fixed 2 Bytes)      (Decimal)          "NumAudioFramesRx"
+    FIELD fQca_BCACxMDenials           (Fixed 2 Bytes)      (Decimal)          "CxM Denials"
+    FIELD fQca_BCALCLateCommands       (Fixed 2 Bytes)      (Decimal)          "LC Late commands"
+    RESERVED                           (Fixed 2 Bytes)
+}
+GROUP gQca_TruncPageStats "Trunc Page Offload Stats"
+{
+    FIELD fQca_TPOCntr (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE TPOCntr
+
+    GROUP gQca_TruncPageStatsDevTxSlot REPEAT COUNT (Fixed 5 Times) "# Tx Slots for each device"
+    {
+        GROUP gQca_TruncPageStatsDevTxSlotCnt
+        {
+            FIELD fQca_runcPageStatsDevTxSlot              (Fixed 4 Bytes)   (DecimalWithFieldLabel TPOCntr)    "# Tx slots for device"
+        }
+        /* Increment the Counter */
+        FIELD fQca_TruncDeviceTxCnt (Fixed 0) RETRIEVE (StoreField TPOCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE TPOCntr
+    }
+
+    FIELD fQca_TruncCxmSlots                 (Fixed 4 Bytes)        (Decimal)          "Cxm denied Slots"
+
+    FIELD fQca_TPOSWCntr (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE TPOSWCntr
+    GROUP gQca_TruncPageStatsDevSwitchSlot REPEAT COUNT (Fixed 5 Times) " # times switched to each device "
+    {
+        GROUP gQca_TruncPageStatsDevSwitchSlotCnt
+        {
+            FIELD fQca_runcPageStatsDevSwitchSlot            (Fixed 2 Bytes)         (DecimalWithFieldLabel TPOSWCntr)    " # times switched to device"
+        }
+        /* Increment the Counter */
+        FIELD fQca_TruncDeviceSwitchCnt (Fixed 0) RETRIEVE (StoreField TPOSWCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE TPOSWCntr
+    }
+    FIELD fQca_TruncpagelastCnt              (Fixed 2 Bytes)       (Decimal)          "Paging slots in last interval"
+    FIELD fQca_TruncCycleslineNo             (Fixed 2 Bytes)       (Decimal)                "Line No"
+    FIELD fQca_TruncOldState                 (Fixed 1 Bytes)       (TABLE tTruncPageState)   "Old state"
+    FIELD fQca_TruncNewState                 (Fixed 1 Bytes)       (TABLE tTruncPageState)   "New State"
+    FIELD fQca_TruncErrReason                (Fixed 1 Bytes)       (Decimal)                "ErrorReason"
+}
+
+
+TABLE tTruncPageState
+    { 0 "Disabled"}
+    { 1 "Paused"}
+    { 2 "Started (but element not in SLC)"}
+    { 3 "Running"}
+    { 4 "Terminating"}
+    {default "Invalid"}
+ENDTABLE
+
+TABLE tQca_IsoType
+    { 0 "CIS Master"}
+    { 1 "CIS Slave"}
+    { 2 "BIS Broadcaster"}
+    { 3 "BIS Sync"}
+    {default "Invalid"}
+ENDTABLE
+
+GROUP gQca_STAT_IsoConnStats "ISO Stats"
+{
+    FIELD fQca_IsoType                            (Fixed 1 Bytes)       (TABLE tQca_IsoType)        "ISO Type"
+    FIELD fQca_IsoStatsHandle                     (Fixed 1 Bytes)       (Decimal)                   "Connection Handle"
+    FIELD fQca_IsoStatsRxCxmDenials               (Fixed 1 Bytes)       (Decimal)                   "Coex Manager Rx Denials"
+    FIELD fQca_IsoStatsTxCxmDenials               (Fixed 1 Bytes)       (Decimal)                   "Coex Manager Tx Denials"
+    GROUP gQca_STAT_CisStats IF (FieldIs LessThanOrEqualTo 1 fQca_IsoType) 
+    {
+        GROUP gQca_STAT_CisTxStats "TX"
+        {
+            FIELD fQca_IsoStatsAcked                  (Fixed 4 Bytes)       (Decimal)          "Acked"
+            FIELD fQca_IsoStatsTxFlush                (Fixed 4 Bytes)       (Decimal)          "Flush"
+            FIELD fQca_IsoStatsUnacked                (Fixed 4 Bytes)       (Decimal)          "Unacked"
+            FIELD fQca_IsoStatsLastSub                (Fixed 4 Bytes)       (Decimal)          "Tx In Last Subevent"
+            FIELD fQca_IsoStatsRetrans                (Fixed 4 Bytes)       (Decimal)          "Retransmission"
+        }
+        GROUP gQca_STAT_CisRxStats "RX"
+        {
+            FIELD fQca_IsoStatsGood                   (Fixed 4 Bytes)       (Decimal)          "Good"
+            FIELD fQca_IsoStatsRxFlush                (Fixed 4 Bytes)       (Decimal)          "Flush"
+            FIELD fQca_IsoStatsMiss                   (Fixed 4 Bytes)       (Decimal)          "Missing(No Packet Received)"
+            FIELD fQca_IsoStatsAbort                  (Fixed 4 Bytes)       (Decimal)          "Abort(Due to Unexpected Length)"
+            FIELD fQca_IsoStatsCrcBad                 (Fixed 4 Bytes)       (Decimal)          "CRC Bad"
+            FIELD fQca_IsoStatsDuplicate              (Fixed 4 Bytes)       (Decimal)          "Retransmission"
+        }
+        
+        GROUP gQca_STAT_CisDispatchStats "Dispatch"
+        {
+            FIELD fQca_IsoStatDispatch_missEvent       (Fixed 4 Bytes)      (Decimal)          "missEvent"
+            FIELD fQca_IsoStatDispatch_EventDispatched (Fixed 4 Bytes)      (Decimal)          "EventDispatched"
+        }
+    }
+
+    GROUP gQca_STAT_BisBroadcasterStats IF (FieldIs EqualTo 2 fQca_IsoType) 
+    {
+        GROUP gQca_STAT_BisTxStats "TX"
+        {
+            FIELD fQca_IsoStatsTxReserved             (Fixed 4 Bytes)       (Decimal)          "Reserved"
+            FIELD fQca_IsoStatsTxFlush;
+            RESERVED                                  (Fixed 8 Bytes)
+            FIELD fQca_IsoStatsRetrans;
+            RESERVED                                  (Fixed 24 Bytes)
+        }
+        GROUP gQca_STAT_CisDispatchStats;
+    }
+
+    GROUP gQca_STAT_BisSyncStats IF (FieldIs EqualTo 3 fQca_IsoType) 
+    {
+        GROUP gQca_STAT_BisRxStats "RX"
+        {
+            RESERVED                                  (Fixed 20 Bytes)
+            FIELD fQca_IsoStatsGood;
+            FIELD fQca_IsoStatsRxFlush;
+            FIELD fQca_IsoStatsMiss;
+            FIELD fQca_IsoStatsAbort;
+            FIELD fQca_IsoStatsCrcBad;
+            RESERVED                                  (Fixed 4 Bytes)
+        }
+        GROUP gQca_STAT_CisDispatchStats;
+    }
+    FIELD fQca_LatecommandsIso                        (Fixed 2 Byte)      (Decimal)              "LateCommands"
+    FIELD fQca_TxPowerLevelIso                        (Fixed 1 Byte)      (Decimal)              "Tx Power Level Index"
+    Reserved                                          (Fixed 1 Bytes)
+
+    FIELD fQca_EventCounterIso                        (Fixed 2 Byte)      (Decimal)              "EventCounter"
+    FIELD fQca_TxPowerdBmIso                          (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)              "Tx Power (dBm)"
+    FIELD fQca_RxRSSIdBmIso                           (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)              "Avg. Rx RSSI (dBm)"
+    FIELD fQca_ChanMapIso                             (Fixed 5 Byte)      (Hex)                  "ChannelMap"
+    Reserved                                          (Fixed 2 Bytes)
+    GROUP gQca_reTransRateStats "Retrans MA Stats"
+    {
+        FIELD fQca_reTransRateStats_CurHighRetrans    (Fixed 1 Byte)      (Decimal)             "current High prio retrans"
+        FIELD fQca_reTransRateStats_lastrunClk        (Fixed 4 Bytes)     (Hex)                 "Last Calculated Time (Native clk)"
+        FIELD fQca_reTransRateStats_MA                (Fixed 4 Bytes)     (Decimal)             "Moving Avg"
+    }
+    FIELD fQca_streamAccessAddr                       (Fixed 4 Bytes)     (Hex)                 "AccessAddr "
+}
+
+GROUP gQca_StatRetranPktStatus "RetransPkt Stats"
+{
+    FIELD fQca_statRxCryptoReg                        (Fixed 2 Bytes)     (Hex)      "RxCryptoReg"
+    FIELD fQca_stat0                                  (Fixed 2 Bytes)     (Hex)      "HWIO_PP_BTC_SC_INT_RAW_STAT_0_IN"
+    FIELD fQca_statCmdDone                            (Fixed 2 Bytes)     (Hex)      "CmdDone"
+    FIELD fQca_statrxFifoLen                          (Fixed 2 Bytes)     (Hex)      "RxLen expect2"
+    FIELD fQca_statrxPayloadCnt                       (Fixed 2 Bytes)     (Hex)      "rxPayloadCnt(0/1)"
+    FIELD fQca_statRxStatus                           (Fixed 2 Bytes)     (Hex)      "RxStatus"
+}
+
+GROUP gQca_OBEX_bbBwReport "OBEX baseband bandwidth report"
+{
+    FIELD fQca_bbBwReport_handle;
+    FIELD fQca_bbBwReport_type;
+    FIELD fQca_bbBwReport_dir;
+    RESERVED (Fixed 1 Bytes)
+    FIELD fQca_bbBwReport_empty;
+    FIELD fQca_bbBwReport_overall;
+    FIELD fQca_bbBwReport_overallretrans;
+    FIELD fQca_bbBwReport_slotsUsed;
+    GROUP gQca_OBEX_bbBwReport_edrStat IF (FieldIs EqualTo 0x00 fQca_bbBwReport_type) "EDR packet statistics"
+    {
+        FIELD fQca_bbBwReport_edr1Slot;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr2slot;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr3slot;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr4slot;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr5slot;
+        RESERVED (Fixed 2 Bytes)
+    }
+    GROUP gQca_OBEX_bbBwReport_QHSStat IF (FieldIs EqualTo 0x01 fQca_bbBwReport_type) "QHS packet statistics"
+    {
+        FIELD fQca_bbBwReport_qhs2M_s1;
+        FIELD fQca_bbBwReport_qhs2M_s3;
+        FIELD fQca_bbBwReport_qhs3M_s1;
+        FIELD fQca_bbBwReport_qhs3M_s3;
+        FIELD fQca_bbBwReport_qhs4M_s1;
+        FIELD fQca_bbBwReport_qhs4M_s3;
+        FIELD fQca_bbBwReport_qhs5M_s1;
+        FIELD fQca_bbBwReport_qhs5M_s3;
+        FIELD fQca_bbBwReport_qhs6M_s1;
+        FIELD fQca_bbBwReport_qhs6M_s3;
+    }
+    FIELD fQca_bbBwReport_retrans;
+    GROUP gQca_OBEX_bbBwReport_edrStatRetrans IF (FieldIs EqualTo 0x00 fQca_bbBwReport_type) "EDR Retrans packet statistics"
+    {
+        FIELD fQca_bbBwReport_edr1SlotRetrans;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr2slotRetrans;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr3slotRetrans;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr4slotRetrans;
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr5slotRetrans;
+        RESERVED (Fixed 2 Bytes)
+    }
+    GROUP gQca_OBEX_bbBwReport_QHSStatRetrans IF (FieldIs EqualTo 0x01 fQca_bbBwReport_type) "QHS packet Retrans statistics"
+    {
+        FIELD fQca_bbBwReport_qhs2M_s1Retrans;
+        FIELD fQca_bbBwReport_qhs2M_s3Retrans;
+        FIELD fQca_bbBwReport_qhs3M_s1Retrans;
+        FIELD fQca_bbBwReport_qhs3M_s3Retrans;
+        FIELD fQca_bbBwReport_qhs4M_s1Retrans;
+        FIELD fQca_bbBwReport_qhs4M_s3Retrans;
+        FIELD fQca_bbBwReport_qhs5M_s1Retrans;
+        FIELD fQca_bbBwReport_qhs5M_s3Retrans;
+        FIELD fQca_bbBwReport_qhs6M_s1Retrans;
+        FIELD fQca_bbBwReport_qhs6M_s3Retrans;
+    }
+    GROUP gQca_OBEX_bbBwReport_TxerrorStatus IF (FieldIs EqualTo 0x00 fQca_bbBwReport_dir)
+    {
+        FIELD fQca_bbBwReport_RfLoss;
+        FIELD fQca_bbBwReport_Nak;
+        FIELD fQca_bbBwReport_txAbort;
+        FIELD fQca_bbBwReport_txDenial;
+    }
+    GROUP gQca_OBEX_bbBwReport_RxerrorStatus IF (FieldIs EqualTo 0x01 fQca_bbBwReport_dir)
+    {
+        FIELD fQca_bbBwReport_errNoAec;
+        FIELD fQca_bbBwReport_errHecBad;
+        FIELD fQca_bbBwReport_errCrcBad;
+        FIELD fQca_bbBwReport_errPhyError;
+    }
+    FIELD fQca_bbBwReport_txPwr;
+    FIELD fQca_bbBwReport_role;
+    FIELD fQca_bbBwReport_linkQual;
+    FIELD fQca_bbBwReport_avgRSSI;
+}
+
+GROUP gQca_STAT_IsoalDbg "ISOAL Debug Info"
+{
+    FIELD gQca_STAT_IsoalDbg_handle             (Fixed 1 Bytes) (hex)       "hciConnHandle"
+
+    RESERVED                                    (Fixed 3 Bytes)
+
+    FIELD gQca_STAT_IsoalDbg_rxInitSduSeqn      (Fixed 2 Bytes) (Decimal)   "rxInitSduSeqn"
+    FIELD gQca_STAT_IsoalDbg_rxInitPduSeqn      (Fixed 2 Bytes) (Decimal)   "rxInitPduSeqn"
+
+    FIELD gQca_STAT_IsoalDbg_txInitSduSeqn      (Fixed 2 Bytes) (Decimal)   "txInitSduSeqn"
+    FIELD gQca_STAT_IsoalDbg_txInitPduSeqn      (Fixed 2 Bytes) (Decimal)   "txInitPduSeqn"
+
+    FIELD gQca_STAT_IsoalDbg_maxTxSduCnt        (Fixed 2 Bytes) (Decimal)   "maxTxSduCnt"
+    FIELD gQca_STAT_IsoalDbg_maxTxPduCnt        (Fixed 2 Bytes) (Decimal)   "maxTxPduCnt"
+
+    FIELD gQca_STAT_IsoalDbg_lastPrepTxSduSeqn  (Fixed 2 Bytes) (Decimal)   "lastPrepTxSduSeqn"
+    FIELD gQca_STAT_IsoalDbg_lastPrepTxPduSeqn  (Fixed 2 Bytes) (Decimal)   "lastPrepTxPduSeqn"
+
+    FIELD gQca_STAT_IsoalDbg_lastUsedTxPduSeqn  (Fixed 2 Bytes) (Decimal)   "lastUsedTxPduSeqn"
+    FIELD gQca_STAT_IsoalDbg_lastSetupTxPduSeqn (Fixed 2 Bytes) (Decimal)   "lastSetupTxPduSeqn"
+
+    FIELD gQca_STAT_IsoalDbg_maxTxOffset        (Fixed 4 Bytes) (Decimal)   "maxTxOffset (us)"
+
+    FIELD gQca_STAT_IsoalDbg_firstTxSduTime     (Fixed 4 Bytes) (hex)       "firstTxSduTime"
+    FIELD gQca_STAT_IsoalDbg_firstTxPduTime     (Fixed 4 Bytes) (hex)       "firstTxPduTime"
+
+    FIELD gQca_STAT_IsoalDbg_lastPrepTxSduTime  (Fixed 4 Bytes) (hex)       "lastPrepTxSduTime"
+    FIELD gQca_STAT_IsoalDbg_lastPrepTxPduTime  (Fixed 4 Bytes) (hex)       "lastPrepTxPduTime"
+
+    FIELD gQca_STAT_IsoalDbg_lastSetupTxPduTime (Fixed 4 Bytes) (hex)       "lastSetupTxPduTime"
+    FIELD gQca_STAT_IsoalDbg_lastUsedTxPduTime  (Fixed 4 Bytes) (hex)       "lastUsedTxPduTime"
+}
+
+
+TABLE tackackType
+    {0 "UNKNOWN"}
+    {1 "NAK"}
+    {2 "INAK"}
+    {3 "ACK"}
+    {4 "RSSI"}
+ENDTABLE
+
+TABLE asdProfile
+    {0 "A2DP"}
+    {1 "SCO"}
+    {2 "CIS"}
+ENDTABLE
+
+GROUP  gQca_STAT_AsdStats "ASDStats"
+{
+	FIELD fQca_STAT_AsdStats_iirAck0 	(Fixed 4 Bytes) (Decimal)   "IIRAck0"
+	FIELD fQca_STAT_AsdStats_iirAck0t	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_iirAck0 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_iirAck0f 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_iirAck0t 16384) (Decimal)  IN_SUMMARY "IIRAck0(%)" "IIRAck0(%)"
+	
+    FIELD fQca_STAT_AsdStats_iirRssi0  	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   "iirRssi0Raw"
+    FIELD fQca_STAT_AsdStats_iirRssi0f  (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_iirRssi0 128) (Decimal)   IN_SUMMARY "IIRRSSI0" "IIRRSSI0"
+	
+	
+	//RESERVED (Fixed 2 Bytes)
+    FIELD fQca_STAT_AsdStats_dbgver  	(Fixed 2 Bytes) (Hex)   "DbgVer"
+    FIELD fQca_STAT_AsdStats_ackNakCnt0 (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal)   "ACK/NAK count0"
+	RESERVED (Fixed 3 Bytes)
+	
+	FIELD fQca_STAT_AsdStats_iirAck1 	(Fixed 4 Bytes) (Decimal)   "IIRAck1"
+	FIELD fQca_STAT_AsdStats_iirAck1t	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_iirAck1 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_iirAck1f 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_iirAck1t 16384) (Decimal)   IN_SUMMARY "IIRAck1(%)" "IIRAck1(%)"
+	
+    FIELD fQca_STAT_AsdStats_iirRssi1  	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   "iirRssi1Raw"
+    FIELD fQca_STAT_AsdStats_iirRssi1f  (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_iirRssi1 128) (Decimal)   IN_SUMMARY "IIRRSSI1" "IIRRSSI1"
+	
+	RESERVED (Fixed 2 Bytes)		
+    FIELD fQca_STAT_AsdStats_ackNakCnt1 (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal)   "ACK/NAK count1"	
+	
+	FIELD fQca_STAT_AsdStats_isAck  	(Fixed 1 Bytes) (Decimal)   		"ACK"
+	FIELD fQca_STAT_AsdStats_acknakType	(Fixed 1 Bytes) (TABLE tackackType) IN_SUMMARY "type" "ACK NAK type"
+	RESERVED (Fixed 1 Bytes)		
+	
+	FIELD fQca_STAT_AsdStats_rssi_unknown   (Fixed 2 Bytes) IF(FieldIs EqualTo 0 fQca_STAT_AsdStats_acknakType) RETRIEVE (SignExtension 16) (Decimal) IN_SUMMARY "RSSI" SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_rssi_nak  	    (Fixed 2 Bytes) IF(FieldIs EqualTo 1 fQca_STAT_AsdStats_acknakType) RETRIEVE (SignExtension 16) (Decimal) IN_SUMMARY "RSSI" "RSSI" 
+	FIELD fQca_STAT_AsdStats_rssi_ack	    (Fixed 2 Bytes) IF(FieldIs EqualTo 2 fQca_STAT_AsdStats_acknakType) RETRIEVE (SignExtension 16) (Decimal) IN_SUMMARY "RSSI" "RSSI"   
+	FIELD fQca_STAT_AsdStats_rssi_inak  	(Fixed 2 Bytes) IF(FieldIs EqualTo 3 fQca_STAT_AsdStats_acknakType) RETRIEVE (SignExtension 16) (Decimal) IN_SUMMARY "RSSI" SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_rssi_only	    (Fixed 2 Bytes) IF(FieldIs EqualTo 4 fQca_STAT_AsdStats_acknakType) RETRIEVE (SignExtension 16) (Decimal) IN_SUMMARY "RSSI" "RSSI"   
+
+	FIELD fQca_STAT_AsdStats_alloc0  		(Fixed 2 Bytes) (Decimal)   		"Alloc0"
+	FIELD fQca_STAT_AsdStats_alloc0t	    (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_alloc0 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_alloc0f 	    (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_alloc0t 16384) (Decimal)  IN_SUMMARY "Alloc0(%)" "Alloc0(%)"
+	FIELD fQca_STAT_AsdStats_selAntenna  	(Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "SelAnt" "Selected Antenna"
+	FIELD fQca_STAT_AsdStats_calcAntenna  	(Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "CalcAnt" "Calculated Antenna"
+	FIELD fQca_STAT_AsdStats_calcAntennat  	(Fixed 0 Bytes) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_calcAntenna 100)(Decimal)   		"CalcAnt*100"
+	FIELD fQca_STAT_AsdStats_targetLoss  	(Fixed 2 Bytes) (Decimal)   		"Target Loss"
+	FIELD fQca_STAT_AsdStats_targetLosst	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_targetLoss 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_targetLossf 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_targetLosst 16384) (Decimal)   "TgtLoss(%)"	
+	
+	FIELD fQca_STAT_AsdStats_desiredAlloc  	(Fixed 4 Bytes) (Decimal)   		"Desired Allocation"
+	FIELD fQca_STAT_AsdStats_desiredAlloct	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_desiredAlloc 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_desiredAllocf 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_desiredAlloct 16384) (Decimal)   IN_SUMMARY "DsrAlloc(%)" "DsrAlloc(%)"
+	
+	FIELD fQca_STAT_AsdStats_allocError 	(Fixed 4 Bytes) RETRIEVE (SignExtension 32) (Decimal)   		"Allocation Error"
+	FIELD fQca_STAT_AsdStats_allocErrort	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_allocError 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_allocErrorf 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_allocErrort 16384) (Decimal)   "AllocErr(%)"
+	FIELD fQca_STAT_AsdStats_mu			 	(Fixed 2 Bytes) (Decimal)   		"MU"
+	FIELD fQca_STAT_AsdStats_mut	        (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_mu 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_muf 	        (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_mut 16384) (Decimal)   "Mu(%)"
+	FIELD fQca_STAT_AsdStats_decCnt		 	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   		"Decremental Count"
+	FIELD fQca_STAT_AsdStats_decCntt        (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_decCnt 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_decCntf        (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_decCntt 16384) (Decimal)   "DecCnt(%)"
+	FIELD fQca_STAT_AsdStats_isShadowState  (Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "shadow" "Shadowing State"		
+	FIELD fQca_STAT_AsdStats_frameAntenna	(Fixed 1 Bytes) (Decimal)   		"Frame Antenna"		
+	FIELD fQca_STAT_AsdStats_connHandle  	(Fixed 1 Bytes) (Decimal)   		"Conn Handle"
+    
+    FIELD fQca_STAT_AsdStats_TxASDGranted   (Fixed 1 Bytes) (Decimal)           "TxASDGranted"
+    FIELD fQca_STAT_AsdStats_RxASDGranted   (Fixed 1 Bytes) (Decimal)           "RxASDGranted"
+    FIELD fQca_STAT_AsdStats_MCI_STATE      (Fixed 1 Bytes) (Table tQca_CXM_CoexMciState_Type)  "MCI STATE"
+    FIELD fQca_STAT_AsdStats_remoteSleepState (Fixed 1 Bytes) (Decimal)         "remoteSleepState"
+    FIELD fQca_STAT_AsdStats_is2GConnected    (Fixed 1 Bytes) (Decimal)         "is2GConnected"
+    FIELD fQca_STAT_AsdStats_is2GScanning     (Fixed 1 Bytes) (Decimal)         "is2GScanning"
+	FIELD fQca_STAT_AsdStats_rxFailCnt  	(Fixed 1 Bytes) (Decimal)   		"rxFailContinousCount"
+    RESERVED                                (Fixed 2 Bytes)
+	FIELD fQca_STAT_AsdStats_pClk  	        (Fixed 4 Bytes) (Hex)               "pClk"
+	FIELD fQca_STAT_AsdStats_randMu     	(Fixed 1 Bytes) (Decimal)   		"randMu(%)"
+	FIELD fQca_STAT_AsdStats_isInitState   	(Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "init" "init State"
+	FIELD fQca_STAT_AsdStats_ContSel0r   	(Fixed 1 Bytes) (Decimal)   		"contSel0_rssiValid"
+	FIELD fQca_STAT_AsdStats_ContSel1r   	(Fixed 1 Bytes) (Decimal)   		"contSel1_rssiValid"
+	FIELD fQca_STAT_AsdStats_ContNoRssi0   	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "contNoRssi0" "contNoRssi0"
+	FIELD fQca_STAT_AsdStats_ContNoRssi1   	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "contNoRssi1" "contNoRssi1"
+	FIELD fQca_STAT_AsdStats_ContNoRxPen0   (Fixed 2 Bytes) (Decimal)   		"contNoRxPenalized0"
+	FIELD fQca_STAT_AsdStats_ContNoRsPen1  	(Fixed 2 Bytes) (Decimal)   		"contNoRxPenalized1"
+	FIELD fQca_STAT_AsdStats_ContSel0   	(Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "contSel0" "contSel0"
+	FIELD fQca_STAT_AsdStats_ContSel1   	(Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "contSel1" "contSel1"
+	FIELD fQca_STAT_AsdStats_adjIirAckBeta 	(Fixed 2 Bytes) (Decimal)   		"adjIirAckBeta"
+    
+	FIELD fQca_STAT_AsdStats_dsrAllocAck    (Fixed 4 Bytes) (Decimal)   		"Desired AllocAck"
+	FIELD fQca_STAT_AsdStats_dsrAllocAckt	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_dsrAllocAck 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_dsrAllocAckf 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_dsrAllocAckt 16384) (Decimal)   IN_SUMMARY "DsrAllocAck(%)" "DsrAllocAck(%)"
+	FIELD fQca_STAT_AsdStats_dsrAllocRssi   (Fixed 4 Bytes) (Decimal)   		"Desired AllocRssi"
+	FIELD fQca_STAT_AsdStats_dsrAllocRssit	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_dsrAllocRssi 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_dsrAllocRssif 	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_dsrAllocRssit 16384) (Decimal)  IN_SUMMARY "DsrAllocRssi(%)" "DsrAllocRssi(%)"
+	FIELD fQca_STAT_AsdStats_dsrAllocB4Skew (Fixed 4 Bytes) (Decimal)   		"Desired dsrAlloc0B4Skew"
+	FIELD fQca_STAT_AsdStats_dsrAllocB4Skewt (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_dsrAllocB4Skew 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_dsrAllocB4Skewf (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_dsrAllocB4Skewt 16384) (Decimal)   IN_SUMMARY "dsrAlloc0B4Skew(%)" "dsrAlloc0B4Skew(%)"
+	FIELD fQca_STAT_AsdStats_tgtLossAck     (Fixed 2 Bytes) (Decimal)   		"Target LossAck"
+	FIELD fQca_STAT_AsdStats_tgtLossAckt	(Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_tgtLossAck 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_tgtLossAckf	(Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_tgtLossAckt 16384) (Decimal)   "TgtLossAck(%)"
+	FIELD fQca_STAT_AsdStats_tgtLossRssi    (Fixed 2 Bytes) (Decimal)   		"Target LossRssi"
+	FIELD fQca_STAT_AsdStats_tgtLossRssit   (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_tgtLossRssi 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_tgtLossRssif   (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_tgtLossRssit 16384) (Decimal)   "TgtLossRssi(%)"
+	FIELD fQca_STAT_AsdStats_weight_ack     (Fixed 2 Bytes) (Decimal)   		"weightAck"
+	FIELD fQca_STAT_AsdStats_weight_ackt    (Fixed 0 Byte) RETRIEVE (MultiplyFieldByInteger fQca_STAT_AsdStats_weight_ack 100)(Decimal) SUPPRESS_DETAIL
+	FIELD fQca_STAT_AsdStats_weight_ackf    (Fixed 0 Byte) RETRIEVE (DivideFieldByInteger fQca_STAT_AsdStats_weight_ackt 16384) (Decimal)   IN_SUMMARY "weightAck(%)" "weightAck(%)"
+	FIELD fQca_STAT_AsdStats_rxFailThresh 	(Fixed 1 Bytes) (Decimal)   		"rxFailThresh"
+	FIELD fQca_STAT_AsdStats_rxFailThreshSh	(Fixed 1 Bytes) (Decimal)   		"rxFailThreshShadow"
+	FIELD fQca_STAT_AsdStats_Profile        (Fixed 1 Bytes) (TABLE asdProfile)  IN_SUMMARY "profile" "profile"
+    FIELD fQca_STAT_AsdStats_Role           (Fixed 1 Byte)  (TABLE tQca_DeviceRole)      "Role"
+    FIELD fQca_STAT_AsdStats_seq            (Fixed 1 Byte)  (Decimal)           IN_SUMMARY "seq" "seq"
+    FIELD fQca_STAT_AsdStats_penXnoRx       (Fixed 1 Byte)  (Decimal)           IN_SUMMARY "penX" "penX"
+    FIELD fQca_STAT_AsdStats_penYnoRx       (Fixed 1 Byte)  (Decimal)           IN_SUMMARY "penY" "penY"
+    FIELD fQca_STAT_AsdStats_txAntenna      (Fixed 1 Byte)  (Decimal)           IN_SUMMARY "txAnt" "txAnt"
+	FIELD fQca_STAT_AsdStats_hdle	        (Fixed 1 Bytes) (Decimal)   		IN_SUMMARY "curhdl" "curhdl"
+    RESERVED                                (Fixed 1 Byte)
+	FIELD fQca_STAT_AsdStats_connInASD      (Fixed 4 Bytes) (Hex)   		    "connInASD" 
+    //debug
+	FIELD fQca_STAT_AsdStats_hdle0	        (Fixed 1 Bytes) (Decimal)   		"hdl0"	    
+	FIELD fQca_STAT_AsdStats_hdle1	        (Fixed 1 Bytes) (Decimal)   		"hdl1"		
+	FIELD fQca_STAT_AsdStats_hdle2	        (Fixed 1 Bytes) (Decimal)   		"hdl2"		
+    RESERVED                                (Fixed 1 Bytes)
+    
+	FIELD fQca_STAT_AsdStats_decCnt0     	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   		IN_SUMMARY "DecCnt0" "DecCnt0"
+	FIELD fQca_STAT_AsdStats_decCnt1     	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   		IN_SUMMARY "DecCnt1" "DecCnt1"
+	FIELD fQca_STAT_AsdStats_decCnt2     	(Fixed 2 Bytes) RETRIEVE (SignExtension 16) (Decimal)   		IN_SUMMARY "DecCnt2" "DecCnt2"
+	FIELD fQca_STAT_AsdStats_frameAntenna0	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "FrameAnt0" "FrameAnt0"
+	FIELD fQca_STAT_AsdStats_frameAntenna1	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "FrameAnt1" "FrameAnt1"		
+	FIELD fQca_STAT_AsdStats_frameAntenna2	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "FrameAnt2" "FrameAnt2"		
+	FIELD fQca_STAT_AsdStats_calcAntenna0  	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "CalcAnt0" "CalcAnt0"
+	FIELD fQca_STAT_AsdStats_calcAntenna1  	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "CalcAnt1" "CalcAnt1"
+	FIELD fQca_STAT_AsdStats_calcAntenna2  	(Fixed 2 Bytes) (Decimal)   		IN_SUMMARY "CalcAnt2" "CalcAnt2"
+}
+
+GROUP gQca_STAT_A2dpSinkConnStats "A2DP Sink Stall Connection Stats"
+{
+    FIELD fQca_A2DPSinkPktNo                   (Fixed 1 Byte)                                                                                           (Decimal)  "PktNo"
+    FIELD fQca_A2DPSinkConnHandle              (Fixed 1 Byte)                                                                                           (Decimal)  "ConnHandle"
+    FIELD fQca_A2DPSinkpktType                 (Fixed 1 Byte)                                                                                           (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2DPSinkltType                  (Fixed 1 Byte)  RETRIEVE (MultiplyInteger 16) ALSO (AddField fQca_A2DPSinkpktType) (Table ACL_PACKETTYPE)           "pktType"
+    GROUP gQca_STAT_ACLPerPktStats;
+    FIELD fQca_A2dpSinkRxLength                (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0)                                                          (Decimal)  "Rx Length"
+    FIELD fQca_A2dpSinkRSSI                    (Fixed 2 Bytes) RETRIEVE (SignExtension 8)                                                               (Decimal)  "RSSI"
+    FIELD fQca_A2dpSinkPiconetClock            (Fixed 4 Bytes)                                                                                          (Hex)      "PiconetClock"
+    FIELD fQca_A2dpSinkClockOffset             (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkTimeLastAck             (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkTimeLastAck1            (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkTimeLastAck) ALSO (OrMask 0x10000000)            (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkTimeLastAck2            (Fixed 0)       RETRIEVE       (AddFieldToField fQca_A2dpSinkTimeLastAck1 fQca_A2dpSinkClockOffset)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkArrivalTime             (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkArrivalTime1            (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkArrivalTime) ALSO (OrMask 0x10000000)            (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkArrivalTime2            (Fixed 0)       RETRIEVE       (AddFieldToField fQca_A2dpSinkArrivalTime1 fQca_A2dpSinkClockOffset)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkSchedInstant            (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkSchedInstant1           (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkSchedInstant) ALSO (OrMask 0x10000000)           (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkSchedInstant2           (Fixed 0)       RETRIEVE       (AddFieldToField fQca_A2dpSinkSchedInstant1 fQca_A2dpSinkClockOffset)     (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastAckInstant          (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastAckInstant1         (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkLastAckInstant) ALSO (OrMask 0x10000000)         (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastAckInstant2         (Fixed 0)       RETRIEVE       (AddFieldToField fQca_A2dpSinkLastAckInstant1 fQca_A2dpSinkClockOffset)   (Hex)      SUPPRESS_DETAIL
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_A2dpSinkLastFlowOffClk          (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastFlowOffClk1         (Fixed 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOffClk) ELSE_SKIP (FIXED 0) RETRIEVE (StoreField fQca_A2dpSinkLastFlowOffClk) ALSO (OrMask 0x10000000)   (Hex) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastFlowOffClk2         (Fixed 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOffClk) ELSE_SKIP (FIXED 0) RETRIEVE (AddFieldToField fQca_A2dpSinkLastFlowOffClk1 fQca_A2dpSinkClockOffset) (Hex) SUPPRESS_DETAIL
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_A2dpSinkLastFlowOnClk           (Fixed 4 Bytes)                                                                                          (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastFlowOnClk1          (Fixed 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE   (StoreField fQca_A2dpSinkLastFlowOnClk) ALSO (OrMask 0x10000000)    (Hex)  SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastFlowOnClk2          (Fixed 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE   (AddFieldToField fQca_A2dpSinkLastFlowOnClk1 fQca_A2dpSinkClockOffset)  (Hex)  SUPPRESS_DETAIL
+
+    FIELD fQca_A2dpSinkAckInstantPnet          (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkTimeLastAck2) ALSO (OrMask 0x10000000)                (Hex)      "AckInstant"
+    FIELD fQca_A2dpSinkArrivalTimePnet         (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkArrivalTime2) ALSO (OrMask 0x10000000)               (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkSchedInstantPnet        (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkSchedInstant2) ALSO (OrMask 0x10000000)              (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkLastTxAckInstantPnet    (Fixed 0)       RETRIEVE       (StoreField fQca_A2dpSinkLastAckInstant2) ALSO (OrMask 0x10000000)          (Hex)      "LastTxAckInstant"
+
+    FIELD fQca_A2dpSinkPrevtoCurrAckDelay      (Fixed 0)       RETRIEVE       (SubtractFieldMinusField fQca_A2dpSinkTimeLastAck fQca_A2dpSinkLastAckInstant)   (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkPrevtoCurrAckDelay1     (Fixed 0)       RETRIEVE       (MultiplyFieldByInteger fQca_A2dpSinkPrevtoCurrAckDelay 625)                  (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkPrevtoCurrAckDelay2     (Fixed 0)       RETRIEVE       (DivideFieldByInteger fQca_A2dpSinkPrevtoCurrAckDelay1 2000)                  (Decimal)  "PrevToCurrPktAckDelay(ms)"
+
+    FIELD fQca_A2dpSinkLastFlowOffClkPnet      (FIXED 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOffClk) ELSE_SKIP (FIXED 0) RETRIEVE  (StoreField fQca_A2dpSinkLastFlowOffClk) ALSO (OrMask 0x10000000) (Hex) "LastFlowOffClk"
+    FIELD fQca_A2dpSinkLastFlowOnClkPnet       (Fixed 0)   IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_A2dpSinkLastFlowOnClk)  ELSE_SKIP (FIXED 0) RETRIEVE  (StoreField fQca_A2dpSinkLastFlowOnClk2) ALSO (OrMask 0x10000000) (Hex) "LastFlowOnClk"
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_A2dpSinkCoexCriticalPriorityClk (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF)                                                 (Hex)      "CoexCriticalPriorityClk"
+    FIELD fQca_A2dpSinkCoexNormalPriorityClk   (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF)                                                 (Hex)      "CoexNormalPriorityClk"
+    FIELD fQca_A2dpSinkWBtime                  (Fixed 4 Bytes)                                                                                          (Hex)      "WBtime"
+
+    FIELD fQca_A2dpSinkPacketLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_A2dpSinkTimeLastAck fQca_A2dpSinkArrivalTime2) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkPacketLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_A2dpSinkPacketLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_A2dpSinkPacketLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_A2dpSinkPacketLatencyTemp 2) (Decimal) SUPPRESS_DETAIL
+}
+
+GROUP gQca_STAT_VoiceGroup "Voice Group Stats"
+{
+    FIELD fQca_STAT_ToAirIntrCnt                    (Fixed 2 Bytes)   (Decimal)   "ToAir Intr Count"
+    FIELD fQca_STAT_ToAirIntrMissedCnt              (Fixed 2 Bytes)   (Decimal)   "ToAir Intr Missed Count"
+    FIELD fQca_STAT_ToAirIntrLateCnt                (Fixed 2 Bytes)   (Decimal)   "ToAir Intr Late Count"
+    FIELD fQca_STAT_ToAirIntrMaxExecutionTime       (Fixed 2 Bytes)   (Decimal)   "ToAir Intr Longest Execution Time"
+    FIELD fQca_STAT_FromAirIntrCnt                  (Fixed 2 Bytes)   (Decimal)   "FromAir Intr Count"
+    FIELD fQca_STAT_FromAirIntrMissedCnt            (Fixed 2 Bytes)   (Decimal)   "FromAir Intr Missed Count"
+    FIELD fQca_STAT_FromAirIntrMaxExecutionTime     (Fixed 2 Bytes)   (Decimal)   "FromAir Intr Longest Execution Time"
+    FIELD fQca_STAT_FromAirGoodCnt                  (Fixed 2 Bytes)   (Decimal)   "FromAir Window Good Count"
+    FIELD fQca_STAT_FromAirFailCnt                  (Fixed 2 Bytes)   (Decimal)   "FromAir Window Fail Count"
+    FIELD fQca_STAT_FromAirLostCnt                  (Fixed 2 Bytes)   (Decimal)   "FromAir Window Lost Count"
+    FIELD fQca_STAT_FromAirEDP1WayVoteCnt           (Fixed 2 Bytes)   (Decimal)   "FromAir EDP 1-Way Vote Count"
+    FIELD fQca_STAT_FromAirEDP2WayVoteCnt           (Fixed 2 Bytes)   (Decimal)   "FromAir EDP 2-Way Vote Count"
+    FIELD fQca_STAT_FromAirEDP3WayVoteCnt           (Fixed 2 Bytes)   (Decimal)   "FromAir EDP 3-Way Vote Count"
+    FIELD fQca_STAT_FromAirEDPCorrelationFailCnt    (Fixed 2 Bytes)   (Decimal)   "FromAir EDP Correlation Fail Count"
+    FIELD fQca_STAT_fromAirGoodPercent    (Fixed 1 Bytes)   (Decimal)   "fromAirGoodPercent"
+    FIELD fQca_STAT_fromAirFailPercent    (Fixed 1 Bytes)   (Decimal)   "fromAirFailPercent"
+    FIELD fQca_STAT_fromAirLostPercent    (Fixed 1 Bytes)   (Decimal)   "fromAirLostPercent"
+    RESERVED (Fixed 1 Bytes) 
+}
+
+GROUP gQca_STAT_VoiceStream "Voice Stream Stats"
+{
+    FIELD fQca_STAT_ConnHandle                      (Fixed 2 Bytes)   (Decimal)   "Stream Connection Handle"
+    FIELD fQca_STAT_ToAirRingSampleLevel            (Fixed 2 Bytes)   (Decimal)   "ToAir Ring Sample Level"
+    FIELD fQca_STAT_FromAirPLCWeakBitDiscardCnt     (Fixed 2 Bytes)   (Decimal)   "FromAir PLC Weak Bit Discard Count"
+    FIELD fQca_STAT_FromAirPLCFillCnt               (Fixed 2 Bytes)   (Decimal)   "FromAir PLC Fill Count"
+    FIELD fQca_STAT_FromAirPLCReplaceCnt            (Fixed 2 Bytes)   (Decimal)   "FromAir PLC Replace Count"
+    FIELD fQca_STAT_FromAirRingSampleLevel          (Fixed 2 Bytes)   (Decimal)   "FromAir Ring Sample Level"
+    FIELD fQca_STAT_ToAirAddCnt                     (Fixed 1 Byte)    (Decimal)   "ToAir Add Count"
+    FIELD fQca_STAT_ToAirDropCnt                    (Fixed 1 Byte)    (Decimal)   "ToAir Drop Count"
+    FIELD fQca_STAT_ToAirStuffCnt                   (Fixed 1 Byte)    (Decimal)   "ToAir Stuff Count"
+    FIELD fQca_STAT_ToAirFlushCnt                   (Fixed 1 Byte)    (Decimal)   "ToAir Flush Count"
+    FIELD fQca_STAT_ToAirIOPDropCnt                 (Fixed 1 Byte)    (Decimal)   "ToAir IOP Drop Count"
+    FIELD fQca_STAT_FromAirAddCnt                   (Fixed 1 Byte)    (Decimal)   "FromAir Add Count"
+    FIELD fQca_STAT_FromAirDropCnt                  (Fixed 1 Byte)    (Decimal)   "FromAir Drop Count"
+    FIELD fQca_STAT_FromAirStuffCnt                 (Fixed 1 Byte)    (Decimal)   "FromAir Stuff Count"
+    FIELD fQca_STAT_FromAirFlushCnt                 (Fixed 1 Byte)    (Decimal)   "FromAir Flush Count"
+    FIELD fQca_STAT_FromAirIOPStuffCnt              (Fixed 1 Byte)    (Decimal)   "FromAir IOP Stuff Count"
+    FIELD fQca_STAT_fromAirPLCPercent              (Fixed 1 Byte)    (Decimal)   "fromAirPLCPercent"
+    RESERVED (Fixed 1 Bytes)    
+}
+
+GROUP gQca_STAT_VoiceTransparent_SB  "Transparent Voice Sample Buf Stats"
+{
+    FIELD fQca_STAT_VoiceTransparent_SB_txPktQueuedCtr            (Fixed 4 Bytes)  (Decimal)   "txPktQueuedCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_txPktDoneCtr              (Fixed 4 Bytes)  (Decimal)   "txPktDoneCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_rxPktCtr                  (Fixed 4 Bytes)  (Decimal)   "rxPktCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_rxNoPktCtr                (Fixed 4 Bytes)  (Decimal)   "rxNoPktCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_driftDetectedCtr          (Fixed 4 Bytes)  (Decimal)   "driftDetectedCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_txPktOverflowCtr          (Fixed 4 Bytes)  (Decimal)   "txPktOverflowCtr"
+    FIELD fQca_STAT_VoiceTransparent_SB_rxPktToIntMin             (Fixed 2 Bytes)  (Decimal)   "rxPktToIntMin"
+    FIELD fQca_STAT_VoiceTransparent_SB_rxPktLateCtr              (Fixed 2 Bytes)  (Decimal)   "rxPktLateCtr"
+}
+
+GROUP gQca_STAT_RtscAclStats  "RTSC ACL packet Stats"
+{
+    FIELD Qca_STAT_RtscAclStats_bytesReceived       (Fixed 4 Bytes)  (Decimal)   "Num Bytes Received in 1 sec"
+    FIELD Qca_STAT_RtscAclStats_gdPktCnt            (Fixed 4 Bytes)  (Decimal)   "Good Packet Count"
+    FIELD Qca_STAT_RtscAclStats_cumuErrCnt          (Fixed 4 Bytes)  (Decimal)   "Overall Error Packets Detected"
+    FIELD Qca_STAT_RtscAclStats_pktsCorr            (Fixed 2 Bytes)  (Decimal)   "Num Corrected Pkts"
+    FIELD Qca_STAT_RtscAclStats_hciHandle           (Fixed 2 Bytes)  (Decimal)   "Hci Handle"
+}
+
+GROUP gQca_STAT_AshaStallStats "ASHA Stall Stats"
+{
+    FIELD Qca_STAT_AshaStallStat_connHandle    (Fixed 1 Byte)   (Decimal)   "ConnHandle"
+    FIELD Qca_STAT_AshaStallStat_seqNum        (Fixed 1 Byte)   (Decimal)   "ASHA Seq Num"
+    RESERVED                                   (Fixed 1 Byte)
+    RESERVED                                   (Fixed 1 Byte)
+    FIELD Qca_STAT_AshaStallStat_evtCtr        (Fixed 4 Bytes)  (Decimal)  "Event Counter"
+    FIELD Qca_STAT_AshaStallStat_txAckLatency  (Fixed 4 Bytes)  (Decimal)  "Tx Ack Latency (us)"
+}
+
+GROUP gQca_STATS_HecErrRaw
+{
+    FIELD gQca_STATS_HecErrRawClk                       (Fixed 4 Bytes)       (Hex)        "PiconetClk"
+    FIELD fQca_STATS_HecErrPktHdr_RawInfo               (Fixed 4 Bytes)       (Hex)        "pktHdrRaw"
+    FIELD fQca_STATS_HecErrPktHdr_AgcGainCodeRb         (Fixed 4 Bytes)       (Hex)        "pktHdr_AgcGainCodeRb"
+    FIELD fQca_STATS_HecErrPktHdr_PPScCmd0RxAgcRssi     (Fixed 4 Bytes)       (Hex)        "pktHdr_PPScCmd0RxAgcRssi"
+}
+
+GROUP gQca_STATS_CrcRaw
+{
+    FIELD gQca_STATS_CrcRawClk                          (Fixed 4 Bytes)       (Hex)        "PiconetClk"
+    FIELD fQca_STATS_CrcPktHdr_RawInfo                  (Fixed 4 Bytes)       (Hex)        "pktHdrRaw"
+    FIELD fQca_STATS_CrcPktHdr_AgcGainCodeRb            (Fixed 4 Bytes)       (Hex)        "pktHdr_AgcGainCodeRb"
+    FIELD fQca_STATS_CrcPktHdr_PPScCmd0RxAgcRssi        (Fixed 4 Bytes)       (Hex)        "pktHdr_PPScCmd0RxAgcRssi"
+    FIELD fQca_STATS_CrcPktEnd_AgcGainCodeRb            (Fixed 4 Bytes)       (Hex)        "pktEnd_AgcGainCodeRb"
+    FIELD fQca_STATS_CrcPktEnd_PPScCmd0RxAgcRssi        (Fixed 4 Bytes)       (Hex)        "pktEnd_PPScCmd0RxAgcRssi"
+    FIELD fQca_STATS_ftl_rot_rb                         (Fixed 4 Byte)        (Hex)        "HZ_MDM_BT_RX_FTL_ROT_RB"
+    FIELD fQca_STATS_acq_init_freq_offset_rb            (Fixed 4 Byte)        (Hex)        "HZ_MDM_BT_RX_ACQ_INIT_FREQ_OFFSET_RB"
+    FIELD fQca_STATS_freq_0                             (Fixed 4 Byte)        (Hex)        "HZ_PP_BTC_SC_HOPC_FREQ_0"
+    FIELD fQca_STATS_freq_1                             (Fixed 4 Byte)        (Hex)        "HZ_PP_BTC_SC_HOPC_FREQ_1"
+    FIELD fQca_STATS_CrcRawLen                          (Fixed 2 Bytes)       (Decimal)    "PktLen"
+    RESERVED (Fixed 2 Bytes)
+    FIELD fQca_STATS_CrcRawPayload   (FromField Bytes fQca_STATS_CrcRawLen)   (Hex)        "PayloadRaw"
+}
+
+GROUP gQca_STAT_RxAgcRegInfo "Rx AGC Register Info"
+{
+    FIELD Qca_STAT_agc_cm_exception_1           (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CM_EXCEPTION_1"
+    FIELD Qca_STAT_agc_cm_exception_2           (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CM_EXCEPTION_2"
+    FIELD Qca_STAT_agc_cm_exception_3           (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CM_EXCEPTION_3"
+    FIELD Qca_STAT_agc_cm_exception_4           (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CM_EXCEPTION_4"
+    FIELD Qca_STAT_agc_cm_exception_5           (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CM_EXCEPTION_5"
+    FIELD Qca_STAT_agc_ctrl                     (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_AGC_CTRL"
+    FIELD Qca_STAT_ctrl_0                       (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_CTRL_0"
+}
+
+TABLE t_IsoPduRxStatus
+    {0 "Unknow_Err"}
+    {1 "AC_err"}
+    {2 "CRC_err"}
+    {3 "CRC_good"}
+    {4 "Rx Buf Not Available"}
+    {5 "Rx Retrans"}
+    {6 "Rx Nak"}
+    {7 "Rx Ack"}
+ENDTABLE
+
+TABLE t_CIS_SduTxStatus
+    {0  "Unknow_Err"}
+    {1  "Flush Instead Of Stuff"}
+    {2  "Flush Disable Path"}
+    {3  "Flush No Memory"}
+    {4  "Flush Exceed Limit"}
+    {5  "Flush Handle Late"}
+    {6  "All PDU be Ack"}
+    {7  "Some PDU Rx Nothing/CRC error"}
+    {8  "Some PDU be Nak"}
+    {9  "Some PDU didn't Tx"}
+ENDTABLE
+
+TABLE t_BIS_SduTxStatus
+    {0  "Unknow_Err"}
+    {1  "Flush Instead Of Stuff"}
+    {2  "Flush Disable Path"}
+    {7  "All PDU Tx"}
+    {9  "Some PDU didn't Tx"}
+ENDTABLE
+
+GROUP gQca_STAT_IsoSduTxDbg "ISO SDU Tx Dbg"
+{
+    FIELD fQca_STAT_IsoSduTxDbg_handle          (Fixed 1 Bytes) (Decimal)   "handle"
+    FIELD fQca_STAT_IsoSduTxDbg_isoType         (Fixed 1 Bytes) (TABLE tQca_IsoType)   "isoType"
+    FIELD fQca_STAT_IsoSduTxDbg_isFrame         (Fixed 1 Bytes) (TABLE t_IsoFrameType)        "frame"
+    GROUP gQca_STAT_IsoSduTxDbg_CIS_sduStatus IF (Fieldis NotEqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
+    {
+        /* CIS */
+        FIELD fQca_STAT_IsoSduTxDbg_CIS_sduStatus        (Fixed 1 Bytes) (TABLE t_CIS_SduTxStatus)   "sduStatus"
+    }
+
+    GROUP gQca_STAT_IsoSduTxDbg_BIS_sduStatus IF (Fieldis EqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
+    {
+        /* BIS */
+        FIELD fQca_STAT_IsoSduTxDbg_BIS_sduStatus        (Fixed 1 Bytes) (TABLE t_BIS_SduTxStatus)   "sduStatus"
+    }
+
+    FIELD fQca_STAT_IsoSduTxDbg_sduSeqn          (Fixed 2 Bytes) (Decimal)   "sduSeqn"
+    FIELD fQca_STAT_IsoSduTxDbg_sduLength        (Fixed 2 Bytes) (Decimal)   "sduLength"
+    FIELD fQca_STAT_IsoSduTxDbg_cxmDenials       (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)   "cxmDenials"
+    Reserved (Fixed 2 bytes)
+    FIELD fQca_STAT_IsoSduTxDbg_arrivalTime      (Fixed 4 Bytes) (Decimal)   "arrivalTime"
+    FIELD fQca_STAT_IsoSduTxDbg_scheduleTime     (Fixed 4 Bytes) (Decimal)   "scheduleTime"
+    FIELD fQca_STAT_IsoSduTxDbg_flushAckTime     (Fixed 4 Bytes) (Decimal)   "flushAckTime"
+    FIELD fQca_STAT_IsoSduTxDbg_LastFlushAckTime (Fixed 4 Bytes) (Decimal)   "LastFlushAckTime"
+    FIELD fQca_STAT_IsoSduTxDbg_deltaFlushAckTime (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_LastFlushAckTime) (Decimal) "delta FlushAckTime (us)"
+
+    GROUP  gQca_STAT_IsoSduTxDbg_Latency_Summary "ISO_Latency_Summary"
+    {
+        FIELD fQca_STAT_IsoSduTxDbg_Arrival_To_Schedule_us   (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_scheduleTime fQca_STAT_IsoSduTxDbg_arrivalTime) (Decimal) "Arrive To Schedule (us)"
+        FIELD fQca_STAT_IsoSduTxDbg_Schedule_To_FlushAcke_us (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_scheduleTime) (Decimal) "Schedule To  FlushAck (us)"
+        FIELD fQca_STAT_IsoSduTxDbg_us (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_arrivalTime) (Decimal) "Iso Latency (us)"
+    }
+
+    FIELD fQca_STAT_IsoSduTxDbg_missDispatch     (Fixed 1 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)   "missDispatch"
+    FIELD fQca_STAT_IsoSduTxDbg_pduCnt           (Fixed 1 Bytes) (Decimal)   "pduCnt"
+    FIELD fQca_STAT_IsoSduTxDbg_pduLogCnt        (Fixed 1 Bytes) (Decimal)   "pduLogCnt"
+    FIELD fQca_STAT_IsoSduTxDbg_beginPduSeqn     (Fixed 1 Bytes) (Decimal)   "beginPduSeqn"
+
+    GROUP gQca_STAT_IsoSduTxDbg_scheduleInfo_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduTxDbg_missDispatch)
+    {
+        GROUP gQca_STAT_Iso_scheduleInfo "miss Dispatch Since Task: "
+        {
+            FIELD fQca_STAT_IsoSduTxDbg_scheduleInfo_opcode          (Fixed 1 Bytes) (TABLE tQca_DispatchOpCode)   "opcode"
+            FIELD fQca_STAT_IsoSduTxDbg_scheduleInfo_priority        (Fixed 1 Bytes) (Decimal)   "priority"
+        }
+    }
+
+    GROUP gQca_STAT_IsoSduTxDbg_pduStat_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduTxDbg_pduLogCnt)
+    {
+        FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn_init (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreInteger 0xFFFFFFFF)
+
+        GROUP gQca_STAT_IsoSduTxDbg_pduStat REPEAT COUNT (FromField Times fQca_STAT_IsoSduTxDbg_pduLogCnt 0) "PDU status"
+        {
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_rxStatus_tmp     (Fixed 3 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt_tmp     (Fixed 4 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp     (Fixed 1 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp         (Fixed 1 bytes) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_event_tmp        (Fixed 2 bytes) (Decimal) SUPPRESS_DETAIL
+
+            FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn (Fixed 0) RETRIEVE (StoreField lastPduSeqnValue) (Decimal) SUPPRESS_DETAIL
+
+            GROUP gQca_STAT_IsoSduTxDbg_pduStat_seqn_show IF (CompareFields fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp NotEqualTo fQca_STAT_IsoSduTxDbg_LastPduSeqn)
+            {
+                FIELD fQca_STAT_IsoSduTxDbg_pduStat_seqn         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp) (Decimal) "------------ PDU seqn --------"
+                FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn_set (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_seqn)
+            }
+
+            GROUP gQca_STAT_IsoSduTxDbg_pduStat_schedule IF (Fieldis EqualTo 0 fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp)
+            {
+                FIELD fQca_STAT_IsoSduTxDbg_pduStat_schedule     (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp)   (Decimal)   "scheduled"
+            }
+
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_event     (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_event_tmp)      (Decimal)   "streamEvent"
+            FIELD fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt  (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt_tmp)   (Decimal)   "subEvt"
+
+            /* show rxStatus if it's not BIS_M */
+            GROUP gQca_STAT_IsoSduTxDbg_pduStat_rxStatus_show IF (Fieldis NotEqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
+            {
+                FIELD fQca_STAT_IsoSduTxDbg_pduStat_rxStatus         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_rxStatus_tmp)   (TABLE t_IsoPduRxStatus)   "rxStatus"
+            }
+        }
+    }
+}
+
+TABLE t_IsoFrameType
+    {0 "UNFRAMED"}
+    {1 "FRAMED"}
+ENDTABLE
+
+TABLE t_ISO_SduRxStatus
+    {0x00 "Success"     "Success"       0   gQca_STAT_IsoSduRxDbg_Success}
+    {0x01 "Miss"        "Miss"          0   gQca_STAT_IsoSduRxDbg_Miss}
+    {0x02 "MissSync"    "MissSync"      0   gQca_STAT_IsoSduRxDbg_MissSync}
+    {0x03 "FailSeqn"    "FailSeqn"      0   gQca_STAT_IsoSduRxDbg_FailSeqn}
+    {0x04 "FailLen"     "FailLen"       0   gQca_STAT_IsoSduRxDbg_FailLen}
+ENDTABLE
+
+GROUP gQca_STAT_IsoSduRxDbg "ISO SDU Rx Dbg"
+{
+    FIELD fQca_STAT_IsoSduRxDbg_handle         (Fixed 1 Bytes) (Decimal)                       "handle"
+    FIELD fQca_STAT_IsoSduRxDbg_isoType        (Fixed 1 Bytes) (TABLE tQca_IsoType)            "isoType"
+    FIELD fQca_STAT_IsoSduRxDbg_isFrame        (Fixed 1 Bytes) (TABLE t_IsoFrameType)          "frame"
+    FIELD fQca_STAT_IsoSduRxDbg_sduStatus      (Fixed 1 Bytes) (TABLE t_ISO_SduRxStatus)       "sduStatus"
+    FIELD fQca_STAT_IsoSduRxDbg_cxmDenials     (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)      "cxmDenials"
+    Reserved (Fixed 2 bytes)
+    FIELD fQca_STAT_IsoSduRxDbg_missDispatch   (Fixed 1 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)      "missDispatch"
+    FIELD fQca_STAT_IsoSduRxDbg_pduCnt         (Fixed 1 Bytes) (Decimal)                       "pduCnt"
+    FIELD fQca_STAT_IsoSduRxDbg_pduLogCnt      (Fixed 1 Bytes) (Decimal)                       "pduLogCnt"
+    FIELD fQca_STAT_IsoSduRxDbg_startPduSeqn   (Fixed 1 Bytes) (Decimal)                       "startPduSeqn"
+
+    BRANCH (FromTable   t_ISO_SduRxStatus   fQca_STAT_IsoSduRxDbg_sduStatus)
+
+    GROUP gQca_STAT_IsoSduRxDbg_schedule_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_missDispatch)
+    {
+        GROUP gQca_STAT_Iso_scheduleInfo;
+    }
+
+    GROUP gQca_STAT_IsoSduRxDbg_rxPduLog_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_pduLogCnt)
+    {
+        FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn_init (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreInteger 0xFFFFFFFF)
+
+        GROUP gQca_STAT_IsoSduRxDbg_pduStat REPEAT COUNT (FromField Times fQca_STAT_IsoSduRxDbg_pduLogCnt 0) "PDU status"
+        {
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_rxStatus_tmp     (Fixed 3 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt_tmp     (Fixed 4 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_schedule_tmp     (Fixed 1 bits)  (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp         (Fixed 1 bytes) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_event_tmp        (Fixed 2 bytes) (Decimal) SUPPRESS_DETAIL
+
+            FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn (Fixed 0) RETRIEVE (StoreField lastPduSeqnValue) (Decimal) SUPPRESS_DETAIL
+
+            GROUP gQca_STAT_IsoSduRxDbg_pduStat_seqn_show IF (CompareFields fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp NotEqualTo fQca_STAT_IsoSduRxDbg_LastPduSeqn)
+            {
+                FIELD fQca_STAT_IsoSduRxDbg_pduStat_seqn         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp) (Decimal) "------------ PDU seqn --------"
+                FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn_set (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_seqn)
+            }
+
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_event       (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_event_tmp)      (Decimal)   "streamEvent"
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt    (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt_tmp)   (Decimal)   "subEvt"
+            FIELD fQca_STAT_IsoSduRxDbg_pduStat_rxStatus    (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_rxStatus_tmp)   (TABLE t_IsoPduRxStatus)   "rxStatus"
+        }
+    }
+}
+
+GROUP gQca_STAT_IsoSduRxDbg_Success  "RX Success"
+{
+    FIELD fQca_STAT_IsoSduRxDbg_Success_SduSeqn         (Fixed 2 Bytes)   (Decimal) "SduSeqn"
+    FIELD fQca_STAT_IsoSduRxDbg_Success_SduLen          (Fixed 2 Bytes)   (Decimal) "SduLen"
+}
+
+GROUP gQca_STAT_IsoSduRxDbg_Miss  "RX Miss"
+{
+    FIELD fQca_STAT_IsoSduRxDbg_UnFrameMiss_SduSeqn     (Fixed 2 Bytes)   (Decimal) "SduSeqn"
+    FIELD fQca_STAT_IsoSduRxDbg_UnFrameMiss_SduLen      (Fixed 2 Bytes)   (Decimal) "SduLen"
+}
+
+GROUP gQca_STAT_IsoSduRxDbg_MissSync  "RX MissSync"
+{
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_missSduSeqn        (Fixed 2 Bytes)   (Decimal) "missSduSeqn"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_cnt                (Fixed 2 Bytes)   (Decimal) "missCnt"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_lastLocalSduSeqn   (Fixed 2 Bytes)   (Decimal) "lastLocalSduSeqn"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_currSduSeqn        (Fixed 2 Bytes)   (Decimal) "currSduSeqn"
+
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_rxPduTime          (Fixed 4 Bytes)   (Decimal) "currRxPduTime"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_rxPduOffset        (Fixed 4 Bytes)   (Decimal) "currRxOffset"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_lastRxSyncRef      (Fixed 4 Bytes)   (Decimal) "last SDU Sync Ref"
+    FIELD fQca_STAT_IsoSduRxDbg_Miss_deltaToRxSyncRef   (Fixed 4 Bytes)   (Decimal) "delta to last SDU Sync Ref"
+}
+
+GROUP gQca_STAT_IsoSduRxDbg_FailSeqn "RX Fail Seqn"
+{
+    Group gQca_STAT_IsoSduRxDbg_FailSeqn_FrameCase IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_isFrame)
+    {
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_expectSduSeqn    (Fixed 2 Bytes)   (Decimal) "expectSduSeqn"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_currSduLen       (Fixed 2 Bytes)   (Decimal) "currSduLen"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_currSduSeqn      (Fixed 2 Bytes)   (Decimal) "currSduSeqn"
+        Reserved (Fixed 4 bytes)
+    }
+
+    Group gQca_STAT_IsoSduRxDbg_FailSeqn_UnframeCase IF (Fieldis EqualTo 0 fQca_STAT_IsoSduRxDbg_isFrame)
+    {
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_localSduSeqn   (Fixed 2 Bytes)   (Decimal) "SduSeqn"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_currSduLen     (Fixed 2 Bytes)   (Decimal) "SduLen"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_rxPayloadCnt_SduWidth (Fixed 2 Bytes)   (Decimal) "rx PayloadCnt/SduWidth"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_currPduSeqn    (Fixed 2 Bytes)   (Decimal) "currPduSeqn"
+        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_rxSduWidth     (Fixed 1 Bytes)   (Decimal) "SduWidth"
+        Reserved (Fixed 1 byte)
+    }
+}
+
+GROUP gQca_STAT_IsoSduRxDbg_FailLen "RX Fail Len"
+{
+    FIELD fQca_STAT_IsoSduRxDbg_FailLen_localSduSeqn    (Fixed 2 Bytes)   (Decimal) "SduSeqn"
+    FIELD fQca_STAT_IsoSduRxDbg_FailLen_currSduLen      (Fixed 2 Bytes)   (Decimal) "currSduLen"
+    FIELD fQca_STAT_IsoSduRxDbg_FailLen_expectSduLen    (Fixed 2 Bytes)   (Decimal) "expectSduLen"
+}
+
+GROUP gQca_STAT_ACLFlushStats "ACL/A2DP Flush Stats based on Naks"
+{
+    FIELD fQca_FlushPktPktNo                (Fixed 1 Byte)  (Decimal)  "PktNo"
+    FIELD fQca_FlushPktConnHandle           (Fixed 1 Byte)  (Decimal)  "ConnHandle"
+    FIELD fQca_FlushPktType                 (Fixed 1 Byte)  (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_FlushPktltType               (Fixed 1 Byte)  RETRIEVE   (MultiplyInteger 16) ALSO (AddField fQca_FlushPktType) (Table ACL_PACKETTYPE) "pktType"
+
+    FIELD fQca_FlushPktTxPowerLevel         (Fixed 1 Byte)  (Decimal)  "TxPowerLevel"
+    FIELD fQca_FlushPktAvgRSSI              (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "avgRSSIdBm"
+    GROUP fQca_FlushPktFlags "flags"
+    {
+        Reserved (fixed 6 bits)
+        FIELD fQca_FlushPktFlags_BIT1_ICBType        (Fixed 1 bit)  (TABLE t_ICBType)       "ACL/Split A2DP Packet"
+        FIELD fQca_FlushPktFlags_BIT0_linkRole       (Fixed 1 bit)  (TABLE t_linkRole)      "linkRole"
+    }
+    RESERVED                            (Fixed 1 Bytes)
+
+    GROUP gQca_STAT_ACLPerPktStats;
+    FIELD fQca_FlushPktOverflowCount        (Fixed 2 Bytes) PRINT_IF   (FieldIs NotEqualTo 0) (Decimal) "OverflowCount"
+    FIELD fQca_FlushPktFlushCount           (Fixed 2 Bytes) PRINT_IF   (FieldIs NotEqualTo 0) (Decimal) "FlushCount"
+    FIELD fQca_FlushPktPiconetClock         (Fixed 4 Bytes) (Hex)      "PiconetClock"
+    FIELD fQca_FlushPktClockOffset          (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktAckInstant           (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktArrivalTime          (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktArrivalTimePnet      (Fixed 0)       RETRIEVE   (AddFieldToField fQca_FlushPktArrivalTime fQca_FlushPktClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "ArrivalTime"
+    FIELD fQca_FlushPktSchedInstant         (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktSchedInstantPnet     (Fixed 0)       RETRIEVE   (AddFieldToField fQca_FlushPktSchedInstant fQca_FlushPktClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "SchedInstant"
+    FIELD fQca_FlushPktLastTxAckInstant     (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktLastTxAckInstantPnet (Fixed 0)       RETRIEVE   (AddFieldToField fQca_FlushPktLastTxAckInstant fQca_FlushPktClockOffset)ALSO (AndMask 0xFFFFFFF) (Hex) "LastTxAckInstant"
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_FlushPktLastFlowOffClk       (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+
+    /* Do not display if the clock values are invalid */
+    FIELD fQca_FlushPktLastFlowOnClk        (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+
+    FIELD fQca_FlushPktInstantPnetROMask (Fixed 0)       RETRIEVE (OrMask 0x10000000)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktPrevtoCurrPktDelay   (Fixed 0)       RETRIEVE (SubtractFieldMinusField fQca_FlushPktInstantPnetROMask fQca_FlushPktLastTxAckInstantPnet) ALSO (AndMask 0xFFFFFFF)   (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_FlushPktPrevtoCurrPktDelay1  (Fixed 0)       RETRIEVE (MultiplyFieldByInteger fQca_FlushPktPrevtoCurrPktDelay 625)           (Decimal)  SUPPRESS_DETAIL
+    FIELD fQca_FlushPktPrevtoCurrPktDelay2  (Fixed 0)       RETRIEVE (DivideFieldByInteger fQca_FlushPktPrevtoCurrPktDelay1 2000)           (Decimal)  "PrevToCurrPktAckDelay(ms)"
+
+    FIELD fQca_FlushPktLastFlowOffClkPnet   (Fixed 0)       IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_FlushPktLastFlowOffClk) ELSE_SKIP (FIXED 0) RETRIEVE (AddFieldToField fQca_FlushPktLastFlowOffClk fQca_FlushPktClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "LastFlowOffClk"
+    FIELD fQca_FlushPktLastFlowOnPnet       (Fixed 0)       IF (FieldIs NotEqualTo 0xFFFFFFFF fQca_FlushPktLastFlowOnClk) ELSE_SKIP (FIXED 0) RETRIEVE (AddFieldToField fQca_FlushPktLastFlowOnClk fQca_FlushPktClockOffset) ALSO (AndMask 0xFFFFFFF) (Hex) "LastFlowOnClk"
+
+    /* Do no display if the clock values are invalid */
+    FIELD fQca_FlushPktCoexCriticalPriorityClk (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "CoexCriticalPriorityClk"
+    FIELD fQca_FlushPktCoexNormalPriorityClk   (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "CoexNormalPriorityClk"
+    FIELD fQca_FlushPktWBtime                  (Fixed 4 Bytes) (Hex)      "WBtime"
+    FIELD fQca_LastPktFlushClk                 (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0xFFFFFFFF) (Hex)      "FlushTimestamp"
+    FIELD fQca_TxAbortByCoexAbortCounter       (Fixed 4 Bytes) (Hex)      SUPPRESS_DETAIL
+    GROUP gQca_FlushSegmentLatency;
+}
+
+TABLE t_ICBType
+    {0, "ACL packet"}
+    {1, "Split A2DP packet"}
+ENDTABLE
+
+GROUP gQca_FlushSegmentLatency "Segmentation Latency"
+{
+    FIELD fQca_FlushPktArrivalLatency              (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_FlushPktArrivalTimePnet fQca_FlushPktLastTxAckInstantPnet) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktArrivalLatencyTemp          (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_FlushPktArrivalLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktPacketArrivalLatencyInMicrosec    (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_FlushPktArrivalLatencyTemp 2) (Decimal) "L1. Arrival Latency from PrevAck(usec)"
+
+    FIELD fQca_FlushPktSchedInstantPnetROMask           (Fixed 0) RETRIEVE (StoreField fQca_FlushPktSchedInstantPnet) ALSO (OrMask 0x10000000)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_FlushPktSchedInstantPnetROMask fQca_FlushPktArrivalTimePnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_FlushPktScheduleLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_FlushPktScheduleLatencyTemp 2) (Decimal) "L2. Schedule Latency from Arrival(usec)"
+
+    FIELD fQca_FlushPktSchedInstantPnetROMask1           (Fixed 0) RETRIEVE (StoreField fQca_FlushPktSchedInstantPnet) ALSO (OrMask 0x10000000)      (Hex)      SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatency1            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_FlushPktSchedInstantPnetROMask1 fQca_FlushPktLastTxAckInstantPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatencyTemp1        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_FlushPktScheduleLatency1 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktScheduleLatencyInMicrosec1  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_FlushPktScheduleLatencyTemp1 2) (Decimal) "L3. Schedule Latency from Last Ack(usec)"
+
+    FIELD fQca_FlushPktTxLatency            (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_FlushPktInstantPnetROMask fQca_FlushPktSchedInstantPnet) ALSO (AndMask 0xFFFFFFF) (Hex) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktTxLatencyTemp        (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_FlushPktTxLatency 625) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_FlushPktTxLatencyInMicrosec  (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_FlushPktTxLatencyTemp 2) (Decimal) "L4. OTA Latency from Schedule(usec)"
+}
+
+GROUP gQca_STAT_leScan "LE Scan Stats"
+{
+    FIELD fQca_STAT_lescanCnt       (Fixed 4 Bytes)   (Decimal)   "LE Scan Rx Count"
+	FIELD fQca_STAT_advRxCnt        (Fixed 4 Bytes)   (Decimal)   "Adv ind Rx Count"
+	FIELD fQca_STAT_scanReqTxCnt    (Fixed 4 Bytes)   (Decimal)   "Scan Req Tx Count"
+	FIELD fQca_STAT_scanRspRxCnt    (Fixed 4 Bytes)   (Decimal)   "Scan Rsp Rx Count"
+	FIELD fQca_STAT_ScanReqPrmpCnt  (Fixed 2 Bytes)   (Decimal)   "Scan Req preempted Count"
+	FIELD fQca_STAT_ScanReqTxAbtCnt (Fixed 2 Bytes)   (Decimal)   "Scan Req CxM Tx Abort Count"
+	FIELD fQca_STAT_ScanRspRxAbtCnt (Fixed 2 Bytes)   (Decimal)   "Scan Rsp Rx Abort Count"
+	FIELD fQca_STAT_ScanRspNoRxCnt  (Fixed 2 Bytes)   (Decimal)   "Scan Rsp No Rx Count"
+	FIELD fQca_STAT_initMatchCnt    (Fixed 2 Bytes)   (Decimal)   "adv cnt matching initiate Count"
+	FIELD fQca_STAT_initConReqTxCnt (Fixed 2 Bytes)   (Decimal)   "initate Connect IND TX Count"
+	FIELD fQca_STAT_initConReqAbortCnt (Fixed 2 Bytes) (Decimal)  "initate Connect IND abort Count"
+	FIELD fQca_STAT_allocFailCnt    (Fixed 2 Bytes)   (Decimal)   "malloc hci events unsuccessfully  Count"
+}
+
+TABLE tQca_RxAgcInfoxLNA
+    {0x00, "Disabled"}
+	{0x01, "Enabled"}
+ENDTABLE
+
+TABLE tQca_RxAgcInfoGain
+    {0x00, "GAIN LEVEL 0"}
+	{0x01, "GAIN LEVEL 1"}
+	{0x02, "GAIN LEVEL 2"}
+	{0x03, "GAIN LEVEL 3"}
+	{0x04, "GAIN LEVEL 4"}
+	{0x05, "GAIN LEVEL 5"}
+	{0x06, "GAIN LEVEL 6"}
+	{0x07, "GAIN LEVEL 7"}
+ENDTABLE
+
+GROUP gQca_STAT_LERxAgcInfo "LE Rx AGC Status"
+{
+    FIELD fQca_RxAgcCntr (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE RxAgcCntr
+
+    GROUP gQca_LERxAgcStatus REPEAT COUNT (Fixed 8 Times) 
+    {
+		GROUP gQca_LERxAgcGroup LABEL(LabelCount "LE Rx Agc Status #" RxAgcCntr)
+		{
+			FIELD fQca_RxAgcInfo_sLNA  (Fixed 3 bits) (TABLE tQca_RxAgcInfoGain) "SLNA"
+			FIELD fQca_RxAgcInfo_GM  (Fixed 3 bits) (TABLE tQca_RxAgcInfoGain)  "GM"
+			FIELD fQca_RxAgcInfo_TIA  (Fixed 2 bits) (TABLE tQca_RxAgcInfoGain) "TIA"
+			RESERVED (Fixed 7 bits)
+			FIELD fQca_RxAgcInfo_xLNA  (Fixed 1 bit) (TABLE tQca_RxAgcInfoxLNA)  "xLNA"
+		}
+        /* Increment the Counter */
+        FIELD fQca_RxAgcGroupCntr (Fixed 0) RETRIEVE (StoreField RxAgcCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE RxAgcCntr
+    }
+}
+
+GROUP gQca_STATS_FragBuffIndex "DBFW Fragment Buff Stats"
+{
+    FIELD Qca_STAT_FragBuff_Index    (Fixed 1 Byte)   (Decimal)   "Fragment Buff Init Index"
+}
+
+GROUP gQca_STAT_RssiUnsetLut "Unset LUT for RSSI"
+{
+    FIELD Qca_STAT_UnsetLut_RxAgcRssi                (Fixed 4 Byte)   (Hex)   "RxAgcRssi"
+}
+
+GROUP gQca_STAT_A2DPCxmDenialStats "A2DP Cxm Denial Stats"
+{
+    FIELD gQca_STAT_A2DPCxmDenialStats_Clk               (Fixed 4 Bytes)   (Hex)       "Native Clk"
+    FIELD gQca_STAT_A2DPCxmDenialStats_abortClk          (Fixed 4 Bytes)   (Hex)       "First Abort Clk"
+    FIELD gQca_STAT_A2DPCxmDenialStats_normalCnt         (Fixed 2 Bytes)   (Decimal)   "Normal Cxm Cnt"
+    FIELD gQca_STAT_A2DPCxmDenialStats_CriticalCnt       (Fixed 2 Bytes)   (Decimal)   "Critical Cxm Cnt"
+    FIELD gQca_STAT_A2DPCxmDenialStats_mciState          (Fixed 2 Bytes)   (Table tQca_CXM_CoexMciState_Type)   "MCI State"
+    FIELD gQca_STAT_A2DPCxmDenialStats_ackDelay          (Fixed 2 Bytes)   (Decimal)   "ACK delay in ms"
+    FIELD gQca_STAT_A2DPCxmDenialStats_dumpScRaw         (Fixed 4 Bytes)   (Hex)   "HWIO_PP_BTC_SC_INT_RAW_STAT_1_IN"
+    FIELD gQca_STAT_A2DPCxmDenialStats_dumpAonCoexRo     (Fixed 4 Bytes)   (Hex)   "HWIO_RFA_CMN_REG_AON_COEX_RO_COEX_DBG0_CH0_IN"
+    FIELD gQca_STAT_A2DPCxmDenialStats_dumpAonWlConfig   (Fixed 4 Bytes)   (Hex)   "HWIO_RFA_CMN_AON_WL_RFA_CONFIG_IN"
+    FIELD gQca_STAT_A2DPCxmDenialStats_dumpCoexMgtCtrl   (Fixed 4 Bytes)   (Hex)   "HWIO_COEX_MGR_TOP_CM_INT_CTRL_4_IN"
+    FIELD gQca_STAT_A2DPCxmDenialStats_dumpCxmCtrl       (Fixed 4 Bytes)   (Hex)   "HWIO_CXM_CXM_CTRL1_IN"
+}

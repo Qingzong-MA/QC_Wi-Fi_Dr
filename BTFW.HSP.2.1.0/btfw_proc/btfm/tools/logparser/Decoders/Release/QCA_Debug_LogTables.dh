@@ -1,0 +1,262 @@
+/************************************************
+ * File: QCA_Debug_LogTables.dh
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2015-2016,2019 Qualcomm Technologies, Inc. 
+ * 2015-2016 Qualcomm Atheros, Inc.  
+ * All Rights Reserved
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+************************************************/
+
+
+TABLE tQca_BBPacketType
+    { 0x0 "NULL"}
+    { 0x1 "POLL"}
+    { 0x2 "FHS"}
+    { 0x3 "DM1"}
+    { 0x4 "DH1"}
+    { 0x5 "HV1"}
+    { 0x6 "HV2"}
+    { 0x7 "HV3"}
+    { 0x8 "DV"}
+    { 0x9 "AUX1"}
+    { 0xA "DM3"}
+    { 0xB "DH3"}
+    { 0xE "DM5"}
+    { 0xF "DH5"}
+    { 0x10 "NULL"}
+    { 0x11 "POLL"}
+    { 0x12 "FHS"}
+    { 0x13 "DM1"}
+    { 0x14 "DH1"}
+    { 0x15 "HV1"}
+    { 0x16 "HV2"}
+    { 0x17 "EV3"}
+    { 0x18 "DV"}
+    { 0x19 "AUX1"}
+    { 0x1A "DM3"}
+    { 0x1B "DH3"}
+    { 0x1C "EV4"}
+    { 0x1D "EV5"}
+    { 0x1E "DM5"}
+    { 0x1F "DH5"}
+    { 0x20 "NULL"}
+    { 0x21 "POLL"}
+    { 0x22 "FHS"}
+    { 0x23 "DM1"}
+    { 0x24 "2-DH1"}
+    { 0x25 "HV1"}
+    { 0x26 "HV2"}
+    { 0x27 "HV3"}
+    { 0x28 "3-DH1"}
+    { 0x29 "AUX1"}
+    { 0x2A "2-DH3"}
+    { 0x2B "3-DH3"}
+    { 0x2E "2-DH5"}
+    { 0x2F "3-DH5"}
+    { 0x30 "NULL"}
+    { 0x31 "POLL"}
+    { 0x32 "FHS"}
+    { 0x33 "DM1"}
+    { 0x34 "DH1"}
+    { 0x35 "HV1"}
+    { 0x36 "2-EV3"}
+    { 0x37 "3-EV3"}
+    { 0x38 "DV"}
+    { 0x39 "AUX1"}
+    { 0x3A "DM3"}
+    { 0x3B "DH3"}
+    { 0x3C "2-EV5"}
+    { 0x3D "3-EV5"}
+    { 0x3E "DM5"}
+    { 0x3F "DH5"}
+    { DEFAULT "UnDefined" }
+ENDTABLE
+
+TABLE tQca_DeviceRole
+    { 0x00 "Master" "Master"}
+    { 0x01 "Slave"  "Slave" }
+    { DEFAULT "UnKnown"}
+ENDTABLE
+
+TABLE tQca_DispatchOpCode
+    { 0x00  "DISQ_NULL" "DISQ_NULL" }
+    { 0x01  "DISQ_COMMON_TERMINATE_ACL_SCHEDULE" "DISQ_COMMON_TERMINATE_ACL_SCHEDULE" }
+    { 0x02  "DISQ_AFH_CHAN_ASSESSMENT" "DISQ_AFH_CHAN_ASSESSMENT" }
+    { 0x03  "DISQ_COMMON_PERIODIC_RADIO_CAL" "DISQ_COMMON_PERIODIC_RADIO_CAL" }
+    { 0x04  "DISQ_COMMON_SW_MPTA" "DISQ_COMMON_SW_MPTA" }
+    
+    { 0x20  "DISQ_BREDR_SCO_DATA" "DISQ_BREDR_SCO_DATA" }
+    { 0x21  "DISQ_BREDR_E_SCO_RESERVED_FRAME" "DISQ_BREDR_E_SCO_RESERVED_FRAME" }
+    { 0x22  "DISQ_BREDR_E_SCO_RETRANS_FRAME" "DISQ_BREDR_E_SCO_RETRANS_FRAME" }
+    { 0x23  "DISQ_BREDR_TERMINATE_SCO_SCHEDULE" "DISQ_BREDR_TERMINATE_SCO_SCHEDULE" }
+    { 0x24  "DISQ_BREDR_HOLD_INSTANT" "DISQ_BREDR_HOLD_INSTANT" }
+    { 0x25  "DISQ_BREDR_HOLD_ACTIVE" "DISQ_BREDR_HOLD_ACTIVE" }
+    { 0x26  "DISQ_BREDR_HOLD_ACTIVE_SCAN_AC" "DISQ_BREDR_HOLD_ACTIVE_SCAN_AC" }
+    { 0x27  "DISQ_BREDR_SNIFF_INSTANT" "DISQ_BREDR_SNIFF_INSTANT" }
+    { 0x28  "DISQ_BREDR_SNIFF_FRAME" "DISQ_BREDR_SNIFF_FRAME" }
+    { 0x29  "DISQ_BREDR_SNIFF_ENTER" "DISQ_BREDR_SNIFF_ENTER" }
+    { 0x2a  "DISQ_BREDR_SNIFF_EXIT" "DISQ_BREDR_SNIFF_EXIT" }
+    { 0x2b  "DISQ_BREDR_SNIFF_SUBRATE_BASE_RATE" "DISQ_BREDR_SNIFF_SUBRATE_BASE_RATE" }
+    { 0x2c  "DISQ_BREDR_ROLE_SWITCH_INSTANT" "DISQ_BREDR_ROLE_SWITCH_INSTANT" }
+    { 0x2d  "DISQ_BREDR_ROLE_SWITCH_FRAME" "DISQ_BREDR_ROLE_SWITCH_FRAME" }
+    { 0x2e  "DISQ_BREDR_INQUIRY_FRAME" "DISQ_BREDR_INQUIRY_FRAME" }
+    { 0x2f  "DISQ_BREDR_PAGE_FRAME" "DISQ_BREDR_PAGE_FRAME" }
+    { 0x30  "DISQ_BREDR_LLM_TOKEN_LM_RETURN" "DISQ_BREDR_LLM_TOKEN_LM_RETURN" }
+    { 0x31  "DISQ_BREDR_INQUIRY_SCAN" "DISQ_BREDR_INQUIRY_SCAN" }
+    { 0x32  "DISQ_BREDR_PAGE_SCAN" "DISQ_BREDR_PAGE_SCAN" }
+    { 0x33  "DISQ_BREDR_IDLE_PAGE_SCAN" "DISQ_BREDR_IDLE_PAGE_SCAN" }
+    { 0x34  "DISQ_BREDR_CLOCK_ADJUST" "DISQ_BREDR_CLOCK_ADJUST" }
+    { 0x35  "DISQ_BREDR_POWER_MEASURE" "DISQ_BREDR_POWER_MEASURE" }
+    { 0x36  "DISQ_BREDR_SET_AFH" "DISQ_BREDR_SET_AFH" }
+    { 0x37  "DISQ_BREDR_ACL_SERVICE" "DISQ_BREDR_ACL_SERVICE" }
+    { 0x38  "DISQ_BREDR_ACL_A2DP_PENDING_TX" "DISQ_BREDR_ACL_A2DP_PENDING_TX" }
+    { 0x39  "DISQ_BREDR_PHY_SWITCH_INSTANT" "DISQ_BREDR_PHY_SWITCH_INSTANT" }
+    { 0x3a  "DISQ_BREDR_PHY_SWITCH_TO_INSTANT" "DISQ_BREDR_PHY_SWITCH_TO_INSTANT" }
+    { 0x3b  "DISQ_BREDR_SPARE_FOR_PATCHING" "DISQ_BREDR_SPARE_FOR_PATCHING" }
+
+    { 0x40  "DISQ_BREDR_DUT_TX" "DISQ_BREDR_DUT_TX" }
+    { 0x41  "DISQ_BREDR_EPTM_CONN_ESTAB" "DISQ_BREDR_EPTM_CONN_ESTAB" }
+    { 0x42  "DISQ_BREDR_EPTM_TEST" "DISQ_BREDR_EPTM_TEST" }
+    { 0x43  "DISQ_BREDR_LINKLESS_BROADCAST" "DISQ_BREDR_LINKLESS_BROADCAST" }
+    { 0x44  "DISQ_BREDR_SYNCHRONIZATION_TRAIN" "DISQ_BREDR_SYNCHRONIZATION_TRAIN" }
+    { 0x45  "DISQ_BREDR_SYNCHRONIZATION_TRAIN_SCAN" "DISQ_BREDR_SYNCHRONIZATION_TRAIN_SCAN" }
+    { 0x46  "DISQ_BREDR_CSB_RECEIVE" "DISQ_BREDR_CSB_RECEIVE" }
+    { 0x47  "DISQ_BREDR_PAGE_LLR" "DISQ_BREDR_PAGE_LLR" }
+    { 0x48  "DISQ_BREDR_LLR_TRIGGER_SCAN" "DISQ_BREDR_LLR_TRIGGER_SCAN" }
+    { 0x49  "DISQ_BREDR_TESTER_TX" "DISQ_BREDR_TESTER_TX" }
+    { 0x4A  "DISQ_BREDR_TESTER_CHANGE" "DISQ_BREDR_TESTER_CHANGE" }
+    { 0x4B  "DISQ_BREDR_CSB_RECEIVE_CANCEL" "DISQ_BREDR_CSB_RECEIVE_CANCEL" }
+    { 0x4C  "DISQ_BREDR_BURST_BROADCAST" "DISQ_BREDR_BURST_BROADCAST" }
+    { 0x4D  "DISQ_BREDR_BURST_RECEIVE" "DISQ_BREDR_BURST_RECEIVE" }
+
+    { 0x60  "DISQ_LE_ADV" "DISQ_LE_ADV" }
+    { 0x61  "DISQ_LE_ADV_MGR" "DISQ_LE_ADV_MGR" }
+    { 0x62  "DISQ_LE_CONN_ADV_DIRECTED" "DISQ_LE_CONN_ADV_DIRECTED" }
+    { 0x63  "DISQ_LE_SCAN" "DISQ_LE_SCAN" }
+    { 0x64  "DISQ_LE_IDLE_SCAN" "DISQ_LE_IDLE_SCAN" }
+    { 0x65  "DISQ_LE_CONN_MASTER" "DISQ_LE_CONN_MASTER" }
+    { 0x66  "DISQ_LE_CONN_SLAVE" "DISQ_LE_CONN_SLAVE" }
+    { 0x67  "DISQ_LE_CONN_UPDATE" "DISQ_LE_CONN_UPDATE" }
+    { 0x68  "DISQ_LE_CONN_HI_MASTER" "DISQ_LE_CONN_HI_MASTER" }
+    { 0x69  "DISQ_LE_CONN_HI_SLAVE" "DISQ_LE_CONN_HI_SLAVE" }
+    { 0x6A  "DISQ_LE_ROLLBACK_SLAVE_LATENCY" "DISQ_LE_ROLLBACK_SLAVE_LATENCY" }
+    { 0x6B  "DISQ_LE_TEST_MODE_START" "DISQ_LE_TEST_MODE_START" }
+    { 0x6C  "DISQ_LE_ADV_AUX_ADV"  "DISQ_LE_ADV_AUX_ADV" }
+    { 0x6D  "DISQ_LE_ADV_AUX_CHAIN_ADV" "DISQ_LE_ADV_AUX_CHAIN_ADV" } 
+    { 0x6E  "DISQ_LE_ADV_AUX_CHAIN_SCAN_RSP" "DISQ_LE_ADV_AUX_CHAIN_SCAN_RSP" }
+    { 0x6F  "DISQ_LE_ADV_AUX_SYNC" "DISQ_LE_ADV_AUX_SYNC" }
+    { 0x70  "DISQ_LE_ADV_AUX_CHAIN_SYNC" "DISQ_LE_ADV_AUX_CHAIN_SYNC" }
+    { 0x71  "DISQ_LE_SCAN_4_AUX_ADV" "DISQ_LE_SCAN_4_AUX_ADV" }
+    { 0x72  "DISQ_LE_SCAN_4_AUX_CHAIN_ADV" "DISQ_LE_SCAN_4_AUX_CHAIN_ADV" }
+    { 0x73  "DISQ_LE_SCAN_4_AUX_CHAIN_SCAN_RSP" "DISQ_LE_SCAN_4_AUX_CHAIN_SCAN_RSP" }
+    { 0x74  "DISQ_LE_SCAN_4_AUX_SYNC" "DISQ_LE_SCAN_4_AUX_SYNC" }
+    { 0x75  "DISQ_LE_SCAN_4_AUX_CHAIN_SYNC" "DISQ_LE_SCAN_4_AUX_CHAIN_SYNC" }
+    { 0x76  "DISQ_LE_ISO_GROUP" "DISQ_LE_ISO_GROUP" }
+    { 0x77  "DISQ_LE_ISO_STREAM_START" "DISQ_LE_ISO_STREAM_START" }
+    { 0x78  "DISQ_LE_ISO_STREAM_STOP" "DISQ_LE_ISO_STREAM_STOP" }                  
+    { 0x79  "DISQ_LE_SCAN_AUX_SYNC_CANCEL" "DISQ_LE_SCAN_AUX_SYNC_CANCEL" }
+
+    { 0x80  "DISQ_ANT_FRAME" "DISQ_ANT_FRAME" }
+    { 0x81  "DISQ_ANT_EVENT_RESCHEDULE" "DISQ_ANT_EVENT_RESCHEDULE" }
+    { 0x82  "DISQ_ANT_SPARE_FOR_PATCHING" "DISQ_ANT_SPARE_FOR_PATCHING" }
+ENDTABLE
+
+TABLE tQca_ConnState
+    { 0x00 "CONNECTION_IDLE" }
+    { 0x81 "CONNECTION_ACTIVE" }
+    { 0x02 "CONNECTION_HOLD" }
+
+    { 0x03 "CONNECTION_SNIFF_IDLE" }
+    { 0x84 "CONNECTION_SNIFF_ACTIVE" }
+    { 0x85 "CONNECTION_SNIFF_MASTER_TRANSITION" }
+
+    { 0x46 "CONNECTION_DISCONNECT_PENDING" }
+
+    { 0x07 "CONNECTION_PAGING" }
+    { 0x08 "CONNECTION_PAGE_SCAN" }
+    { 0x09 "CONNECTION_LOCAL_LOOPBACK" }
+
+    { 0x0A "CONNECTION_LE_ACTIVE" }
+    { 0x0B "CONNECTION_ANT_ACTIVE" }
+
+    { 0x0C "CONNECTION_TRIGGER_SCAN" }
+    { 0x0D "CONNECTION_RECONNECTING" }
+    { 0x0E "CONNECTION_SEMI_CONN" }
+ENDTABLE
+
+TABLE tQca_HciLinkType
+    { 0x00 "SCO" }
+    { 0x01 "ACL" }
+    { 0x02 "eSCO" }
+    { 0x03 "LE" }
+    { 0x04 "ANT" } 
+    { 0x05 "ISO" }
+ENDTABLE
+
+TABLE tQca_PriorityChangeReason
+    { 0x01 "RoleSwitch_Init" }
+    { 0x02 "RoleSwitch_Time" }
+    { 0x03 "RoleSwitch_Success" }
+    { 0x04 "LLR_Init" }
+    { 0x05 "LLR_Yield" }
+    { 0x06 "ACL_Init" }
+    { 0x07 "ACL_Inactive" }
+    { 0x08 "A2DP_Critical" }
+    { 0x09 "A2DP_High" }
+    { 0x0A "A2DP_Low" }
+    { 0x0B "BROADCAST_High" }
+    { 0x0C "BROADCAST_Low" }
+    { 0x0D "ACL_Interact_Critical" }
+    { 0x0E "ACL_Interact_High" }
+    { 0x0F "ACL_Interact_Low" }
+    { 0x10 "ACL_Critical" }
+    { 0x11 "ACL_Low" }
+    { 0x12 "LE_Conn_Yield" }
+    { 0x13 "LE_Conn_Update_Pending" }
+    { 0x14 "LE_Conn_Timing" }
+    { 0x15 "LE_Conn_Normal" }
+    { 0x16 "LE_Conn_Idle" }
+    { 0x17 "LE_Conn_SyncHistory_High" }
+    { 0x18 "xSCO_Init" }
+    { 0x19 "xSCO_Retran_Boost" }
+    { 0x1A "xSCO_Retran" }
+    { 0x1B "xSCO_SyncHistory_High" }
+    { 0x1C "xSCO_Normal" }
+    { 0x1D "BCA_Init" }
+    { 0x1E "BCA_Normal" }
+    { 0x1F "BCA_Timing" }
+    { 0x20 "Page_Init" }
+    { 0x21 "Page_ID" }
+    { 0x22 "Page_FHS_RNR" }
+    { 0x23 "Page_FHS" }
+    { 0x24 "Page_Poll_RNR" }
+    { 0x25 "Page_Poll_High" }
+    { 0x26 "Page_Poll_Low" }
+    { 0x27 "PageScan_Init" }
+    { 0x28 "PageScan_Normal" }
+    { 0x29 "PageScan_FHS" }
+    { 0x2A "PageScan_Poll_High" }
+    { 0x2B "PageScan_Poll_Low" }
+    { 0x2C "Sniff_Init" }
+    { 0x2D "Sniff_LSTO_Almost_Hit" }
+    { 0x2E "HID_SyncHistory" }
+    { 0x2F "Sniff_Timing" }
+    { 0x30 "Sniff_SyncHistory" }
+    { 0x31 "ANT_Critical" }
+    { 0x32 "SCO_TWS_L_ReTx" }
+    { 0x33 "SCO_TWS_R_ReTx" }
+    { 0x34 "SCO_TWS_L_ReTx_Boost" }
+    { 0x35 "SCO_TWS_R_ReTx_Boost" }
+    { 0x36 "ACL_BB_ACK_Critical" }
+    { 0x37 "A2DP_Low_Latency" }
+    { 0x38 "ACL_Relay_Unsynchronized" }
+    { 0x39 "ACL_Relay_Critical" }
+    { 0x3A "ACL_Relay_High_Priority" }
+    { 0x3B "ACL_Relay_Packet_Queued" }
+    { 0x3C "ACL_Relay_Relay_Required" }
+    { 0x3D "ACL_Relay_Normal" }
+    { 0x3E "SCO_Fixed_Tiered_ReTx_Low" }
+    { 0x3F "SCO_Fixed_Tiered_ReTx_High" }
+    { 0x40 "Sniff_Afh_Instant" }
+ENDTABLE

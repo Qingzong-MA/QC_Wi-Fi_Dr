@@ -1,0 +1,293 @@
+/************************************************
+ * File: QCA_Debug_OTALog.dh
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2015-2021 Qualcomm Technologies, Inc.
+ *               2015-2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only
+************************************************/
+
+TABLE tQca_OTALogID APPENDS_ONLY tQca_EnhLogID
+    {0x0300 "OTA LMP RX PDU"        "OTA LMP RX PDU"            0 gQca_OTA_LMPRxPDU}
+    {0x0301 "OTA LMP TX PDU"        "OTA LMP TX PDU"            0 gQca_OTA_LMPTxPDU}
+    {0x0302 "OTA LE CTRL RX PDU"    "OTA LE CTRL RX PDU"        0 gQca_OTA_LECtrlRxPDU}
+    {0x0303 "OTA LE CTRL TX PDU"    "OTA LE CTRL TX PDU"        0 gQca_OTA_LECtrlTxPDU}
+    {0x0309 "OTA BIG CTRL RX PDU"           "OTA BIG CTRL RX PDU"               0   gQca_OTA_BIGCtrlRxPDU}
+    {0x030A "OTA BIG CTRL TX PDU"           "OTA BIG CTRL TX PDU"               0   gQca_OTA_BIGCtrlTxPDU}
+    {0x030B "OTA PROTOTYPE CTRL RX PDU"    "OTA LEP CTRL RX PDU"        0 gQca_OTA_LEPCtrlPDU}
+    {0x030C "OTA PROTOTYPE CTRL TX PDU"    "OTA LEP CTRL TX PDU"        0 gQca_OTA_LEPCtrlPDU}
+ENDTABLE
+
+GROUP gQca_OTA_LMPTxPDU "LMP Tx PDU Info"
+{
+
+    FIELD fQca_OTA_Handle               (Fixed 1 Byte)      (Decimal)           "Handle"
+    RESERVED                            (Fixed 1 Byte)
+    FIELD fQca_OTA_LMPPduLen            (Fixed 1 Byte)      (Decimal)           "PDU Length"
+    FIELD fQca_OTA_LMPTxAck             (Fixed 1 Bit)       (Decimal)           "TxACK Req"    
+    RESERVED                            (Fixed 7 Bits)    
+    FIELD fQca_OTA_LMPPDU_Type          (Fixed 0) RETRIEVE(StoreInteger 0) (Decimal) SUPPRESS_DETAIL	STORE sQca_PduType
+    FIELD fQca_SetTraversalOverride     (Fixed 0) RETRIEVE(StoreInteger 1) (HEX) SUPPRESS_DETAIL Store sQca_TraversalOverride
+
+}
+
+GROUP gQca_OTA_LMPRxPDU "LMP Rx PDU Info"
+{
+    FIELD fQca_OTA_Handle;
+    RESERVED                            (Fixed 1 Byte)
+    FIELD fQca_OTA_LMPPduLen;
+    FIELD fQca_OTA_LMPTxAck;    
+    RESERVED                            (Fixed 7 Bits)   
+    FIELD fQca_OTA_LMPPDU_Type;
+    FIELD fQca_SetTraversalOverride;
+}
+
+GROUP gQca_OTA_LECtrlRxPDU "LE Ctrl Rx PDU Info"
+{
+    FIELD fQca_OTA_Handle;
+    RESERVED                            (Fixed 2 Bytes)
+    FIELD fQca_OTA_LETxAck              (Fixed 1 Bit)       (Decimal)                   "TxACK Req"
+    FIELD fQca_OTA_LEPduLen             (Fixed 7 Bits)      (Decimal)                   "PDU Length"
+    
+    FIELD fQca_OTA_LERxType             (Fixed 1 Byte)  (TABLE tQca_OTA_RxPrototypeCtrlOpcode)   "LL Control Opcode" 
+    BRANCH (FromTable tQca_OTA_RxPrototypeCtrlOpcode fQca_OTA_LERxType)    
+}
+
+GROUP gQca_OTA_LECtrlRxOpCode "LE Ctrl Rx Opcode"
+{
+    FIELD fQca_OTA_LEPDU_Type           START_BIT (Move -8 Bits) (Fixed 0) RETRIEVE(StoreInteger 1) (Decimal) SUPPRESS_DETAIL	STORE sQca_PduType
+    FIELD fQca_SetTraversalOverride;
+    FIELD fQca_OTA_LERxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 2) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_OTA_LECtrlTxPDU "LE Ctrl Tx PDU Info"
+{
+    FIELD fQca_OTA_Handle;
+    RESERVED                            (Fixed 2 Bytes)
+    FIELD fQca_OTA_LETxAck;
+    FIELD fQca_OTA_LEPduLen;
+    
+    FIELD fQca_OTA_LETxType             (Fixed 1 Byte)  (TABLE tQca_OTA_TxPrototypeCtrlOpcode)   "LL Control Opcode" 
+    BRANCH (FromTable tQca_OTA_TxPrototypeCtrlOpcode fQca_OTA_LETxType)    
+}
+
+GROUP gQca_OTA_LECtrlTxOpCode "LE Ctrl Tx Opcode"
+{
+    FIELD fQca_OTA_LEPDU_Type;
+    FIELD fQca_SetTraversalOverride;
+    FIELD fQca_OTA_LETxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 1) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL    
+}
+
+
+TABLE tQca_OTA_RxPrototypeCtrlOpcode 
+            { 0x28      "LE_LL_CHANNEL_REPORTING_IND"       "LE_LL_CHANNEL_REPORTING_IND"       0 gQca_CtrlData_LeChannelReportInd }
+            { 0x29      "LE_LL_CHANNEL_STATUS_IND"          "LE_LL_CHANNEL_STATUS_IND"          0 gQca_CtrlData_LeChannelStatusInd }
+            { 0xB4      "QLL_LE_LL_CHANNEL_REPORTING_IND"   "QLL_LE_LL_CHANNEL_REPORTING_IND"   0 gQca_CtrlData_LeChannelReportInd }
+            { 0xB5      "QLL_LE_LL_CHANNEL_STATUS_IND"      "QLL_LE_LL_CHANNEL_STATUS_IND"      0 gQca_CtrlData_LeChannelStatusInd }
+            {Default    ""                                  ""                                  0 gQca_OTA_LECtrlRxOpCode   } 
+ENDTABLE
+
+TABLE tQca_OTA_TxPrototypeCtrlOpcode 
+            { 0x28      "LE_LL_CHANNEL_REPORTING_IND"       "LE_LL_CHANNEL_REPORTING_IND"       0 gQca_CtrlData_LeChannelReportInd }
+            { 0x29      "LE_LL_CHANNEL_STATUS_IND"          "LE_LL_CHANNEL_STATUS_IND"          0 gQca_CtrlData_LeChannelStatusInd }
+            { 0xB4      "QLL_LE_LL_CHANNEL_REPORTING_IND"   "QLL_LE_LL_CHANNEL_REPORTING_IND"   0 gQca_CtrlData_LeChannelReportInd }
+            { 0xB5      "QLL_LE_LL_CHANNEL_STATUS_IND"      "QLL_LE_LL_CHANNEL_STATUS_IND"      0 gQca_CtrlData_LeChannelStatusInd }
+            {Default    ""                                  ""                                  0 gQca_OTA_LECtrlTxOpCode   } 
+ENDTABLE
+
+GROUP gQca_OTA_BIGCtrlRxPDU "BIG Ctrl Rx PDU Info"
+{
+    RESERVED                            (Fixed 3 Bytes)
+    FIELD fQca_OTA_BIGPduLen            (Fixed 1 Bytes)     (Decimal)                  "PDU Length"
+
+    FIELD fQca_OTA_BIGPDU_Type           (Fixed 0) RETRIEVE(StoreInteger 2) (Decimal) SUPPRESS_DETAIL   STORE sQca_PduType
+    FIELD fQca_SetTraversalOverride;
+    FIELD fQca_OTA_BIGTxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 1) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_OTA_BIGCtrlTxPDU "BIG Ctrl Tx PDU Info"
+{
+    FIELD fQca_OTA_BIGRetrx             (Fixed 1 Bytes)     (Decimal)                  "Tx Count"
+    RESERVED                            (Fixed 2 Bytes)
+    FIELD fQca_OTA_BIGPduLen;
+
+    FIELD fQca_OTA_BIGPDU_Type;
+    FIELD fQca_SetTraversalOverride;
+    FIELD fQca_OTA_BIGRxPDU_Side         (Fixed 0) RETRIEVE(StoreInteger 2) ALSO (StoreIntraframeField side) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_OTA_LEPCtrlPDU "LEP Ctrl PDU Info"
+{
+    FIELD fQca_OTA_Handle;
+    RESERVED                          (Fixed 2 Bytes)
+    FIELD fQca_OTA_LEPPAck            (Fixed 1 Bit)       (Decimal)                   "TxACK Req"
+    FIELD fQca_OTA_LEPPduLen          (Fixed 7 Bits)      (Decimal)                   "PDU Length"
+    
+    FIELD fQca_OTA_LEPPDU_Type        (Fixed 1 Byte)  (TABLE tQca_LC_PrototypeCtrlOpcode)   "LL Prototype Control opcode" 
+    BRANCH (FromTable tQca_LC_PrototypeCtrlOpcode fQca_OTA_LEPPDU_Type)
+    FIELD fQca_OTA_LEPEvtCnter        (Fixed 2 Bytes) (Hex) "Event counter"
+}
+
+GROUP gQca_ChangeTraversal  if(FieldIs Equalto 1 sQca_TraversalOverride) 
+{
+	GROUP gQca_TraverseToLMP IF (FieldIs EqualTo 0 sQca_PduType)
+	{
+		FIELD fQca_LMPTraverse  (Fixed 0) RETRIEVE(StoreInteger 0xf1)   (hex)   SUPPRESS_DETAIL Store sQca_Traversal
+	}
+	GROUP gQca_TraverseToLLCtrl IF (FieldIs EqualTo 1 sQca_PduType)
+	{
+		FIELD fQca_LLCtrlTraverse  (Fixed 0) RETRIEVE(StoreInteger 0xf2)   (hex)   SUPPRESS_DETAIL Store sQca_Traversal
+	}
+	GROUP gQca_TraverseToBIGCtrl IF (FieldIs EqualTo 2 sQca_PduType)
+	{
+        /* Not sure the protocol value, need update if it is defined in frontline. */
+		//FIELD fQca_LLCtrlTraverse  (Fixed 0) RETRIEVE(StoreInteger 0xf3)   (hex)   SUPPRESS_DETAIL Store sQca_Traversal
+	}
+	
+	// We are traversing to LMP and it expects to see the values below.  Put something there to suppress errors.
+    FIELD SatisfyClock 			(fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField clock) (hex)  SUPPRESS_DETAIL 
+    FIELD SatisfyAddress		(Fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField Static_ConnHandle)  (Decimal) SUPPRESS_DETAIL
+	
+    //LE LL 
+    FIELD SatisfyAccessAddr     (Fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField AccessAddr)   (Hex)			SUPPRESS_DETAIL 	 
+    FIELD SatisfyEventCtr       (Fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField EventCtr)     (Hex)			SUPPRESS_DETAIL
+    FIELD SatisfyEncrInfo       (Fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField EncrInfo)     (Hex)			SUPPRESS_DETAIL
+    //FIELD SatisfySide           (Fixed 0) RETRIEVE(StoreInteger 0) ALSO (StoreIntraframeField side)         (Hex)			SUPPRESS_DETAIL 	     
+}
+
+
+
+TABLE tQcaLePowerCtrl_PHY
+    { 0x00 "Current" }
+    { 0x01 "1M" }
+    { 0x02 "2M" }
+    { 0x04 "Coded S=8" }
+    { 0x08 "Coded S=2" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQcaLePowerCtrl_Limits
+    { 0x00 "Intermediate" }
+    { 0x01 "Min" }
+    { 0x02 "Max" }
+    { 0x03 "Single Fixed" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQcaLePowerCtrl_Enable
+    { 0x0 "Disabled" }
+    { 0x1 "Enabled" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LC_PrototypeCtrlOpcode 
+            { 0x23 "LE_LL_PWR_CTRL_REQ" "LE_LL_PWR_CTRL_REQ" 0 gQca_CtrlData_LePowerCtrlReq }
+            { 0x24 "LE_LL_PWR_CTRL_RSP" "LE_LL_PWR_CTRL_RSP" 0 gQca_CtrlData_LePowerCtrlRsp }
+            { 0x25 "LE_LL_PWR_CHANGE_IND" "LE_LL_PWR_CHANGE_IND" 0 gQca_CtrlData_LePowerChangeInd }
+            { 0xF4 "LE_LL_PWR_REPORTS_REQ" "LE_LL_PWR_REPORTS_REQ" 0 gQca_CtrlData_LePowerReportsReq }
+            { 0xF5 "LE_LL_PWR_REPORTS_RSP" "LE_LL_PWR_REPORTS_RSP" 0 gQca_CtrlData_LePowerReportsRsp }
+            {Default "Unknown"          "Unknown"              0   } 
+ENDTABLE
+
+GROUP gQca_CtrlData_LeChannelReportInd
+{
+        FIELD fQca_ChannelReportIndEnable            (Fixed 1 Byte)      (Decimal)      "Enable"
+        FIELD fQca_ChannelReportIndintervalMin       (Fixed 1 Byte)      (Decimal)      "Min Interval (200ms unit)"
+        FIELD fQca_ChannelReportIndintervalMax       (Fixed 1 Byte)      (Decimal)      "Max Interval (200ms unit)"
+        FIELD fQca_leChReportIndConnEvtCnt           (Fixed 2 Byte)      (Hex)          "Le Conn Evt Counter"
+}
+
+GROUP gQca_CtrlData_LeChannelStatusInd
+{
+    FIELD fQca_OTA_ChannelStatusIndChannelClass         (Fixed 10 Bytes)     (Hex)     "Channel Classification"   NETWORK_DATA_ORDER
+    FIELD fQca_OTA_leChann00 START_BIT (Move -74 Bits)  (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  0"
+    FIELD fQca_OTA_leChann01 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  1"
+    FIELD fQca_OTA_leChann02 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  2"
+    FIELD fQca_OTA_leChann03 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  3"
+    
+    FIELD fQca_OTA_leChann04 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  4"
+    FIELD fQca_OTA_leChann05 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  5"
+    FIELD fQca_OTA_leChann06 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  6"
+    FIELD fQca_OTA_leChann07 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  7"
+    
+    FIELD fQca_OTA_leChann08 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  8"
+    FIELD fQca_OTA_leChann09 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  9"
+    FIELD fQca_OTA_leChann10 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 10"
+    FIELD fQca_OTA_leChann11 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 11"
+    
+    FIELD fQca_OTA_leChann12 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 12"
+    FIELD fQca_OTA_leChann13 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 13"
+    FIELD fQca_OTA_leChann14 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 14"
+    FIELD fQca_OTA_leChann15 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 15"
+    
+    FIELD fQca_OTA_leChann16 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 16"
+    FIELD fQca_OTA_leChann17 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 17"
+    FIELD fQca_OTA_leChann18 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 18"
+    FIELD fQca_OTA_leChann19 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 19"
+    
+    FIELD fQca_OTA_leChann20 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 20"
+    FIELD fQca_OTA_leChann21 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 21"
+    FIELD fQca_OTA_leChann22 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 22"
+    FIELD fQca_OTA_leChann23 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 23"
+    
+    FIELD fQca_OTA_leChann24 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 24"
+    FIELD fQca_OTA_leChann25 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 25"
+    FIELD fQca_OTA_leChann26 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 26"
+    FIELD fQca_OTA_leChann27 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 27"
+    
+    FIELD fQca_OTA_leChann28 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 28"
+    FIELD fQca_OTA_leChann29 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 29"
+    FIELD fQca_OTA_leChann30 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 30"
+    FIELD fQca_OTA_leChann31 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 31"
+    
+    FIELD fQca_OTA_leChann32 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 32"
+    FIELD fQca_OTA_leChann33 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 33"
+    FIELD fQca_OTA_leChann34 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 34"
+    FIELD fQca_OTA_leChann35 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 35"
+    
+    FIELD fQca_OTA_leChann36 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 36"
+    FIELD fQca_OTA_leChann37 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 37"
+    FIELD fQca_OTA_leChann38 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 38"
+    FIELD fQca_OTA_leChann39 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 39"        
+
+    FIELD fQca_leChStatusIndConnEvtCnt  START_BIT (Move 6 Bits) (Fixed 2 Byte)      (Hex)          "Le Conn Evt Counter"    
+}
+
+GROUP gQca_CtrlData_LePowerCtrlReq
+{
+        FIELD fQca_OTA_Phy            (Fixed 1 Byte)      (TABLE tQcaLePowerCtrl_PHY)          "Phy Type"
+        FIELD fQca_OTA_Delta          (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)  "Delta"
+        FIELD fQca_OTA_TxPower        (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)  "Tx Power"
+}
+
+GROUP gQca_CtrlData_LePowerCtrlRsp
+{
+        RESERVED                      (Fixed 6 Bits)
+        FIELD fQca_OTA_LEPRspMax   (Fixed 1 Bits)      (Hex) "Max"
+		FIELD fQca_OTA_LEPRspMin   (Fixed 1 Bits)      (Hex) "Min"
+        FIELD fQca_OTA_LEPRspDelta    (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)     "Delta"
+        FIELD fQca_OTA_LEPRspTxPower  (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)     "Tx Power"
+        FIELD fQca_OTA_APR            (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)     "APR"
+}
+
+GROUP gQca_CtrlData_LePowerChangeInd
+{
+        FIELD fQca_OTA_LEPChIndPhy    (Fixed 1 Byte)      (TABLE tQcaLePowerCtrl_PHY) "Phy Type"
+		RESERVED                      (Fixed 6 Bits)
+        FIELD fQca_OTA_LEPRspMax;
+		FIELD fQca_OTA_LEPRspMin;
+        FIELD fQca_OTA_ChIndDelta     (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)    "Delta"
+        FIELD fQca_OTA_ChIndTxPower   (Fixed 1 Byte)      RETRIEVE (SignExtension 8) (Decimal)    "Tx Power"
+}
+
+GROUP gQca_CtrlData_LePowerReportsReq
+{
+        FIELD fQca_OTA_LEPReqEnable   (Fixed 1 Byte)      (TABLE tQcaLePowerCtrl_Enable) "Enable"
+}
+
+GROUP gQca_CtrlData_LePowerReportsRsp
+{
+}
+

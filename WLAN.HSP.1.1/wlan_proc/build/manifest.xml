@@ -1,0 +1,10 @@
+<config>
+  <image_tree>
+    <name>WLAN.HSP.1.1</name>
+    <build_id>WLAN.HSP.1.1-03353-QCAHSPSWPL_V2_SILICONZ_CE-1</build_id>
+    <branch_point_revision>None</branch_point_revision>
+    <revision>03353</revision>
+    <spin>1</spin>
+    <client>QCAHSPSWPL_V2_SILICONZ_CE</client>
+  </image_tree>
+</config>

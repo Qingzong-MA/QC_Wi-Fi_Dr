@@ -1,0 +1,51 @@
+diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
+index 3bcea62..b1c2e78 100644
+--- a/drivers/pci/controller/dwc/pci-imx6.c
++++ b/drivers/pci/controller/dwc/pci-imx6.c
+@@ -2354,7 +2354,7 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	void __iomem *iomem;
+ 	struct regmap_config regconfig = imx6_pcie_regconfig;
+ 	int ret;
+-	u32 reg, val;
++	u32 reg;
+ 
+ 	imx6_pcie = devm_kzalloc(dev, sizeof(*imx6_pcie), GFP_KERNEL);
+ 	if (!imx6_pcie)
+@@ -2675,10 +2675,6 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	imx6_pcie_deassert_core_reset(imx6_pcie);
+ 	imx6_setup_phy_mpll(imx6_pcie);
+ 
+-	val = dw_pcie_readl_dbi(pci, PCIE_AMBA_ORDERING_CTRL_OFF);
+-	val |= 0xD;
+-	dw_pcie_writel_dbi(pci, PCIE_AMBA_ORDERING_CTRL_OFF, val);
+-
+ 	switch (imx6_pcie->drvdata->mode) {
+ 	case DW_PCIE_RC_TYPE:
+ 		/* add attributes for bus freq */
+diff --git a/drivers/pci/controller/dwc/pcie-designware-host.c b/drivers/pci/controller/dwc/pcie-designware-host.c
+index a0add8c..8027cf5 100644
+--- a/drivers/pci/controller/dwc/pcie-designware-host.c
++++ b/drivers/pci/controller/dwc/pcie-designware-host.c
+@@ -718,10 +718,6 @@ void dw_pcie_setup_rc(struct pcie_port *pp)
+ 	val |= PORT_LOGIC_SPEED_CHANGE;
+ 	dw_pcie_wr_own_conf(pp, PCIE_LINK_WIDTH_SPEED_CONTROL, 4, val);
+ 
+-	val = dw_pcie_readl_dbi(pci, PCIE_AMBA_ORDERING_CTRL_OFF);
+-	val |= 0xD;
+-	dw_pcie_writel_dbi(pci, PCIE_AMBA_ORDERING_CTRL_OFF, val);
+-
+ 	dw_pcie_dbi_ro_wr_dis(pci);
+ }
+ EXPORT_SYMBOL_GPL(dw_pcie_setup_rc);
+diff --git a/drivers/pci/controller/dwc/pcie-designware.h b/drivers/pci/controller/dwc/pcie-designware.h
+index 541878a..5a18e94 100644
+--- a/drivers/pci/controller/dwc/pcie-designware.h
++++ b/drivers/pci/controller/dwc/pcie-designware.h
+@@ -60,7 +60,6 @@
+ #define PCIE_MSI_INTR0_MASK		0x82C
+ #define PCIE_MSI_INTR0_STATUS		0x830
+ 
+-#define PCIE_AMBA_ORDERING_CTRL_OFF	0x8D8
+ #define PCIE_ATU_VIEWPORT		0x900
+ #define PCIE_ATU_REGION_INBOUND		BIT(31)
+ #define PCIE_ATU_REGION_OUTBOUND	0

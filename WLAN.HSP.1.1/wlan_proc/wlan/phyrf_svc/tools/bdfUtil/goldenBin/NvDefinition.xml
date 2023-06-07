@@ -1,0 +1,1642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NV Template File -->
+<!-- Derived from NvDefinition_QCA649X.xlsx on 05/24/2022 with version: 5.3.22 (DO NOT EDIT) -->
+<NvDefinition>
+	<DataType name="uint8">
+		<Member type="uint8" sizeOf="1"/>
+	</DataType>
+	<DataType name="uint16">
+		<Member type="uint16" sizeOf="1"/>
+	</DataType>
+	<DataType name="uint32">
+		<Member type="uint32" sizeOf="1"/>
+	</DataType>
+	<DataType name="uint64">
+		<Member type="uint64" sizeOf="1"/>
+	</DataType>
+	<DataType name="int8">
+		<Member type="int8" sizeOf="1"/>
+	</DataType>
+	<DataType name="int16">
+		<Member type="int16" sizeOf="1"/>
+	</DataType>
+	<DataType name="int32">
+		<Member type="int32" sizeOf="1"/>
+	</DataType>
+	<DataType name="int64">
+		<Member type="int64" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits0_3">
+		<Member type="bits0_3" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits3_5">
+		<Member type="bits3_5" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits0_1">
+		<Member type="bits0_1" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits1_4">
+		<Member type="bits1_4" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits5_3">
+		<Member type="bits5_3" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits0_7">
+		<Member type="bits0_7" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits7_1">
+		<Member type="bits7_1" sizeOf="1"/>
+	</DataType>
+	<DataType name="bits1_7">
+		<Member type="bits1_7" sizeOf="1"/>
+	</DataType>
+	<DataType name="CONFIG_ADDR_ENTRY_HEADER">
+		<Member type="uint32" sizeOf="1" name="address"/>
+		<Member type="uint32" sizeOf="1" name="mask"/>
+		<Member type="uint32" sizeOf="1" name="flags"/>
+	</DataType>
+	<DataType name="HALPHY_HCA_CONFIG">
+		<Member type="uint16" sizeOf="1" name="type"/>
+		<Member type="uint16" sizeOf="1" name="id"/>
+		<Member type="uint32" sizeOf="1" name="hwId"/>
+		<Member type="uint32" sizeOf="1" name="revId"/>
+		<Member type="uint32" sizeOf="1" name="chainMask"/>
+	</DataType>
+	<DataType name="ChannelChangeTimeLimits">
+		<Member type="uint32" sizeOf="1" name="EnableDisableFlag"/>
+		<Member type="uint32" sizeOf="1" name="ActiveCaseTimeLimit"/>
+		<Member type="uint32" sizeOf="1" name="LpCaseTimeLimit"/>
+		<Member type="uint32" sizeOf="1" name="rsvd1"/>
+		<Member type="uint32" sizeOf="1" name="rsvd2"/>
+	</DataType>
+	<DataType name="HALPHY_GTX_CONFIG">
+		<Member type="uint8" sizeOf="1" name="greentxConfig"/>
+		<Member type="uint8" sizeOf="1" name="gtxRTMask_basic_TpcPkts"/>
+		<Member type="uint8" sizeOf="1" name="gtxPER_VSupport"/>
+		<Member type="uint8" sizeOf="1" name="gtxBWMASK_Vthreshold"/>
+		<Member type="uint8" sizeOf="1" name="gtxVCompen_VGpioPin"/>
+		<Member type="uint8" sizeOf="1" name="gtxuserGtxMask"/>
+		<Member type="uint8" sizeOf="1" name="gtxRTMask_CCK"/>
+		<Member type="uint8" sizeOf="1" name="gtxRTMask_OFDM"/>
+		<Member type="uint32" sizeOf="1" name="gtxRTMask_HT"/>
+		<Member type="uint32" sizeOf="1" name="gtxRTMask_VHT"/>
+		<Member type="uint32" sizeOf="1" name="gtxRTMask_VHT_160"/>
+		<Member type="uint32" sizeOf="1" name="gtxRTMask_HE"/>
+		<Member type="uint32" sizeOf="1" name="gtxRTMask_HE_160"/>
+		<Member type="int8" sizeOf="1" name="gtxTPCMin5G_11_ac_ax"/>
+		<Member type="uint8" sizeOf="7" name="gtxConfigFuture"/>
+	</DataType>
+	<DataType name="RADAR_DET_CONFIG">
+		<Member type="uint16" sizeOf="1" name="radar_pd_ma_th_high"/>
+		<Member type="uint16" sizeOf="1" name="radar_pd_ma_th_high_dur_cac"/>
+		<Member type="uint8" sizeOf="1" name="radar_pd_jump_th"/>
+		<Member type="uint8" sizeOf="1" name="radar_pd_jump_th_dur_cac"/>
+		<Member type="uint8" sizeOf="1" name="radar_time_amp_th"/>
+		<Member type="uint8" sizeOf="1" name="radar_time_amp_th_dur_cac"/>
+		<Member type="uint8" sizeOf="1" name="radar_zero_cross_noise_thr"/>
+		<Member type="uint8" sizeOf="7" name="reserved"/>
+	</DataType>
+	<DataType name="PCIE_VENDOR_PHY_CONFIG_REG_ADDR_VAL">
+		<Member type="uint32" sizeOf="1" name="reg_offset"/>
+		<Member type="uint32" sizeOf="1" name="reg_val"/>
+	</DataType>
+	<DataType name="PCIE_VENDOR_PHY_CONFIG">
+		<Member type="uint8" sizeOf="1" name="pcie_vendor_cfg_enable"/>
+		<Member type="uint8" sizeOf="1" name="pcie_vendor_cfg_reg_count"/>
+		<Member type="PCIE_VENDOR_PHY_CONFIG_REG_ADDR_VAL" sizeOf="10" name="pcie_vendor_cfg_reg_offset_val"/>
+	</DataType>
+	<DataType name="GainTableShift">
+		<Member type="uint8" sizeOf="1" name="rxgain_table_offset_5g_20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_offset_5g_non20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_offset_6g_20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_offset_6g_non20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_regular_start_5g"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_lg_start_5g"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_regular_start_5g_non20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_lg_start_5g_non20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_regular_start_6g"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_lg_start_6g"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_regular_start_6g_non20"/>
+		<Member type="uint8" sizeOf="1" name="rxgain_table_lg_start_6g_non20"/>
+		<Member type="uint8" sizeOf="12" name="reserved"/>
+	</DataType>
+	<DataType name="BASE_BDF_HEADER">
+		<Member type="uint16" sizeOf="1" name="length"/>
+		<Member type="uint16" sizeOf="1" name="checksum"/>
+		<Member type="uint8" sizeOf="1" name="templateVerMinor"/>
+		<Member type="uint8" sizeOf="1" name="templateVerMajor"/>
+		<Member type="uint8" sizeOf="6" name="macAddr"/>
+		<Member type="uint16" sizeOf="2" name="regDmn"/>
+		<Member type="uint8" sizeOf="1" name="refDesignId"/>
+		<Member type="uint8" sizeOf="1" name="customerId"/>
+		<Member type="uint8" sizeOf="1" name="projectId"/>
+		<Member type="uint8" sizeOf="1" name="boardDataRev"/>
+		<Member type="uint8" sizeOf="1" name="rfSilent"/>
+		<Member type="uint8" sizeOf="1" name="wlanLedGpio"/>
+		<Member type="uint8" sizeOf="1" name="nvMacFlag"/>
+		<Member type="uint8" sizeOf="1" name="calSmVersion"/>
+		<Member type="uint32" sizeOf="1" name="concurrencyModeMask"/>
+		<Member type="uint32" sizeOf="1" name="commonBoardFlags"/>
+		<Member type="uint16" sizeOf="1" name="overwriteCdacIn"/>
+		<Member type="uint16" sizeOf="1" name="overwriteCdacOut"/>
+		<Member type="uint16" sizeOf="1" name="otpCdacIn"/>
+		<Member type="uint16" sizeOf="1" name="otpCdacOut"/>
+		<Member type="uint8" sizeOf="1" name="fineCorrectionCdacIn"/>
+		<Member type="uint8" sizeOf="1" name="fineCorrectionCdacOut"/>
+		<Member type="uint16" sizeOf="1" name="checkTrainingStatusDelay"/>
+		<Member type="uint8" sizeOf="1" name="intPaConfig_rtcExSel"/>
+		<Member type="uint8" sizeOf="1" name="mipiPowerMode"/>
+		<Member type="uint8" sizeOf="1" name="calRFId"/>
+		<Member type="uint8" sizeOf="1" name="calBBId"/>
+		<Member type="uint8" sizeOf="4" name="dbsTableSelect"/>
+		<Member type="uint8" sizeOf="1" name="future"/>
+		<Member type="uint8" sizeOf="1" name="swreg"/>
+		<Member type="uint8" sizeOf="1" name="clkOutDriveStrengh"/>
+		<Member type="uint8" sizeOf="1" name="spectralShapingSelect"/>
+		<Member type="int8" sizeOf="4" name="xtalCapInterval"/>
+		<Member type="uint8" sizeOf="20" name="custData"/>
+		<Member type="uint32" sizeOf="1" name="hwCReserved"/>
+		<Member type="uint32" sizeOf="1" name="boardFlags"/>
+		<Member type="HALPHY_HCA_CONFIG" sizeOf="16" name="hcaConfig"/>
+		<Member type="int16" sizeOf="16" name="normal_maxCCApwr"/>
+		<Member type="int16" sizeOf="8" name="dtim_maxCCApwr"/>
+		<Member type="int8" sizeOf="8" name="rssiOffset"/>
+		<Member type="uint8" sizeOf="1" name="coexFlags"/>
+		<Member type="uint8" sizeOf="1" name="coexConfig"/>
+		<Member type="int16" sizeOf="16" name="normal_maxCCApwr_1x1"/>
+		<Member type="uint32" sizeOf="1" name="swreg32"/>
+		<Member type="uint16" sizeOf="1" name="tpcCalVersion"/>
+		<Member type="uint16" sizeOf="1" name="calVersion"/>
+		<Member type="uint16" sizeOf="1" name="iniVersion"/>
+		<Member type="uint8" sizeOf="1" name="numMacAddr"/>
+		<Member type="uint8" sizeOf="1" name="numPhy"/>
+		<Member type="uint32" sizeOf="1" name="fwVersion"/>
+		<Member type="uint16" sizeOf="1" name="bdfVersion"/>
+		<Member type="uint8" sizeOf="1" name="cck_fir_wb_sel"/>
+		<Member type="uint8" sizeOf="1" name="minTpcTxPwr"/>
+		<Member type="uint8" sizeOf="1" name="bdfTemplateVer1"/>
+		<Member type="uint8" sizeOf="1" name="bdfTemplateVer2"/>
+		<Member type="uint8" sizeOf="1" name="bdfTemplateVer3"/>
+		<Member type="HALPHY_GTX_CONFIG" sizeOf="1" name="gtx_config"/>
+		<Member type="uint32" sizeOf="1" name="gtx_config2"/>
+		<Member type="uint8" sizeOf="1" name="gtxPwrMargin"/>
+		<Member type="uint8" sizeOf="1" name="tpcGoodChain"/>
+		<Member type="uint8" sizeOf="1" name="tpcPerChainDelta"/>
+		<Member type="uint16" sizeOf="1" name="CoexTxPwrThr6gToLaa"/>
+		<Member type="uint16" sizeOf="1" name="CoexTxPwrThr5gToLaa"/>
+		<Member type="uint16" sizeOf="1" name="CoexTxPwrThr5gToN79"/>
+		<Member type="uint16" sizeOf="1" name="CoexFreqThr5gToN79"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_high_2G"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_low_2G"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_high_5G"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_low_5G"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_high_6G"/>
+		<Member type="int16" sizeOf="1" name="ocl_rssi_thr_low_6G"/>
+		<Member type="uint8" sizeOf="1" name="bdfHwsTemplateVer1"/>
+		<Member type="uint8" sizeOf="1" name="bdfHwsTemplateVer2"/>
+		<Member type="uint8" sizeOf="1" name="bdfHwsTemplateVer3"/>
+		<Member type="uint8" sizeOf="1" name="HDLVerStampLvl1"/>
+		<Member type="uint8" sizeOf="1" name="HDLVerStampLvl2"/>
+		<Member type="uint8" sizeOf="1" name="HDLVerStampLvl3"/>
+		<Member type="uint8" sizeOf="1" name="HDLVerStampLvl4"/>
+		<Member type="uint8" sizeOf="1" name="ctlQuarterStepPowerFlag"/>
+		<Member type="uint8" sizeOf="1" name="enableRegulatory5Dot9"/>
+		<Member type="uint8" sizeOf="1" name="UwbCoexConfig"/>
+		<Member type="uint32" sizeOf="2" name="TX_PWR_LV_LAA_0"/>
+		<Member type="uint32" sizeOf="2" name="TX_PWR_LV_N79_0"/>
+		<Member type="int8" sizeOf="1" name="clpcACKPowerOffsetCck2G"/>
+		<Member type="int8" sizeOf="1" name="clpcACKPowerOffsetOfdm2G"/>
+		<Member type="int8" sizeOf="1" name="clpcACKPowerOffsetOfdm5G"/>
+		<Member type="uint8" sizeOf="1" name="regDBVer"/>
+		<Member type="uint8" sizeOf="1" name="enable1T2R"/>
+		<Member type="uint8" sizeOf="1" name="txCckDelay2G"/>
+		<Member type="uint8" sizeOf="1" name="ppmRescueAlphaConfigEnable"/>
+		<Member type="uint8" sizeOf="1" name="ppmRescueAlphaConfigThreshold"/>
+		<Member type="uint8" sizeOf="1" name="ppmRescueAlphaConfig"/>
+		<Member type="uint32" sizeOf="1" name="edcaOverride"/>
+		<Member type="uint32" sizeOf="1" name="edcaVoTxop"/>
+		<Member type="uint32" sizeOf="1" name="edcaViTxop"/>
+		<Member type="uint32" sizeOf="1" name="edcaBeTxop"/>
+		<Member type="uint32" sizeOf="1" name="edcaBkTxop"/>
+		<Member type="uint8" sizeOf="1" name="DfsRssiThreshold20"/>
+		<Member type="uint8" sizeOf="1" name="DfsRssiThreshold40"/>
+		<Member type="uint8" sizeOf="1" name="DfsRssiThreshold80"/>
+		<Member type="uint8" sizeOf="1" name="DfsRssiThreshold160"/>
+		<Member type="uint8" sizeOf="1" name="enable7115Chan"/>
+		<Member type="uint8" sizeOf="1" name="enable5935Chan"/>
+		<Member type="int8" sizeOf="1" name="targetBo_2G"/>
+		<Member type="int8" sizeOf="1" name="targetBo_5G"/>
+		<Member type="int8" sizeOf="1" name="antGainOffset6GReg"/>
+		<Member type="ChannelChangeTimeLimits" sizeOf="2" name="channelChangeTimeLimit"/>
+		<Member type="RADAR_DET_CONFIG" sizeOf="1" name="radarDetConfig"/>
+		<Member type="uint8" sizeOf="1" name="sip_bbf_config"/>
+		<Member type="int16" sizeOf="1" name="a2ni_rssi_thr_far"/>
+		<Member type="int16" sizeOf="1" name="a2ni_rssi_thr_mid"/>
+		<Member type="int16" sizeOf="1" name="a2ni_rssi_thr_near"/>
+		<Member type="int16" sizeOf="1" name="a2ni_preassoc_rssi_thr_far"/>
+		<Member type="int16" sizeOf="1" name="a2ni_preassoc_rssi_thr_mid"/>
+		<Member type="int16" sizeOf="1" name="a2ni_preassoc_rssi_thr_near"/>
+		<Member type="uint8" sizeOf="1" name="HeCtlOffsetEnable"/>
+		<Member type="PCIE_VENDOR_PHY_CONFIG" sizeOf="1" name="pcieVendorPhyCfg"/>
+		<Member type="GainTableShift" sizeOf="1" name="GainTableShift"/>
+		<Member type="uint8" sizeOf="264" name="baseFuture"/>
+	</DataType>
+	<DataType name="HALPHY_BDF_FLAGS">
+		<Member type="uint32" sizeOf="1" name="opFlags"/>
+		<Member type="uint32" sizeOf="1" name="featureEnable"/>
+		<Member type="uint32" sizeOf="1" name="miscConfiguration"/>
+		<Member type="uint32" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="PER_PHY_SECTION">
+		<Member type="HALPHY_BDF_FLAGS" sizeOf="1" name="opCapBrdFlags"/>
+		<Member type="uint16" sizeOf="1" name="txMask2G"/>
+		<Member type="uint16" sizeOf="1" name="rxMask2G"/>
+		<Member type="uint16" sizeOf="1" name="txMask5G"/>
+		<Member type="uint16" sizeOf="1" name="rxMask5G"/>
+		<Member type="uint8" sizeOf="40" name="reserved"/>
+		<Member type="uint8" sizeOf="1" name="tpc_flag"/>
+		<Member type="uint8" sizeOf="1" name="xtalSettleTime"/>
+		<Member type="int8" sizeOf="1" name="smartAntennaEnable"/>
+		<Member type="int8" sizeOf="1" name="ccaThresh"/>
+		<Member type="int8" sizeOf="2" name="dbsConcurrencyBackoff"/>
+		<Member type="uint16" sizeOf="2" name="regDmn"/>
+		<Member type="int8" sizeOf="1" name="sensitivityAdjustment"/>
+		<Member type="int8" sizeOf="1" name="minSensitivityLevel"/>
+		<Member type="int8" sizeOf="1" name="maxSensitivityLevel"/>
+		<Member type="uint8" sizeOf="1" name="rxDcoControlFlags"/>
+		<Member type="int16" sizeOf="2" name="InitialCLPCError"/>
+		<Member type="uint32" sizeOf="1" name="powerSaveMask"/>
+		<Member type="uint16" sizeOf="1" name="chainMskfor1T2R"/>
+		<Member type="uint8" sizeOf="56" name="perPhyFuture"/>
+	</DataType>
+	<DataType name="NV_HEADER">
+		<Member type="uint32" sizeOf="1" name="nvFlag"/>
+	</DataType>
+	<DataType name="SPUR_MIT">
+		<Member type="uint8" sizeOf="1" name="spurRssiThreshSel"/>
+		<Member type="uint8" sizeOf="1" name="spurRssiThresh"/>
+		<Member type="uint8" sizeOf="1" name="spurRssiThreshCck"/>
+		<Member type="uint8" sizeOf="1" name="spurMitFlag"/>
+		<Member type="uint16" sizeOf="32" name="spurChans_5Gx10"/>
+		<Member type="int8" sizeOf="32" name="spurStr_5G"/>
+		<Member type="uint16" sizeOf="6" name="spurChans_CCKx10"/>
+		<Member type="uint16" sizeOf="8" name="spurChans_2Gx10"/>
+		<Member type="int8" sizeOf="8" name="spurStr_2G"/>
+		<Member type="uint8" sizeOf="1" name="spurPuncMask"/>
+		<Member type="uint8" sizeOf="1" name="spurPilotMask"/>
+		<Member type="uint8" sizeOf="1" name="spurChanMask"/>
+		<Member type="uint8" sizeOf="1" name="reserved"/>
+		<Member type="int8" sizeOf="5" name="spurThreshold"/>
+		<Member type="uint8" sizeOf="2" name="spur_config_reserve"/>
+		<Member type="uint8" sizeOf="1" name="spurNotchFilterFlag_2G"/>
+		<Member type="uint32" sizeOf="1" name="spurNotchFilterFlag_5G"/>
+		<Member type="uint32" sizeOf="32" name="vregSpurNotch5G"/>
+		<Member type="uint32" sizeOf="8" name="vregSpurNotch2G"/>
+	</DataType>
+	<DataType name="PAPRD_ATTEN_TABLE">
+		<Member type="int8" sizeOf="24" name="paprdAtten"/>
+	</DataType>
+	<DataType name="DPD_PEF_CONFIG">
+		<Member type="uint32" sizeOf="1" name="pefMask"/>
+		<Member type="uint8" sizeOf="1" name="pefFlag"/>
+		<Member type="int8" sizeOf="1" name="pefCalMax"/>
+		<Member type="int8" sizeOf="1" name="pefCalMin"/>
+		<Member type="int8" sizeOf="1" name="pefCalStep"/>
+		<Member type="int8" sizeOf="1" name="pefMaxCalAtt"/>
+		<Member type="int8" sizeOf="1" name="pefMaxCalBw"/>
+		<Member type="int8" sizeOf="1" name="pefMagSel"/>
+		<Member type="int8" sizeOf="1" name="pefLbSel"/>
+		<Member type="uint32" sizeOf="1" name="bwCntl"/>
+		<Member type="uint32" sizeOf="2" name="paprdBwTableDpdOff"/>
+		<Member type="uint32" sizeOf="16" name="paprdBwTable"/>
+	</DataType>
+	<DataType name="PEF_COEFF_TABLE_2G">
+		<Member type="int16" sizeOf="9" name="PefCoefI"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ"/>
+		<Member type="int16" sizeOf="9" name="PefCoefI_HT40"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ_HT40"/>
+	</DataType>
+	<DataType name="PEF_COEFF_TABLE_5G">
+		<Member type="int16" sizeOf="9" name="PefCoefI"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ"/>
+		<Member type="int16" sizeOf="9" name="PefCoefI_HT40"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ_HT40"/>
+		<Member type="int16" sizeOf="9" name="PefCoefI_VHT80"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ_VHT80"/>
+		<Member type="int16" sizeOf="9" name="PefCoefI_VHT160"/>
+		<Member type="int16" sizeOf="9" name="PefCoefQ_VHT160"/>
+	</DataType>
+	<DataType name="TX_BBF_BW">
+		<Member type="uint8" sizeOf="1" name="txbbf_20"/>
+		<Member type="uint8" sizeOf="1" name="txbbf_40"/>
+		<Member type="uint8" sizeOf="1" name="txbbf_80"/>
+		<Member type="uint8" sizeOf="1" name="txbbf_160"/>
+	</DataType>
+	<DataType name="RSSICOMBOFFSET_EXT">
+		<Member type="uint16" sizeOf="1" name="ChannelThreshold"/>
+		<Member type="int8" sizeOf="2" name="rssiCombOffsetAtLowGain"/>
+	</DataType>
+	<DataType name="BAND_MODAL_SECTION">
+		<Member type="uint32" sizeOf="1" name="antCtrlCommon"/>
+		<Member type="uint32" sizeOf="1" name="antCtrlCommon2"/>
+		<Member type="uint16" sizeOf="2" name="antCtrlChain"/>
+		<Member type="int16" sizeOf="1" name="minCCAPwrThresh"/>
+		<Member type="uint8" sizeOf="1" name="minPwr4TPCErrCorr"/>
+		<Member type="int8" sizeOf="2" name="voltSlope"/>
+		<Member type="uint8" sizeOf="1" name="femHighIsolationMode"/>
+		<Member type="int8" sizeOf="1" name="femXpaSet"/>
+		<Member type="uint8" sizeOf="1" name="femXlnaSet"/>
+		<Member type="uint8" sizeOf="1" name="xtrSwitchSet"/>
+		<Member type="uint8" sizeOf="2" name="clpcAttenTargetPwrChain"/>
+		<Member type="uint8" sizeOf="1" name="clpcPdetTiaGain"/>
+		<Member type="uint8" sizeOf="1" name="clpcLpfHighLowTiaHighGain"/>
+		<Member type="uint8" sizeOf="1" name="clpcSqGain"/>
+		<Member type="uint8" sizeOf="1" name="thermal_interval"/>
+		<Member type="uint8" sizeOf="1" name="thermal_interval_lowTemp"/>
+		<Member type="int8" sizeOf="1" name="calPowerOffset"/>
+		<Member type="uint8" sizeOf="1" name="TxIQCalMaxTxGain"/>
+		<Member type="uint16" sizeOf="1" name="startChannel"/>
+		<Member type="uint16" sizeOf="1" name="endChannel"/>
+		<Member type="int8" sizeOf="1" name="antennaGainCh"/>
+		<Member type="uint8" sizeOf="1" name="txrxgain"/>
+		<Member type="uint8" sizeOf="2" name="paBiasTrim"/>
+		<Member type="uint8" sizeOf="1" name="xpaBiasLvl"/>
+		<Member type="uint8" sizeOf="2" name="xlnaGain"/>
+		<Member type="TX_BBF_BW" sizeOf="1" name="txBbfBw"/>
+		<Member type="uint8" sizeOf="3" name="PA2CINTUNE_0"/>
+		<Member type="uint8" sizeOf="3" name="PA2CINTUNE_1"/>
+		<Member type="int8" sizeOf="1" name="diversityGain"/>
+		<Member type="int8" sizeOf="2" name="rssiChainCompForDbs"/>
+		<Member type="uint8" sizeOf="1" name="droopingFlag"/>
+		<Member type="int8" sizeOf="1" name="droopingEnableTempThresh"/>
+		<Member type="int8" sizeOf="1" name="droopingDisableTempThresh"/>
+		<Member type="uint32" sizeOf="8" name="tiaSettingPerChain"/>
+		<Member type="int8" sizeOf="1" name="bypassXlnaILRSSIThrHi"/>
+		<Member type="int8" sizeOf="1" name="bypassXlnaILRSSIThrLo"/>
+		<Member type="uint16" sizeOf="1" name="synthCtrlRSSIThreshold"/>
+		<Member type="uint16" sizeOf="1" name="dynSpurMitRSSIThres"/>
+		<Member type="uint8" sizeOf="1" name="BW20acrSetting"/>
+		<Member type="uint8" sizeOf="1" name="BW40acrSetting"/>
+		<Member type="uint8" sizeOf="1" name="BW80acrSetting"/>
+		<Member type="uint8" sizeOf="1" name="BW160acrSetting"/>
+		<Member type="uint8" sizeOf="1" name="gtxEnable"/>
+		<Member type="int8" sizeOf="2" name="gtxTempThresholdForVoltSel"/>
+		<Member type="uint32" sizeOf="1" name="heavyClipOFDMASetting"/>
+		<Member type="uint16" sizeOf="2" name="bqSettingPerChain"/>
+		<Member type="uint8" sizeOf="1" name="rssiCombOffsetGainThreshold"/>
+		<Member type="int8" sizeOf="1" name="rssiCombOffsetAtLowGain"/>
+		<Member type="int8" sizeOf="1" name="ccaThrOffset"/>
+		<Member type="uint8" sizeOf="1" name="BW40rssiCombOffsetGainThreshold"/>
+		<Member type="int8" sizeOf="1" name="BW40rssiCombOffsetAtLowGain"/>
+		<Member type="RSSICOMBOFFSET_EXT" sizeOf="1" name="lowFreqExtend"/>
+		<Member type="RSSICOMBOFFSET_EXT" sizeOf="1" name="HighFreqExtend"/>
+		<Member type="int8" sizeOf="1" name="indexFourOffset"/>
+		<Member type="uint8" sizeOf="1" name="PDCenable"/>
+		<Member type="int8" sizeOf="1" name="avgBcnRssiThr"/>
+		<Member type="uint8" sizeOf="1" name="avgBcnRssiImb"/>
+		<Member type="int8" sizeOf="1" name="ccaThrOffset20M"/>
+		<Member type="int8" sizeOf="1" name="ccaThrOffset40M"/>
+		<Member type="int8" sizeOf="1" name="ccaThrOffset80M"/>
+		<Member type="int8" sizeOf="1" name="ccaThrOffset160M"/>
+		<Member type="int8" sizeOf="2" name="rssiCombOffsetAtLowGain_perCh"/>
+		<Member type="int8" sizeOf="2" name="BW40rssiCombOffsetAtLowGain_perCh"/>
+		<Member type="int8" sizeOf="1" name="rssiCombOffsetAtLowGain_LEXT_CM3"/>
+		<Member type="int8" sizeOf="1" name="rssiCombOffsetAtLowGain_MEXT_CM3"/>
+		<Member type="int8" sizeOf="1" name="rssiCombOffsetAtLowGain_HEXT_CM3"/>
+		<Member type="uint8" sizeOf="168" name="futureBandModal"/>
+	</DataType>
+	<DataType name="DPD_CONFIG">
+		<Member type="uint8" sizeOf="1" name="dpdDebugMode"/>
+	</DataType>
+	<DataType name="DPD_CONFIG_BAND">
+		<Member type="uint8" sizeOf="1" name="dpdDynamicGlut"/>
+		<Member type="uint32" sizeOf="1" name="dpdWarmPktNum"/>
+		<Member type="uint8" sizeOf="1" name="dpdWarmPktEnable"/>
+		<Member type="int8" sizeOf="8" name="dpdWarmPktDacGain"/>
+		<Member type="uint8" sizeOf="1" name="dpdTempRecal"/>
+		<Member type="uint8" sizeOf="1" name="dpdTempThreshold"/>
+		<Member type="uint8" sizeOf="1" name="dpdPostScalingEnable"/>
+		<Member type="uint8" sizeOf="2" name="dpdPostScalingValue"/>
+		<Member type="uint8" sizeOf="1" name="dpdPostScalingSlopeEnable"/>
+		<Member type="uint8" sizeOf="1" name="dpdPostScalingSlope"/>
+		<Member type="uint8" sizeOf="1" name="dpdRxIQCorrEn"/>
+		<Member type="int8" sizeOf="1" name="dpdTgtPwrMin"/>
+		<Member type="int8" sizeOf="1" name="dpdTgtPwrMax"/>
+		<Member type="uint32" sizeOf="1" name="dpdEnPerRateMask"/>
+		<Member type="uint8" sizeOf="1" name="dpdMinLoopbackDelay"/>
+		<Member type="uint8" sizeOf="1" name="dpdGlutTableEn"/>
+		<Member type="uint8" sizeOf="8" name="dpdGMGlutIdx"/>
+		<Member type="uint16" sizeOf="1" name="disableDPDStartfreq"/>
+		<Member type="uint16" sizeOf="1" name="disableDPDEndfreq"/>
+		<Member type="uint8" sizeOf="1" name="tpcGLUTIdxDpdRange"/>
+		<Member type="uint8" sizeOf="1" name="dpdCalAttempts"/>
+		<Member type="uint8" sizeOf="1" name="dpdAdapDacPktCnt"/>
+		<Member type="int8" sizeOf="1" name="dpdGLUTMinTxPwrOffset"/>
+		<Member type="uint8" sizeOf="1" name="edpd_gtx_enable"/>
+		<Member type="uint8" sizeOf="1" name="edpdOneTblEnable"/>
+		<Member type="uint32" sizeOf="1" name="edpdOneTblCalTime"/>
+		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset40M"/>
+		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset80M"/>
+		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset160M"/>
+		<Member type="uint8" sizeOf="9" name="pad"/>
+	</DataType>
+	<DataType name="LDPD_CONFIG_BAND">
+		<Member type="uint8" sizeOf="1" name="ldpdEnable"/>
+		<Member type="uint8" sizeOf="2" name="ldpdCurveFitEnable"/>
+		<Member type="uint8" sizeOf="2" name="ldpdCurveFitNoiseBin"/>
+		<Member type="uint16" sizeOf="2" name="ldpdCurveFitSmGain"/>
+		<Member type="uint8" sizeOf="2" name="ldpdNoiseRatioAMAM"/>
+		<Member type="uint8" sizeOf="2" name="ldpdNoiseRatioAMPM"/>
+		<Member type="uint8" sizeOf="1" name="ldpdDebugMode"/>
+		<Member type="uint8" sizeOf="1" name="ldpdSQLimit"/>
+		<Member type="uint8" sizeOf="8" name="ldpdTrainingDacGain"/>
+		<Member type="uint8" sizeOf="1" name="dpdCalAttempts"/>
+		<Member type="int8" sizeOf="1" name="ldpdAdapDacGainEnable"/>
+		<Member type="int8" sizeOf="1" name="ldpdCompressionThrHigh"/>
+		<Member type="int8" sizeOf="1" name="ldpdCompressionThrLow"/>
+		<Member type="int8" sizeOf="1" name="ldpdTargetDacGain"/>
+		<Member type="int8" sizeOf="1" name="ldpdDynGlutSel"/>
+		<Member type="int8" sizeOf="1" name="ldpdAgc2AttenSel"/>
+		<Member type="int8" sizeOf="2" name="ldpdPoutForAtten7"/>
+		<Member type="uint8" sizeOf="24" name="pad"/>
+	</DataType>
+	<DataType name="EDPD_CONFIG_BAND">
+		<Member type="uint8" sizeOf="1" name="edpdEnable"/>
+		<Member type="uint8" sizeOf="2" name="edpdRxIQMask"/>
+		<Member type="uint8" sizeOf="1" name="edpdSqLimit"/>
+		<Member type="int8" sizeOf="1" name="edpdNmseLimit"/>
+		<Member type="uint8" sizeOf="2" name="edpdSelfEqualizerEnable"/>
+		<Member type="int8" sizeOf="8" name="edpdDacGain"/>
+		<Member type="uint8" sizeOf="1" name="edpdDebug"/>
+		<Member type="uint8" sizeOf="4" name="edpdKernelSel"/>
+		<Member type="uint8" sizeOf="1" name="edpdAdapDacGainEnable"/>
+		<Member type="int8" sizeOf="1" name="edpdCompressionThrHigh"/>
+		<Member type="int8" sizeOf="1" name="edpdCompressionThrLow"/>
+		<Member type="int8" sizeOf="1" name="edpdTargetDacGain"/>
+		<Member type="int8" sizeOf="1" name="edpdDynGlutSel"/>
+		<Member type="int8" sizeOf="1" name="edpdAgc2AttenSel"/>
+		<Member type="int8" sizeOf="2" name="edpdPoutForAtten7"/>
+		<Member type="uint8" sizeOf="1" name="dpdCalAttempts"/>
+		<Member type="int8" sizeOf="1" name="GtxInitTgtPwr"/>
+		<Member type="uint8" sizeOf="1" name="GTXGlutInit"/>
+		<Member type="uint8" sizeOf="1" name="GTXGlutLast"/>
+		<Member type="uint8" sizeOf="52" name="pad"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_CHIP_PER_PHY">
+		<Member type="int16" sizeOf="2" name="thermAdcScaledGain"/>
+		<Member type="int8" sizeOf="2" name="thermAdcOffset"/>
+		<Member type="uint8" sizeOf="2" name="pad"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_CHIP_PER_CHAIN">
+		<Member type="uint8" sizeOf="1" name="ateCALTemp"/>
+		<Member type="uint8" sizeOf="1" name="ateChainThermCode"/>
+		<Member type="uint8" sizeOf="2" name="pad"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_CHIP">
+		<Member type="uint8" sizeOf="1" name="configFlag"/>
+		<Member type="uint8" sizeOf="1" name="rbias"/>
+		<Member type="uint8" sizeOf="1" name="tempSlopeCharacterized"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+		<Member type="CAL_DATA_PER_CHIP_PER_CHAIN" sizeOf="2" name="perChain"/>
+		<Member type="CAL_DATA_PER_CHIP_PER_PHY" sizeOf="2" name="perPhy"/>
+		<Member type="uint8" sizeOf="52" name="ate_reserved"/>
+	</DataType>
+	<DataType name="ATTEN_TABLE">
+		<Member type="uint8" sizeOf="15" name="atten_ext"/>
+		<Member type="uint8" sizeOf="15" name="atten_int"/>
+		<Member type="uint8" sizeOf="2" name="pad"/>
+	</DataType>
+	<DataType name="table_gUnit">
+		<Member type="bits0_3" sizeOf="1" name="pasetting"/>
+		<Member type="bits3_5" sizeOf="1" name="txgainIdx"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_POINT_OLPC_NEW">
+		<Member type="uint8" sizeOf="1" name="txgainIdx"/>
+		<Member type="int16" sizeOf="1" name="meas_pwr"/>
+		<Member type="uint8" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_FREQ_OLPC">
+		<Member type="CAL_DATA_PER_POINT_OLPC_NEW" sizeOf="16" name="calPerPoint_olpc"/>
+		<Member type="int8" sizeOf="2" name="dacGain"/>
+		<Member type="uint8" sizeOf="2" name="thermCalVal"/>
+		<Member type="uint8" sizeOf="1" name="voltCalVal"/>
+		<Member type="uint8" sizeOf="3" name="reserved"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_POINT_CLPC">
+		<Member type="uint8" sizeOf="1" name="pdadc_read"/>
+		<Member type="uint8" sizeOf="1" name="meas_pwr"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_FREQ_CLPCF">
+		<Member type="CAL_DATA_PER_POINT_CLPC" sizeOf="20" name="calPerPoint_clpcf"/>
+	</DataType>
+	<DataType name="PRE_TXCAL_GUIDE_PER_BAND">
+		<Member type="uint8" sizeOf="64" name="gainIdxForCal"/>
+		<Member type="uint8" sizeOf="64" name="paConfigForCal"/>
+		<Member type="int16" sizeOf="64" name="calDataTgtPwr"/>
+		<Member type="int16" sizeOf="8" name="calPwrTargets"/>
+		<Member type="uint8" sizeOf="10" name="calPdadcTargets"/>
+		<Member type="uint8" sizeOf="15" name="pdetAttenProfile_32nddb"/>
+		<Member type="int8" sizeOf="1" name="dacGainForCal"/>
+		<Member type="uint8" sizeOf="1" name="pdetTiaGainProfile_8thdb"/>
+		<Member type="uint8" sizeOf="1" name="alutOffset"/>
+		<Member type="uint8" sizeOf="1" name="pdetRange_8thdb"/>
+		<Member type="uint8" sizeOf="1" name="txPwrOffset"/>
+		<Member type="uint8" sizeOf="1" name="valid"/>
+		<Member type="uint8" sizeOf="1" name="minDacGainMargin"/>
+		<Member type="int16" sizeOf="1" name="clpcErrorForCal"/>
+		<Member type="uint8" sizeOf="2" name="unused"/>
+	</DataType>
+	<DataType name="PER_RATE_POWER_OFFSET">
+		<Member type="int8" sizeOf="10" name="powerOffset_HT20"/>
+		<Member type="int8" sizeOf="10" name="powerOffset_HT40"/>
+		<Member type="int8" sizeOf="10" name="powerOffset_VHT80"/>
+		<Member type="int8" sizeOf="10" name="powerOffset_VHT160"/>
+	</DataType>
+	<DataType name="PER_CHAIN_POWER_OFFSET">
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_cck"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_Legacy"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_HT20"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_VHT20"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_HT40"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_VHT40"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_VHT80"/>
+		<Member type="int8" sizeOf="1" name="per_chain_powerOffset_VHT160"/>
+	</DataType>
+	<DataType name="CLPC_POWER_OFFSET">
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_cck"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm20"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm20_hc"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm40"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm40_hc"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm80"/>
+		<Member type="int8" sizeOf="1" name="clpcPowerOffset_ofdm80_hc"/>
+		<Member type="int8" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="CLPC_POWER_OFFSET_LTE_COEX">
+		<Member type="int8" sizeOf="4" name="clpcPowerOffset_ofdm40_lte_coex"/>
+		<Member type="int8" sizeOf="8" name="clpcPowerOffset_lte_coex_reserved"/>
+	</DataType>
+	<DataType name="PER_CHAIN_SAR_LIMITS">
+		<Member type="uint8" sizeOf="1" name="CCK2gLimit"/>
+		<Member type="uint8" sizeOf="1" name="Ofdm2gLimit"/>
+		<Member type="uint8" sizeOf="1" name="Ofdm5gLimit"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="CCK_RATES">
+		<Member type="int8" sizeOf="1" name="rate_1_L"/>
+		<Member type="int8" sizeOf="1" name="rate_2_L"/>
+		<Member type="int8" sizeOf="1" name="rate_2_S"/>
+		<Member type="int8" sizeOf="1" name="rate_5_L"/>
+		<Member type="int8" sizeOf="1" name="rate_5_S"/>
+		<Member type="int8" sizeOf="1" name="rate_11_L"/>
+		<Member type="int8" sizeOf="1" name="rate_11_S"/>
+		<Member type="int8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="LEGACY_RATES">
+		<Member type="int8" sizeOf="1" name="rate_6"/>
+		<Member type="int8" sizeOf="1" name="rate_9"/>
+		<Member type="int8" sizeOf="1" name="rate_12"/>
+		<Member type="int8" sizeOf="1" name="rate_18"/>
+		<Member type="int8" sizeOf="1" name="rate_24"/>
+		<Member type="int8" sizeOf="1" name="rate_36"/>
+		<Member type="int8" sizeOf="1" name="rate_48"/>
+		<Member type="int8" sizeOf="1" name="rate_54"/>
+	</DataType>
+	<DataType name="HT_RATES">
+		<Member type="int8" sizeOf="1" name="rate_ht_0"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_1"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_2"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_3"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_4"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_5"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_6"/>
+		<Member type="int8" sizeOf="1" name="rate_ht_7"/>
+	</DataType>
+	<DataType name="VHT_HE_RATES">
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_0"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_1"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_2"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_3"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_4"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_5"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_6"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_7"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_8"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_9"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_10"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_11"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_12"/>
+		<Member type="int8" sizeOf="1" name="rate_vht_mcs_13"/>
+	</DataType>
+	<DataType name="EXTRA_RATES">
+		<Member type="int8" sizeOf="1" name="rate_dup_cck"/>
+		<Member type="int8" sizeOf="1" name="rate_dup_ofdm"/>
+		<Member type="int8" sizeOf="1" name="rate_ext_cck"/>
+		<Member type="int8" sizeOf="1" name="rate_ext_ofdm"/>
+		<Member type="int8" sizeOf="1" name="rate_xr"/>
+		<Member type="int8" sizeOf="3" name="pad"/>
+	</DataType>
+	<DataType name="table_u">
+		<Member type="bits0_7" sizeOf="1" name="t_power"/>
+		<Member type="bits7_1" sizeOf="1" name="flag"/>
+	</DataType>
+	<DataType name="CAL_CTL_EDGE_PWR">
+		<Member type="table_u" sizeOf="1" name="u"/>
+	</DataType>
+	<DataType name="CTL_INDEX">
+		<Member type="uint8" sizeOf="1" name="mode"/>
+		<Member type="bits0_1" sizeOf="1" name="beamforming"/>
+		<Member type="bits1_4" sizeOf="1" name="regDmn"/>
+		<Member type="bits5_3" sizeOf="1" name="reserved"/>
+		<Member type="uint8" sizeOf="1" name="numChMask"/>
+		<Member type="uint8" sizeOf="1" name="numSSMask"/>
+	</DataType>
+	<DataType name="CTL_CONFIG">
+		<Member type="uint8" sizeOf="1" name="numRegDomain"/>
+		<Member type="uint8" sizeOf="1" name="numChannelRowsPerMode"/>
+		<Member type="uint16" sizeOf="1" name="ctlFlags"/>
+	</DataType>
+	<DataType name="HALPHY_XTAL_TEMP_COMP">
+		<Member type="uint16" sizeOf="1" name="deltaCapin"/>
+		<Member type="uint16" sizeOf="1" name="deltaCapout"/>
+		<Member type="int16" sizeOf="1" name="temperature"/>
+		<Member type="int16" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="XTAL_CAL_DATA">
+		<Member type="uint16" sizeOf="1" name="calCapIn"/>
+		<Member type="uint16" sizeOf="1" name="calCapOut"/>
+		<Member type="HALPHY_XTAL_TEMP_COMP" sizeOf="10" name="xtalTempComp"/>
+	</DataType>
+	<DataType name="HEAVY_CLIP_TABLE">
+		<Member type="uint16" sizeOf="1" name="heavyClipEnableBitMap2G"/>
+		<Member type="uint8" sizeOf="1" name="heavyClipLiteMcsThr2G"/>
+		<Member type="uint8" sizeOf="1" name="heavyClipLevelForHeavy2G"/>
+		<Member type="int8" sizeOf="1" name="heavyClipLevelForLite2G"/>
+		<Member type="uint16" sizeOf="1" name="heavyClipPerMcs2G"/>
+		<Member type="uint16" sizeOf="1" name="heavyClipEnablePktType2G"/>
+		<Member type="int8" sizeOf="1" name="heavyClipNssThreshold2G"/>
+		<Member type="uint16" sizeOf="1" name="heavyClipEnableBitMap5G"/>
+		<Member type="uint8" sizeOf="1" name="heavyClipLiteMcsThr5G"/>
+		<Member type="uint8" sizeOf="1" name="heavyClipLevelForHeavy5G"/>
+		<Member type="int8" sizeOf="1" name="heavyClipLevelForLite5G"/>
+		<Member type="uint16" sizeOf="1" name="heavyClipPerMcs5G"/>
+		<Member type="uint16" sizeOf="1" name="heavyClipEnablePktType5G"/>
+		<Member type="int8" sizeOf="1" name="heavyClipNssThreshold5G"/>
+		<Member type="uint16" sizeOf="1" name="bandEdgeheavyClipPerMcs2G"/>
+		<Member type="int8" sizeOf="9" name="hc_offset_per_MCS_grp"/>
+		<Member type="int8" sizeOf="73" name="heavyClipTableFuture"/>
+	</DataType>
+	<DataType name="RATE_TPC_PA">
+		<Member type="bits0_3" sizeOf="1" name="tpc_init_pwr_cfg"/>
+		<Member type="bits3_5" sizeOf="1" name="tpc"/>
+	</DataType>
+	<DataType name="RATE_TPC_PA_BW">
+		<Member type="RATE_TPC_PA" sizeOf="20" name="rate_tpc_pa"/>
+	</DataType>
+	<DataType name="PEF_SETTING">
+		<Member type="uint32" sizeOf="1" name="PREEMP_CNTL"/>
+		<Member type="uint32" sizeOf="2" name="PEFTBL_SEL"/>
+	</DataType>
+	<DataType name="RXGAIN_CAL_CFG">
+		<Member type="uint8" sizeOf="1" name="bandMask"/>
+		<Member type="int8" sizeOf="1" name="refISS"/>
+		<Member type="uint8" sizeOf="1" name="rate"/>
+		<Member type="uint8" sizeOf="1" name="bandWidth"/>
+		<Member type="uint8" sizeOf="1" name="numChan"/>
+		<Member type="uint8" sizeOf="1" name="numChain"/>
+		<Member type="uint16" sizeOf="1" name="numPkts"/>
+		<Member type="uint16" sizeOf="16" name="chans"/>
+		<Member type="uint16" sizeOf="2" name="chainMasks"/>
+	</DataType>
+	<DataType name="RXGAIN_CAL_DATA">
+		<Member type="int8" sizeOf="2" name="rxNFCalPowerDBr"/>
+		<Member type="int8" sizeOf="2" name="rxNFCalPowerDBm"/>
+		<Member type="uint8" sizeOf="2" name="rxTempMeas"/>
+		<Member type="int8" sizeOf="2" name="rxNFThermCalSlope"/>
+		<Member type="int8" sizeOf="2" name="minCcaThreshold"/>
+		<Member type="uint8" sizeOf="2" name="reserved"/>
+	</DataType>
+	<DataType name="RXGAIN_CAL_TABLE">
+		<Member type="RXGAIN_CAL_CFG" sizeOf="1" name="rxGainCalCfg"/>
+		<Member type="RXGAIN_CAL_DATA" sizeOf="16" name="rxGainCalResult"/>
+	</DataType>
+	<DataType name="NF_CAL_2G">
+		<Member type="int16" sizeOf="3" name="primary"/>
+		<Member type="int16" sizeOf="3" name="secondary"/>
+		<Member type="uint16" sizeOf="3" name="chan2g"/>
+	</DataType>
+	<DataType name="NF_CAL_5G">
+		<Member type="int16" sizeOf="16" name="primary"/>
+		<Member type="int16" sizeOf="16" name="secondary"/>
+		<Member type="uint16" sizeOf="16" name="chan5g"/>
+	</DataType>
+	<DataType name="ANTENNA_GAIN_2G">
+		<Member type="uint16" sizeOf="3" name="antennaGainFreq2G"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+		<Member type="uint8" sizeOf="12" name="antennaGainPerChanPerChain2G"/>
+	</DataType>
+	<DataType name="ANTENNA_GAIN_5G">
+		<Member type="uint16" sizeOf="16" name="antennaGainFreq5G"/>
+		<Member type="uint8" sizeOf="64" name="antennaGainPerChanPerChain5G"/>
+	</DataType>
+	<DataType name="REGULATORY_RULE">
+		<Member type="uint16" sizeOf="1" name="start_freq"/>
+		<Member type="uint16" sizeOf="1" name="end_freq"/>
+		<Member type="uint16" sizeOf="1" name="max_bw"/>
+		<Member type="uint16" sizeOf="1" name="flags"/>
+		<Member type="uint8" sizeOf="1" name="reg_power"/>
+		<Member type="uint8" sizeOf="3" name="pad"/>
+	</DataType>
+	<DataType name="REG_DOMAIN">
+		<Member type="uint8" sizeOf="1" name="ctl_val"/>
+		<Member type="uint8" sizeOf="1" name="dfs_region"/>
+		<Member type="uint8" sizeOf="1" name="min_bw"/>
+		<Member type="uint8" sizeOf="1" name="ant_gain"/>
+		<Member type="uint8" sizeOf="1" name="num_reg_rules"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+		<Member type="uint8" sizeOf="10" name="reg_rule_id"/>
+	</DataType>
+	<DataType name="COUNTRY_CODE_TO_REG_DOMAIN">
+		<Member type="uint16" sizeOf="1" name="country_code"/>
+		<Member type="uint16" sizeOf="1" name="reg_dmn_pair_id"/>
+		<Member type="uint8" sizeOf="1" name="super_dmn_6g_id"/>
+		<Member type="uint8" sizeOf="3" name="alpha2"/>
+		<Member type="uint8" sizeOf="3" name="alpha2_11d"/>
+		<Member type="uint8" sizeOf="1" name="max_bw_2g"/>
+		<Member type="uint8" sizeOf="1" name="max_bw_5g"/>
+		<Member type="uint8" sizeOf="1" name="max_bw_6g"/>
+		<Member type="uint8" sizeOf="1" name="phymode_bitmap"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="REG_DOMAIN_PAIR">
+		<Member type="uint16" sizeOf="1" name="reg_dmn_pair_id"/>
+		<Member type="uint8" sizeOf="1" name="dmn_id_5g"/>
+		<Member type="uint8" sizeOf="1" name="dmn_id_2g"/>
+	</DataType>
+	<DataType name="NF_CAL_PER_CHAIN_5G">
+		<Member type="int16" sizeOf="32" name="primary"/>
+		<Member type="int16" sizeOf="32" name="secondary"/>
+		<Member type="uint16" sizeOf="16" name="chan"/>
+	</DataType>
+	<DataType name="NF_CAL_PER_CHAIN_2G">
+		<Member type="int16" sizeOf="6" name="primary"/>
+		<Member type="int16" sizeOf="6" name="secondary"/>
+		<Member type="uint16" sizeOf="3" name="chan"/>
+	</DataType>
+	<DataType name="RSSI_OFFSET_2G">
+		<Member type="int8" sizeOf="3" name="rssiOffset"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+		<Member type="uint16" sizeOf="3" name="chan"/>
+	</DataType>
+	<DataType name="RSSI_OFFSET_5G">
+		<Member type="int8" sizeOf="16" name="rssiOffset"/>
+		<Member type="uint16" sizeOf="16" name="chan"/>
+	</DataType>
+	<DataType name="PER_RATE_POWER_HE_OFFSET_DELTA">
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe20_2g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe40_2g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe20_5g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe40_5g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe80_5g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe160_5g"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe20_5g2"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe40_5g2"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe80_5g2"/>
+		<Member type="int8" sizeOf="1" name="powerOffsetDeltaHe160_5g2"/>
+		<Member type="int8" sizeOf="2" name="reserved"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_20_40">
+		<Member type="int16" sizeOf="12" name="rttDelay20"/>
+		<Member type="int16" sizeOf="6" name="rttDelay40"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_20_160">
+		<Member type="int16" sizeOf="24" name="rttDelay20"/>
+		<Member type="int16" sizeOf="18" name="rttDelay40"/>
+		<Member type="int16" sizeOf="10" name="rttDelay80"/>
+		<Member type="int16" sizeOf="5" name="rttDelay160"/>
+		<Member type="uint8" sizeOf="2" name="reserved"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_40">
+		<Member type="int16" sizeOf="2" name="rttDelayDynamicBw20_40"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_160">
+		<Member type="int16" sizeOf="4" name="rttDelayDynamicBw20_160"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40">
+		<Member type="int16" sizeOf="1" name="rttDelayDynamicBw20_20"/>
+		<Member type="int16" sizeOf="2" name="rttDelayDynamicBw20_40"/>
+		<Member type="uint8" sizeOf="2" name="reserved"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160">
+		<Member type="int16" sizeOf="1" name="rttDelayDynamicBw20_20"/>
+		<Member type="int16" sizeOf="2" name="rttDelayDynamicBw20_40"/>
+		<Member type="int16" sizeOf="3" name="rttDelayDynamicBw20_80"/>
+		<Member type="int16" sizeOf="4" name="rttDelayDynamicBw20_160"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_40_40">
+		<Member type="int16" sizeOf="2" name="rttDelayDynamicBw20_40"/>
+	</DataType>
+	<DataType name="RTT_DELAY_TBL_DYNAMIC_BW_20_40_160">
+		<Member type="int16" sizeOf="2" name="rttDelayDynamicBw20_40"/>
+		<Member type="int16" sizeOf="3" name="rttDelayDynamicBw20_80"/>
+		<Member type="int16" sizeOf="4" name="rttDelayDynamicBw20_160"/>
+		<Member type="uint8" sizeOf="2" name="rttPad"/>
+	</DataType>
+	<DataType name="RTT_DELAYS_20_160">
+		<Member type="RTT_DELAY_TBL_20_160" sizeOf="2" name="rttBaseDelay5GLow"/>
+		<Member type="RTT_DELAY_TBL_20_160" sizeOf="2" name="rttBaseDelay5GHigh"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDelta6GBand1"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDelta6GBand2"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDelta6GBand3"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDelta6GBand4"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_40_160" sizeOf="14" name="rttDeltaPrimary20Location"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains5GLow"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains5GHigh"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains6GBand1"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains6GBand2"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains6GBand3"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_160" sizeOf="2" name="rttDeltaOtherChains6GBand4"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="2" name="rttDeltaIqCorrectionOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="2" name="rttDeltaLpcOff"/>
+		<Member type="RTT_DELAY_TBL_20_160" sizeOf="1" name="rttDeltaTxHeavyClipOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="1" name="rttDeltaTxTdPostDpdPefOn"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="1" name="rttDeltaTxDacUpsamplingFilterOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="1" name="rttDeltaRxTiadcDcCompOn"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="1" name="rttDeltaRxVsrcFilterOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="2" name="rttDeltaRxPri80SpurMitOn"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_160" sizeOf="2" name="rttDeltaRxSec80SpurMitOn"/>
+	</DataType>
+	<DataType name="RTT_DELAYS_20_40">
+		<Member type="RTT_DELAY_TBL_20_40" sizeOf="2" name="rttBaseDelay"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_40_40" sizeOf="2" name="rttDeltaPrimary20Location"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_40" sizeOf="2" name="rttDeltaOtherChains"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="2" name="rttDeltaIqCorrectionOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="2" name="rttDeltaLpcOff"/>
+		<Member type="RTT_DELAY_TBL_20_40" sizeOf="1" name="rttDeltaTxHeavyClipOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="1" name="rttDeltaTxTdPostDpdPefOn"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="1" name="rttDeltaTxDacUpsamplingFilterOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="1" name="rttDeltaRxTiadcDcCompOn"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="1" name="rttDeltaRxVsrcFilterOff"/>
+		<Member type="RTT_DELAY_TBL_DYNAMIC_BW_20_20_40" sizeOf="2" name="rttDeltaRxSpurMitOn"/>
+	</DataType>
+	<DataType name="TARGET_POWERS_2G">
+		<Member type="CCK_RATES" sizeOf="1" name="cckRates"/>
+		<Member type="LEGACY_RATES" sizeOf="1" name="legacyRates"/>
+		<Member type="HT_RATES" sizeOf="1" name="ht20Rates"/>
+		<Member type="HT_RATES" sizeOf="1" name="ht40Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht20RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht20RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht40RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht40RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he20RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he20RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he40RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he40RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru26Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru52Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru106Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ruOtherRates"/>
+		<Member type="EXTRA_RATES" sizeOf="1" name="extra2gRates"/>
+	</DataType>
+	<DataType name="TARGET_POWERS_5G">
+		<Member type="LEGACY_RATES" sizeOf="1" name="legacyRates"/>
+		<Member type="HT_RATES" sizeOf="1" name="ht20Rates"/>
+		<Member type="HT_RATES" sizeOf="1" name="ht40Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht20RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht20RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht40RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht40RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht80RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht80RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht160RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="vht160RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he20RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he20RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he40RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he40RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he80RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he80RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he160RatesSu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="he160RatesMu"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru26Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru52Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ru106Rates"/>
+		<Member type="VHT_HE_RATES" sizeOf="1" name="ruOtherRates"/>
+		<Member type="EXTRA_RATES" sizeOf="1" name="extra5gRates"/>
+	</DataType>
+	<DataType name="CHAIN_SAR_LIMITS_NEW">
+		<Member type="int8" sizeOf="1" name="chain0Pwr"/>
+		<Member type="int8" sizeOf="1" name="chain1Pwr"/>
+		<Member type="int8" sizeOf="1" name="chain0LimitChain0PlusChain1"/>
+		<Member type="int8" sizeOf="1" name="chain1LimitChain0PlusChain1"/>
+	</DataType>
+	<DataType name="SAR_LIMIT_MODES_2G">
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="4" name="SARLimitsCck"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="4" name="SARLimitsHT20"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="4" name="SARLimitsHT40"/>
+	</DataType>
+	<DataType name="SAR_LIMIT_MODES_5G">
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="10" name="SARLimitsHT20"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="10" name="SARLimitsHT40"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="10" name="SARLimitsHT80"/>
+	</DataType>
+	<DataType name="SAR_LIMIT_MODES_5G_160">
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="2" name="SARLimitsVHT160"/>
+	</DataType>
+	<DataType name="SAR_LIMIT_MODES_6G">
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="5" name="SARLimitsHT20"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="5" name="SARLimitsHT40"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="5" name="SARLimitsHT80"/>
+		<Member type="CHAIN_SAR_LIMITS_NEW" sizeOf="5" name="SARLimitsVHT160"/>
+	</DataType>
+	<DataType name="THERM_THROTTLE_CONFIG">
+		<Member type="uint32" sizeOf="1" name="thermThrotKp"/>
+		<Member type="uint32" sizeOf="1" name="thermThrotKi"/>
+		<Member type="uint32" sizeOf="1" name="thermThrotKd"/>
+		<Member type="uint32" sizeOf="1" name="thermThrotTsp1"/>
+		<Member type="uint32" sizeOf="1" name="thermThrotTsp2"/>
+		<Member type="uint32" sizeOf="1" name="thermThrotTsp3"/>
+	</DataType>
+	<DataType name="CALDB_CFG">
+		<Member type="uint32" sizeOf="1" name="calDbTimeoutMs"/>
+		<Member type="uint8" sizeOf="1" name="calDbPersistentEnable"/>
+		<Member type="uint8" sizeOf="3" name="reserved"/>
+	</DataType>
+	<DataType name="COMB_CAL_SRCH">
+		<Member type="uint16" sizeOf="10" name="srchBase"/>
+		<Member type="uint16" sizeOf="2" name="srchWin"/>
+	</DataType>
+	<DataType name="PRE_TXCAL_GLUT_GP_PER_BAND">
+		<Member type="uint32" sizeOf="1" name="gainIdxForCalBitmap"/>
+		<Member type="uint16" sizeOf="1" name="glutPwrsMapBitMap"/>
+		<Member type="uint16" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="GTX_GLUT_TARGET_PWR_LEVELS">
+		<Member type="int16" sizeOf="3" name="GLUTTargetPwrLevel2G"/>
+		<Member type="int16" sizeOf="3" name="GLUTTargetPwrLevel5G"/>
+	</DataType>
+	<DataType name="GTX_GLUT_IDX_RANGE2G">
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxOfdmHighMCSRange2G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxOfdmLowMCSRange2G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxCCKRange2G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxSingleRURange2G"/>
+	</DataType>
+	<DataType name="GTX_GLUT_IDX_RANGE5G">
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxOfdmHighMCSRange5G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxOfdmLowMCSRange5G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxCCKRange5G"/>
+		<Member type="uint8" sizeOf="4" name="tpcGLUTIdxSingleRURange5G"/>
+	</DataType>
+	<DataType name="GTX_CAL_PWR_TGT_ENTRIES">
+		<Member type="int16" sizeOf="8" name="calPwrTargetsExt2G"/>
+		<Member type="int16" sizeOf="8" name="calPwrTargetsExt5G"/>
+		<Member type="uint8" sizeOf="1" name="numGlutEntries2G"/>
+		<Member type="uint8" sizeOf="1" name="numGlutEntries5G"/>
+		<Member type="int8" sizeOf="1" name="gtxGlutProg"/>
+		<Member type="uint8" sizeOf="1" name="glutInitMcsthr"/>
+	</DataType>
+	<DataType name="CAL_DATA_PER_FREQ_GTX_EXT">
+		<Member type="CAL_DATA_PER_POINT_OLPC_NEW" sizeOf="16" name="calPerPoint_gtxExt"/>
+	</DataType>
+	<DataType name="TWO_PT_CAL_CONFIG">
+		<Member type="uint8" sizeOf="1" name="overrideAvgPwrAtPdadc"/>
+		<Member type="int8" sizeOf="2" name="twoPointCalPout702G"/>
+		<Member type="int8" sizeOf="2" name="twoPointCalPout705G"/>
+		<Member type="int8" sizeOf="2" name="twoPointCalPout706G"/>
+		<Member type="uint8" sizeOf="1" name="reserved"/>
+	</DataType>
+	<DataType name="PRE_TXCAL_GLUT_GP_PER_BAND_EXT">
+		<Member type="uint32" sizeOf="1" name="gainIdxForCalBitmapGrp1"/>
+		<Member type="uint32" sizeOf="1" name="gainIdxForCalBitmapGrp2"/>
+		<Member type="uint32" sizeOf="1" name="gainIdxForCalBitmapGrp3"/>
+		<Member type="uint32" sizeOf="1" name="gainIdxForCalBitmapGrp4"/>
+	</DataType>
+	<DataType name="AGC_ENERGY_DET_THR">
+		<Member type="uint8" sizeOf="1" name="thrCcaPri20dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt20dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt40dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt80dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaPri20dB_FCC"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt20dB_FCC"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt40dB_FCC"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt80dB_FCC"/>
+	</DataType>
+	<DataType name="AGC_ENERGY_DET_THR_EXT">
+		<Member type="uint8" sizeOf="1" name="thrCcaPri20dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt20dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt40dB"/>
+		<Member type="uint8" sizeOf="1" name="thrCcaExt80dB"/>
+	</DataType>
+	<DataType name="SPUR_DATA">
+		<Member type="uint32" sizeOf="8" name="spurCoeff"/>
+		<Member type="uint8" sizeOf="1" name="chainmask"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="SPUR_FREQ_BW">
+		<Member type="uint16" sizeOf="1" name="spurFreq"/>
+		<Member type="uint8" sizeOf="1" name="bandwidth"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="SCAN_CAL_PIER_DATA">
+		<Member type="uint8" sizeOf="2" name="meas_pwr"/>
+	</DataType>
+	<DataType name="SCAN_CAL_DATA_2G">
+		<Member type="uint8" sizeOf="1" name="calTxGainIdx"/>
+		<Member type="SCAN_CAL_PIER_DATA" sizeOf="14" name="calPierData"/>
+	</DataType>
+	<DataType name="SCAN_CAL_DATA_5G">
+		<Member type="uint8" sizeOf="1" name="calTxGainIdx"/>
+		<Member type="SCAN_CAL_PIER_DATA" sizeOf="48" name="calPierData"/>
+	</DataType>
+	<DataType name="THERM_SENSOR_OFFSET_DATA">
+		<Member type="int16" sizeOf="8" name="thermal_Offset"/>
+	</DataType>
+	<DataType name="IPA_PLUT_OFFSET">
+		<Member type="uint8" sizeOf="1" name="calEnable"/>
+		<Member type="uint8" sizeOf="2" name="gainIdxForCal"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="REGULATORY_RULE_6G">
+		<Member type="uint16" sizeOf="1" name="start_freq"/>
+		<Member type="uint16" sizeOf="1" name="end_freq"/>
+		<Member type="uint16" sizeOf="1" name="max_bw"/>
+		<Member type="uint16" sizeOf="1" name="flags"/>
+		<Member type="uint8" sizeOf="1" name="psd_power"/>
+		<Member type="uint8" sizeOf="1" name="tx_power_eirp"/>
+		<Member type="int8" sizeOf="1" name="max_psd_eirp"/>
+		<Member type="uint8" sizeOf="1" name="pad"/>
+	</DataType>
+	<DataType name="REG_DOMAIN_6G">
+		<Member type="uint8" sizeOf="1" name="ctl_val"/>
+		<Member type="uint8" sizeOf="1" name="min_bw"/>
+		<Member type="uint8" sizeOf="1" name="ant_gain"/>
+		<Member type="uint8" sizeOf="1" name="num_reg_rules"/>
+		<Member type="uint16" sizeOf="1" name="max_bw"/>
+		<Member type="uint8" sizeOf="10" name="reg_rule_id"/>
+	</DataType>
+	<DataType name="SUPER_DOMAIN_SUBSET">
+		<Member type="uint8" sizeOf="1" name="super_dmn_id"/>
+		<Member type="uint8" sizeOf="1" name="dmn_id_6g_ap_sp"/>
+		<Member type="uint8" sizeOf="1" name="dmn_id_6g_ap_lpi"/>
+		<Member type="uint8" sizeOf="1" name="dmn_id_6g_ap_vlp"/>
+		<Member type="uint8" sizeOf="2" name="dmn_id_6g_client_sp"/>
+		<Member type="uint8" sizeOf="2" name="dmn_id_6g_client_lpi"/>
+		<Member type="uint8" sizeOf="2" name="dmn_id_6g_client_vlp"/>
+		<Member type="uint8" sizeOf="2" name="pad"/>
+	</DataType>
+	<DataType name="SUBDOMAIN_6G_MAP">
+		<Member type="uint16" sizeOf="1" name="dmn_6g_id_internal"/>
+		<Member type="uint16" sizeOf="1" name="dmn_6g_id_code"/>
+	</DataType>
+	<DataType name="GTX_PLUTOFFSET_CONFIG">
+		<Member type="uint8" sizeOf="1" name="GtxInitGainIdx"/>
+		<Member type="int8" sizeOf="2" name="plutOffsetGtx"/>
+		<Member type="uint8" sizeOf="5" name="future"/>
+	</DataType>
+	<DataType name="GTX_GLUT_TARGET_PWR_LEVELS_160M">
+		<Member type="int16" sizeOf="3" name="GLUTTargetPwrLevel5G"/>
+	</DataType>
+	<DataType name="PDC_BAND_CONFIG">
+		<Member type="uint8" sizeOf="1" name="skip1stGap"/>
+		<Member type="uint32" sizeOf="3" name="delay"/>
+		<Member type="uint8" sizeOf="1" name="stepSize1"/>
+		<Member type="uint8" sizeOf="1" name="stepSize2"/>
+		<Member type="uint8" sizeOf="1" name="numBlock1"/>
+		<Member type="uint8" sizeOf="1" name="numBlock2"/>
+		<Member type="uint8" sizeOf="1" name="p1NStep"/>
+		<Member type="uint8" sizeOf="1" name="p1NMax"/>
+		<Member type="uint8" sizeOf="1" name="p2NMax"/>
+		<Member type="uint8" sizeOf="1" name="glut"/>
+		<Member type="uint8" sizeOf="1" name="lbAttn"/>
+		<Member type="uint16" sizeOf="1" name="gapTh1"/>
+		<Member type="uint16" sizeOf="1" name="gapTh2"/>
+		<Member type="uint16" sizeOf="1" name="droopCompStart"/>
+		<Member type="uint16" sizeOf="1" name="thermalGap"/>
+		<Member type="uint8" sizeOf="1" name="numDumRun"/>
+		<Member type="uint8" sizeOf="3" name="reserved"/>
+	</DataType>
+	<NvItem id="1" name="COMMON_BDF_HEADER">
+		<Member type="NV_HEADER" sizeOf="1" name="nvBase"/>
+		<Member type="BASE_BDF_HEADER" sizeOf="1" name="baseBdfHeader"/>
+	</NvItem>
+	<NvItem id="2" name="PER_PHY_SETTING">
+		<Member type="NV_HEADER" sizeOf="1" name="nvPerPhy"/>
+		<Member type="PER_PHY_SECTION" sizeOf="2" name="perPhySection"/>
+	</NvItem>
+	<NvItem id="3" name="FREQMODAL">
+		<Member type="NV_HEADER" sizeOf="1" name="nvFreqModal"/>
+		<Member type="SPUR_MIT" sizeOf="1" name="spurMitConfig"/>
+		<Member type="COMB_CAL_SRCH" sizeOf="1" name="combCalSrch"/>
+		<Member type="uint8" sizeOf="140" name="freqModalFuture"/>
+	</NvItem>
+	<NvItem id="4" name="TWO_G_FIVE_G_BAND_SPECIFIC">
+		<Member type="NV_HEADER" sizeOf="1" name="nvBand"/>
+		<Member type="BAND_MODAL_SECTION" sizeOf="1" name="bandModal2G"/>
+		<Member type="BAND_MODAL_SECTION" sizeOf="1" name="bandModal5G"/>
+		<Member type="BAND_MODAL_SECTION" sizeOf="1" name="bandModal6G"/>
+		<Member type="uint8" sizeOf="206" name="bandModalFuture"/>
+	</NvItem>
+	<NvItem id="5" name="STAND_ALONE_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvStandAlone"/>
+		<Member type="HEAVY_CLIP_TABLE" sizeOf="1" name="heavyClipTbl"/>
+		<Member type="uint8" sizeOf="512" name="standAloneReserve"/>
+	</NvItem>
+	<NvItem id="6" name="DPD_PRE_EMPHASIS_FILTER_CONFIGURATION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvDpdPefConfig"/>
+		<Member type="DPD_PEF_CONFIG" sizeOf="1" name="dpdPefConfig"/>
+		<Member type="PEF_COEFF_TABLE_2G" sizeOf="1" name="pefCoeffTbl2G"/>
+		<Member type="PEF_COEFF_TABLE_5G" sizeOf="1" name="pefCoeffTbl5G"/>
+		<Member type="PEF_SETTING" sizeOf="1" name="pefsetting"/>
+		<Member type="uint8" sizeOf="316" name="dpdPefConfigFuture"/>
+	</NvItem>
+	<NvItem id="7" name="DPD_CONFIG">
+		<Member type="NV_HEADER" sizeOf="1" name="nvDpdConfig"/>
+		<Member type="DPD_CONFIG" sizeOf="1" name="dpdConfig"/>
+		<Member type="DPD_CONFIG_BAND" sizeOf="2" name="dpdConfigBand"/>
+		<Member type="uint8" sizeOf="147" name="dpdConfigFuture"/>
+	</NvItem>
+	<NvItem id="8" name="TPC_DATA">
+		<Member type="NV_HEADER" sizeOf="1" name="nvTpcData"/>
+		<Member type="uint16" sizeOf="14" name="calFreqPier2G"/>
+		<Member type="CAL_DATA_PER_FREQ_OLPC" sizeOf="14" name="calPierData2G"/>
+		<Member type="CAL_DATA_PER_FREQ_CLPCF" sizeOf="14" name="calPierData2G_CLPC"/>
+		<Member type="uint16" sizeOf="4" name="calOffsetFreqPier2G"/>
+		<Member type="int8" sizeOf="8" name="calOffsetPierData2G"/>
+		<Member type="uint8" sizeOf="1" name="offsetThreshold2G"/>
+		<Member type="int8" sizeOf="1" name="dacGainForCalSaved2G"/>
+		<Member type="uint8" sizeOf="1" name="alignPad2G"/>
+		<Member type="uint8" sizeOf="1" name="opcCalOffsetApply2G"/>
+		<Member type="int8" sizeOf="8" name="calGlutOffsetPierData2G"/>
+		<Member type="uint8" sizeOf="8" name="calThermOffsetPierData2G"/>
+		<Member type="CAL_DATA_PER_FREQ_GTX_EXT" sizeOf="14" name="calPierData_GtxExt2G"/>
+		<Member type="SCAN_CAL_DATA_2G" sizeOf="1" name="scanCalData2G"/>
+		<Member type="SCAN_CAL_DATA_5G" sizeOf="1" name="scanCalData5G"/>
+		<Member type="uint8" sizeOf="178" name="calData2GFuture"/>
+		<Member type="uint16" sizeOf="48" name="calFreqPier5G"/>
+		<Member type="CAL_DATA_PER_FREQ_OLPC" sizeOf="48" name="calPierData5G"/>
+		<Member type="CAL_DATA_PER_FREQ_CLPCF" sizeOf="48" name="calPierData5G_CLPC"/>
+		<Member type="uint16" sizeOf="16" name="calOffsetFreqPier5G"/>
+		<Member type="int8" sizeOf="32" name="calOffsetPierData5G"/>
+		<Member type="uint8" sizeOf="1" name="offsetThreshold5G"/>
+		<Member type="int8" sizeOf="1" name="dacGainForCalSaved5G"/>
+		<Member type="uint8" sizeOf="1" name="alignPad5G"/>
+		<Member type="uint8" sizeOf="1" name="opcCalOffsetApply5G"/>
+		<Member type="int8" sizeOf="32" name="calGlutOffsetPierData5G"/>
+		<Member type="uint8" sizeOf="32" name="calThermOffsetPierData5G"/>
+		<Member type="CAL_DATA_PER_FREQ_GTX_EXT" sizeOf="48" name="calPierData_GtxExt5G"/>
+		<Member type="int8" sizeOf="2" name="plutOffsetData2G"/>
+		<Member type="int8" sizeOf="2" name="plutOffsetData5G"/>
+		<Member type="int8" sizeOf="2" name="plutOffsetData6G"/>
+		<Member type="uint8" sizeOf="62" name="calData5GFuture"/>
+	</NvItem>
+	<NvItem id="9" name="TPC_CONFIG">
+		<Member type="NV_HEADER" sizeOf="1" name="nvTpcConfig"/>
+		<Member type="PRE_TXCAL_GUIDE_PER_BAND" sizeOf="1" name="preCalData2G"/>
+		<Member type="PRE_TXCAL_GUIDE_PER_BAND" sizeOf="1" name="preCalData5G"/>
+		<Member type="PER_RATE_POWER_OFFSET" sizeOf="1" name="powerOffset2G"/>
+		<Member type="PER_RATE_POWER_OFFSET" sizeOf="1" name="powerOffset5G"/>
+		<Member type="RATE_TPC_PA_BW" sizeOf="2" name="rateTpcPaGTX2GTable"/>
+		<Member type="RATE_TPC_PA_BW" sizeOf="4" name="rateTpcPaGTX5GTable"/>
+		<Member type="ATTEN_TABLE" sizeOf="2" name="attenTable2G"/>
+		<Member type="ATTEN_TABLE" sizeOf="2" name="attenTable5G"/>
+		<Member type="CLPC_POWER_OFFSET" sizeOf="1" name="clpcPowerOffset2G"/>
+		<Member type="CLPC_POWER_OFFSET" sizeOf="1" name="clpcPowerOffset5G"/>
+		<Member type="CLPC_POWER_OFFSET_LTE_COEX" sizeOf="1" name="clpcPowerOffsetLteCoex"/>
+		<Member type="PER_CHAIN_POWER_OFFSET" sizeOf="2" name="perChainPowerOffset2G"/>
+		<Member type="PER_CHAIN_POWER_OFFSET" sizeOf="2" name="perChainPowerOffset5G"/>
+		<Member type="uint16" sizeOf="1" name="TPCPowerMeasurementDelay"/>
+		<Member type="PER_RATE_POWER_HE_OFFSET_DELTA" sizeOf="1" name="perRatePowerHeOffsetDelta"/>
+		<Member type="uint8" sizeOf="1" name="calOffsetPower"/>
+		<Member type="uint8" sizeOf="1" name="opcCalOffsetConfig2G"/>
+		<Member type="uint8" sizeOf="1" name="opcCalOffsetConfig5G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp1_2G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp1_5G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp2_2G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp2_5G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp3_2G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp3_5G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp4_2G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND" sizeOf="1" name="preCalDataGlutGrp4_5G"/>
+		<Member type="GTX_GLUT_TARGET_PWR_LEVELS" sizeOf="1" name="gtxGlutTargetPwrLevels"/>
+		<Member type="GTX_GLUT_IDX_RANGE2G" sizeOf="1" name="gtxGlutIdxRange2G"/>
+		<Member type="GTX_GLUT_IDX_RANGE5G" sizeOf="1" name="gtxGlutIdxRange5G"/>
+		<Member type="GTX_CAL_PWR_TGT_ENTRIES" sizeOf="1" name="gtxCalPwrTgtEntries"/>
+		<Member type="TWO_PT_CAL_CONFIG" sizeOf="1" name="twoPtCalConfig"/>
+		<Member type="uint8" sizeOf="1" name="thermGainErrMax2G"/>
+		<Member type="uint8" sizeOf="1" name="thermGainErrMax5G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND_EXT" sizeOf="1" name="preCalDataGlutGrpExt_2G"/>
+		<Member type="PRE_TXCAL_GLUT_GP_PER_BAND_EXT" sizeOf="1" name="preCalDataGlutGrpExt_5G"/>
+		<Member type="int8" sizeOf="2" name="targetPowerTempThresh_phyA"/>
+		<Member type="int8" sizeOf="2" name="targetPowerTempOffset_phyA"/>
+		<Member type="int8" sizeOf="2" name="targetPowerTempThresh_phyB"/>
+		<Member type="int8" sizeOf="2" name="targetPowerTempOffset_phyB"/>
+		<Member type="uint8" sizeOf="1" name="alutOffset6g"/>
+		<Member type="uint8" sizeOf="1" name="pdetTiaGainProfile_8thdb6g"/>
+		<Member type="IPA_PLUT_OFFSET" sizeOf="1" name="plutOffsetCal2G"/>
+		<Member type="IPA_PLUT_OFFSET" sizeOf="1" name="plutOffsetCal5G"/>
+		<Member type="IPA_PLUT_OFFSET" sizeOf="1" name="plutOffsetCal6G"/>
+		<Member type="int8" sizeOf="1" name="pdadcTargetHiBackOff2G"/>
+		<Member type="int8" sizeOf="1" name="pdadcTargetHiBackOff5G"/>
+		<Member type="int8" sizeOf="1" name="pdadcTargetHiBackOff6G"/>
+		<Member type="GTX_PLUTOFFSET_CONFIG" sizeOf="1" name="plutOffsetForGTX2G"/>
+		<Member type="GTX_PLUTOFFSET_CONFIG" sizeOf="1" name="plutOffsetForGTX5G"/>
+		<Member type="GTX_PLUTOFFSET_CONFIG" sizeOf="1" name="plutOffsetForGTX6G"/>
+		<Member type="GTX_GLUT_TARGET_PWR_LEVELS_160M" sizeOf="1" name="gtxGlutTargetPwrLevels160M"/>
+		<Member type="uint8" sizeOf="90" name="alutFuture"/>
+	</NvItem>
+	<NvItem id="10" name="TPC_COMPENSATION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvTpcComp"/>
+		<Member type="uint16" sizeOf="8" name="tempCompChans2G"/>
+		<Member type="uint8" sizeOf="32" name="alphaThermTbl2G"/>
+		<Member type="uint8" sizeOf="256" name="pdetTempComp2G"/>
+		<Member type="uint16" sizeOf="16" name="tempCompChans5G"/>
+		<Member type="uint8" sizeOf="64" name="alphaThermTbl5G"/>
+		<Member type="uint8" sizeOf="512" name="pdetTempComp5G"/>
+		<Member type="int8" sizeOf="36" name="secondChannelGLUTOffset"/>
+	</NvItem>
+	<NvItem id="11" name="TARGET_POWER_TABLES">
+		<Member type="NV_HEADER" sizeOf="1" name="nvTargetPwr"/>
+		<Member type="uint8" sizeOf="1" name="enable2ChainR2P"/>
+		<Member type="uint16" sizeOf="3" name="targetPowerR2PFreqRange5G"/>
+		<Member type="TARGET_POWERS_2G" sizeOf="1" name="targetPowerR2PTable2GChain0"/>
+		<Member type="TARGET_POWERS_2G" sizeOf="1" name="targetPowerR2PTable2GChain1"/>
+		<Member type="uint8" sizeOf="483" name="targetPower2GFuture"/>
+		<Member type="TARGET_POWERS_5G" sizeOf="3" name="targetPowerR2PTable5GChain0"/>
+		<Member type="TARGET_POWERS_5G" sizeOf="3" name="targetPowerR2PTable5GChain1"/>
+		<Member type="uint8" sizeOf="822" name="targetPower5GFuture"/>
+	</NvItem>
+	<NvItem id="12" name="CTL_TABLES">
+		<Member type="NV_HEADER" sizeOf="1" name="nvCtl"/>
+		<Member type="CTL_CONFIG" sizeOf="1" name="ctlConfiguration"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex2G_11b"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_11b"/>
+		<Member type="int8" sizeOf="108" name="ctlData2G_11b"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex2G_11g"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_11g"/>
+		<Member type="int8" sizeOf="108" name="ctlData2G_11g"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_HT20"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_HT20"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_HT20"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_HT40"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin2G_HT40"/>
+		<Member type="int8" sizeOf="96" name="ctlData2G_HT40"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_RU26"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_RU26"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_RU26"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_RU52"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_RU52"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_RU52"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_RU106"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_RU106"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_RU106"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_RU242"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_RU242"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_RU242"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex2G_RU484"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin2G_RU484"/>
+		<Member type="int8" sizeOf="144" name="ctlData2G_RU484"/>
+		<Member type="uint8" sizeOf="436" name="ctlSpare2G"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex5G_11a"/>
+		<Member type="uint16" sizeOf="96" name="ctlFreqbin5G_11a"/>
+		<Member type="int8" sizeOf="288" name="ctlData5G_11a"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_HT20"/>
+		<Member type="uint16" sizeOf="96" name="ctlFreqbin5G_HT20"/>
+		<Member type="int8" sizeOf="384" name="ctlData5G_HT20"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_HT40"/>
+		<Member type="uint16" sizeOf="72" name="ctlFreqbin5G_HT40"/>
+		<Member type="int8" sizeOf="288" name="ctlData5G_HT40"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_VHT80"/>
+		<Member type="uint16" sizeOf="60" name="ctlFreqbin5G_VHT80"/>
+		<Member type="int8" sizeOf="240" name="ctlData5G_VHT80"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_VHT160"/>
+		<Member type="uint16" sizeOf="36" name="ctlFreqbin5G_VHT160"/>
+		<Member type="int8" sizeOf="144" name="ctlData5G_VHT160"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU26"/>
+		<Member type="uint16" sizeOf="96" name="ctlFreqbin5G_RU26"/>
+		<Member type="int8" sizeOf="384" name="ctlData5G_RU26"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU52"/>
+		<Member type="uint16" sizeOf="72" name="ctlFreqbin5G_RU52"/>
+		<Member type="int8" sizeOf="288" name="ctlData5G_RU52"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU106"/>
+		<Member type="uint16" sizeOf="48" name="ctlFreqbin5G_RU106"/>
+		<Member type="int8" sizeOf="192" name="ctlData5G_RU106"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU242"/>
+		<Member type="uint16" sizeOf="48" name="ctlFreqbin5G_RU242"/>
+		<Member type="int8" sizeOf="192" name="ctlData5G_RU242"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU484"/>
+		<Member type="uint16" sizeOf="48" name="ctlFreqbin5G_RU484"/>
+		<Member type="int8" sizeOf="192" name="ctlData5G_RU484"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex5G_RU996"/>
+		<Member type="uint16" sizeOf="48" name="ctlFreqbin5G_RU996"/>
+		<Member type="int8" sizeOf="192" name="ctlData5G_RU996"/>
+		<Member type="uint8" sizeOf="1296" name="ctlSpare5G"/>
+	</NvItem>
+	<NvItem id="13" name="SAR_TABLES">
+		<Member type="NV_HEADER" sizeOf="1" name="nvSAR"/>
+		<Member type="PER_CHAIN_SAR_LIMITS" sizeOf="10" name="SARLimits"/>
+		<Member type="uint8" sizeOf="1" name="SARVersion"/>
+		<Member type="uint8" sizeOf="1" name="SARFlags"/>
+		<Member type="uint32" sizeOf="1" name="SAR_BW_RU_Config_L"/>
+		<Member type="uint32" sizeOf="1" name="SAR_BW_RU_Config_U"/>
+		<Member type="uint8" sizeOf="36" name="SAR_BW_RU_Mapping"/>
+		<Member type="uint16" sizeOf="4" name="SAR2GChannels"/>
+		<Member type="uint16" sizeOf="10" name="SAR5GChannels"/>
+		<Member type="uint16" sizeOf="2" name="SAR5G160Channels"/>
+		<Member type="uint8" sizeOf="6" name="SARCtlList"/>
+		<Member type="SAR_LIMIT_MODES_2G" sizeOf="36" name="SARPwrLimits2G"/>
+		<Member type="SAR_LIMIT_MODES_5G" sizeOf="36" name="SARPwrLimits5G"/>
+		<Member type="SAR_LIMIT_MODES_5G_160" sizeOf="36" name="SARPwrLimits5G160"/>
+		<Member type="uint8" sizeOf="6" name="SARAntennaGroupingExt"/>
+		<Member type="uint32" sizeOf="8" name="TASPeakModeIndicator"/>
+		<Member type="uint32" sizeOf="8" name="TAS_FCC_ICNIRP_Indicator"/>
+		<Member type="uint8" sizeOf="1" name="TASIsPairWith3rdPartyWwan"/>
+		<Member type="int32" sizeOf="1" name="TASLogReducedLim"/>
+		<Member type="uint32" sizeOf="1" name="TASCapLimit"/>
+		<Member type="uint32" sizeOf="8" name="PowerLimitIndictor"/>
+		<Member type="uint8" sizeOf="1" name="TASReserveMarginDb"/>
+		<Member type="uint8" sizeOf="380" name="SARFuture"/>
+	</NvItem>
+	<NvItem id="14" name="RX_GAIN_TABLES">
+		<Member type="NV_HEADER" sizeOf="1" name="nvRxGain"/>
+		<Member type="RXGAIN_CAL_TABLE" sizeOf="2" name="rxGainCalTbl2G"/>
+		<Member type="RXGAIN_CAL_TABLE" sizeOf="2" name="rxGainCalTbl5G"/>
+		<Member type="uint8" sizeOf="72" name="rxGainFuture"/>
+	</NvItem>
+	<NvItem id="15" name="RTT_DELAY_TABLES">
+		<Member type="NV_HEADER" sizeOf="1" name="nvRttTable"/>
+		<Member type="RTT_DELAYS_20_160" sizeOf="1" name="rttDelays5G"/>
+		<Member type="uint8" sizeOf="460" name="rttDelaysPhyAFuture"/>
+		<Member type="RTT_DELAYS_20_40" sizeOf="1" name="rttDelays2G"/>
+		<Member type="uint8" sizeOf="368" name="rttDelaysFuture"/>
+	</NvItem>
+	<NvItem id="16" name="CUSTOMIZE_STICKY_WRITE_COMMAND_TABLE">
+		<Member type="NV_HEADER" sizeOf="1" name="nvConfigAddr"/>
+		<Member type="uint32" sizeOf="512" name="configAddr"/>
+	</NvItem>
+	<NvItem id="17" name="ATE_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvAte"/>
+		<Member type="CAL_DATA_PER_CHIP" sizeOf="1" name="chipCalData"/>
+		<Member type="uint8" sizeOf="24" name="ateFuture"/>
+	</NvItem>
+	<NvItem id="18" name="XTAL_CAL_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvXtalCal"/>
+		<Member type="XTAL_CAL_DATA" sizeOf="1" name="xtalCalData5G"/>
+		<Member type="XTAL_CAL_DATA" sizeOf="1" name="xtalCalData2G"/>
+	</NvItem>
+	<NvItem id="19" name="ANTENNA_GAIN_PER_CHAN_PER_CHAIN">
+		<Member type="NV_HEADER" sizeOf="1" name="nvAntennaGainPerChanPerChain"/>
+		<Member type="ANTENNA_GAIN_5G" sizeOf="1" name="antennaGainPerChanPerChain5G"/>
+		<Member type="ANTENNA_GAIN_2G" sizeOf="1" name="antennaGainPerChanPerChain2G"/>
+		<Member type="uint8" sizeOf="1" name="antennaGainFeatureEnabled"/>
+		<Member type="uint8" sizeOf="68" name="antGainFuture"/>
+	</NvItem>
+	<NvItem id="20" name="NF_CAL_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvForcedNfCal"/>
+		<Member type="NF_CAL_5G" sizeOf="1" name="forcedNfCal5G"/>
+		<Member type="NF_CAL_2G" sizeOf="1" name="forcedNfCal2G"/>
+		<Member type="uint8" sizeOf="70" name="nfCalFuture"/>
+	</NvItem>
+	<NvItem id="21" name="CTL_TABLES_6G">
+		<Member type="NV_HEADER" sizeOf="1" name="nvCtlTables6g"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex6G_SP_11a"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex6G_LPI_11a"/>
+		<Member type="CTL_INDEX" sizeOf="18" name="ctlIndex6G_VLP_11a"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_11a"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_11a"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_11a"/>
+		<Member type="int8" sizeOf="72" name="ctlData6G_SP_11a"/>
+		<Member type="int8" sizeOf="72" name="ctlData6G_LPI_11a"/>
+		<Member type="int8" sizeOf="72" name="ctlData6G_VLP_11a"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_HE20"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_HE20"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_HE20"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_HE20"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_HE20"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_HE20"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_HE20"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_HE20"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_HE20"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_HE40"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_HE40"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_HE40"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_HE40"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_HE40"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_HE40"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_HE40"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_HE40"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_HE40"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_HE80"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_HE80"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_HE80"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_HE80"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_HE80"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_HE80"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_HE80"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_HE80"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_HE80"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_HE160"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_HE160"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_HE160"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_SP_HE160"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_LPI_HE160"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_VLP_HE160"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_SP_HE160"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_LPI_HE160"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_VLP_HE160"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU26"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU26"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU26"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_RU26"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_RU26"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_RU26"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_RU26"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_RU26"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_RU26"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU52"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU52"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU52"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_RU52"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_RU52"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_RU52"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_RU52"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_RU52"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_RU52"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU106"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU106"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU106"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_RU106"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_RU106"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_RU106"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_RU106"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_RU106"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_RU106"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU242"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU242"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU242"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_SP_RU242"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_LPI_RU242"/>
+		<Member type="uint16" sizeOf="24" name="ctlFreqbin6G_VLP_RU242"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_SP_RU242"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_LPI_RU242"/>
+		<Member type="int8" sizeOf="96" name="ctlData6G_VLP_RU242"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU484"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU484"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU484"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_SP_RU484"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_LPI_RU484"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_VLP_RU484"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_SP_RU484"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_LPI_RU484"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_VLP_RU484"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_SP_RU996"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_LPI_RU996"/>
+		<Member type="CTL_INDEX" sizeOf="24" name="ctlIndex6G_VLP_RU996"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_SP_RU996"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_LPI_RU996"/>
+		<Member type="uint16" sizeOf="12" name="ctlFreqbin6G_VLP_RU996"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_SP_RU996"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_LPI_RU996"/>
+		<Member type="int8" sizeOf="48" name="ctlData6G_VLP_RU996"/>
+		<Member type="uint8" sizeOf="40" name="ctlTables6gFuture"/>
+	</NvItem>
+	<NvItem id="22" name="NF_CAL_PER_CHAIN">
+		<Member type="NV_HEADER" sizeOf="1" name="nvNfCalPerChain"/>
+		<Member type="NF_CAL_PER_CHAIN_5G" sizeOf="1" name="nfCalPerChain5G"/>
+		<Member type="NF_CAL_PER_CHAIN_2G" sizeOf="1" name="nfCalPerChain2G"/>
+		<Member type="uint8" sizeOf="58" name="nfCalPerChainFuture"/>
+	</NvItem>
+	<NvItem id="23" name="FEM_CONFIG">
+		<Member type="NV_HEADER" sizeOf="1" name="nvFemConfig"/>
+		<Member type="uint32" sizeOf="4" name="configureXfemControl"/>
+		<Member type="uint32" sizeOf="4" name="configureXfemControl1"/>
+		<Member type="uint8" sizeOf="1" name="enableFemControl"/>
+		<Member type="uint8" sizeOf="1" name="wlanBtRfSwitchCtrlEn"/>
+		<Member type="uint32" sizeOf="1" name="wlanBtRfSwitchCtrlVal"/>
+		<Member type="uint8" sizeOf="210" name="femConfigFuture"/>
+	</NvItem>
+	<NvItem id="24" name="BDF_ENABLE_DISABLE_FLAGS">
+		<Member type="NV_HEADER" sizeOf="1" name="nvBdfEnableDisableFlags"/>
+		<Member type="uint8" sizeOf="1" name="disableCalDb"/>
+		<Member type="uint8" sizeOf="1" name="enableNfCal"/>
+		<Member type="uint8" sizeOf="1" name="enableXPA"/>
+		<Member type="uint8" sizeOf="1" name="enableXLNA"/>
+		<Member type="uint16" sizeOf="1" name="lowerPowerSynthFlags"/>
+		<Member type="uint32" sizeOf="1" name="xfemPinCfg0"/>
+		<Member type="uint32" sizeOf="1" name="xfemGpoCfg"/>
+		<Member type="uint8" sizeOf="1" name="TimexEnable"/>
+		<Member type="uint8" sizeOf="1" name="rxDcoControlFlags"/>
+		<Member type="uint8" sizeOf="1" name="synthControlFlags"/>
+		<Member type="uint8" sizeOf="1" name="txBBF_RFALDO_glutSS"/>
+		<Member type="uint8" sizeOf="1" name="phydbgDisable"/>
+		<Member type="uint8" sizeOf="1" name="xLNAxPAControl2g5g"/>
+		<Member type="uint8" sizeOf="1" name="config3xADC6xADC"/>
+		<Member type="uint8" sizeOf="1" name="disableOTPOnePtCal"/>
+		<Member type="uint8" sizeOf="1" name="EnableDisableBits1"/>
+		<Member type="uint8" sizeOf="1" name="LowPWR_tbl_enable"/>
+		<Member type="uint8" sizeOf="1" name="RegulatoryHeavyClipEnable"/>
+		<Member type="uint8" sizeOf="1" name="wlanBtCalSyncEn"/>
+		<Member type="uint8" sizeOf="1" name="fdmtEnableDisableBits"/>
+		<Member type="uint8" sizeOf="1" name="pa1p8Support"/>
+		<Member type="uint8" sizeOf="28" name="bdfEnableDisableFlagsFuture"/>
+	</NvItem>
+	<NvItem id="25" name="RSSI_OFFSET">
+		<Member type="NV_HEADER" sizeOf="1" name="nvRssiOffset"/>
+		<Member type="RSSI_OFFSET_5G" sizeOf="1" name="rssiOffset5G"/>
+		<Member type="RSSI_OFFSET_2G" sizeOf="1" name="rssiOffset2G"/>
+		<Member type="int8" sizeOf="1" name="bw40rssiOffset2G"/>
+		<Member type="int8" sizeOf="1" name="bw40rssiOffset5G"/>
+		<Member type="int8" sizeOf="1" name="bw80rssiOffset5G"/>
+		<Member type="int8" sizeOf="1" name="bw160rssiOffset5G"/>
+		<Member type="int8" sizeOf="1" name="bw40rssiOffset6G"/>
+		<Member type="int8" sizeOf="1" name="bw80rssiOffset6G"/>
+		<Member type="int8" sizeOf="1" name="bw160rssiOffset6G"/>
+		<Member type="uint8" sizeOf="23" name="rssiOffsetFuture"/>
+	</NvItem>
+	<NvItem id="26" name="THERM_THROT">
+		<Member type="NV_HEADER" sizeOf="1" name="nvThermThrot"/>
+		<Member type="THERM_THROTTLE_CONFIG" sizeOf="2" name="thermThrotConfig"/>
+		<Member type="uint8" sizeOf="1" name="thermAlgo"/>
+		<Member type="int8" sizeOf="1" name="xtalCalPpmOffsetSetting85C"/>
+		<Member type="int8" sizeOf="1" name="xtalCalPpmOffsetSetting100C"/>
+		<Member type="int8" sizeOf="1" name="xtalCalPpmOffsetSetting30C"/>
+		<Member type="uint8" sizeOf="1" name="temp_hyst"/>
+		<Member type="uint8" sizeOf="1" name="slope_dc_prcnt"/>
+		<Member type="uint8" sizeOf="2" name="thermThrotFuture"/>
+	</NvItem>
+	<NvItem id="27" name="CALDB_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvCalDb"/>
+		<Member type="CALDB_CFG" sizeOf="1" name="calDbCfg5G"/>
+		<Member type="CALDB_CFG" sizeOf="1" name="calDbCfg2G"/>
+		<Member type="uint8" sizeOf="1" name="nvCaldbEnable"/>
+		<Member type="uint8" sizeOf="1" name="miniColdBoot"/>
+		<Member type="uint8" sizeOf="38" name="calDbFuture"/>
+	</NvItem>
+	<NvItem id="28" name="AGC_ENERGY_DETECT_THRESHOLD">
+		<Member type="NV_HEADER" sizeOf="1" name="nvAgcEnergyDetectThresholds"/>
+		<Member type="AGC_ENERGY_DET_THR" sizeOf="3" name="agcEnergyDetThr"/>
+		<Member type="AGC_ENERGY_DET_THR_EXT" sizeOf="1" name="agcEnergyDetThr_etsi6gLpi"/>
+		<Member type="AGC_ENERGY_DET_THR_EXT" sizeOf="1" name="agcEnergyDetThr_etsi6gVlp"/>
+	</NvItem>
+	<NvItem id="29" name="BDF_SPURMIT_SECTION">
+		<Member type="NV_HEADER" sizeOf="1" name="nvSpurMit"/>
+		<Member type="SPUR_FREQ_BW" sizeOf="40" name="spurChanFreq"/>
+		<Member type="SPUR_DATA" sizeOf="40" name="spurNotchData"/>
+		<Member type="uint8" sizeOf="12" name="spurMitFuture"/>
+	</NvItem>
+	<NvItem id="30" name="DPD_CONFIG_EXT">
+		<Member type="NV_HEADER" sizeOf="1" name="nvDpdConfigExt"/>
+		<Member type="LDPD_CONFIG_BAND" sizeOf="2" name="lDpdConfigBand"/>
+		<Member type="EDPD_CONFIG_BAND" sizeOf="2" name="eDpdConfigBand"/>
+		<Member type="uint8" sizeOf="112" name="dpdConfigExtFuture"/>
+	</NvItem>
+	<NvItem id="31" name="SAR_TABLES_6G">
+		<Member type="NV_HEADER" sizeOf="1" name="nvSAR6G"/>
+		<Member type="uint16" sizeOf="5" name="SAR6GChannels"/>
+		<Member type="SAR_LIMIT_MODES_6G" sizeOf="36" name="SARPwrLimits6G"/>
+		<Member type="uint8" sizeOf="2" name="SAR6GFuture"/>
+	</NvItem>
+	<NvItem id="32" name="CHLIST_PER_PHY_PER_BAND_PER_BW">
+		<Member type="NV_HEADER" sizeOf="1" name="nvChListCbc"/>
+		<Member type="uint16" sizeOf="15" name="chList_2G_20"/>
+		<Member type="uint16" sizeOf="4" name="chList_2G_40"/>
+		<Member type="uint16" sizeOf="34" name="chList_5G_20"/>
+		<Member type="uint16" sizeOf="43" name="chList_5G_40"/>
+		<Member type="uint16" sizeOf="21" name="chList_5G_80"/>
+		<Member type="uint16" sizeOf="11" name="chList_5G_160"/>
+		<Member type="uint16" sizeOf="15" name="chList_PHYB_5G_20"/>
+		<Member type="uint16" sizeOf="15" name="chList_PHYB_5G_40"/>
+		<Member type="uint16" sizeOf="2" name="chList_PHYB_5G_80"/>
+		<Member type="uint8" sizeOf="1" name="chListFlag"/>
+		<Member type="uint8" sizeOf="1" name="chListRepeatCount"/>
+		<Member type="uint8" sizeOf="70" name="chListCbcFuture"/>
+	</NvItem>
+	<NvItem id="33" name="ANI_STATIC">
+		<Member type="NV_HEADER" sizeOf="1" name="nvAniStatic"/>
+		<Member type="int8" sizeOf="1" name="aniEnable"/>
+		<Member type="int8" sizeOf="1" name="aniDesenseVal"/>
+		<Member type="int8" sizeOf="1" name="aniEnable5G"/>
+		<Member type="int8" sizeOf="1" name="aniDesensephyA5G"/>
+		<Member type="int8" sizeOf="1" name="aniEnable6G"/>
+		<Member type="int8" sizeOf="1" name="aniDesensephyA6G"/>
+		<Member type="int8" sizeOf="1" name="aniEnable2G"/>
+		<Member type="int8" sizeOf="1" name="aniDesensephyB2G"/>
+		<Member type="int8" sizeOf="4" name="aniFuture"/>
+	</NvItem>
+	<NvItem id="34" name="THERM_SENSOR_OFFSET">
+		<Member type="NV_HEADER" sizeOf="1" name="nvThermalSensorOffset"/>
+		<Member type="uint32" sizeOf="1" name="invalid_Bits_Mask"/>
+		<Member type="THERM_SENSOR_OFFSET_DATA" sizeOf="1" name="thermalSensorOffset"/>
+		<Member type="uint8" sizeOf="68" name="thermalSensorFuture"/>
+	</NvItem>
+	<NvItem id="35" name="PDC_CONFIG">
+		<Member type="NV_HEADER" sizeOf="1" name="nvPDCConfig"/>
+		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config2G"/>
+		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config5G"/>
+		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config6G"/>
+		<Member type="uint8" sizeOf="6" name="PDCConfigFuture"/>
+	</NvItem>
+	<NvItem id="36" name="RESERVED_NV">
+		<Member type="NV_HEADER" sizeOf="1" name="nvReserved"/>
+		<Member type="uint8" sizeOf="56" name="reservedFuture"/>
+	</NvItem>
+</NvDefinition>
