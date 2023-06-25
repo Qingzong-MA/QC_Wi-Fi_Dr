@@ -1,34 +1,28 @@
 /*
-* Copyright (c) 2014-2019 Qualcomm Technologies, Inc.
+* Copyright (c) 2014-2019, 2022 Qualcomm Technologies, Inc.
 * All Rights Reserved.
 * Qualcomm Technologies Proprietary and Confidential.
 *
 */
 
-//#include "halLog.hpp"
+#include "log.h"
 #ifndef ANDROID_WEAR
 #include "nan_test.hpp"
 #endif
-#if 0
-#include "gscan_test.hpp"
-#include "llstats_test.hpp"
-#include "rtt_test.hpp"
-#include "tdls_test.hpp"
-#include "wifihal_test.hpp"
-#include "wificonfig_test.hpp"
-#endif
+//#include "gscan_test.hpp"
+//#include "llstats_test.hpp"
+//#include "rtt_test.hpp"
+//#include "tdls_test.hpp"
+//#include "wifihal_test.hpp"
+//#include "wificonfig_test.hpp"
 #include "wifi_hal.h"
-#if 0
-#include "wifilogger_test.hpp"
-#include "wifi_calling_test.hpp"
-#include "packet_filtering.hpp"
-#endif
+//#include "wifilogger_test.hpp"
+//#include "wifi_calling_test.hpp"
+//#include "packet_filtering.hpp"
 #include "common.hpp"
-#if 0
-#include "nd_offload.hpp"
-#include "roam_test.hpp"
-#include "wifihal_vendor_test.hpp"
-#endif
+//#include "nd_offload.hpp"
+//#include "roam_test.hpp"
+//#include "wifihal_vendor_test.hpp"
 
 #include <netinet/in.h>
 #include <sys/select.h>
@@ -44,6 +38,7 @@
 #define LOG_TAG "HalProxyDaemon"
 
 #define UDP_PORT 51000
+#define GID_WIFI 1010
 
 wifi_handle gbl_handle;
 
@@ -70,9 +65,6 @@ std::vector <int> glb_distance_mm;
 #define HAL_LOG_MSG(level, stream)\
     do {\
     } while (0)\
-
-
-#include "log.h"
 
 namespace HAL
 {
@@ -478,7 +470,7 @@ int validate_rtt_iterations_count(int iter_count)
     return 0;
 }
 
-wifi_hal_fn fn;
+//wifi_hal_fn fn;
 int
 main(
     int argc,
@@ -491,6 +483,10 @@ main(
     int flush = 0;
     int band = 0;
     unsigned int sleep_time;
+    // to interact with lowi-server over dgram socket,
+    // halproxydaemon should be of wifi group
+    setgid(GID_WIFI);
+
     HAL::HalProxyDaemon halProxyDaemon(argc, argv);
 
     if (!halProxyDaemon.isGood())
@@ -526,11 +522,13 @@ main(
         ::exit(-1);
     }
 
+#if 0
     if(init_wifi_vendor_hal_func_table(&fn))
     {
         fprintf(stderr, "Failed to initialize the function table");
         ::exit(-1);
     }
+#endif
     if(argc >= 2)
     {
         fprintf(stderr, "%s: Version: " HAL_PROXY_DAEMON_VER "\n", argv[0]);
@@ -540,7 +538,7 @@ main(
             NAN_TEST::NanTestSuite nan(wifiHandle);
             nan.processCmd(argc, argv);
         }
-        //else
+        else
 #endif
 #if 0
         if(strcasecmp(argv[1], LLStats::LLStatsTestSuite::LL_CMD) == 0)
@@ -1060,6 +1058,8 @@ main(
                         " Regulatory domain change monitoring\n");
                 fprintf(stderr, "    Type 7 for Set SAR/tx_power Limits\n");
                 fprintf(stderr, "    Type 8 for Reset SAR Limits\n");
+                fprintf(stderr, "    Type 9 for Get Usable Channels\n");
+                fprintf(stderr, "    Type 10 for Set Coex Unsafe Channels\n");
                 fprintf(stderr, "    Type 1000 to exit.\n");
                 fprintf(stderr, "**********************\n");
 
@@ -1090,12 +1090,20 @@ main(
                     case 7:
                     {
                         int scenario;
-                        fprintf(stderr, "Enter scenario ID : \n");
-                        fprintf(stderr, "\tVOICE_CALL    : 0 \n");
-                        fprintf(stderr, "\tHEAD_CELL_OFF : 1 \n");
-                        fprintf(stderr, "\tHEAD_CELL_ON  : 2 \n");
-                        fprintf(stderr, "\tBODY_CELL_OFF : 3 \n");
-                        fprintf(stderr, "\tBODY_CELL_ON  : 4 \n:");
+                        fprintf(stderr, "Enter scenario ID     :  \n");
+                        fprintf(stderr, "\tVOICE_CALL          : 0  \n");
+                        fprintf(stderr, "\tHEAD_CELL_OFF       : 1  \n");
+                        fprintf(stderr, "\tHEAD_CELL_ON        : 2  \n");
+                        fprintf(stderr, "\tBODY_CELL_OFF       : 3  \n");
+                        fprintf(stderr, "\tBODY_CELL_ON        : 4  \n:");
+                        fprintf(stderr, "\tBODY_BT             : 5  \n");
+                        fprintf(stderr, "\tHEAD_HOTSPOT        : 6  \n");
+                        fprintf(stderr, "\tHEAD_HOTSPOT_MMW    : 7  \n");
+                        fprintf(stderr, "\tBODY_CELL_ON_BT     : 8  \n");
+                        fprintf(stderr, "\tBODY_HOTSPOT        : 9  \n");
+                        fprintf(stderr, "\tBODY_HOTSPOT_BT     : 10 \n");
+                        fprintf(stderr, "\tBODY_HOTSPOT_MMW    : 11 \n");
+                        fprintf(stderr, "\tBODY_HOTSPOT_BT_MMW : 12 \n");
                         read_int(&scenario);
                         if (scenario == 0)
                             data.scenario = WIFI_POWER_SCENARIO_VOICE_CALL;
@@ -1107,6 +1115,22 @@ main(
                           data.scenario = WIFI_POWER_SCENARIO_ON_BODY_CELL_OFF;
                         else if (scenario == 4)
                           data.scenario = WIFI_POWER_SCENARIO_ON_BODY_CELL_ON;
+                        else if (scenario == 5)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_BT;
+                        else if (scenario == 6)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_HEAD_HOTSPOT;
+                        else if (scenario == 7)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_HEAD_HOTSPOT_MMW;
+                        else if (scenario == 8)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_CELL_ON_BT;
+                        else if (scenario == 9)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_HOTSPOT;
+                        else if (scenario == 10)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_HOTSPOT_BT;
+                        else if (scenario == 11)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_HOTSPOT_MMW;
+                        else if (scenario == 12)
+                          data.scenario = WIFI_POWER_SCENARIO_ON_BODY_HOTSPOT_BT_MMW;
                         else {
                           fprintf(stderr, "Invalid scenario: %d\n", scenario);
                           continue;
@@ -1116,6 +1140,93 @@ main(
                     case 8:
                     break;
 
+                    case 9:
+                        data.wifiHandle = wifiHandle;
+
+                        fprintf(stderr, "Enter value of band mask:\n");
+                                read_uint(&data.band_mask);
+                        fprintf(stderr, "Enter value of iface mask:\n");
+                                read_uint(&data.iface_mask);
+                        fprintf(stderr, "Enter value of filter mask:\n");
+                                read_uint(&data.filter_mask);
+                        fprintf(stderr, "Enter max size:\n");
+                                read_uint(&data.max_size);
+                        fprintf(stderr, "Band mask %u, iface mask %u, filter mask %u, max size %u\n",
+                                data.band_mask, data.iface_mask,
+                                data.filter_mask, data.max_size);
+                        break;
+                    case 10:
+                         data.wifiHandle = wifiHandle;
+                         u32 band;
+                         FILE *f_read;
+                         char comment[100];
+                         f_read = fopen("/data/vendor/wifi/wifi_hal_coex_unsafe_channels_data.txt", "r");
+                         if (f_read) {
+                             //Detect a comment and move to next line
+                             while (!feof(f_read)) {
+                                 memset(&comment, 0, sizeof(comment));
+                                 if (fscanf(f_read, "%s", comment) == 0) {
+                                     fprintf(stderr, "%s: Failed to read data"
+                                     " from file. Exit\n", __func__);
+                                     goto failure;
+                                 }
+                                 if (comment[0] != '#')
+                                    break;
+                                 fscanf(f_read, "%*[^\n]");     // Skip to the End of the Line
+                                 fscanf(f_read, "%*1[\n]");     // Skip One Newline
+                             }
+                             data.no_of_channels = atoi(comment);
+                             if (data.no_of_channels > 0) {
+                                 data.unsafe_channs = (wifi_coex_unsafe_channel *)malloc(sizeof(wifi_coex_unsafe_channel)*data.no_of_channels);
+                                 if (!data.unsafe_channs)
+                                     goto failure;
+                                 memset(data.unsafe_channs, 0, sizeof(wifi_coex_unsafe_channel)*data.no_of_channels);
+                                 if ((fscanf(f_read, "%d", &data.iface_mask)) == 0) {
+                                      fprintf(stderr, "%s: Failed to read iface mask"
+                                              " from file. Exit\n", __func__);
+                                      goto failure;
+                                 }
+                             }
+                             for (int i = 0; i < data.no_of_channels; i++) {
+                                 if ((fscanf(f_read, "%d", &data.unsafe_channs[i].band) &&
+                                      fscanf(f_read, "%d", &data.unsafe_channs[i].channel) &&
+                                      fscanf(f_read, "%d", &data.unsafe_channs[i].power_cap_dbm)) == 0) {
+                                      fprintf(stderr, "%s: Failed parsing Unsafe channel data "
+                                              " file. Exit\n", __func__);
+                                      free(data.unsafe_channs);
+                                      goto failure;
+                                 }
+                             }
+                             fclose(f_read);
+                             break;
+                             failure:
+                                 fclose(f_read);
+                                 return -1;
+                         }
+                         else {
+                             fprintf(stderr, "Enter num_channels:\n");
+                                     read_uint(&data.no_of_channels);
+                             fprintf(stderr, "Number of channels Entered:%d\n", data.no_of_channels);
+                             if (data.no_of_channels > 0) {
+                                 data.unsafe_channs = (wifi_coex_unsafe_channel *)malloc(sizeof(wifi_coex_unsafe_channel)*data.no_of_channels);
+                                 if (!data.unsafe_channs)
+                                     return -1;
+                                 memset(data.unsafe_channs, 0, sizeof(wifi_coex_unsafe_channel)*data.no_of_channels);
+                                 fprintf(stderr, "Enter iface bit mask_to be restricted:\n");
+                                         read_uint(&data.iface_mask);
+                             }
+                             for (int i = 0; i < data.no_of_channels; i++) {
+                                 fprintf(stderr, "Enter the following data for channel:%d\n", i);
+                                 fprintf(stderr, "Enter band:\n---Input 1 for 2G\n---Input 2 for 5G\n---Input 4 for 6G\n");
+                                         read_uint(&band);
+                                 data.unsafe_channs[i].band = (wlan_mac_band) band;
+                                 fprintf(stderr, "Enter channel:\n");
+                                         read_uint(&data.unsafe_channs[i].channel);
+                                 fprintf(stderr, "Enter power_cap_dbm:\n");
+                                         read_int(&data.unsafe_channs[i].power_cap_dbm);
+                             }
+                         }
+                         break;
                     default:
                         fprintf(stderr, "%s: Unknown input.\n", __func__);
                         continue;
@@ -1146,6 +1257,12 @@ main(
                                 "5 <Latency_mode> <iteration> <interval>\n");
                 fprintf(stderr, "Set Thermal Mode                         :"
                                 "6 <thermal_mode> <completion window> <iteration> <interval>\n");
+                fprintf(stderr, "Set Primary Sta in Multi Sta Connection  :"
+                                "7 <sta_iface> <iteration> <interval>\n");
+                fprintf(stderr, "Set Use Case in Multi Sta Connection     :"
+                                "8 <use_case> <iteration> <interval>\n");
+                fprintf(stderr, "Set Modulated DTIM                       :"
+                                "9 <Modulated_dtim> <iteration> <interval>\n");
                 fprintf(stderr, "**********************\n");
                 fprintf(stderr, "######################\n");
                 fprintf(stderr, "interval - time delay between current "
@@ -1161,7 +1278,7 @@ main(
                 while (i < argc) {
                     cmdId = atoi(argv[i++]);
                     fprintf(stderr, "cmd : %d\n", cmdId);
-                    if (cmdId < 0 || cmdId > 6) {
+                    if (cmdId < 0 || cmdId > 9) {
                         fprintf(stderr, "Unknown command\n");
                         break;
                     }
@@ -1210,6 +1327,41 @@ main(
                             if (i < argc)
                                 data.completionWindow = (u32)atoi(argv[i++]);
                             break;
+                        case 7:
+                            data.wifiHandle = wifiHandle;
+                            if (i >= argc)
+                                break;
+                            data.ifaceHandle = wifi_get_iface_handle(wifiHandle, argv[i++]);
+                            if(!data.ifaceHandle)
+                            {
+                                 fprintf(stderr, "Interface %s is not up, exiting.\n", argv[i-1]);
+                                 break;
+                            }
+                            break;
+                        case 8:
+                            data.wifiHandle = wifiHandle;
+                            int case_info;
+
+                            if (i >= argc)
+                                break;
+
+                            case_info = atoi(argv[i++]);
+                            switch(case_info) {
+                                case 0:
+                                    data.caseInfo = WIFI_DUAL_STA_TRANSIENT_PREFER_PRIMARY;
+                                    break;
+                                case 1:
+                                    data.caseInfo = WIFI_DUAL_STA_NON_TRANSIENT_UNBIASED;
+                                    break;
+                                default:
+                                    fprintf(stderr, "%s: Unknown Use Case.\n", __func__);
+                                    break;
+                            }
+                            break;
+                        case 9:
+                            if (i < argc)
+                                data.dtim = atoi(argv[i++]);
+                            break;
                         default:
                             fprintf(stderr, "%s: Unknown input.\n", __func__);
                     }
@@ -1245,10 +1397,15 @@ main(
                 fprintf(stderr, "    Type 4 for Set Country Code\n");
                 fprintf(stderr, "    Type 5 for Set Latency Mode\n");
                 fprintf(stderr, "    Type 6 for Set Thermal Mode\n");
+                fprintf(stderr, "    Type 7 for Set Primary Sta in Multi-Sta\n");
+                fprintf(stderr, "    Type 8 for Set Multi Sta Use Case\n");
+                fprintf(stderr, "    Type 9 for Set Modulated DTIM\n");
                 fprintf(stderr, "    Type 1000 to exit.\n");
                 fprintf(stderr, "**********************\n");
-                int temp;
+                int temp, iface_i, iface_num;
                 while (cmdId != 1000) {
+                    iface_i = 0;
+                    iface_num = 0;
                     cmdId = 0;
                     memset(&data, 0, sizeof(WIFI_CONFIG_TEST::cmdData));
                     fprintf(stderr, "*********************\n");
@@ -1303,6 +1460,63 @@ main(
                             fprintf(stderr, "Enter value for completion window of thermal mode configuration:\n");
                             fprintf(stderr, "completion window (in milliseconds) \n");
                             read_uint(&data.completionWindow);
+                            break;
+                        case 7:
+                            data.wifiHandle = wifiHandle;
+                            wifi_interface_handle *interfaces;
+                            WIFIHAL_TEST::interface_info **iface;
+                            char name[IFNAMSIZ+1];
+                            size_t len;
+                            fprintf(stderr, "Enter primary sta iface in Multi Sta:\n");
+
+                            wifi_get_ifaces(wifiHandle, &iface_num, &interfaces);
+                            iface = (WIFIHAL_TEST::interface_info **)interfaces;
+
+                            fprintf(stderr, "Number of interfaces available: %d\n", iface_num);
+
+                            for(iface_i = 0; iface_i < iface_num; iface_i++) {
+                                if(wifi_get_iface_name((wifi_interface_handle)iface[iface_i],
+                                                        &name[0], IFNAMSIZ) == WIFI_SUCCESS) {
+                                               fprintf(stderr, "Interface %d : %s\n", iface_i, name);
+                                } else {
+                                        fprintf(stderr, "Failed to get the iface name");
+                                }
+                            }
+                            fprintf(stderr, "Enter primary sta iface name in Multi Sta:\n");
+                            fgets(name, IFNAMSIZ+1, stdin);
+                            len = strlen(name);
+                            if (len > 0 && name[len - 1] == '\n')
+                                  name[len - 1] = '\0';
+                            fprintf(stderr, "Interface name entered for primary sta: %s\n", name);
+                            data.ifaceHandle = wifi_get_iface_handle(wifiHandle, name);
+                            if(!data.ifaceHandle)
+                            {
+                                 fprintf(stderr, "Interface %s is not up, exiting.\n", name);
+                                 break;
+                            }
+                            break;
+                        case 8:
+                            data.wifiHandle = wifiHandle;
+                            int case_info;
+
+                            fprintf(stderr, "Enter value for Multi Sta Use Case:\n");
+                            fprintf(stderr, "Use Case - 0: TRANSIENT_PREFER_PRIMARY, 1: NON_TRANSIENT_UNBIASED, Default: NONE\n");
+                            read_int(&case_info);
+                            switch(case_info) {
+                                case 0:
+                                    data.caseInfo = WIFI_DUAL_STA_TRANSIENT_PREFER_PRIMARY;
+                                    break;
+                                case 1:
+                                    data.caseInfo = WIFI_DUAL_STA_NON_TRANSIENT_UNBIASED;
+                                    break;
+                                default:
+                                    fprintf(stderr, "%s: Unknown Use Case.\n", __func__);
+                                    break;
+                            }
+                            break;
+                        case 9:
+                            fprintf(stderr, "Enter value for Modulated DTIM:\n");
+                            read_int(&data.dtim);
                             break;
                         default:
                             fprintf(stderr, "%s: Unknown input.\n", __func__);
@@ -1740,10 +1954,10 @@ main(
             return ndo.executeCmd(argc, argv);
         }
         else
+#endif
         {
             fprintf(stderr, "%s: Unknown command %s\n", argv[0], argv[1]);
         }
-#endif
     }
     else
     {
@@ -1757,7 +1971,7 @@ main(
             fprintf(stderr, "daemon: Sleep: \n");
         }
     }
-    fn.wifi_cleanup(gbl_handle, cleanup_handler);
+    wifi_cleanup(gbl_handle, cleanup_handler);
     usleep(2000000);
 
     return halProxyDaemon();

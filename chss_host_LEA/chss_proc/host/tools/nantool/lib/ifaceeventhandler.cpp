@@ -24,6 +24,40 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted (subject to the limitations in the
+ * disclaimer below) provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *
+ *   * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+ * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+ * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "sync.h"
@@ -33,6 +67,7 @@
 #include <errno.h>
 
 #include "ifaceeventhandler.h"
+#include "common.h"
 
 /* Used to handle NL command events from driver/firmware. */
 IfaceEventHandlerCommand *mwifiEventHandler = NULL;
@@ -202,15 +237,21 @@ WifihalGeneric::WifihalGeneric(wifi_handle handle, int id, u32 vendor_id,
     filterVersion = 0;
     filterLength = 0;
     firmware_bus_max_size = 0;
-    mCapa = &(info->capa);
+    //mCapa = &(info->capa);
     mfilter_packet_read_buffer = NULL;
     mfilter_packet_length = 0;
+    res_size = 0;
+    channel_buff = NULL;
+    mRadio_matrix = NULL;
+    mRadio_matrix_max_size = 0;
+    mRadio_matrix_size = NULL;
     memset(&mDriverFeatures, 0, sizeof(mDriverFeatures));
+    memset(&mRadarResultParams, 0, sizeof(RadarHistoryResultsParams));
 }
 
 WifihalGeneric::~WifihalGeneric()
 {
-    mCapa = NULL;
+    //mCapa = NULL;
     if (mDriverFeatures.flags != NULL) {
         free(mDriverFeatures.flags);
         mDriverFeatures.flags = NULL;
@@ -221,6 +262,121 @@ wifi_error WifihalGeneric::requestResponse()
 {
     return WifiCommand::requestResponse(mMsg);
 }
+
+#if 0
+static u32 get_wifi_iftype_masks(u32 in_mask)
+{
+    u32 op_mask = 0;
+
+    if (in_mask & BIT(NL80211_IFTYPE_STATION)) {
+        op_mask |= BIT(WIFI_INTERFACE_STA);
+        op_mask |= BIT(WIFI_INTERFACE_TDLS);
+    }
+    if (in_mask & BIT(NL80211_IFTYPE_AP))
+        op_mask |= BIT(WIFI_INTERFACE_SOFTAP);
+    if (in_mask & BIT(NL80211_IFTYPE_P2P_CLIENT))
+        op_mask |= BIT(WIFI_INTERFACE_P2P_CLIENT);
+    if (in_mask & BIT(NL80211_IFTYPE_P2P_GO))
+        op_mask |= BIT(WIFI_INTERFACE_P2P_GO);
+    if (in_mask & BIT(NL80211_IFTYPE_NAN))
+        op_mask |= BIT(WIFI_INTERFACE_NAN);
+
+    return op_mask;
+}
+
+static wifi_channel_width get_channel_width(u32 nl_width)
+{
+    switch(nl_width) {
+    case NL80211_CHAN_WIDTH_20:
+         return WIFI_CHAN_WIDTH_20;
+    case NL80211_CHAN_WIDTH_40:
+         return WIFI_CHAN_WIDTH_40;
+    case NL80211_CHAN_WIDTH_80:
+         return WIFI_CHAN_WIDTH_80;
+    case NL80211_CHAN_WIDTH_160:
+         return WIFI_CHAN_WIDTH_160;
+    case NL80211_CHAN_WIDTH_80P80:
+         return WIFI_CHAN_WIDTH_80P80;
+    case NL80211_CHAN_WIDTH_5:
+         return WIFI_CHAN_WIDTH_5;
+    case NL80211_CHAN_WIDTH_10:
+         return WIFI_CHAN_WIDTH_10;
+    default:
+         return WIFI_CHAN_WIDTH_INVALID;
+    }
+}
+
+int WifihalGeneric::handle_response_usable_channels(struct nlattr *VendorData,
+                                                    u32 mDataLen)
+{
+    struct nlattr *tb[QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_MAX + 1];
+    struct nlattr *curr_attr;
+    wifi_usable_channel *chan_info = NULL;
+    int rem;
+    u32 currSize = 0;
+
+    if (nla_parse(tb, QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_MAX,
+                  (struct nlattr *)mVendorData, mDataLen, NULL)) {
+         ALOGE("Failed to parse NL channels list");
+         return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    if (!tb[QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_CHAN_INFO]) {
+         ALOGE("%s: USABLE_CHANNELS_CHAN_INFO not found", __FUNCTION__);
+         return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    for_each_nested_attribute(curr_attr,
+                     tb[QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_CHAN_INFO], rem) {
+         struct nlattr *ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_MAX + 1];
+
+         if (currSize >= mSetSizeMax) {
+              ALOGE("Got max channels %d completed", mSetSizeMax);
+              break;
+         }
+
+         if (nla_parse_nested(ch_info, QCA_WLAN_VENDOR_ATTR_CHAN_INFO_MAX,
+                              curr_attr, NULL)) {
+              ALOGE("Failed to get usable channel info");
+              return NL_SKIP;
+         }
+
+         chan_info = &channel_buff[currSize];
+         if (!ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_PRIMARY_FREQ]) {
+              ALOGE("%s: CHAN_INFO_PRIMARY_FREQ not found",
+                    __FUNCTION__);
+              return NL_SKIP;
+         }
+
+         chan_info->freq = nla_get_u32(ch_info[
+                                  QCA_WLAN_VENDOR_ATTR_CHAN_INFO_PRIMARY_FREQ]);
+         if (!ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_BANDWIDTH]) {
+              ALOGE("%s: CHAN_INFO_BANDWIDTH not found",
+                    __FUNCTION__);
+              return NL_SKIP;
+         }
+
+         chan_info->width = get_channel_width(nla_get_u32(
+                            ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_BANDWIDTH]));
+         if (!ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_IFACE_MODE_MASK]) {
+              ALOGE("%s: CHAN_INFO_IFACE_MODE_MASK not found",
+                    __FUNCTION__);
+              return NL_SKIP;
+         }
+
+         chan_info->iface_mode_mask = get_wifi_iftype_masks(nla_get_u32(
+                      ch_info[QCA_WLAN_VENDOR_ATTR_CHAN_INFO_IFACE_MODE_MASK]));
+         ALOGV("Primary freq %d BW %d iface mask %d", chan_info->freq,
+               chan_info->width, chan_info->iface_mode_mask);
+         currSize++;
+    }
+
+    res_size = currSize;
+    ALOGV("%s: Result size %d", __FUNCTION__, res_size);
+
+    return NL_SKIP;
+}
+#endif
 
 int WifihalGeneric::handleResponse(WifiEvent &reply)
 {
@@ -437,6 +593,34 @@ int WifihalGeneric::handleResponse(WifiEvent &reply)
                 }
             }
             break;
+        case QCA_NL80211_VENDOR_SUBCMD_USABLE_CHANNELS:
+            return handle_response_usable_channels((struct nlattr *)mVendorData,
+                                                   mDataLen);
+        case QCA_NL80211_VENDOR_SUBCMD_GET_RADAR_HISTORY:
+            {
+                wifiParseRadarHistory();
+            }
+            break;
+        case QCA_NL80211_VENDOR_SUBCMD_GET_RADIO_COMBINATION_MATRIX:
+            {
+                wifi_parse_radio_combinations_matrix();
+            }
+	    break;
+        case QCA_NL80211_VENDOR_SUBCMD_GET_SAR_CAPABILITY:
+            {
+                struct nlattr *tb_vendor[
+                        QCA_WLAN_VENDOR_ATTR_SAR_CAPABILITY_MAX + 1];
+                nla_parse(tb_vendor, QCA_WLAN_VENDOR_ATTR_SAR_CAPABILITY_MAX,
+                          (struct nlattr *)mVendorData,mDataLen, NULL);
+
+                if(tb_vendor[QCA_WLAN_VENDOR_ATTR_SAR_CAPABILITY_VERSION])
+                {
+                    mInfo->sar_version = (qca_wlan_vendor_sar_version) nla_get_u32(tb_vendor[
+                                               QCA_WLAN_VENDOR_ATTR_SAR_CAPABILITY_VERSION]);
+                }
+                ALOGV("%s: sar_version return %d", __func__, mInfo->sar_version);
+            }
+            break;
 #endif
         default :
             ALOGE("%s: Wrong Wi-Fi HAL event received %d", __func__, mSubcmd);
@@ -444,10 +628,10 @@ int WifihalGeneric::handleResponse(WifiEvent &reply)
     return NL_SKIP;
 }
 
+#if 0
 /* Parses and extract capabilities results. */
 wifi_error WifihalGeneric::wifiParseCapabilities(struct nlattr **tbVendor)
 {
-#if 0
     if (!tbVendor[QCA_WLAN_VENDOR_ATTR_GSCAN_RESULTS_CAPABILITIES_MAX_SCAN_CACHE_SIZE]) {
         ALOGE("%s: QCA_WLAN_VENDOR_ATTR_GSCAN_RESULTS_CAPABILITIES_MAX_SCAN_CACHE_SIZE not found",
               __FUNCTION__);
@@ -560,9 +744,249 @@ wifi_error WifihalGeneric::wifiParseCapabilities(struct nlattr **tbVendor)
         mCapa->roaming_capa.max_blacklist_size = nla_get_u32(tbVendor[
                                       QCA_WLAN_VENDOR_ATTR_GSCAN_MAX_NUM_BLACKLISTED_BSSID]);
     }
-#endif
     return WIFI_SUCCESS;
 }
+
+wifi_error WifihalGeneric::wifi_parse_radio_combinations_matrix() {
+    // tbVendor
+    struct nlattr *tbVendor[QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_MAX + 1];
+    int rem = 0, rem_radio = 0;
+    u32 num_radio_combinations = 0, num_radio_configurations = 0;
+    // nested radio matrix configurations
+    struct nlattr *radio_combination[QCA_WLAN_VENDOR_ATTR_RADIO_COMBINATIONS_MAX + 1];
+    struct nlattr *attr, *attr_cfg;
+    struct nlattr *radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_MAX + 1];
+    u8 band, antenna;
+    u32 result_size = sizeof(u32); /* num_radio_combinations */
+    bool max_size_exceeded = false;
+    u32 size_needed = 0, radio_cfg_size = 0;
+    bool invalid_radio_cfg = false;
+    wifi_radio_combination *radio_combination_ptr;
+    wifi_radio_configuration *radio_config;
+    u8 *buff_ptr;
+
+    static struct nla_policy
+        policy[QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_MAX + 1] = {
+            [QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_SUPPORTED_CFGS] =
+                                                { .type = NLA_NESTED},
+        };
+
+    if (nla_parse(tbVendor, QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_MAX,
+                (struct nlattr *)mVendorData,mDataLen, NULL)) {
+        ALOGE("%s: nla_parse ATTR_RADIO_MATRIX fail", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    if (!tbVendor[QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_SUPPORTED_CFGS]) {
+        ALOGE("%s: radio matrix attr entries not present", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    if (!mRadio_matrix) {
+        ALOGE("%s: radio matrix buffer is null", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    buff_ptr = (u8 *)mRadio_matrix;
+    buff_ptr += sizeof(u32); /* num_radio_combinations */
+    nla_for_each_nested(attr,
+            tbVendor[QCA_WLAN_VENDOR_ATTR_RADIO_MATRIX_SUPPORTED_CFGS],
+            rem) {
+        if (nla_parse_nested(radio_combination,
+                    QCA_WLAN_VENDOR_ATTR_RADIO_COMBINATIONS_MAX,
+                    attr, policy)) {
+            ALOGI("%s: nla_parse_nested radio combination fail", __FUNCTION__);
+            continue;
+        }
+        radio_combination_ptr = (wifi_radio_combination *)buff_ptr;
+
+        num_radio_configurations = 0;
+        radio_cfg_size = 0;
+        nla_for_each_nested(attr_cfg,
+                radio_combination[QCA_WLAN_VENDOR_ATTR_RADIO_COMBINATIONS_CFGS],
+                rem_radio) {
+            if (nla_parse_nested(radio_cfg,
+                        QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_MAX,
+                        attr_cfg, policy)) {
+                ALOGI("%s: nla_parse_nested radio cfg attr fail", __FUNCTION__);
+                continue;
+            }
+
+            if (!radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_BAND] ||
+                !radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_ANTENNA]) {
+                ALOGI("%s: band/antenna info not present", __FUNCTION__);
+                continue;
+            }
+
+            if (!invalid_radio_cfg) {
+                if (!num_radio_configurations) {
+                    size_needed = sizeof(wifi_radio_configuration) +
+                                  sizeof(u32);
+                    buff_ptr += sizeof(u32); /* num_radio_configurations */
+                } else {
+                    size_needed = sizeof(wifi_radio_configuration);
+                    buff_ptr += sizeof(wifi_radio_configuration);
+                }
+            }
+            if (mRadio_matrix_max_size < result_size + size_needed) {
+                ALOGI("%s: Max size reached, max size %u, needed %u",
+                        __FUNCTION__, mRadio_matrix_max_size,
+                        result_size + size_needed);
+                max_size_exceeded = true;
+                break;
+            }
+            invalid_radio_cfg = false;
+            radio_config = (wifi_radio_configuration *)buff_ptr;
+
+            if (radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_BAND]) {
+                band = nla_get_u32(
+                        radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_BAND]);
+                if (band == QCA_SETBAND_5G) {
+                    radio_config->band = WLAN_MAC_5_0_BAND;
+                } else if (band == QCA_SETBAND_6G) {
+                    radio_config->band = WLAN_MAC_6_0_BAND;
+                } else if (band == QCA_SETBAND_2G) {
+                    radio_config->band = WLAN_MAC_2_4_BAND;
+                } else {
+                    ALOGI("%s: Invalid band value %d", __FUNCTION__, band);
+                    invalid_radio_cfg = true;
+                    continue;
+                }
+            }
+            if (radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_ANTENNA]) {
+                antenna = nla_get_u8(
+                        radio_cfg[QCA_WLAN_VENDOR_ATTR_SUPPORTED_RADIO_CFG_ANTENNA]);
+                if (antenna == 1) {
+                    radio_config->antenna_cfg = WIFI_ANTENNA_1X1;
+                } else if (antenna == 2) {
+                    radio_config->antenna_cfg = WIFI_ANTENNA_2X2;
+                } else if (antenna == 3) {
+                    radio_config->antenna_cfg = WIFI_ANTENNA_3X3;
+                } else if (antenna == 4) {
+                    radio_config->antenna_cfg = WIFI_ANTENNA_4X4;
+                } else {
+                    ALOGI("%s: Invalid antenna cfg value %d", __FUNCTION__,
+                          antenna);
+                    invalid_radio_cfg = true;
+                    continue;
+                }
+            }
+            radio_cfg_size += size_needed;
+            num_radio_configurations++;
+            result_size += size_needed;
+        } /* RADIO_COMBINATIONS_CFGS */
+        if (num_radio_configurations) {
+            num_radio_combinations++;
+            radio_combination_ptr->num_radio_configurations =
+                                                    num_radio_configurations;
+            ALOGI("%s: radio_combinations[%d]: num_radio_configurations %d",
+                  __FUNCTION__, num_radio_combinations,
+                  num_radio_configurations);
+        }
+
+        buff_ptr = (u8 *)radio_combination_ptr + radio_cfg_size;
+
+        if (max_size_exceeded)
+            break;
+    } /* RADIO_MATRIX_SUPPORTED_CFGS */
+    mRadio_matrix->num_radio_combinations = num_radio_combinations;
+    *mRadio_matrix_size = result_size;
+    ALOGI("%s: num_radio_combinations %d, radio_matrix_size %d", __FUNCTION__,
+          num_radio_combinations, result_size);
+
+    return WIFI_SUCCESS;
+}
+
+wifi_error WifihalGeneric::wifiParseRadarHistory() {
+{
+    // tbVendor
+    struct nlattr *tbVendor[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_MAX + 1];
+    int rem = 0, num_dfs_entries = 0;
+
+    if (nla_parse(tbVendor, QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_MAX,
+          (struct nlattr *)mVendorData,mDataLen, NULL)) {
+        ALOGE("%s: nla_parse fail", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+    if (!tbVendor[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_ENTRIES]) {
+        ALOGE("%s: radar attr entries not present", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    // nested radar history
+    struct nlattr *tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_MAX + 1];
+    struct nlattr *attr;
+    static struct nla_policy
+      policy[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_MAX + 1] = {
+            [QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_FREQ] = { .type = NLA_U32 },
+            [QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_TIMESTAMP] = { .type = NLA_U64 },
+            [QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_DETECTED] = { .type = NLA_FLAG },
+    };
+    radar_history_result *newEntry;
+    radar_history_result *temp;
+    u32 totalEntrySize = 0;
+    u32 newEntrySize = sizeof(radar_history_result);
+
+    nla_for_each_nested(attr,
+            tbVendor[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_ENTRIES],
+            rem) {
+        if ((num_dfs_entries ++) > MAX_NUM_RADAR_HISTORY) {
+            ALOGE("%s: exceeded max entries, drop others", __FUNCTION__);
+            break;
+        }
+        if (nla_parse_nested(tb, QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_MAX,
+                attr, policy)) {
+            ALOGI("%s: nla_parse_nested fail", __FUNCTION__);
+            continue;
+        }
+        if (!tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_FREQ]) {
+            ALOGI("%s: radar attr freq not present", __FUNCTION__);
+            continue;
+        }
+        if (!tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_TIMESTAMP]) {
+            ALOGI("%s: radar attr timestamp not present", __FUNCTION__);
+            continue;
+        }
+
+        // realloc buffer for new entry
+        temp = (radar_history_result *) realloc(
+                mRadarResultParams.entries, totalEntrySize + newEntrySize);
+        if (temp == NULL) {
+            ALOGE("%s: failed to realloc memory", __FUNCTION__);
+            free(mRadarResultParams.entries);
+            mRadarResultParams.entries = NULL;
+            return WIFI_ERROR_OUT_OF_MEMORY;
+        }
+        mRadarResultParams.entries = temp;
+
+        newEntry = (radar_history_result *)(
+                (u8 *) mRadarResultParams.entries + totalEntrySize);
+        memset(newEntry, 0, newEntrySize);
+        totalEntrySize += newEntrySize;
+
+        // save to current radar entry
+        newEntry->freq = nla_get_u32(
+                tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_FREQ]);
+        newEntry->clock_boottime = nla_get_u64(
+                tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_TIMESTAMP]);
+        newEntry->radar_detected = false;
+        if (tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_DETECTED]) {
+             newEntry->radar_detected = nla_get_flag(
+                     tb[QCA_WLAN_VENDOR_ATTR_RADAR_HISTORY_DETECTED]);
+        }
+        mRadarResultParams.num_entries ++;
+
+        ALOGI("Radar history: freq:%d boottime: %" PRId64 " detected:%d",
+                newEntry->freq,
+                newEntry->clock_boottime,
+                newEntry->radar_detected);
+        }
+    }
+
+    return WIFI_SUCCESS;
+}
+#endif
+
 
 void WifihalGeneric::getResponseparams(feature_set *pset)
 {
@@ -596,6 +1020,19 @@ void WifihalGeneric::setConcurrencySet(feature_set set[]) {
     mConcurrencySet = set;
 }
 
+void WifihalGeneric::set_radio_matrix_max_size(u32 max_size) {
+    mRadio_matrix_max_size = max_size;
+}
+
+void WifihalGeneric::set_radio_matrix_size(u32 *size){
+    mRadio_matrix_size = size;
+}
+
+void WifihalGeneric::set_radio_matrix(
+        wifi_radio_combination_matrix *radio_combination_matrix){
+    mRadio_matrix = radio_combination_matrix;
+}
+
 void WifihalGeneric::setSizePtr(int *set_size) {
     mSetSizePtr = set_size;
 }
@@ -614,6 +1051,17 @@ void WifihalGeneric::setPacketBufferParams(u8 *host_packet_buffer, int packet_le
 
 int WifihalGeneric::getBusSize() {
     return firmware_bus_max_size;
+}
+
+void WifihalGeneric::set_channels_buff(wifi_usable_channel* channels)
+{
+    channel_buff = channels;
+    memset(channel_buff, 0, sizeof(wifi_usable_channel) * mSetSizeMax);
+}
+
+u32 WifihalGeneric::get_results_size(void)
+{
+    return res_size;
 }
 
 wifi_error WifihalGeneric::wifiGetCapabilities(wifi_interface_handle handle)
@@ -655,3 +1103,70 @@ wifi_error WifihalGeneric::wifiGetCapabilities(wifi_interface_handle handle)
 
     return ret;
 }
+
+wifi_error WifihalGeneric::copyCachedRadarHistory(
+        radar_history_result *resultBuf, int resultBufSize, int *numResults) {
+    *numResults = 0;
+
+    if (mRadarResultParams.entries) {
+        radar_history_result *sEntry = NULL;
+        radar_history_result *tEntry = NULL;
+        u32 offset = 0;
+        int i;
+
+        for (i = 0; i < mRadarResultParams.num_entries; i ++) {
+            if (resultBufSize < (offset + sizeof(radar_history_result))) {
+                break;
+            }
+
+            sEntry = (radar_history_result *)(
+                           (u8 *) mRadarResultParams.entries + offset);
+            tEntry = (radar_history_result *)(
+                           (u8 *) resultBuf + offset);
+            memcpy(tEntry, sEntry, sizeof(radar_history_result));
+            (*numResults) += 1;
+            offset += sizeof(radar_history_result);
+        }
+    }
+
+    return WIFI_SUCCESS;
+}
+
+void WifihalGeneric::freeCachedRadarHistory() {
+    if (mRadarResultParams.entries) {
+        free(mRadarResultParams.entries);
+        mRadarResultParams.entries = NULL;
+        mRadarResultParams.num_entries = 0;
+    }
+}
+
+
+
+wifi_error WifihalGeneric::getSarVersion(wifi_interface_handle handle)
+{
+    wifi_error ret;
+    interface_info *ifaceInfo = getIfaceInfo(handle);
+
+
+    /* Create the NL message. */
+    ret = create();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: Failed to create NL message,  Error:%d", __FUNCTION__, ret);
+        return ret;
+    }
+
+    /* Set the interface Id of the message. */
+    ret = set_iface_id(ifaceInfo->name);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: Failed to set interface Id of message, Error:%d", __FUNCTION__, ret);
+        return ret;
+    }
+
+    ret = requestResponse();
+    if (ret != WIFI_SUCCESS)
+        ALOGE("%s: Failed to send request, Error:%d", __FUNCTION__, ret);
+
+    return ret;
+}
+
+

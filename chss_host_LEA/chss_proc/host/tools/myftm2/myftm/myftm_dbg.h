@@ -23,7 +23,7 @@ extern unsigned int g_dbg_level;
     do {\
         if (g_dbg_level & (_level))\
         {\
-            fprintf(stderr, _x);\
+            printf(_x);\
         }\
     } while (0);
 

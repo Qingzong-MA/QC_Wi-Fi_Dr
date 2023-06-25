@@ -6,7 +6,7 @@ Description
   Unit test component file for regsitering the routines to Diag library
   for BT and FTM commands
 
-# Copyright (c) 2012-2020  Qualcomm Technologies, Inc.
+# Copyright (c) 2012-2022  Qualcomm Technologies, Inc.
 # All Rights Reserved.
 # Qualcomm Technologies Proprietary and Confidential.
 
@@ -63,7 +63,7 @@ extern int g_dbg_scpc;
 
 static void usage(void)
 {
-	fprintf(stderr, "\nusage: %s [options] \n"
+	printf("\nusage: %s [options] \n"
 		"   -n, --nodaemon      do not run as a daemon\n"
 		"   -d    show more debug messages (-dd for even more)\n"
 #ifdef CONFIG_FTM_BT
@@ -118,6 +118,9 @@ static void usage(void)
 		"   --rstdir <set RSSI self test direction, 0: chain0 to chain1 1: chain1 to chain0>\n"
 		"   --rst  <RSSI self test (need to enable dbs mode before this test\n"
 		"           per cmd myftm -J -B dbs)>\n"
+		"   --aifsn <set aifsn number>\n"
+		"   --pw_mode_6g <set 6g power mode 0-None 1-VLP 2-LPI 3-SP>\n"
+		"   --puncBw <set puncture bandwidth pattern eg:0x1>\n"
 		"   --help   display this help and exit\n"
 		, progname);
 		exit(EXIT_FAILURE);
@@ -229,6 +232,14 @@ int main(int argc, char *argv[])
 		{"forcedrxidx", required_argument, NULL, MYFTM_OPT_CMD_SET_FORCEDRXIDX},
 		{"rstdir", required_argument, NULL, MYFTM_OPT_CMD_SET_RSTDIR},
 		{"rst", no_argument, NULL, MYFTM_OPT_CMD_RST},
+		{"aifsn", required_argument, NULL, MYFTM_OPT_CMD_SET_AIFSN},
+		{"pw_mode_6g", required_argument, NULL, MYFTM_OPT_CMD_SET_PW_MODE_6G},
+		{"dpdcomplete", no_argument, NULL, MYFTM_OPT_CMD_GET_DPD_COMPLETE},
+		{"puncBw", required_argument, NULL, MYFTM_OPT_CMD_SET_PUNC_BW},
+		{"skipRxStop", no_argument, NULL, MYFTM_OPT_CMD_SET_SKIP_RX_STOP},
+		{"noiseFloorRead", required_argument, NULL, MYFTM_OPT_CMD_SET_NOISEFLOORREAD},
+		{"xlnaCtrl", required_argument, NULL, MYFTM_OPT_CMD_SET_XLNACTRL},
+		{"getnoisefloor", no_argument, NULL, MYFTM_OPT_CMD_GET_NOISEFLOOR},
 		{0, 0, 0, 0}
 	};
 	int daemonize = 0;
@@ -271,192 +282,192 @@ int main(int argc, char *argv[])
 				g_dbg_scpc = 1;
 				break;
 			case 'e':
-				fprintf(stderr, "SetWifiEnable using athtestcmdlib\n");
+				printf("SetWifiEnable using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiEnable(int_parm);
 				break;
 			case 'E':
-				fprintf(stderr, "GetWifiEnable using athtestcmdlib\n");
+				printf("GetWifiEnable using athtestcmdlib\n");
 				int_parm = WlanATGetWifiEnable();
-				fprintf(stderr, "WlanATGetWifiEnable return as %d\n", int_parm);
+				printf("WlanATGetWifiEnable return as %d\n", int_parm);
 				break;
 			case 'm':
-				fprintf(stderr, "SetWifiMode using athtestcmdlib\n");
+				printf("SetWifiMode using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiMode(int_parm);
 				break;
 			case 'w':
-				fprintf(stderr, "WlanATSetWifiBand using athtestcmdlib\n");
+				printf("WlanATSetWifiBand using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiBand(int_parm);
 				break;
 			case 'f':
-				fprintf(stderr, "WlanATSetWifiFreq using athtestcmdlib\n");
+				printf("WlanATSetWifiFreq using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				freq_parm.value = int_parm;
 				freq_parm.offset = 0;
 				WlanATSetWifiFreq(&freq_parm);
 				break;
 			case 'p':
-				fprintf(stderr, "WlanATSetWifiTxPower using athtestcmdlib\n");
+				printf("WlanATSetWifiTxPower using athtestcmdlib\n");
 				WlanATSetWifiTxPower(optarg);
 				break;
 			case 'P':
-				fprintf(stderr, "WlanATGetWifiTxPower using athtestcmdlib\n");
+				printf("WlanATGetWifiTxPower using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATGetWifiTxPower();
 				break;
 			case 'r':
-				fprintf(stderr, "WlanATSetRate using athtestcmdlib\n");
+				printf("WlanATSetRate using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetRate(int_parm);
 				break;
 			case 'R':
-				fprintf(stderr, "WlanATGetRate using athtestcmdlib\n");
+				printf("WlanATGetRate using athtestcmdlib\n");
 				WlanATGetRate();
 				break;
 			case 'a':
-				fprintf(stderr, "WlanATSetWifiAntenna using athtestcmdlib\n");
+				printf("WlanATSetWifiAntenna using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiAntenna(int_parm);
 				break;
 			case 'A':
-				fprintf(stderr, "WlanATGetWifiAntenna using athtestcmdlib\n");
+				printf("WlanATGetWifiAntenna using athtestcmdlib\n");
 				WlanATGetWifiAntenna();
 				break;
 			case 't':
 				printf("WlanATSetWifiTX using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				if (0 != WlanATSetWifiTX(int_parm)) {
-					fprintf(stderr, "WlanATSetWifiTX failed!\n");
+					printf("WlanATSetWifiTX failed!\n");
 					exit(EXIT_FAILURE);
 				}
 				printf("WlanATSetWifiTX done with sucess\n");
 				exit(EXIT_SUCCESS);
 				break;
 			case 'x':
-				fprintf(stderr, "WlanATSetWifiRX using athtestcmdlib\n");
+				printf("WlanATSetWifiRX using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiRX(int_parm);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'u':
-				fprintf(stderr, "unittest using athtestcmdlib\n");
+				printf("unittest using athtestcmdlib\n");
 				unittest();
 				exit(EXIT_SUCCESS);
 				break;
 			case 's':
-				fprintf(stderr, "WlanATSetWifiPktSize using athtestcmdlib\n");
+				printf("WlanATSetWifiPktSize using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiPktSize(int_parm);
 				break;
 			case 'c':
-				fprintf(stderr, "WlanATSetWifiTPC using athtestcmdlib\n");
+				printf("WlanATSetWifiTPC using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiTPC(int_parm);
 				break;
 			case 'C':
-				fprintf(stderr, "WlanATSetPaCfg using athtestcmdlib\n");
+				printf("WlanATSetPaCfg using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetPaCfg(int_parm);
 				break;
 			case 'D':
-				fprintf(stderr, "WlanATSetDacGain using athtestcmdlib\n");
+				printf("WlanATSetDacGain using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetDacGain(int_parm);
 				break;
 			case 'G':
-				fprintf(stderr, "WlanATSetGainIdx using athtestcmdlib\n");
+				printf("WlanATSetGainIdx using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetGainIdx(int_parm);
 				break;
 			case 'j':
-				fprintf(stderr, "WlanATSetNumPkt using athtestcmdlib\n");
+				printf("WlanATSetNumPkt using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetNumPkt(int_parm);
 				break;
 			case 'k':
-				fprintf(stderr, "WlanATSetAgg using athtestcmdlib\n");
+				printf("WlanATSetAgg using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetAgg(int_parm);
 				break;
 			case 'y':
-				fprintf(stderr, "WlanATSetStbc using athtestcmdlib\n");
+				printf("WlanATSetStbc using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetStbc(int_parm);
 				break;
 			case 'z':
-				fprintf(stderr, "WlanATSetLdpc using athtestcmdlib\n");
+				printf("WlanATSetLdpc using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetLdpc(int_parm);
 				break;
 			case 'M':
-				fprintf(stderr, "WlanATSetWlanMode using athtestcmdlib\n");
+				printf("WlanATSetWlanMode using athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWlanMode(int_parm);
 				break;
 			case 'l':
-				fprintf(stderr, "WlanATSetLPreamble using athtestcmdlib\n");
+				printf("WlanATSetLPreamble using athtestcmdlib\n");
 				WlanATSetLPreamble();
 				break;
 			case 'L':
 				printf("SCPC cal request\n");
 				int_parm = atoi(optarg);
 				if (0 != myftm_wlan_set_scpc_cal(int_parm)) {
-					fprintf(stderr, "myftm_wlan_set_scpc_cal failed!\n");
+					printf("myftm_wlan_set_scpc_cal failed!\n");
 					exit(EXIT_FAILURE);
 				}
 				break;
 			case 'q':
-				fprintf(stderr, "Starting QTIP server.\n");
+				printf("Starting QTIP server.\n");
 				qtip();
 				break;
 
 			case 'B':
-				fprintf(stderr, "WlanATSetDBS using "
+				printf("WlanATSetDBS using "
 					"athtestcmdlib\n");
 				WlanATSetDBS(optarg);
 				exit(EXIT_SUCCESS);
 				break;
 
 			case 'H':
-				fprintf(stderr, "WlanATSetWifiRXMode using "
+				printf("WlanATSetWifiRXMode using "
 					"athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetWifiRXMode(int_parm);
 				break;
 
 			case 'I':
-				fprintf(stderr, "WlanATSetPhyid using "
+				printf("WlanATSetPhyid using "
 					"athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetPhyid(int_parm);
 				break;
 
 			case 'J':
-				fprintf(stderr, "using TLV2.0\n");
+				printf("using TLV2.0\n");
 				tlv2_enabled = 1;
 				break;
 
 			case 'N':
-				fprintf(stderr, "Set Bssid using "
+				printf("Set Bssid using "
 					"athtestcmdlib\n");
 				WlanATSetBssid(optarg);
 				break;
 
 			case 'O':
-				fprintf(stderr, "Set STA Addr using "
+				printf("Set STA Addr using "
 					"athtestcmdlib\n");
 				WlanATSetSTAAddr(optarg);
 				break;
 
 			case 'o':
-				fprintf(stderr, "Set BT using athtestcmdlib\n");
+				printf("Set BT using athtestcmdlib\n");
 				WlanATSetBTAddr(optarg);
 				break;
 
 			case 'Q':
-				fprintf(stderr, "WlanATSetWifiFreq2 using "
+				printf("WlanATSetWifiFreq2 using "
 					"athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				freq_parm.value = int_parm;
@@ -465,219 +476,292 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'U':
-				fprintf(stderr, "WlanATSetShortGuard using "
+				printf("WlanATSetShortGuard using "
 					"athtestcmdlib\n");
 				int_parm = atoi(optarg);
 				WlanATSetShortGuard(int_parm);
 				break;
 
 			case 'X':
-				fprintf(stderr, "Set TX using athtestcmdlib\n");
+				printf("Set TX using athtestcmdlib\n");
 				WlanATSetTXSta(optarg);
 				break;
 
 			case 'Y':
-				fprintf(stderr, "Set RX using athtestcmdlib\n");
+				printf("Set RX using athtestcmdlib\n");
 				WlanATSetRXSta(optarg);
 				break;
 
 			case MYFTM_OPT_CMD_SAR:
-				fprintf(stderr, "Command SAR\n");
+				printf("Command SAR\n");
 				int_parm = atoi(optarg);
 				WlanATCmdSAR(int_parm);
 				break;
 
 			case MYFTM_OPT_PRM_SAR_INDEX8:
-				fprintf(stderr, "SAR Index %s \n", optarg);
+				printf("SAR Index %s \n", optarg);
 				WlanATCmdSARIndex(optarg);
 				break;
 
 			case MYFTM_OPT_PRM_SAR_CHAIN:
-				fprintf(stderr, "SAR CHAIN \n");
+				printf("SAR CHAIN \n");
 				int_parm = atoi(optarg);
 				WlanATCmdSARChain(int_parm);
 				break;
 
 			case MYFTM_OPT_PRM_SAR_CCK2GLIMIT:
-				fprintf(stderr, "SAR CCK2GLIMIT %s \n", optarg);
+				printf("SAR CCK2GLIMIT %s \n", optarg);
 				WlanATCmdSARCCK2gLimit(optarg);
 				break;
 
 			case MYFTM_OPT_PRM_SAR_OFDM2GLIMIT:
-				fprintf(stderr, "SAR OFDM2GLIMIT %s \n", optarg);
+				printf("SAR OFDM2GLIMIT %s \n", optarg);
 				WlanATCmdSAROFDM2gLimit(optarg);
 				break;
 
 			case MYFTM_OPT_PRM_SAR_OFDM5GLIMIT:
-				fprintf(stderr, "SAR OFDM5GLIMIT %s \n", optarg);
+				printf("SAR OFDM5GLIMIT %s \n", optarg);
 				WlanATCmdSAROFDM5gLimit(optarg);
 				break;
 
 			case MYFTM_OPT_PRM_FLAG_DPD:
-				fprintf(stderr, "Enable DPD Flag\n");
+				printf("Enable DPD Flag\n");
 				WlanATCmdFlagDPDEnable();
 				break;
 
 			case MYFTM_OPT_CMD_SETREGDMN:
-				fprintf(stderr, "Command REGDMN\n");
+				printf("Command REGDMN\n");
 				WlanATCmdSETREGDMN(optarg);
 				break;
 
 			case MYFTM_OPT_CMD_DPDSTATUS:
-				fprintf(stderr, "Command dpdstatus\n");
+				printf("Command dpdstatus\n");
 				WlanATCmdDPDStatus();
 				break;
 
 			case MYFTM_OPT_CMD_SET_RATEBW:
-				fprintf(stderr, "Command rateBw\n");
+				printf("Command rateBw\n");
 				WlanATCmdSETRateBW(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_NSS:
-				fprintf(stderr, "Command nss\n");
+				printf("Command nss\n");
 				WlanATCmdSETNSS(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_GI:
-				fprintf(stderr, "Command gI\n");
+				printf("Command gI\n");
 				WlanATCmdSETGI(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_OFDM_ADCM:
-				fprintf(stderr, "Command ofdm adcm\n");
+				printf("Command ofdm adcm\n");
 				WlanATCmdSETADCM(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_OFDM_PPDU_TYPE:
-				fprintf(stderr, "Command ofdm ppdu type\n");
+				printf("Command ofdm ppdu type\n");
 				WlanATCmdSETPPDUTYPE(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_OFDM_LINKDIR:
-				fprintf(stderr, "Command odfm linkdir\n");
+				printf("Command odfm linkdir\n");
 				WlanATCmdSETLINKDIR(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_OFDMA_TONEPLAN:
-				fprintf(stderr, "WlanATCmdSET_TONEPLAN using athtestcmdlib\n");
+				printf("WlanATCmdSET_TONEPLAN using athtestcmdlib\n");
 				if (0 != WlanATCmdSET_TONEPLAN(optarg)) {
-					fprintf(stderr, "WlanATCmdSET_TONEPLAN failed!\n");
+					printf("WlanATCmdSET_TONEPLAN failed!\n");
 					exit(EXIT_FAILURE);
 				}
-				fprintf(stderr, "WlanATCmdSET_TONEPLAN done with success\n");
+				printf("WlanATCmdSET_TONEPLAN done with success\n");
 				exit(EXIT_SUCCESS);
 				break;
 
 			case MYFTM_OPT_CMD_SET_PREFECPAD:
-				fprintf(stderr, "Command prefecpad\n");
+				printf("Command prefecpad\n");
 				WlanATCmdSET_PREFECPAD(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_LDPCEXTRASYMBOL:
-				fprintf(stderr, "Command ldpc extrasymbol\n");
+				printf("Command ldpc extrasymbol\n");
 				WlanATCmdSET_LDPCEXTRASYMBOL(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_OFDMAUL_TXCONFIG:
-				fprintf(stderr, "Command odfma uplink Tx config\n");
+				printf("Command odfma uplink Tx config\n");
 				if (0 != WlanATCmdSET_OFDMAULTX()) {
-					fprintf(stderr, "WlanATCmdSET_OFDMAULTX failed!\n");
+					printf("WlanATCmdSET_OFDMAULTX failed!\n");
 					exit(EXIT_FAILURE);
 				}
-				fprintf(stderr, "WlanATCmdSET_OFDMAULTX done with success\n");
+				printf("WlanATCmdSET_OFDMAULTX done with success\n");
 				exit(EXIT_SUCCESS);
 				break;
 
 			case MYFTM_OPT_CMD_SET_DUTYCYCLE:
-				fprintf(stderr, "Command Duty Cycle\n");
+				printf("Command Duty Cycle\n");
 				WlanATCmdSET_DUTYCYCLE(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_WRT_REGISTER_VAL:
-				fprintf(stderr, "Command to write value at register \n");
+				printf("Command to write value at register \n");
 
-				t_val = strtol(optarg, NULL, 0);
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
+					exit(EXIT_FAILURE);
+				}
 				if (t_val >= 0)
 					WlanATCmdWRITE_REGVAL(t_val);
 				else
-					fprintf(stderr, "setting WlanATCmdWRITE_REGVAL to 0\n");
+					printf("setting WlanATCmdWRITE_REGVAL to 0\n");
 				break;
 
 			case MYFTM_OPT_CMD_WRITE_REGISTER:
-				fprintf(stderr, "Command to write register \n");
+				printf("Command to write register \n");
 
-				t_val = strtol(optarg, NULL, 0);
-				if ((t_val <= 0) || (0 != WlanATCmdWRITE_REGISTER(t_val))) {
-					fprintf(stderr, "WlanATCmdWRITE_REGISTER failed!\n");
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
 					exit(EXIT_FAILURE);
 				}
-				fprintf(stderr, "WlanATCmdWRITE_REGISTER done with success\n");
+				if ((t_val <= 0) || (0 != WlanATCmdWRITE_REGISTER(t_val))) {
+					printf("WlanATCmdWRITE_REGISTER failed!\n");
+					exit(EXIT_FAILURE);
+				}
+				printf("WlanATCmdWRITE_REGISTER done with success\n");
 				exit(EXIT_SUCCESS);
 				break;
 
 			case MYFTM_OPT_CMD_READ_REGISTER:
-				fprintf(stderr, "Command to read register \n");
+				printf("Command to read register \n");
 
-				t_val = strtol(optarg, NULL, 0);
-				if ((t_val <= 0) || (0 != WlanATCmdREAD_REGISTER(t_val))) {
-					fprintf(stderr, "WlanATCmdREAD_REGISTER failed!\n");
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
 					exit(EXIT_FAILURE);
 				}
-				fprintf(stderr, "WlanATCmdREAD_REGISTER done with success\n");
+				if ((t_val <= 0) || (0 != WlanATCmdREAD_REGISTER(t_val))) {
+					printf("WlanATCmdREAD_REGISTER failed!\n");
+					exit(EXIT_FAILURE);
+				}
+				printf("WlanATCmdREAD_REGISTER done with success\n");
 				exit(EXIT_SUCCESS);
 				break;
 
 			case MYFTM_OPT_CMD_SET_LOWPOWER:
-				fprintf(stderr, "Command to send LOW POWER config\n");
+				printf("Command to send LOW POWER config\n");
 				if (0 != WlanATCmdSET_LOWPOWER()) {
-					fprintf(stderr, "WlanATCmdSET_LOWPOWER failed!\n");
+					printf("WlanATCmdSET_LOWPOWER failed!\n");
 					exit(EXIT_FAILURE);
 				}
-				fprintf(stderr, "WlanATCmdSET_LOWPOWER done with success\n");
+				printf("WlanATCmdSET_LOWPOWER done with success\n");
 				exit(EXIT_SUCCESS);
 				break;
 
 			case MYFTM_OPT_CMD_SET_LOWPOWER_MODE:
-				fprintf(stderr, "Command to configured LOW POWER MODE\n");
+				printf("Command to configured LOW POWER MODE\n");
 				WlanATCmdSET_LOWPOWER_MODE(optarg);
 				break;
 
 			case MYFTM_OPT_CMD_SET_PHYIDMASK:
-				fprintf(stderr, "Command to set PHYID MASK\n");
+				printf("Command to set PHYID MASK\n");
 				WlanATCmdSET_PHYIDMASK(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_LOWPOWER_FEATUREMASK:
-				fprintf(stderr, "Command to set Low Power Feature Mask \n");
+				printf("Command to set Low Power Feature Mask \n");
 
-				t_val = strtol(optarg, NULL, 0);
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
+					exit(EXIT_FAILURE);
+				}
 				if (t_val >= 0)
 					WlanATCmdSET_LOWEPOWER_FEATUREMASK(t_val);
 				else
-					fprintf(stderr, "setting LOWEPOWER_FEATUREMASK to 0\n");
+					printf("setting LOWEPOWER_FEATUREMASK to 0\n");
 				break;
 
 			case MYFTM_OPT_CMD_SET_CALTXGAIN:
-				fprintf(stderr, "Command to set TX Gain(RF gain for WCN)\n");
+				printf("Command to set TX Gain(RF gain for WCN)\n");
 				WlanATCmdSET_CALTXGAIN(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_FORCEDRXIDX:
-				fprintf(stderr, "Command to set Forced RX gain index\n");
+				printf("Command to set Forced RX gain index\n");
 				WlanATCmdSET_FORCEDRXIDX(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_SET_RSTDIR:
-				fprintf(stderr, "Command to set RSSI self test direction\n");
+				printf("Command to set RSSI self test direction\n");
 				WlanATCmdSET_RSTDIR(atoi(optarg));
 				break;
 
 			case MYFTM_OPT_CMD_RST:
-				fprintf(stderr, "Command to enable RSSI self test, must be placed at end of cmd\n"
+				printf("Command to enable RSSI self test, must be placed at end of cmd\n"
 					"Please enable dbs first if not yet: -J -B dbs, to avoid FW crash\n");
 				WlanATCmd_RST();
 				break;
 
+			case MYFTM_OPT_CMD_SET_AIFSN:
+				printf("Command to set aifsn number\n");
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
+					exit(EXIT_FAILURE);
+				}
+				if (t_val < 0 || t_val > 253) {
+					fprintf(stderr, "WlanATCmdSET_AIFSN failed!\n");
+					exit(EXIT_FAILURE);
+				}
+				WlanTCmdSET_AIFSN((uint8_t)t_val);
+				break;
+			case MYFTM_OPT_CMD_SET_PW_MODE_6G:
+				printf("Command to set 6G power mode\n");
+				errno = 0;
+				t_val = (uint32_t)strtol(optarg, NULL, 0);
+				if(errno != 0) {
+					printf("Argument overflow or underflow occurred\n");
+					exit(EXIT_FAILURE);
+				}
+				if (t_val < 0 || t_val > 3) {
+					fprintf(stderr, "WlanATCmdSET6GPwMode failed!\n");
+					exit(EXIT_FAILURE);
+				}
+				WlanATCmdSET6GPwMode((uint8_t)t_val);
+				break;
+			case MYFTM_OPT_CMD_GET_DPD_COMPLETE:
+				printf("Command to get dpd complete\n");
+				WlanATCmdGetDpdComplete();
+				break;
+			case MYFTM_OPT_CMD_SET_SKIP_RX_STOP:
+				printf("Command to set skip rx stop\n");
+				WlanATSetSkipRxStop(1);
+				break;
+			case MYFTM_OPT_CMD_SET_PUNC_BW:
+				printf("Command to set puncture bandwidth pattern\n");
+				t_val = (uint32_t)strtol(optarg, NULL, 16);
+				WlanATCmdSet_PUNCBW(t_val);
+				break;
+			case MYFTM_OPT_CMD_GET_NOISEFLOOR:
+				printf("Command to get noise floor\n");
+				WlanATCmdGetNoiseFloor();
+				break;
+			case MYFTM_OPT_CMD_SET_XLNACTRL:
+				printf("Command to set xlna ctrl\n");
+				WlanATCmdSetxlnaCtrl(optarg);
+				break;
+			case MYFTM_OPT_CMD_SET_NOISEFLOORREAD:
+				printf("Command to set noise floor read\n");
+				WlanATCmdSetNoiseFloorRead(optarg);
+				break;
 			case 'h':
 			default:
 				usage();

@@ -2668,8 +2668,8 @@ static void qdf_mem_free_list(struct qdf_mem_list_node *listhead)
 					    hash_entry->alloc_size,
 					    hash_entry->paddr,
 					    hash_entry->vaddr);
-		qdf_mem_free(hash_entry);
 		list_iter = list_iter->next;
+		qdf_mem_free(hash_entry);
 	}
 
 	return;

@@ -524,6 +524,11 @@ static void wnm_parse_neighbor_report_elem(struct neighbor_report *rep,
 		rep->mul_bssid->subelem_len = elen - 1;
 		os_memcpy(rep->mul_bssid->subelems, pos + 1, elen - 1);
 		break;
+	default:
+		wpa_printf(MSG_DEBUG,
+			   "WNM: Unsupported neighbor report subelement id %u",
+			   id);
+		break;
 	}
 }
 
@@ -921,7 +926,8 @@ static int wnm_nei_rep_add_bss(struct wpa_supplicant *wpa_s,
 {
 	const u8 *ie;
 	u8 op_class, chan;
-	int sec_chan = 0, vht = 0;
+	int sec_chan = 0;
+	enum oper_chan_width vht = CONF_OPER_CHWIDTH_USE_HT;
 	enum phy_type phy_type;
 	u32 info;
 	struct ieee80211_ht_operation *ht_oper = NULL;

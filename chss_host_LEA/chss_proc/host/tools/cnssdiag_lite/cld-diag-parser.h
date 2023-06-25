@@ -578,7 +578,7 @@ static inline unsigned int aniNlLen(unsigned int len)
     "echo related > /sys/bus/msm_subsys/devices/subsys%d/restart_level"
 #define DB_1_FILE_1_PATH        "/firmware/image/Data.msc"
 #define DB_1_FILE_2_PATH        "/vendor/firmware/Data.msc"
-#define BUF_SIZ  256
+#define BUF_SIZ  384
 #define NUM_OF_DRIVERS  2
 #define DB_2_FILE_1_PATH        "/lib/firmware/qca9377/Data.msc"
 

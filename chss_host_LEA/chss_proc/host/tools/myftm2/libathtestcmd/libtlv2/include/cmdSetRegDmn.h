@@ -18,6 +18,8 @@ extern "C" {
 
 typedef struct setregdmn_parms {
     A_UINT16	regDmn[2];
+    A_UINT8	pwrMode6G;
+    A_UINT8	pad[3];
 } __ATTRIB_PACK CMD_SETREGDMN_PARMS;
 
 typedef void (*SETREGDMN_OP_FUNC)(void *pParms);

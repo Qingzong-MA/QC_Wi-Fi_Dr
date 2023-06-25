@@ -16,6 +16,7 @@
 #include "common/ieee802_11_defs.h"
 #include "common/sae.h"
 #include "crypto/sha384.h"
+#include "pasn/pasn_common.h"
 
 /* STA flags */
 #define WLAN_STA_AUTH BIT(0)
@@ -68,41 +69,33 @@ struct pending_eapol_rx {
 	enum frame_encryption encrypted;
 };
 
-enum pasn_fils_state {
-	PASN_FILS_STATE_NONE = 0,
-	PASN_FILS_STATE_PENDING_AS,
-	PASN_FILS_STATE_COMPLETE
-};
+#define EHT_ML_MAX_STA_PROF_LEN 1024
+struct mld_info {
+	bool mld_sta;
 
-struct pasn_fils_data {
-	u8 state;
-	u8 nonce[FILS_NONCE_LEN];
-	u8 anonce[FILS_NONCE_LEN];
-	u8 session[FILS_SESSION_LEN];
-	u8 erp_pmkid[PMKID_LEN];
+	struct ml_common_info {
+		u8 mld_addr[ETH_ALEN];
+		u16 medium_sync_delay;
+		u16 eml_capa;
+		u16 mld_capa;
+	} common_info;
 
-	struct wpabuf *erp_resp;
-};
+	struct mld_link_info {
+		u8 valid;
+		u8 local_addr[ETH_ALEN];
+		u8 peer_addr[ETH_ALEN];
 
-struct pasn_data {
-	int akmp;
-	int cipher;
-	u16 group;
-	u8 trans_seq;
-	u8 wrapped_data_format;
-	size_t kdk_len;
+		size_t nstr_bitmap_len;
+		u8 nstr_bitmap[2];
 
-	u8 hash[SHA384_MAC_LEN];
-	struct wpa_ptk ptk;
-	struct crypto_ecdh *ecdh;
+		u16 capability;
 
-	struct wpabuf *secret;
-#ifdef CONFIG_SAE
-	struct sae_data sae;
-#endif /* CONFIG_SAE */
-#ifdef CONFIG_FILS
-	struct pasn_fils_data fils;
-#endif /* CONFIG_FILS */
+		u16 status;
+		size_t resp_sta_profile_len;
+		u8 resp_sta_profile[EHT_ML_MAX_STA_PROF_LEN];
+
+		const u8 *rsne, *rsnxe;
+	} links[MAX_NUM_MLD_LINKS];
 };
 
 struct sta_info {
@@ -154,6 +147,7 @@ struct sta_info {
 	unsigned int qos_map_enabled:1;
 	unsigned int remediation:1;
 	unsigned int hs20_deauth_requested:1;
+	unsigned int hs20_deauth_on_ack:1;
 	unsigned int session_timeout_set:1;
 	unsigned int radius_das_match:1;
 	unsigned int ecsa_supported:1;
@@ -334,6 +328,11 @@ struct sta_info {
 #ifdef CONFIG_PASN
 	struct pasn_data *pasn;
 #endif /* CONFIG_PASN */
+
+#ifdef CONFIG_IEEE80211BE
+	struct mld_info mld_info;
+	u8 mld_assoc_link_id;
+#endif /* CONFIG_IEEE80211BE */
 };
 
 
@@ -389,6 +388,8 @@ void ap_sta_stop_sa_query(struct hostapd_data *hapd, struct sta_info *sta);
 int ap_check_sa_query_timeout(struct hostapd_data *hapd, struct sta_info *sta);
 const char * ap_sta_wpa_get_keyid(struct hostapd_data *hapd,
 				  struct sta_info *sta);
+const u8 * ap_sta_wpa_get_dpp_pkhash(struct hostapd_data *hapd,
+				     struct sta_info *sta);
 void ap_sta_disconnect(struct hostapd_data *hapd, struct sta_info *sta,
 		       const u8 *addr, u16 reason);
 
@@ -406,7 +407,8 @@ void ap_sta_clear_disconnect_timeouts(struct hostapd_data *hapd,
 
 int ap_sta_flags_txt(u32 flags, char *buf, size_t buflen);
 void ap_sta_delayed_1x_auth_fail_disconnect(struct hostapd_data *hapd,
-					    struct sta_info *sta);
+					    struct sta_info *sta,
+					    unsigned timeout);
 int ap_sta_pending_delayed_1x_auth_fail_disconnect(struct hostapd_data *hapd,
 						   struct sta_info *sta);
 int ap_sta_re_add(struct hostapd_data *hapd, struct sta_info *sta);

@@ -1,0 +1,47 @@
+From ca4570edcf22acf1c3bebc05498326a143642fdc Mon Sep 17 00:00:00 2001
+From: Bing Sun <quic_bings@quicinc.com>
+Date: Thu, 13 Apr 2023 18:14:21 +0800
+Subject: [PATCH] SAE: Extend automatic enabling of H2E on 6 GHz to additional
+ cases
+
+Commit 3a0edb2cd86e ("SAE: Enable H2E for 6 GHz BSS") started enabling
+H2E automatically for SAE use on the 6 GHz band, but it did not update
+these steps in verifying whether the STA has matching configuration for
+a BSS that mandates use of H2E and whether to use PT for SAE in SME.
+Update these to be aware of automatic H2E enabling.
+
+Signed-off-by: Jouni Malinen <quic_jouni@quicinc.com>
+---
+ wpa_supplicant/events.c | 1 +
+ wpa_supplicant/sme.c    | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/wpa_supplicant/events.c b/wpa_supplicant/events.c
+index aef4115..9ce21e6 100644
+--- a/wpa_supplicant/events.c
++++ b/wpa_supplicant/events.c
+@@ -881,6 +881,7 @@ static int rate_match(struct wpa_supplicant *wpa_s, struct wpa_ssid *ssid,
+ 					BSS_MEMBERSHIP_SELECTOR_SAE_H2E_ONLY)) {
+ 				if (wpa_s->conf->sae_pwe == 0 &&
+ 				    !ssid->sae_password_id &&
++				    !is_6ghz_freq(bss->freq) &&
+ 				    wpa_key_mgmt_sae(ssid->key_mgmt)) {
+ 					if (debug_print)
+ 						wpa_dbg(wpa_s, MSG_DEBUG,
+diff --git a/wpa_supplicant/sme.c b/wpa_supplicant/sme.c
+index 5850d3d..880dff4 100644
+--- a/wpa_supplicant/sme.c
++++ b/wpa_supplicant/sme.c
+@@ -154,6 +154,9 @@ static struct wpabuf * sme_auth_build_sae_commit(struct wpa_supplicant *wpa_s,
+ 
+ 	if (ssid->sae_password_id && wpa_s->conf->sae_pwe != 3)
+ 		use_pt = 1;
++	if (bss && is_6ghz_freq(bss->freq) &&
++	    wpa_s->conf->sae_pwe != 3)
++		use_pt = 1;
+ #ifdef CONFIG_SAE_PK
+ 	if ((rsnxe_capa & BIT(WLAN_RSNX_CAPAB_SAE_PK)) &&
+ 	    ssid->sae_pk != SAE_PK_MODE_DISABLED &&
+-- 
+2.7.4
+

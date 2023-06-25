@@ -293,7 +293,7 @@ public:
     }
 
     struct nlattr * attr_start(int attribute) {
-        return nla_nest_start(mMsg, attribute);
+        return nla_nest_start(mMsg, NLA_F_NESTED | (attribute));
     }
     void attr_end(struct nlattr *attr) {
         nla_nest_end(mMsg, attr);

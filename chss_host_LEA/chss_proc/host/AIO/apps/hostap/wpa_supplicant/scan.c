@@ -446,7 +446,7 @@ static void wpa_supplicant_optimize_freqs(
 	}
 #endif /* CONFIG_P2P */
 
-#ifdef CONFIG_WPS
+#if 0
 	if (params->freqs == NULL && wpa_s->after_wps && wpa_s->wps_freq) {
 		/*
 		 * Optimize post-provisioning scan based on channel used

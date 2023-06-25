@@ -22,10 +22,12 @@ void* initSETREGDMNOpParms(A_UINT8 *pParmsCommon, PARM_OFFSET_TBL *pParmsOffset,
     {
         pSETREGDMNParms->regDmn[i] = pParmDict[PARM_REGDMN].v.ptU16[i];
     }
+    pSETREGDMNParms->pwrMode6G = pParmDict[PARM_PWRMODE6G].v.valU8;
 
     // Make up ParmOffsetTbl
     resetParmOffsetFields();
     fillParmOffsetTbl((A_UINT32)PARM_REGDMN, (A_UINT32)(((A_UINT8 *)&(pSETREGDMNParms->regDmn)) - (A_UINT8 *)pSETREGDMNParms), pParmsOffset);
+    fillParmOffsetTbl((A_UINT32)PARM_PWRMODE6G, (A_UINT32)(((A_UINT32)&(pSETREGDMNParms->pwrMode6G)) - (A_UINT32)pSETREGDMNParms), pParmsOffset);
     return((void*) pSETREGDMNParms);
 }
 
@@ -49,6 +51,7 @@ A_BOOL SETREGDMNOp(void *pParms)
     {
         A_PRINTF("SETREGDMNOp: regDmn 0x%x\n", pSETREGDMNParms->regDmn[i]);
     }
+    A_PRINTF("SETREGDMNOp: pwrMode6G %u\n", pSETREGDMNParms->pwrMode6G);
 #endif //_DEBUG
 
     if (NULL != SETREGDMNOpFunc) {

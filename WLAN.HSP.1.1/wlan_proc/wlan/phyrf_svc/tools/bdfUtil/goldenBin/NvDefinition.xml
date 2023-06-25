@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- NV Template File -->
-<!-- Derived from NvDefinition_QCA649X.xlsx on 05/24/2022 with version: 5.3.22 (DO NOT EDIT) -->
+<!-- Derived from NvDefinition_QCA649X.xlsx on 04/06/2023 with version: 5.3.29 (DO NOT EDIT) -->
 <NvDefinition>
 	<DataType name="uint8">
 		<Member type="uint8" sizeOf="1"/>
@@ -119,6 +119,15 @@
 		<Member type="uint8" sizeOf="1" name="rxgain_table_regular_start_6g_non20"/>
 		<Member type="uint8" sizeOf="1" name="rxgain_table_lg_start_6g_non20"/>
 		<Member type="uint8" sizeOf="12" name="reserved"/>
+	</DataType>
+	<DataType name="Freq_Plim_values">
+		<Member type="uint16" sizeOf="1" name="frequency"/>
+		<Member type="uint8" sizeOf="1" name="Plim"/>
+	</DataType>
+	<DataType name="HALPHY_FWBDFCHECK_CONFIG">
+		<Member type="uint32" sizeOf="1" name="fwBdfCheckConfig"/>
+		<Member type="uint32" sizeOf="1" name="fwVerMinor"/>
+		<Member type="uint32" sizeOf="1" name="fwVerMajor"/>
 	</DataType>
 	<DataType name="BASE_BDF_HEADER">
 		<Member type="uint16" sizeOf="1" name="length"/>
@@ -239,7 +248,10 @@
 		<Member type="uint8" sizeOf="1" name="HeCtlOffsetEnable"/>
 		<Member type="PCIE_VENDOR_PHY_CONFIG" sizeOf="1" name="pcieVendorPhyCfg"/>
 		<Member type="GainTableShift" sizeOf="1" name="GainTableShift"/>
-		<Member type="uint8" sizeOf="264" name="baseFuture"/>
+		<Member type="uint8" sizeOf="1" name="rssiImbThr"/>
+		<Member type="Freq_Plim_values" sizeOf="8" name="freqPlimvalues"/>
+		<Member type="HALPHY_FWBDFCHECK_CONFIG" sizeOf="1" name="fwBdfMatchCheck"/>
+		<Member type="uint8" sizeOf="227" name="baseFuture"/>
 	</DataType>
 	<DataType name="HALPHY_BDF_FLAGS">
 		<Member type="uint32" sizeOf="1" name="opFlags"/>
@@ -438,7 +450,8 @@
 		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset40M"/>
 		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset80M"/>
 		<Member type="int8" sizeOf="1" name="dpdMinLbDelayOffset160M"/>
-		<Member type="uint8" sizeOf="9" name="pad"/>
+		<Member type="int8" sizeOf="1" name="ftmRunDpdBehindTxCmdKickoff"/>
+		<Member type="uint8" sizeOf="8" name="pad"/>
 	</DataType>
 	<DataType name="LDPD_CONFIG_BAND">
 		<Member type="uint8" sizeOf="1" name="ldpdEnable"/>
@@ -1096,6 +1109,10 @@
 	<DataType name="GTX_GLUT_TARGET_PWR_LEVELS_160M">
 		<Member type="int16" sizeOf="3" name="GLUTTargetPwrLevel5G"/>
 	</DataType>
+	<DataType name="PDC_BAND_GB">
+		<Member type="uint32" sizeOf="3" name="pdcGBcoef"/>
+		<Member type="int16" sizeOf="1" name="tempCompSlope"/>
+	</DataType>
 	<DataType name="PDC_BAND_CONFIG">
 		<Member type="uint8" sizeOf="1" name="skip1stGap"/>
 		<Member type="uint32" sizeOf="3" name="delay"/>
@@ -1113,7 +1130,9 @@
 		<Member type="uint16" sizeOf="1" name="droopCompStart"/>
 		<Member type="uint16" sizeOf="1" name="thermalGap"/>
 		<Member type="uint8" sizeOf="1" name="numDumRun"/>
-		<Member type="uint8" sizeOf="3" name="reserved"/>
+		<Member type="uint8" sizeOf="1" name="usePdcGBcoef"/>
+		<Member type="int8" sizeOf="1" name="tempCompBase"/>
+		<Member type="uint8" sizeOf="1" name="reserved"/>
 	</DataType>
 	<NvItem id="1" name="COMMON_BDF_HEADER">
 		<Member type="NV_HEADER" sizeOf="1" name="nvBase"/>
@@ -1537,7 +1556,9 @@
 		<Member type="uint8" sizeOf="1" name="wlanBtCalSyncEn"/>
 		<Member type="uint8" sizeOf="1" name="fdmtEnableDisableBits"/>
 		<Member type="uint8" sizeOf="1" name="pa1p8Support"/>
-		<Member type="uint8" sizeOf="28" name="bdfEnableDisableFlagsFuture"/>
+		<Member type="uint8" sizeOf="1" name="enableDisableBits2"/>
+		<Member type="uint32" sizeOf="1" name="autoFeatureCtrlBits"/>
+		<Member type="uint8" sizeOf="23" name="bdfEnableDisableFlagsFuture"/>
 	</NvItem>
 	<NvItem id="25" name="RSSI_OFFSET">
 		<Member type="NV_HEADER" sizeOf="1" name="nvRssiOffset"/>
@@ -1633,10 +1654,12 @@
 		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config2G"/>
 		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config5G"/>
 		<Member type="PDC_BAND_CONFIG" sizeOf="1" name="config6G"/>
-		<Member type="uint8" sizeOf="6" name="PDCConfigFuture"/>
+		<Member type="PDC_BAND_GB" sizeOf="1" name="pdcGB2G"/>
+		<Member type="PDC_BAND_GB" sizeOf="1" name="pdcGB5G"/>
+		<Member type="PDC_BAND_GB" sizeOf="1" name="pdcGB6G"/>
 	</NvItem>
 	<NvItem id="36" name="RESERVED_NV">
 		<Member type="NV_HEADER" sizeOf="1" name="nvReserved"/>
-		<Member type="uint8" sizeOf="56" name="reservedFuture"/>
+		<Member type="uint8" sizeOf="20" name="reservedFuture"/>
 	</NvItem>
 </NvDefinition>

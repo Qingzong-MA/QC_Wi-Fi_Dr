@@ -40,6 +40,9 @@ extern "C" {
 #include "ndisdefs.h"
 #endif  /* NDIS_HW */
 
+#include <stdint.h>
+#include <sys/types.h>
+
 /* No OS's have this define */
 typedef const unsigned char     cu8;
 typedef union wlanMACAddr WLAN_MACADDR;
@@ -371,6 +374,15 @@ typedef enum {
     ATH_DEV_TYPE_AP,
     ATH_DEV_TYPE_MAX
 } ATH_DEV_TYPE;
+
+//modes
+#define MODE_11A                                0
+#define MODE_11G                                1
+#define MODE_11B                                2
+#define MODE_11O                                3       //OFDM at 2.4
+#define HALF_SPEED_MODE                 50
+#define QUARTER_SPEED_MODE              51
+#define TURBO_ENABLE                    1
 
 #define ARRAY_NUM_ENTRIES(a) (sizeof(a)/sizeof(*(a)))
 

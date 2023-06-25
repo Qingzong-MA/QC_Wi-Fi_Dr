@@ -148,6 +148,7 @@ static int ap_ft_enabled(struct sigma_dut *dut)
 		 ((1 << AKM_FT_EAP) |
 		  (1 << AKM_FT_PSK) |
 		  (1 << AKM_FT_SAE) |
+		  (1 << AKM_FT_SAE_EXT_KEY) |
 		  (1 << AKM_FT_SUITE_B) |
 		  (1 << AKM_FT_FILS_SHA256) |
 		  (1 << AKM_FT_FILS_SHA384)));
@@ -663,6 +664,64 @@ static void get_he_mcs_nssmap(uint8_t *mcsnssmap, uint8_t nss,
 	}
 	he_reset_mcs_values_for_unsupported_ss(mcsnssmap, nss);
 }
+
+
+#ifdef NL80211_SUPPORT
+static int wcn_set_txbf_periodic_ndp(struct sigma_dut *dut, const char *intf,
+				     uint8_t cfg_val)
+{
+	struct nl_msg *msg;
+	struct nlattr *params;
+	int ifindex, ret;
+
+	ifindex = if_nametoindex(intf);
+	if (ifindex == 0) {
+		sigma_dut_print(dut, DUT_MSG_ERROR,
+				"%s: Index for interface %s not found",
+				__func__, intf);
+		return -1;
+	}
+
+	msg = nl80211_drv_msg(dut, dut->nl_ctx, ifindex, 0,
+			      NL80211_CMD_VENDOR);
+	if (!msg) {
+		sigma_dut_print(dut, DUT_MSG_ERROR,
+				"%s: err in adding vendor_cmd", __func__);
+		return -1;
+	}
+
+	if (nla_put_u32(msg, NL80211_ATTR_VENDOR_ID, OUI_QCA) ||
+	    nla_put_u32(msg, NL80211_ATTR_VENDOR_SUBCMD,
+			QCA_NL80211_VENDOR_SUBCMD_SET_WIFI_CONFIGURATION)) {
+		sigma_dut_print(dut, DUT_MSG_ERROR,
+				"%s: err in adding vendor_attr", __func__);
+		nlmsg_free(msg);
+		return -1;
+	}
+
+	params = nla_nest_start(msg, NL80211_ATTR_VENDOR_DATA);
+	if (!params ||
+	    nla_put_u8(msg,
+		    QCA_WLAN_VENDOR_ATTR_CONFIG_BEAMFORMER_PERIODIC_SOUNDING,
+		    cfg_val)) {
+		sigma_dut_print(dut, DUT_MSG_ERROR,
+				"%s: err in adding vendor_data", __func__);
+		nlmsg_free(msg);
+		return -1;
+	}
+
+	nla_nest_end(msg, params);
+	ret = send_and_recv_msgs(dut, dut->nl_ctx, msg, NULL, NULL);
+	if (ret) {
+		sigma_dut_print(dut, DUT_MSG_ERROR,
+				"%s: err in send_and_recv_msgs, ret=%d (%s)",
+				__func__, ret, strerror(-ret));
+		return ret;
+	}
+
+	return 0;
+}
+#endif /* NL80211_SUPPORT */
 
 
 static enum sigma_cmd_result cmd_ap_set_wireless(struct sigma_dut *dut,
@@ -1324,6 +1383,13 @@ static enum sigma_cmd_result cmd_ap_set_wireless(struct sigma_dut *dut,
 		dut->ap_txBF = strcasecmp(val, "enable") == 0;
 		dut->he_sounding = VALUE_DISABLED;
 		dut->he_set_sta_1x1 = VALUE_ENABLED;
+#ifdef NL80211_SUPPORT
+		if (dut->ap_txBF && get_driver_type(dut) == DRIVER_LINUX_WCN &&
+		    wcn_set_txbf_periodic_ndp(dut, get_main_ifname(dut), 1)) {
+			sigma_dut_print(dut, DUT_MSG_ERROR,
+					"Failed to set NDP periodicity");
+		}
+#endif /* NL80211_SUPPORT */
 	}
 
 	val = get_param(cmd, "MU_TxBF");
@@ -8004,11 +8070,14 @@ enum sigma_cmd_result cmd_ap_config_commit(struct sigma_dut *dut,
 	enum driver_type drv;
 	const char *key_mgmt;
 	int conf_counter = 0;
+	bool append_vht = false;
+	enum ap_mode mode;
 #ifdef ANDROID
 	struct group *gr;
 #endif /* ANDROID */
 
 	drv = get_driver_type(dut);
+	mode = dut->ap_mode;
 
 	if (dut->mode == SIGMA_MODE_STATION) {
 		stop_sta_mode(dut);
@@ -8032,6 +8101,13 @@ enum sigma_cmd_result cmd_ap_config_commit(struct sigma_dut *dut,
 
 	dut->mode = SIGMA_MODE_AP;
 
+	if (dut->ap_dpp_conf_addr &&
+	    strcasecmp(dut->ap_dpp_conf_addr, "mDNS") == 0 &&
+	    dpp_mdns_discover_relay_params(dut) < 0) {
+		sigma_dut_print(dut, DUT_MSG_INFO,
+				"Failed to discover DPP Controller for AP Relay using mDNS");
+	}
+
 	if (drv == DRIVER_ATHEROS)
 		return cmd_ath_ap_config_commit(dut, conn, cmd);
 	if (drv == DRIVER_WCN)
@@ -8053,6 +8129,17 @@ write_conf:
 		if (run_system_wrapper(dut, "cp %s %s", f1, f2) != 0)
 			sigma_dut_print(dut, DUT_MSG_INFO,
 					"Failed to copy %s to %s", f1, f2);
+
+#ifdef ANDROID
+		if (chmod(f2, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) < 0)
+			sigma_dut_print(dut, DUT_MSG_ERROR,
+					"Error changing permissions");
+
+		gr = getgrnam("wifi");
+		if (!gr || chown(f2, -1, gr->gr_gid) < 0)
+			sigma_dut_print(dut, DUT_MSG_ERROR,
+					"Error changing groupid");
+#endif /* ANDROID */
 	} else {
 		ap_conf_path_1[0] = '\0';
 	}
@@ -8069,7 +8156,10 @@ write_conf:
 
 	ifname = get_hostapd_ifname(dut);
 
-	switch (dut->ap_mode) {
+	if (conf_counter == 1 && dut->ap_mode_1 != AP_inval)
+		mode = dut->ap_mode_1;
+
+	switch (mode) {
 	case AP_11g:
 	case AP_11b:
 	case AP_11ng:
@@ -8121,14 +8211,14 @@ write_conf:
 
 	if ((drv == DRIVER_MAC80211 || drv == DRIVER_QNXNTO ||
 	     drv == DRIVER_LINUX_WCN) &&
-	    (dut->ap_mode == AP_11ng || dut->ap_mode == AP_11na ||
-	     (dut->ap_mode == AP_11ax && !dut->use_5g))) {
+	    (mode == AP_11ng || mode == AP_11na ||
+	     (mode == AP_11ax && !dut->use_5g))) {
 		int ht40plus = 0, ht40minus = 0, tx_stbc = 0;
 
 		fprintf(f, "ieee80211n=1\n");
-		if (dut->ap_mode == AP_11ax)
+		if (mode == AP_11ax)
 			fprintf(f, "ieee80211ax=1\n");
-		if (dut->ap_mode == AP_11ng &&
+		if (mode == AP_11ng &&
 		    (dut->ap_chwidth == AP_40 ||
 		     (dut->ap_chwidth == AP_AUTO &&
 		      dut->default_11ng_ap_chwidth == AP_40))) {
@@ -8140,7 +8230,7 @@ write_conf:
 		}
 
 		/* configure ht_capab based on channel width */
-		if (dut->ap_mode == AP_11na &&
+		if (mode == AP_11na &&
 		    (dut->ap_chwidth == AP_40 ||
 		     (dut->ap_chwidth == AP_AUTO &&
 		      dut->default_11na_ap_chwidth == AP_40))) {
@@ -8172,13 +8262,13 @@ write_conf:
 
 	if ((drv == DRIVER_MAC80211 || drv == DRIVER_QNXNTO ||
 	     drv == DRIVER_LINUX_WCN) &&
-	    (dut->ap_mode == AP_11ac ||
-	    (dut->ap_mode == AP_11ax && dut->use_5g))) {
+	    (mode == AP_11ac ||
+	    (mode == AP_11ax && dut->use_5g))) {
 		int ht40plus = 0, ht40minus = 0;
 
 		fprintf(f, "ieee80211ac=1\n"
 			"ieee80211n=1\n");
-		if (dut->ap_mode == AP_11ax)
+		if (mode == AP_11ax)
 			fprintf(f, "ieee80211ax=1\n");
 
 		/* configure ht_capab based on channel width */
@@ -8196,7 +8286,7 @@ write_conf:
 
 	if ((drv == DRIVER_MAC80211 || drv == DRIVER_QNXNTO ||
 	     drv == DRIVER_LINUX_WCN) &&
-	    (dut->ap_mode == AP_11ac || dut->ap_mode == AP_11na)) {
+	    (mode == AP_11ac || mode == AP_11na)) {
 		if (dut->ap_countrycode[0]) {
 			fprintf(f, "country_code=%s\n", dut->ap_countrycode);
 			fprintf(f, "ieee80211d=1\n");
@@ -8204,7 +8294,7 @@ write_conf:
 		}
 	}
 
-	if (drv == DRIVER_LINUX_WCN && dut->ap_mode == AP_11ax) {
+	if (drv == DRIVER_LINUX_WCN && mode == AP_11ax) {
 		if (dut->ap_txBF) {
 			fprintf(f, "he_su_beamformer=1\n");
 			fprintf(f, "he_su_beamformee=1\n");
@@ -8239,8 +8329,12 @@ write_conf:
 	if (dut->bridge)
 		fprintf(f, "bridge=%s\n", dut->bridge);
 
-	if (dut->ap_is_dual && conf_counter == 1)
-		fprintf(f, "channel=%d\n", dut->ap_tag_channel[0]);
+	if (dut->ap_is_dual && conf_counter == 1) {
+		if (dut->ap_channel_1)
+			fprintf(f, "channel=%d\n", dut->ap_channel_1);
+		else
+			fprintf(f, "channel=%d\n", dut->ap_tag_channel[0]);
+	}
 	else
 		fprintf(f, "channel=%d\n", dut->ap_channel);
 
@@ -8253,6 +8347,8 @@ write_conf:
 		fprintf(f, "ssid=%s\n", dut->ap_ssid);
 	else if (dut->ap_tag_ssid[0][0] && conf_counter == 1)
 		fprintf(f, "ssid=%s\n", dut->ap_tag_ssid[0]);
+	else if (dut->ap_ssid[0] && conf_counter == 1)
+		fprintf(f, "ssid=%s\n", dut->ap_ssid);
 	else
 		fprintf(f, "ssid=QCA AP OOB\n");
 
@@ -8280,6 +8376,8 @@ write_conf:
 			{ AKM_FILS_SHA384, "FILS-SHA384" },
 			{ AKM_FT_FILS_SHA256, "FT-FILS-SHA256" },
 			{ AKM_FT_FILS_SHA384, "FT-FILS-SHA384" },
+			{ AKM_SAE_EXT_KEY, "SAE-EXT-KEY" },
+			{ AKM_FT_SAE_EXT_KEY, "FT-SAE-EXT-KEY" },
 		};
 		int first = 1;
 		unsigned int i;
@@ -8815,9 +8913,14 @@ skip_key_mgmt:
 			fprintf(f, "fragment_size=128\n");
 	}
 
-	if (dut->ap_dpp_conf_addr && dut->ap_dpp_conf_pkhash)
-		fprintf(f, "dpp_controller=ipaddr=%s pkhash=%s\n",
-			dut->ap_dpp_conf_addr, dut->ap_dpp_conf_pkhash);
+	if (dut->ap_dpp_conf_addr && dut->ap_dpp_conf_pkhash) {
+		if (strcasecmp(dut->ap_dpp_conf_addr, "mDNS") != 0) {
+			fprintf(f, "dpp_controller=ipaddr=%s pkhash=%s\n",
+				dut->ap_dpp_conf_addr, dut->ap_dpp_conf_pkhash);
+			fprintf(f, "dpp_configurator_connectivity=1\n");
+		}
+		fprintf(f, "dpp_relay_port=8908\n");
+	}
 
 	if (dut->ap_he_rtsthrshld == VALUE_ENABLED)
 		fprintf(f, "he_rts_threshold=512\n");
@@ -8827,6 +8930,26 @@ skip_key_mgmt:
 	if ((dut->program == PROGRAM_VHT) ||
 	    (dut->program == PROGRAM_HE && dut->use_5g)) {
 		int vht_oper_centr_freq_idx;
+
+		/* Do not try to enable VHT or higher channel bandwidth for HE
+		 * on the 2.4 GHz band when configuring a dual band AP that
+		 * does have VHT enabled on the 5 GHz radio. */
+		if (dut->use_5g) {
+			if (dut->ap_is_dual) {
+				int chan;
+
+				if (conf_counter)
+					chan = dut->ap_tag_channel[0];
+				else
+					chan = dut->ap_channel;
+				append_vht = chan >= 36 && chan <= 171;
+			} else {
+				append_vht = true;
+			}
+		}
+
+		if (!append_vht)
+			goto skip_vht_parameters_set;
 
 		if (check_channel(dut, dut->ap_channel) < 0) {
 			send_resp(dut, conn, SIGMA_INVALID,
@@ -8870,7 +8993,7 @@ skip_key_mgmt:
 		fprintf(f, "vht_oper_centr_freq_seg0_idx=%d\n",
 			vht_oper_centr_freq_idx);
 		fprintf(f, "vht_oper_chwidth=%d\n", dut->ap_vht_chwidth);
-		if (dut->ap_mode == AP_11ax) {
+		if (mode == AP_11ax) {
 			fprintf(f, "he_oper_chwidth=%d\n", dut->ap_vht_chwidth);
 			fprintf(f, "he_oper_centr_freq_seg0_idx=%d\n",
 				vht_oper_centr_freq_idx);
@@ -8881,11 +9004,13 @@ skip_key_mgmt:
 
 		find_ap_ampdu_exp_and_max_mpdu_len(dut);
 
-		if (dut->ap_sgi80 || dut->ap_txBF ||
-		    dut->ap_ldpc != VALUE_NOT_SET ||
-		    dut->ap_tx_stbc == VALUE_ENABLED || dut->ap_mu_txBF ||
-		    dut->ap_ampdu_exp || dut->ap_max_mpdu_len ||
-		    dut->ap_chwidth == AP_160 || dut->ap_chwidth == AP_80_80) {
+		if (append_vht &&
+		    (dut->ap_sgi80 || dut->ap_txBF ||
+		     dut->ap_ldpc != VALUE_NOT_SET ||
+		     dut->ap_tx_stbc == VALUE_ENABLED || dut->ap_mu_txBF ||
+		     dut->ap_ampdu_exp || dut->ap_max_mpdu_len ||
+		     dut->ap_chwidth == AP_160 ||
+		     dut->ap_chwidth == AP_80_80)) {
 			fprintf(f, "vht_capab=%s%s%s%s%s%s",
 				dut->ap_sgi80 ? "[SHORT-GI-80]" : "",
 				dut->ap_txBF ?
@@ -8910,6 +9035,7 @@ skip_key_mgmt:
 			fprintf(f, "\n");
 		}
 	}
+skip_vht_parameters_set:
 
 	if (dut->ap_key_mgmt == AP_WPA2_OWE && dut->ap_tag_ssid[0][0] &&
 	    dut->ap_tag_key_mgmt[0] == AP2_OPEN) {
@@ -9829,6 +9955,7 @@ static enum sigma_cmd_result cmd_ap_reset_default(struct sigma_dut *dut,
 	dut->ap_is_dual = 0;
 	dut->ap_mode = AP_inval;
 	dut->ap_mode_1 = AP_inval;
+	dut->ap_channel_1 = 0;
 
 	dut->ap_allow_vht_wep = 0;
 	dut->ap_allow_vht_tkip = 0;
@@ -9891,8 +10018,7 @@ static enum sigma_cmd_result cmd_ap_reset_default(struct sigma_dut *dut,
 
 	dut->ap_ocvc = dut->user_config_ap_ocvc;
 
-	if (dut->program == PROGRAM_HS2 || dut->program == PROGRAM_HS2_R2 ||
-	    dut->program == PROGRAM_HS2_R3 || dut->program == PROGRAM_HS2_R4 ||
+	if (is_passpoint(dut->program) ||
 	    dut->program == PROGRAM_IOTLP) {
 		int i;
 
@@ -9949,8 +10075,8 @@ static enum sigma_cmd_result cmd_ap_reset_default(struct sigma_dut *dut,
 		dut->ap_add_sha256 = 0;
 	}
 
-	if (dut->program == PROGRAM_HS2_R2 || dut->program == PROGRAM_HS2_R3 ||
-	     dut->program == PROGRAM_HS2_R4 || dut->program == PROGRAM_IOTLP) {
+	if (is_passpoint_r2_or_newer(dut->program) ||
+	    dut->program == PROGRAM_IOTLP) {
 		int i;
 		const char hessid[] = "50:6f:9a:00:11:22";
 
@@ -10202,6 +10328,8 @@ static enum sigma_cmd_result cmd_ap_reset_default(struct sigma_dut *dut,
 	dut->dpp_local_bootstrap = -1;
 	dut->ap_start_disabled = 0;
 	dpp_mdns_stop(dut);
+	unlink("/tmp/dpp-rest-server.uri");
+	unlink("/tmp/dpp-rest-server.id");
 
 	if (is_60g_sigma_dut(dut)) {
 		dut->ap_mode = AP_11ad;
@@ -11299,6 +11427,11 @@ enum sigma_cmd_result cmd_ap_send_frame(struct sigma_dut *dut,
 	if (val && (protected == INCORRECT_KEY ||
 		    (protected == UNPROTECTED && frame == SAQUERY)))
 		return ap_inject_frame(dut, conn, frame, protected, val);
+
+	if (!val && frame != CHANNEL_SWITCH) {
+		sigma_dut_print(dut, DUT_MSG_ERROR, "stationID not specified");
+		return INVALID_SEND_STATUS;
+	}
 
 	switch (frame) {
 	case DISASSOC:

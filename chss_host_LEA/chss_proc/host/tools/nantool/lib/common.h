@@ -12,6 +12,40 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted (subject to the limitations in the
+ * disclaimer below) provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *
+ *   * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+ * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+ * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "wifi_hal.h"
@@ -41,20 +75,19 @@
 #include <netlink/netlink.h>
 #include <netlink/socket.h>
 
-#include <linux/nl80211.h>
+#include "nl80211_copy.h"
 
 #include "log.h"
-#if 0
-#include "rb_wrapper.h"
-#include "pkt_stats.h"
-#endif
-#include "wifihal_internal.h"
+//#include "rb_wrapper.h"
+//#include "pkt_stats.h"
+//#include "wifihal_internal.h"
 #include "qca-vendor_copy.h"
 
 #define SOCKET_BUFFER_SIZE      (32768U)
 #define RECV_BUF_SIZE           (4096)
 #define DEFAULT_EVENT_CB_SIZE   (64)
 #define NUM_RING_BUFS           5
+#define MAX_NUM_RADAR_HISTORY   64
 
 #define WIFI_HAL_CTRL_IFACE     "/dev/socket/wifihal/wifihal_ctrlsock"
 
@@ -91,19 +124,18 @@ typedef struct {
     int  id;                                        // id to use when talking to driver
 } interface_info;
 
-typedef struct {
 #if 0
+typedef struct {
     wifi_gscan_capabilities gscan_capa;
     wifi_roaming_capabilities roaming_capa;
-#endif
 } wifi_capa;
+#endif
 
 typedef struct {
     u8 *flags;
     size_t flags_len;
 } features_info;
 
-#if 0
 enum pkt_log_version {
     PKT_LOG_V0          = 0,     // UNSPECIFIED Target
     PKT_LOG_V1          = 1,     // ROME Base Target
@@ -113,8 +145,6 @@ enum pkt_log_version {
 
 struct gscan_event_handlers_s;
 struct rssi_monitor_event_handler_s;
-#endif
-
 struct cld80211_ctx;
 
 struct ctrl_sock {
@@ -127,8 +157,10 @@ typedef struct hal_info_s {
     struct nl_sock *cmd_sock;                       // command socket object
     struct nl_sock *event_sock;                     // event socket object
     struct nl_sock *user_sock;                      // user socket object
+#if 0
     struct ctrl_sock wifihal_ctrl_sock;             // ctrl sock object
     struct list_head monitor_sockets;               // list of monitor sockets
+#endif
     int nl80211_family_id;                          // family id for 80211 driver
 
     bool in_event_loop;                             // Indicates that event loop is active
@@ -168,6 +200,7 @@ typedef struct hal_info_s {
 #if 0
     wifi_ring_buffer_entry *rx_aggr_pkts;
     rx_aggr_stats aggr_stats;
+#endif
     u32 prev_seq_no;
     // pointer to structure having various gscan_event_handlers
     struct gscan_event_handlers_s *gscan_handlers;
@@ -178,22 +211,33 @@ typedef struct hal_info_s {
     pthread_mutex_t ah_lock;
     u32 firmware_bus_max_size;
     bool fate_monitoring_enabled;
-    packet_fate_monitor_info *pkt_fate_stats;
-#endif
+    //packet_fate_monitor_info *pkt_fate_stats;
     /* mutex for the packet fate stats shared resource protection */
     pthread_mutex_t pkt_fate_stats_lock;
-#if 0
     struct rssi_monitor_event_handler_s *rssi_handlers;
     struct radio_event_handler_s *radio_handlers;
-#endif
-    wifi_capa capa;
+    //wifi_capa capa;
     struct cld80211_ctx *cldctx;
     bool apf_enabled;
     bool support_nan_ext_cmd;
-#if 0
     pkt_log_version  pkt_log_ver;
-#endif
+#ifndef TARGET_SUPPORTS_WEARABLES
+    /* Interface combination matrix */
+    wifi_iface_concurrency_matrix iface_comb_matrix;
+#endif /* TARGET_SUPPORTS_WEARABLES */
+    qca_wlan_vendor_sar_version sar_version;
 } hal_info;
+
+typedef struct {
+    bool radar_detected;
+    u32 freq;
+    u64 clock_boottime;
+} radar_history_result;
+
+static inline void wifi_put_le16(u8 *a, u16 val) {
+    a[1] = val >> 8;
+    a[0] = val & 0xff;
+}
 
 wifi_error wifi_register_handler(wifi_handle handle, int cmd, nl_recvmsg_msg_cb_t func, void *arg);
 wifi_error wifi_register_vendor_handler(wifi_handle handle,
@@ -208,6 +252,7 @@ hal_info *getHalInfo(wifi_handle handle);
 hal_info *getHalInfo(wifi_interface_handle handle);
 wifi_handle getWifiHandle(hal_info *info);
 wifi_interface_handle getIfaceHandle(interface_info *info);
+#if 0
 wifi_error initializeGscanHandlers(hal_info *info);
 wifi_error cleanupGscanHandlers(hal_info *info);
 wifi_error initializeRSSIMonitorHandler(hal_info *info);
@@ -215,7 +260,6 @@ wifi_error cleanupRSSIMonitorHandler(hal_info *info);
 wifi_error initializeRadioHandler(hal_info *info);
 wifi_error cleanupRadioHandler(hal_info *info);
 
-#if 0
 lowi_cb_table_t *getLowiCallbackTable(u32 requested_lowi_capabilities);
 
 wifi_error wifi_start_sending_offloaded_packet(wifi_request_id id,
@@ -229,22 +273,31 @@ wifi_error wifi_stop_rssi_monitoring(wifi_request_id id, wifi_interface_handle i
 wifi_error wifi_set_radio_mode_change_handler(wifi_request_id id, wifi_interface_handle
         iface, wifi_radio_mode_change_handler eh);
 #endif
-
 wifi_error mapKernelErrortoWifiHalError(int kern_err);
-void wifi_cleanup_dynamic_ifaces(wifi_handle handle);
 #if 0
+void wifi_cleanup_dynamic_ifaces(wifi_handle handle);
 wifi_error wifi_virtual_interface_create(wifi_handle handle, const char* ifname,
                                          wifi_interface_type iface_type);
 wifi_error wifi_virtual_interface_delete(wifi_handle handle, const char* ifname);
+wifi_error wifi_get_radar_history(wifi_interface_handle handle,
+        radar_history_result *resultBuf, int resultBufSize, int *numResults);
+wifi_error wifi_disable_next_cac(wifi_interface_handle handle);
+
+wifi_error wifi_get_supported_radio_combinations_matrix(
+        wifi_handle handle, u32 max_size, u32 *size,
+        wifi_radio_combination_matrix *radio_combination_matrix);
 #endif
 // some common macros
 
-#define min(x, y)       ((x) < (y) ? (x) : (y))
-#define max(x, y)       ((x) > (y) ? (x) : (y))
+#define MIN(x, y)       ((x) < (y) ? (x) : (y))
+#define MAX(x, y)       ((x) > (y) ? (x) : (y))
 
 #define REQUEST_ID_MAX 1000
+#define REQUEST_ID_U8_MAX 255
 #define get_requestid() ((random()%REQUEST_ID_MAX) + 1)
+#define get_requestid_u8() ((random()%REQUEST_ID_U8_MAX) + 1)
 #define WAIT_TIME_FOR_SET_REG_DOMAIN 50000
+#define ITER_COUNT_FOR_SET_REG_DOMAIN 10
 
 #ifndef UNUSED
 #define UNUSED(x)    (void)(x)

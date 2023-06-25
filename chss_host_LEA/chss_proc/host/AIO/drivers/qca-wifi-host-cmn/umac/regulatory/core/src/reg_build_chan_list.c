@@ -845,6 +845,50 @@ reg_modify_chan_list_for_5dot9_ghz_channels(struct wlan_objmgr_pdev *pdev,
 	}
 }
 
+#if defined(CONFIG_BAND_6GHZ) && defined(CONFIG_REG_CLIENT)
+/**
+ * reg_modify_chan_list_for_6g_edge_channels() - Modify 6 GHz edge channels
+ *
+ * @pdev: Pointer to pdev object
+ * @chan_list: Current channel list
+ *
+ * This function disables lower 6G edge channel (5935MHz) if service bit
+ * wmi_service_lower_6g_edge_ch_supp is not set. If service bit is set
+ * the channels remain enabled. It disables upper 6G edge channel (7115MHz)
+ * if the service bit wmi_service_disable_upper_6g_edge_ch_supp is set, it
+ * is enabled by default.
+ *
+ */
+static void
+reg_modify_chan_list_for_6g_edge_channels(struct wlan_objmgr_pdev *pdev,
+					  struct regulatory_channel
+					  *chan_list)
+{
+	struct wlan_objmgr_psoc *psoc;
+
+	psoc = wlan_pdev_get_psoc(pdev);
+
+	if (!reg_is_lower_6g_edge_ch_supp(psoc)) {
+		chan_list[CHAN_ENUM_5935].state = CHANNEL_STATE_DISABLE;
+		chan_list[CHAN_ENUM_5935].chan_flags |=
+						REGULATORY_CHAN_DISABLED;
+	}
+
+	if (reg_is_upper_6g_edge_ch_disabled(psoc)) {
+		chan_list[CHAN_ENUM_7115].state = CHANNEL_STATE_DISABLE;
+		chan_list[CHAN_ENUM_7115].chan_flags |=
+						REGULATORY_CHAN_DISABLED;
+	}
+}
+#else
+static inline void
+reg_modify_chan_list_for_6g_edge_channels(struct wlan_objmgr_pdev *pdev,
+					  struct regulatory_channel
+					  *chan_list)
+{
+}
+#endif
+
 #ifdef DISABLE_UNII_SHARED_BANDS
 /**
  * reg_is_reg_unii_band_1_set() - Check UNII bitmap
@@ -979,17 +1023,40 @@ static void
 reg_append_mas_chan_list_for_6g(struct wlan_regulatory_pdev_priv_obj
 				*pdev_priv_obj)
 {
-	struct regulatory_channel *master_chan_list_6g_client =
-		pdev_priv_obj->mas_chan_list_6g_client
-			[pdev_priv_obj->reg_cur_6g_ap_pwr_type]
+	struct regulatory_channel *master_chan_list_6g_client;
+
+	if (pdev_priv_obj->reg_cur_6g_ap_pwr_type >= REG_CURRENT_MAX_AP_TYPE ||
+	    pdev_priv_obj->reg_cur_6g_client_mobility_type >=
+	    REG_MAX_CLIENT_TYPE) {
+		reg_debug("invalid 6G AP or client power type");
+		return;
+	}
+
+	master_chan_list_6g_client =
+		pdev_priv_obj->mas_chan_list_6g_client[REG_INDOOR_AP]
 			[pdev_priv_obj->reg_cur_6g_client_mobility_type];
 
-		qdf_mem_copy(&pdev_priv_obj->mas_chan_list[MIN_6GHZ_CHANNEL],
-			     master_chan_list_6g_client,
-			     NUM_6GHZ_CHANNELS *
-			     sizeof(struct regulatory_channel));
+	qdf_mem_copy(&pdev_priv_obj->mas_chan_list[MIN_6GHZ_CHANNEL],
+		     master_chan_list_6g_client,
+		     NUM_6GHZ_CHANNELS *
+		     sizeof(struct regulatory_channel));
 }
-#else
+
+static void
+reg_populate_secondary_cur_chan_list(struct wlan_regulatory_pdev_priv_obj
+				     *pdev_priv_obj)
+{
+	qdf_mem_copy(pdev_priv_obj->secondary_cur_chan_list,
+		     pdev_priv_obj->mas_chan_list,
+		     (NUM_CHANNELS - NUM_6GHZ_CHANNELS) *
+		     sizeof(struct regulatory_channel));
+	qdf_mem_copy(&pdev_priv_obj->
+		     secondary_cur_chan_list[MIN_6GHZ_CHANNEL],
+		     pdev_priv_obj->mas_chan_list_6g_ap
+		     [pdev_priv_obj->reg_cur_6g_ap_pwr_type],
+		     NUM_6GHZ_CHANNELS * sizeof(struct regulatory_channel));
+}
+#else /* CONFIG_REG_CLIENT */
 static void
 reg_append_mas_chan_list_for_6g(struct wlan_regulatory_pdev_priv_obj
 				*pdev_priv_obj)
@@ -1000,6 +1067,12 @@ reg_append_mas_chan_list_for_6g(struct wlan_regulatory_pdev_priv_obj
 		     pdev_priv_obj->mas_chan_list_6g_ap[ap_pwr_type],
 		     NUM_6GHZ_CHANNELS * sizeof(struct regulatory_channel));
 }
+
+static inline void
+reg_populate_secondary_cur_chan_list(struct wlan_regulatory_pdev_priv_obj
+				     *pdev_priv_obj)
+{
+}
 #endif /* CONFIG_REG_CLIENT */
 
 static void reg_copy_6g_cur_mas_chan_list_to_cmn(
@@ -1008,7 +1081,7 @@ static void reg_copy_6g_cur_mas_chan_list_to_cmn(
 	if (pdev_priv_obj->is_6g_channel_list_populated)
 		reg_append_mas_chan_list_for_6g(pdev_priv_obj);
 }
-#else
+#else /* CONFIG_BAND_6GHZ */
 static inline void
 reg_copy_6g_cur_mas_chan_list_to_cmn(
 			struct wlan_regulatory_pdev_priv_obj *pdev_priv_obj)
@@ -1020,6 +1093,23 @@ reg_append_mas_chan_list_for_6g(
 			struct wlan_regulatory_pdev_priv_obj *pdev_priv_obj)
 {
 }
+
+#ifdef CONFIG_REG_CLIENT
+static void
+reg_populate_secondary_cur_chan_list(struct wlan_regulatory_pdev_priv_obj
+				     *pdev_priv_obj)
+{
+	qdf_mem_copy(pdev_priv_obj->secondary_cur_chan_list,
+		     pdev_priv_obj->mas_chan_list,
+		     NUM_CHANNELS * sizeof(struct regulatory_channel));
+}
+#else /* CONFIG_REG_CLIENT */
+static inline void
+reg_populate_secondary_cur_chan_list(struct wlan_regulatory_pdev_priv_obj
+				     *pdev_priv_obj)
+{
+}
+#endif /* CONFIG_REG_CLIENT */
 #endif /* CONFIG_BAND_6GHZ */
 
 void reg_compute_pdev_current_chan_list(struct wlan_regulatory_pdev_priv_obj
@@ -1029,6 +1119,8 @@ void reg_compute_pdev_current_chan_list(struct wlan_regulatory_pdev_priv_obj
 
 	qdf_mem_copy(pdev_priv_obj->cur_chan_list, pdev_priv_obj->mas_chan_list,
 		     NUM_CHANNELS * sizeof(struct regulatory_channel));
+
+	reg_populate_secondary_cur_chan_list(pdev_priv_obj);
 
 	reg_modify_chan_list_for_freq_range(pdev_priv_obj->cur_chan_list,
 					    pdev_priv_obj->range_2g_low,
@@ -1065,6 +1157,10 @@ void reg_compute_pdev_current_chan_list(struct wlan_regulatory_pdev_priv_obj
 
 	reg_modify_chan_list_for_max_chwidth(pdev_priv_obj->pdev_ptr,
 					     pdev_priv_obj->cur_chan_list);
+
+	reg_modify_chan_list_for_6g_edge_channels(pdev_priv_obj->pdev_ptr,
+						  pdev_priv_obj->
+						  cur_chan_list);
 }
 
 void reg_reset_reg_rules(struct reg_rule_info *reg_rules)
@@ -2101,3 +2197,24 @@ QDF_STATUS reg_get_current_chan_list(struct wlan_objmgr_pdev *pdev,
 
 	return QDF_STATUS_SUCCESS;
 }
+
+#ifdef CONFIG_REG_CLIENT
+QDF_STATUS
+reg_get_secondary_current_chan_list(struct wlan_objmgr_pdev *pdev,
+				    struct regulatory_channel *chan_list)
+{
+	struct wlan_regulatory_pdev_priv_obj *pdev_priv_obj;
+
+	pdev_priv_obj = reg_get_pdev_obj(pdev);
+
+	if (!IS_VALID_PDEV_REG_OBJ(pdev_priv_obj)) {
+		reg_err("reg pdev private obj is NULL");
+		return QDF_STATUS_E_FAILURE;
+	}
+
+	qdf_mem_copy(chan_list, pdev_priv_obj->secondary_cur_chan_list,
+		     NUM_CHANNELS * sizeof(struct regulatory_channel));
+
+	return QDF_STATUS_SUCCESS;
+}
+#endif

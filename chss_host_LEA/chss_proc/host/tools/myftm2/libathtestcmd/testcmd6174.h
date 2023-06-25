@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 Qualcomm Technologies, Inc.
+ * Copyright (c) 2014-2020, 2022 Qualcomm Technologies, Inc.
  * All Rights Reserved.
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
 */
@@ -93,6 +93,8 @@ typedef struct _cmdParmeter{
 	uint8_t txStation[ATH_MAC_LEN];
 	uint8_t rxStation[ATH_MAC_LEN];
 	int aifs;
+	uint8_t pw_mode_6g;
+	uint8_t skip_rx_stop;
 
 	uint32_t rxPkt;
 	int32_t  rxRssi;
@@ -146,6 +148,10 @@ typedef struct _cmdParmeter{
 	uint8_t rstDir;
 	uint32_t calTxGain;
 	uint32_t forcedRXIdx;
+        uint32_t puncBw;
+	uint8_t noiseFloorRead;
+	uint8_t xlnaCtrl;
+	int8_t xlnaCtrlValid;
 }_CMD_PARM;
 
 
@@ -163,6 +169,8 @@ void qca6174SetLongPreamble(int enable);
 /** @breif Set the interval between frames in aifs number
  *  @param slot aifs slot 0->SIFS, 1->PIFS, 2->DIFS, ... 253 */
 void qca6174SetAifsNum(int slot);
+void qca6174SetPwMode6G(int pw_mode_6g);
+void qca6174SetSkipRxStop(uint8_t skip_rx_stop);
 void qca6174SetAntenna(int antenna);
 void qca6174SetChain(int chain);
 void qca6174SetBssid(char *mac);
@@ -234,11 +242,11 @@ int qca6174Cmd_TONEPLAN(char *val);
 void qca6174Cmd_PREFECPAD(uint8_t val);
 void qca6174Cmd_LDPCEXTRASYMBOL(uint8_t val);
 void qca6174Cmd_DUTYCYCLE(uint8_t val);
-int qca6174Cmd_OFDMAUL_TX();
+int qca6174Cmd_OFDMAUL_TX(void);
 void qca6174CmdRegWriteValue(uint32_t val);
 int qca6174CmdRegWrite(uint32_t reg);
 int qca6174CmdRegRead(uint32_t reg);
-int qca6174Cmd_LOWPOWER();
+int qca6174Cmd_LOWPOWER(void);
 void qca6174Set_LOWPOWER_MODE(char *val);
 void qca6174Set_PHYIDMASK(uint8_t val);
 void qca6174Set_LOWPOWER_FEATUREMASK(uint32_t mask);
@@ -246,7 +254,12 @@ void qca6174Set_CALTXGAIN(uint32_t val);
 void qca6174Set_FORCEDRXIDX(uint32_t val);
 void qca6174Set_RSTDIR(uint8_t val);
 void handleRstRSP(void *parms);
-void qca6174RssiSelfTest();
+void qca6174RssiSelfTest(void);
+int qca6174GetDpdComplete(void);
+void qca6174SetPuncBw(int);
+void qca6174SetxlnaCtrl(char *val);
+void qca6174SetNoiseFloorRead(char *val);
+int qca6174GetNoiseFloor();
 
 #ifdef __cplusplus
 } /* extern "C" */

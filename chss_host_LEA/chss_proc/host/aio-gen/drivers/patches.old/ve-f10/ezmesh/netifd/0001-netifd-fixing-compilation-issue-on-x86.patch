@@ -1,4 +1,4 @@
-From e2f5af590b341ae5c56b5a6dc507ca4ab4760230 Mon Sep 17 00:00:00 2001
+From f1d63b14845069feda3d95d9ac3b85ebf53e88a1 Mon Sep 17 00:00:00 2001
 From: Li Feng <quic_lifeng@quicinc.com>
 Date: Mon, 10 Jan 2022 14:32:53 +0800
 Subject: [PATCH] netifd: fixing compilation issue on x86
@@ -8,10 +8,11 @@ Subject: [PATCH] netifd: fixing compilation issue on x86
  bridge.c       | 2 +-
  interface.c    | 2 +-
  proto-shell.c  | 6 +++---
- 4 files changed, 9 insertions(+), 9 deletions(-)
+ system-linux.c | 5 +++++
+ 5 files changed, 14 insertions(+), 9 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index bcb5133..039fa88 100644
+index ca5d944..251d6b2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -7,11 +7,11 @@ IF(NOT ${CMAKE_VERSION} LESS 3.0)
@@ -31,10 +32,10 @@ index bcb5133..039fa88 100644
  SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
  
 diff --git a/bridge.c b/bridge.c
-index 7e61b9d..2d9780c 100644
+index 04a9abf..c4d9d1e 100644
 --- a/bridge.c
 +++ b/bridge.c
-@@ -571,7 +571,7 @@ bridge_member_cb(struct device_user *dep, enum device_event ev)
+@@ -518,7 +518,7 @@ bridge_member_cb(struct device_user *dep, enum device_event ev)
  
  		if (bst->n_present == 1)
  			device_set_present(&bst->dev, true);
@@ -44,10 +45,10 @@ index 7e61b9d..2d9780c 100644
  		if (!bst->dev.active)
  			break;
 diff --git a/interface.c b/interface.c
-index b3bb601..f76e761 100644
+index 1d1a5f8..cb09206 100644
 --- a/interface.c
 +++ b/interface.c
-@@ -262,7 +262,7 @@ interface_event(struct interface *iface, enum interface_event ev)
+@@ -258,7 +258,7 @@ interface_event(struct interface *iface, enum interface_event ev)
  	case IFEV_UP:
  		interface_error_flush(iface);
  		adev = iface->l3_dev.dev;
@@ -87,6 +88,22 @@ index e20d539..0d7482a 100644
  	case S_SETUP:
  		proto_shell_handler(&state->proto, PROTO_CMD_TEARDOWN, false);
  		break;
+diff --git a/system-linux.c b/system-linux.c
+index b9e440e..32dc9fb 100644
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -76,6 +76,11 @@
+ #include "system.h"
+ #include "utils.h"
+ 
++#ifndef NL_CAPABILITY_VERSION_3_5_0
++#define nla_nest_start(msg, attrtype) \
++	nla_nest_start(msg, NLA_F_NESTED | (attrtype))
++#endif
++
+ struct event_socket {
+ 	struct uloop_fd uloop;
+ 	struct nl_sock *sock;
 -- 
 2.7.4
 

@@ -56,9 +56,9 @@ namespace NAN_TEST
 
         /* Various Events/response Callbacks */
         static void nanNotifyResponse(transaction_id id, NanResponseMsg *rsp_data);
-//#if QTI_BSP
+#if QTI_BSP
         static void nanEventPublishReplied(NanPublishRepliedInd *event);
-//#endif
+#endif
         static void nanEventPublishTerminated(NanPublishTerminatedInd *event);
         static void nanEventMatch(NanMatchInd *event);
         static void nanEventMatchExpired(NanMatchExpiredInd *event);

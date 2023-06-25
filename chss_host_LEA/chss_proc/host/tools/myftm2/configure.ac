@@ -69,12 +69,18 @@ if (test "x${with_glib}" = "xyes"); then
 fi
 AM_CONDITIONAL(USE_GLIB, test "x${with_glib}" = "xyes")
 
+AC_ARG_WITH([DMDM],
+      AC_HELP_STRING([--with-DMDM],
+         [enable DMDM]))
+
+AM_CONDITIONAL([MDM_SET], [test "x${with_DMDM}" = "xyes"])
+
 AC_ARG_ENABLE(target,
   [AS_HELP_STRING([--enable-target=TARGET], [Specify the target product to build])],
   [TARGET=$enableval],
   [TARGET=none]
 )
-AM_CONDITIONAL([MDM], [test "x$TARGET" = "xmdm9607" -o "x$TARGET" = "xmdm9635" -o "x$TARGET" = "xmdm9640" -o "x$TARGET" = "xmdmcalifornium"])
+AM_CONDITIONAL([MDM], [test "x$TARGET" = "xmdm9607" -o "x$TARGET" = "xmdm9635" -o "x$TARGET" = "xmdm9640" -o "x$TARGET" = "xmdmcalifornium" -o "x$TARGET" = "xqcs40x" -o "x$TARGET" = "xsdxprairie" -o "x$TARGET" = "xsdxlemur" -o "x$TARGET" = "xqrbx210"])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -98,6 +104,7 @@ AC_CONFIG_FILES([ \
         libtcmd/Makefile \
         libathtestcmd/Makefile \
         libathtestcmd/libtlvutil/Makefile \
+        libathtestcmd/libtlv2/Makefile \
         myftm/Makefile \
         ath6kl-utils.pc
         ])

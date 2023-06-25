@@ -13,7 +13,6 @@
 
 #ifdef WIN_AP_HOST
 #include <linux/errno.h>
-int errno = -1;
 #endif
 
 int tcmd_set_timer(struct tcmd_cfg *cfg)
@@ -30,7 +29,7 @@ int tcmd_set_timer(struct tcmd_cfg *cfg)
 	err = timer_settime(cfg->timer, 0, &exp_time, NULL);
 	cfg->timeout = false;
 	if (err < 0)
-		return errno;
+		return -errno;
 	return 0;
 }
 
@@ -41,7 +40,7 @@ int tcmd_reset_timer(struct tcmd_cfg *cfg)
 
 	err = timer_gettime(cfg->timer, &curr_time);
 	if (err < 0)
-		return errno;
+		return -errno;
 
 	if (!curr_time.it_value.tv_sec && !curr_time.it_value.tv_nsec)
 		return -ETIMEDOUT;
@@ -53,6 +52,6 @@ int tcmd_reset_timer(struct tcmd_cfg *cfg)
 	bzero(&curr_time, sizeof(curr_time));
 	err = timer_settime(cfg->timer, 0, &curr_time, NULL);
 	if (err < 0)
-		return errno;
+		return -errno;
 	return 0;
 }

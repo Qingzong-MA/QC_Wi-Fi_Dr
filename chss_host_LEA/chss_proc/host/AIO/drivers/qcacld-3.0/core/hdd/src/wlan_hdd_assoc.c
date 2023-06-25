@@ -2015,8 +2015,15 @@ QDF_STATUS hdd_change_peer_state(struct hdd_adapter *adapter,
 		return QDF_STATUS_E_FAULT;
 	}
 
-	if (hdd_is_roam_sync_in_progress(hdd_ctx, adapter->vdev_id))
+	if (hdd_is_roam_sync_in_progress(hdd_ctx, adapter->vdev_id)) {
+		if (adapter->device_mode == QDF_STA_MODE &&
+		    (wlan_mlme_get_wds_mode(hdd_ctx->psoc) ==
+		    WLAN_WDS_MODE_REPEATER))
+			hdd_config_wds_repeater_mode(adapter, peer_mac);
+
+		hdd_son_deliver_peer_authorize_event(adapter, peer_mac);
 		return QDF_STATUS_SUCCESS;
+	}
 
 	if (sta_state == OL_TXRX_PEER_STATE_AUTH) {
 		/* Reset scan reject params on successful set key */
@@ -4280,7 +4287,7 @@ hdd_sme_roam_callback(void *context, struct csr_roam_info *roam_info,
 					WLAN_CONTROL_PATH);
 			break;
 		}
-		/* fallthrough */
+		fallthrough;
 	case eCSR_ROAM_DISASSOCIATED:
 	{
 		hdd_debug("****eCSR_ROAM_DISASSOCIATED****");
@@ -4336,7 +4343,7 @@ hdd_sme_roam_callback(void *context, struct csr_roam_info *roam_info,
 		break;
 	case eCSR_ROAM_CANCELLED:
 		hdd_debug("****eCSR_ROAM_CANCELLED****");
-		/* fallthrough */
+		fallthrough;
 	case eCSR_ROAM_ASSOCIATION_FAILURE:
 		/* This is temp ifdef will be removed in near future */
 #ifndef FEATURE_CM_ENABLE

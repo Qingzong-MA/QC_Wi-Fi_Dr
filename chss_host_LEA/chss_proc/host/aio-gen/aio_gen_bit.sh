@@ -308,6 +308,10 @@ then
             then
                 git reset --hard ${CUTOFF_ID_AIO_PATCH}
             fi
+            for i in "${custom_aio_patch_arr[@]}"
+            do
+                git cherry-pick ${i}
+            done
 
             if [ -d "./fixce/3rdparty/patches/${INPUT_BOARD_TYPE}" ]
             then

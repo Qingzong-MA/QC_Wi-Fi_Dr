@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -71,6 +71,8 @@
 #include "cfg_nan_api.h"
 #include "nan_ucfg_api.h"
 #include <../../core/src/wlan_cm_vdev_api.h>
+#include "wlan_reg_ucfg_api.h"
+
 #include <ol_defines.h>
 #include "wlan_pkt_capture_ucfg_api.h"
 #include "wlan_psoc_mlme_api.h"
@@ -5354,7 +5356,7 @@ QDF_STATUS csr_roam_process_command(struct mac_context *mac, tSmeCmd *pCommand)
 		}
 #endif
 		/* for success case */
-		/* fallthrough */
+		fallthrough;
 	default:
 		csr_roam_state_change(mac, eCSR_ROAMING_STATE_JOINING,
 				sessionId);
@@ -10619,6 +10621,7 @@ csr_roam_chk_lnk_assoc_ind(struct mac_context *mac_ctx, tSirSmeRsp *msg_ptr)
 #endif
 	roam_info->addIELen = (uint8_t)pAssocInd->addIE.length;
 	roam_info->paddIE = pAssocInd->addIE.addIEdata;
+	roam_info->fReassocReq = pAssocInd->reassocReq;
 	qdf_mem_copy(roam_info->peerMac.bytes,
 		     pAssocInd->peerMacAddr,
 		     sizeof(tSirMacAddr));
@@ -14155,7 +14158,7 @@ csr_update_sae_single_pmk_ap_cap(struct mac_context *mac,
 }
 #endif
 
-static void csr_get_basic_rates(tSirMacRateSet *b_rates, uint32_t chan_freq)
+void csr_get_basic_rates(tSirMacRateSet *b_rates, uint32_t chan_freq)
 {
 	/*
 	 * Some IOT APs don't send supported rates in
@@ -14219,6 +14222,36 @@ rel_vdev_ref:
 	return status;
 }
 
+/*
+ * csr_iterate_triplets() - Iterate the country IE to validate it
+ * @country_ie: country IE to iterate through
+ *
+ * This function always returns success because connection should not be failed
+ * in the case of missing elements in the country IE
+ *
+ * Return: QDF_STATUS
+ */
+static QDF_STATUS csr_iterate_triplets(tDot11fIECountry country_ie)
+{
+	u_int8_t i;
+
+	if (country_ie.first_triplet[0] > OP_CLASS_ID_200) {
+		if (country_ie.more_triplets[0][0] <= OP_CLASS_ID_200)
+			return QDF_STATUS_SUCCESS;
+	}
+
+	for (i = 0; i < country_ie.num_more_triplets; i++) {
+		if ((country_ie.more_triplets[i][0] > OP_CLASS_ID_200) &&
+		    (i < country_ie.num_more_triplets - 1)) {
+			if (country_ie.more_triplets[i + 1][0] <=
+			    OP_CLASS_ID_200)
+				return QDF_STATUS_SUCCESS;
+		}
+	}
+	sme_debug("No operating class triplet followed by sub-band triplet");
+	return QDF_STATUS_SUCCESS;
+}
+
 /**
  * The communication between HDD and LIM is thru mailbox (MB).
  * Both sides will access the data structure "struct join_req".
@@ -14249,6 +14282,7 @@ QDF_STATUS csr_send_join_req_msg(struct mac_context *mac, uint32_t sessionId,
 	struct ps_params *ps_param = &ps_global_info->ps_params[sessionId];
 	tpCsrNeighborRoamControlInfo neigh_roam_info;
 	enum csr_akm_type akm;
+	uint8_t programmed_country[REG_ALPHA2_LEN + 1];
 #ifdef FEATURE_WLAN_ESE
 	bool ese_config = false;
 #endif
@@ -14688,6 +14722,24 @@ QDF_STATUS csr_send_join_req_msg(struct mac_context *mac, uint32_t sessionId,
 			}
 		}
 #endif /* FEATURE_WLAN_ESE */
+
+		if (wlan_reg_is_6ghz_chan_freq(pBssDescription->chan_freq)) {
+			if (!pIes->Country.present)
+				sme_debug("Channel is 6G but country IE not present");
+			wlan_reg_read_current_country(mac->psoc,
+						      programmed_country);
+			if (!qdf_mem_cmp(pIes->Country.country,
+					 programmed_country,
+					 REG_ALPHA2_LEN + 1))
+				sme_debug("Country IE does not match country stored in regulatory");
+			status = csr_iterate_triplets(pIes->Country);
+		}
+
+		if (wlan_reg_is_6ghz_chan_freq(pBssDescription->chan_freq)) {
+			if (!pIes->num_transmit_power_env ||
+			    !pIes->transmit_power_env[0].present)
+				sme_debug("TPE not present for 6G channel");
+		}
 
 		if (pProfile->bOSENAssociation)
 			csr_join_req->isOSENConnection = true;

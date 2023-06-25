@@ -31,7 +31,6 @@
 #define strlcat strncat
 #define strlcpy strncpy
 #endif
-
 #define ALOGE printf
 typedef struct _TlvParamDefault
 {

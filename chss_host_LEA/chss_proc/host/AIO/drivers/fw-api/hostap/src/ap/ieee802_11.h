@@ -18,6 +18,8 @@ struct ieee80211_vht_capabilities;
 struct ieee80211_mgmt;
 struct radius_sta;
 enum ieee80211_op_mode;
+enum oper_chan_width;
+struct ieee802_11_elems;
 
 int ieee802_11_mgmt(struct hostapd_data *hapd, const u8 *buf, size_t len,
 		    struct hostapd_frame_info *fi);
@@ -45,7 +47,8 @@ static inline int ieee802_11_get_mib_sta(struct hostapd_data *hapd,
 #endif /* NEED_AP_MLME */
 u16 hostapd_own_capab_info(struct hostapd_data *hapd);
 void ap_ht2040_timeout(void *eloop_data, void *user_data);
-u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid);
+u8 * hostapd_eid_ext_capab(struct hostapd_data *hapd, u8 *eid,
+			   bool mbssid_complete);
 u8 * hostapd_eid_qos_map_set(struct hostapd_data *hapd, u8 *eid);
 u8 * hostapd_eid_supp_rates(struct hostapd_data *hapd, u8 *eid);
 u8 * hostapd_eid_ext_supp_rates(struct hostapd_data *hapd, u8 *eid);
@@ -82,6 +85,15 @@ void hostapd_get_eht_capab(struct hostapd_data *hapd,
 			   const struct ieee80211_eht_capabilities *src,
 			   struct ieee80211_eht_capabilities *dest,
 			   size_t len);
+u8 * hostapd_eid_eht_basic_ml(struct hostapd_data *hapd, u8 *eid,
+			      struct sta_info *info, bool include_mld_id);
+struct wpabuf * hostapd_ml_auth_resp(struct hostapd_data *hapd);
+const u8 * hostapd_process_ml_auth(struct hostapd_data *hapd,
+				   const struct ieee80211_mgmt *mgmt,
+				   size_t len);
+u16 hostapd_process_ml_assoc_req(struct hostapd_data *hapd,
+				 struct ieee802_11_elems *elems,
+				 struct sta_info *sta);
 int hostapd_get_aid(struct hostapd_data *hapd, struct sta_info *sta);
 u16 copy_sta_ht_capab(struct hostapd_data *hapd, struct sta_info *sta,
 		      const u8 *ht_capab);
@@ -214,5 +226,16 @@ u16 copy_sta_eht_capab(struct hostapd_data *hapd, struct sta_info *sta,
 		       enum ieee80211_op_mode opmode,
 		       const u8 *he_capab, size_t he_capab_len,
 		       const u8 *eht_capab, size_t eht_capab_len);
+size_t hostapd_eid_mbssid_len(struct hostapd_data *hapd, u32 frame_type,
+			      u8 *elem_count, const u8 *known_bss,
+			      size_t known_bss_len, size_t *rnr_len);
+u8 * hostapd_eid_mbssid(struct hostapd_data *hapd, u8 *eid, u8 *end,
+			unsigned int frame_stype, u8 elem_count,
+			u8 **elem_offset,
+			const u8 *known_bss, size_t known_bss_len, u8 *rnr_eid,
+			u8 *rnr_count, u8 **rnr_offset, size_t rnr_len);
+void punct_update_legacy_bw(u16 bitmap, u8 pri_chan,
+			    enum oper_chan_width *width, u8 *seg0, u8 *seg1);
+bool hostapd_is_mld_ap(struct hostapd_data *hapd);
 
 #endif /* IEEE802_11_H */

@@ -587,6 +587,36 @@ uint32_t hal_read32_mb_cmem(struct hal_soc *hal_soc, uint32_t offset)
 }
 #endif
 
+#ifdef WLAN_FEATURE_TSF_BY_REG
+/* TSF is 64bit, the offset to next tsf register is 8 bytes */
+#define TSF64_REG_OFFSET_STEP    (8)
+/* The num of 64bit tsf register is 0..4 */
+#define TSF64_ID_MAX             (4)
+/* Generally mac_id 0 corresponds to 5G */
+#define WMAC_ID_0                (0)
+/* Generally mac_id 1 corresponds to 2.4G */
+#define WMAC_ID_1                (1)
+
+static inline
+uint64_t hal_read_reg_tsf64(void *hal_soc, uint32_t mac_id, uint32_t tsf_id)
+{
+	struct hal_soc *hal;
+
+	hal = (struct hal_soc *)hal_soc;
+	if (!hal) {
+		hal_err("hal_soc is NULL");
+		return 0;
+	}
+
+	if (!hal->ops->hal_read_tsf64) {
+		hal_err("ops hal_read_tsf64 is NULL");
+		return 0;
+	}
+
+	return hal->ops->hal_read_tsf64(hal, mac_id, tsf_id);
+}
+#endif /* WLAN_FEATURE_TSF_BY_REG */
+
 /* Max times allowed for register writing retry */
 #define HAL_REG_WRITE_RETRY_MAX		5
 /* Delay milliseconds for each time retry */

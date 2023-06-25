@@ -1,5 +1,11 @@
 /*
- * Copyright (c) 2016 Qualcomm Atheros, Inc.
+ * Copyright (c) 2019 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+*/
+
+/*
+ * 2016 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
  */

@@ -138,7 +138,6 @@ extern char legacy_db_parse_path[MAX_SIZE];
 #define INTMAXT     0x1000		/* intmax_t */
 #define CHARINT     0x2000		/* print char using int format */
 
-#if DIAG_KEEP_ORIG
 /*
  * macros to safely extract 8, 16, 32, or 64-bit values from byte buffer
  */
@@ -162,7 +161,6 @@ extern char legacy_db_parse_path[MAX_SIZE];
 	msg += sizeof(uint16_t);            \
 	msg_len -= sizeof(uint16_t);        \
 } while (0)
-#endif
 
 #define _GET_LE32(a) ( \
 	(((uint32_t)(a)[3]) << 24) | \
@@ -179,7 +177,6 @@ extern char legacy_db_parse_path[MAX_SIZE];
 	msg_len -= sizeof(uint32_t);        \
 } while (0)
 
-#if DIAG_KEEP_ORIG
 #define _GET_LE64(a) ( \
 	(((uint64_t)(a)[7]) << 56) | \
 	(((uint64_t)(a)[6]) << 48) | \
@@ -202,7 +199,6 @@ extern char legacy_db_parse_path[MAX_SIZE];
  * pack_printf derived from Rome FW's cmnos_vprintf which
  * internally is using the FreeBSD version implementation.
  */
-#endif
 
 /*
  * Macros for converting digits to letters and vice versa
@@ -295,17 +291,60 @@ char fmt_cur_char(const char **fmtptr)
 
 long long get_value_from_msg(char pack, uint8_t **msg, uint32_t *msg_len)
 {
-	int32_t val = 0;
-
-	UNUSED(pack);
-
-	GET_LE32(val, *msg, *msg_len);
-
-	return val;
-
+	switch (pack) {
+	case 'b':
+	{
+		signed char val = 0;
+		GET_8(val, *msg, *msg_len);
+		return val;
+	}
+	case 'B':
+	{
+		unsigned char val = 0;
+		GET_8(val, *msg, *msg_len);
+		return val;
+	}
+	case 'h':
+	{
+		int16_t val = 0;
+		GET_LE16(val, *msg, *msg_len);
+		return val;
+	}
+	case 'H':
+	{
+		uint16_t val = 0;
+		GET_LE16(val, *msg, *msg_len);
+		return val;
+	}
+	case 'i':
+	{
+		int32_t val = 0;
+		GET_LE32(val, *msg, *msg_len);
+		return val;
+	}
+	case 'I':
+	{
+		uint32_t val = 0;
+		GET_LE32(val, *msg, *msg_len);
+		return val;
+	}
+	case 'q':
+	{
+		int64_t val = 0;
+		GET_LE64(val, *msg, *msg_len);
+		return val;
+	}
+	case 'Q':
+	{
+		uint64_t val = 0;
+		GET_LE64(val, *msg, *msg_len);
+		return val;
+	}
+	default:
+		return 0;
+	}
 msg_error:
-	printf("Fatal error to fetch param\n");
-	return 0;
+		return 0;
 }
 
 /*

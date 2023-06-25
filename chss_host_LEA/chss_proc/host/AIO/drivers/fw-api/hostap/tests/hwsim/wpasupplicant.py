@@ -469,6 +469,11 @@ class WpaSupplicant:
             if field in params:
                 self.set_cred(id, field, params[field])
 
+        as_list = ["home_ois", "required_home_ois"]
+        for field in as_list:
+            if field in params:
+                self.set_cred_quoted(id, field, ','.join(params[field]))
+
         return id
 
     def select_network(self, id, freq=None):
@@ -1103,13 +1108,16 @@ class WpaSupplicant:
                       "engine", "fils_dh_group", "bssid_hint",
                       "dpp_csign", "dpp_csign_expiry",
                       "dpp_netaccesskey", "dpp_netaccesskey_expiry", "dpp_pfs",
+                      "dpp_connector_privacy",
                       "group_mgmt", "owe_group", "owe_only",
                       "owe_ptk_workaround",
                       "transition_disable", "sae_pk",
                       "roaming_consortium_selection", "ocv",
                       "multi_ap_backhaul_sta", "rx_stbc", "tx_stbc",
                       "ft_eap_pmksa_caching", "beacon_prot",
-                      "wpa_deny_ptk0_rekey"]
+                      "mac_value",
+                      "wpa_deny_ptk0_rekey",
+                      "enable_4addr_mode"]
         for field in not_quoted:
             if field in kwargs and kwargs[field]:
                 self.set_network(id, field, kwargs[field])
@@ -1141,14 +1149,14 @@ class WpaSupplicant:
             if "eap" in kwargs:
                 self.connect_network(id, timeout=20)
             else:
-                self.connect_network(id)
+                self.connect_network(id, timeout=15)
         else:
             self.dump_monitor()
             self.select_network(id)
         return id
 
     def scan(self, type=None, freq=None, no_wait=False, only_new=False,
-             passive=False):
+             passive=False, timeout=15):
         if not no_wait:
             self.dump_monitor()
         if type:
@@ -1169,7 +1177,7 @@ class WpaSupplicant:
         if no_wait:
             return
         ev = self.wait_event(["CTRL-EVENT-SCAN-RESULTS",
-                              "CTRL-EVENT-SCAN-FAILED"], 15)
+                              "CTRL-EVENT-SCAN-FAILED"], timeout)
         if ev is None:
             raise Exception("Scan timed out")
         if "CTRL-EVENT-SCAN-FAILED" in ev:
@@ -1243,9 +1251,12 @@ class WpaSupplicant:
         if check_bssid and self.get_status_field('bssid') != bssid:
             raise Exception("Did not roam to correct BSSID")
 
-    def roam_over_ds(self, bssid, fail_test=False):
+    def roam_over_ds(self, bssid, fail_test=False, force=False):
         self.dump_monitor()
-        if "OK" not in self.request("FT_DS " + bssid):
+        cmd = "FT_DS " + bssid
+        if force:
+            cmd += " force"
+        if "OK" not in self.request(cmd):
             raise Exception("FT_DS failed")
         if fail_test:
             ev = self.wait_event(["CTRL-EVENT-CONNECTED"], timeout=1)

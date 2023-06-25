@@ -2884,10 +2884,9 @@ int hif_ce_msi_configure_irq_by_ceid(struct hif_softc *scn, int ce_id)
 	/* implies the ce is also initialized */
 	if (!ce_sc->tasklets[ce_id].inited)
 		goto skip;
-
 	pci_sc->ce_msi_irq_num[ce_id] = irq;
 #ifdef WLAN_ONE_MSI_VECTOR
-	irq_flags = IRQF_SHARED | IRQF_NO_SUSPEND;
+	irq_flags = IRQF_SHARED | IRQF_NO_SUSPEND | IRQF_NOBALANCING;
 #else
 	irq_flags = IRQF_SHARED;
 #endif
@@ -3169,7 +3168,11 @@ int hif_pci_configure_grp_irq(struct hif_softc *scn,
 		ret = pfrm_request_irq(
 				scn->qdf_dev->dev, irq,
 				hif_ext_group_interrupt_handler,
+#ifdef WLAN_ONE_MSI_VECTOR
+				IRQF_SHARED | IRQF_NO_SUSPEND | IRQF_NOBALANCING,
+#else
 				IRQF_SHARED | IRQF_NO_SUSPEND,
+#endif
 				dp_irqname[pci_slot][hif_ext_group->grp_id],
 				hif_ext_group);
 		if (ret) {

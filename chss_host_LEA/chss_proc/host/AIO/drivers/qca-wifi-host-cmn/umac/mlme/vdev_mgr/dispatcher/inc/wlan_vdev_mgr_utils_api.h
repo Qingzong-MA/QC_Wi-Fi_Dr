@@ -97,4 +97,24 @@ void wlan_util_vdev_get_param(struct wlan_objmgr_vdev *vdev,
 			      enum wlan_mlme_cfg_id param_id,
 			      uint32_t *param_value);
 
+/**
+ * wlan_util_vdev_mgr_get_cac_timeout_for_vdev() - Get the CAC timeout value for
+ * a given vdev.
+ * @vdev: Pointer to vdev object.
+ *
+ * Return: CAC timeout value
+ */
+int wlan_util_vdev_mgr_get_cac_timeout_for_vdev(struct wlan_objmgr_vdev *vdev);
+
+/**
+ * wlan_util_vdev_mgr_set_cac_timeout_for_vdev() - set the CAC timeout value for
+ * a given vdev.
+ * @vdev: Pointer to vdev object.
+ * @new_chan_cac_ms: cac duration of new channel
+ *
+ * Return: void
+ */
+void wlan_util_vdev_mgr_set_cac_timeout_for_vdev(struct wlan_objmgr_vdev *vdev,
+						 uint32_t new_chan_cac_ms);
+
 #endif /* __WLAN_VDEV_MGR_UTILS_API_H__ */

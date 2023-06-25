@@ -1,5 +1,11 @@
 /*
- * Copyright (c) 2014 Qualcomm Atheros, Inc.
+ * Copyright (c) 2014, 2021 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+*/
+
+/*
+ * 2014 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
  */
@@ -168,7 +174,7 @@ int getParams(uint8_t *key, uint8_t **data, uint32_t *len)
 
 	if (searchTestFlowParmTemplate((char*)key, parmTemplate, numOfTemplateParms, &parmCode, &parmType, &parmSize)) {
 		opCodeLenHandled = getCmdOpCodeTemplateSize();
-		if ( opCodeTLV <= opCodeLenHandled ) {
+		if ( opCodeTLV < opCodeLenHandled ) {
 			parmBinTemplate = (CmdOpCodeTemplate[opCodeTLV]._CmdOpCodeTemplate)();
 			rc = cmdParmsParser(parmBinTemplate, parmCode, parmType, parmSize, data, len);
 		}

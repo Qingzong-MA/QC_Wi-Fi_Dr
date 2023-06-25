@@ -14,7 +14,8 @@ void* initOFDMAULTXCONFIGOpParms(A_UINT8 *pParmsCommon, PARM_OFFSET_TBL *pParmsO
     if (pParmsCommon == NULL) return (NULL);
 
     i = j = 0;	//assign a number to avoid warning in case i and j are not used
-
+    pParmDict = NULL;	//assign NULL to avoid warning in case parameter not used
+    pParmsOffset = NULL;	//assign NULL to avoid warning in case parameter not used
     // Make up ParmOffsetTbl
     resetParmOffsetFields();
     return((void*) pParmsCommon);

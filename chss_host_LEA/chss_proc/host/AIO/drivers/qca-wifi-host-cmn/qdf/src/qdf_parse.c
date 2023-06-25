@@ -56,7 +56,7 @@ QDF_STATUS qdf_ini_parse(const char *ini_path, void *context,
 			case '\n':
 				*cursor = '\0';
 				cursor++;
-				/* fall through */
+				fallthrough;
 			case '\0':
 				eol = true;
 				break;
@@ -81,7 +81,7 @@ QDF_STATUS qdf_ini_parse(const char *ini_path, void *context,
 				 */
 				comment = true;
 				*cursor = '\0';
-				/* fall through */
+				fallthrough;
 			default:
 				cursor++;
 				break;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -718,6 +718,15 @@ lim_send_probe_rsp_mgmt_frame(struct mac_context *mac_ctx,
 		 *         &frm.VHTExtBssLoad );
 		 */
 		is_vht_enabled = true;
+	}
+
+	if (wlan_reg_is_6ghz_chan_freq(pe_session->curr_op_freq)) {
+		populate_dot11f_tx_power_env(mac_ctx,
+					     &frm->transmit_power_env[0],
+					     pe_session->ch_width,
+					     pe_session->curr_op_freq,
+					     &frm->num_transmit_power_env,
+					     false);
 	}
 
 	if (lim_is_session_he_capable(pe_session)) {
@@ -2637,7 +2646,7 @@ lim_send_assoc_req_mgmt_frame(struct mac_context *mac_ctx,
 	QDF_TRACE_HEX_DUMP(QDF_MODULE_ID_PE, QDF_TRACE_LEVEL_DEBUG,
 			  frame, (uint16_t)(sizeof(tSirMacMgmtHdr) + payload));
 
-	min_rid = lim_get_min_session_txrate(pe_session);
+	min_rid = lim_get_min_session_txrate(pe_session, NULL);
 	lim_diag_event_report(mac_ctx, WLAN_PE_DIAG_ASSOC_START_EVENT,
 			      pe_session, QDF_STATUS_SUCCESS, QDF_STATUS_SUCCESS);
 	lim_diag_mgmt_tx_event_report(mac_ctx, mac_hdr,
@@ -3124,7 +3133,7 @@ alloc_packet:
 			 session->peSessionId, mac_hdr->fc.subType));
 
 	mac_ctx->auth_ack_status = LIM_ACK_NOT_RCD;
-	min_rid = lim_get_min_session_txrate(session);
+	min_rid = lim_get_min_session_txrate(session, NULL);
 	peer_rssi = mac_ctx->lim.bss_rssi;
 	lim_diag_mgmt_tx_event_report(mac_ctx, mac_hdr,
 				      session, QDF_STATUS_SUCCESS, QDF_STATUS_SUCCESS);
@@ -5328,7 +5337,7 @@ returnAfterError:
 QDF_STATUS lim_send_addba_response_frame(struct mac_context *mac_ctx,
 		tSirMacAddr peer_mac, uint16_t tid,
 		struct pe_session *session, uint8_t addba_extn_present,
-		uint8_t amsdu_support, uint8_t is_wep)
+		uint8_t amsdu_support, uint8_t is_wep, uint16_t calc_buff_size)
 {
 
 	tDot11faddba_rsp frm;
@@ -5343,7 +5352,7 @@ QDF_STATUS lim_send_addba_response_frame(struct mac_context *mac_ctx,
 	uint8_t dialog_token;
 	void *soc = cds_get_context(QDF_MODULE_ID_SOC);
 	uint8_t he_frag = 0;
-	tpDphHashNode sta_ds;
+	tpDphHashNode sta_ds = NULL;
 	uint16_t aid;
 	bool he_cap = false;
 	struct wlan_mlme_qos *qos_aggr;
@@ -5353,6 +5362,7 @@ QDF_STATUS lim_send_addba_response_frame(struct mac_context *mac_ctx,
 	cdp_addba_responsesetup(soc, peer_mac, vdev_id, tid,
 				&dialog_token, &status_code, &buff_size,
 				&batimeout);
+
 	qos_aggr = &mac_ctx->mlme_cfg->qos_mlme_params;
 	qdf_mem_zero((uint8_t *) &frm, sizeof(frm));
 	frm.Category.category = ACTION_CATEGORY_BACK;
@@ -5361,42 +5371,51 @@ QDF_STATUS lim_send_addba_response_frame(struct mac_context *mac_ctx,
 	frm.DialogToken.token = dialog_token;
 	frm.Status.status = status_code;
 
-	if (qos_aggr->reject_addba_req) {
+	if ((LIM_IS_STA_ROLE(session) && qos_aggr->rx_aggregation_size == 1 &&
+	    !mac_ctx->usr_cfg_ba_buff_size) || mac_ctx->reject_addba_req) {
 		frm.Status.status = STATUS_REQUEST_DECLINED;
-		pe_err("refused addba req");
-	}
-	frm.addba_param_set.tid = tid;
+		pe_err("refused addba req for rx_aggregation_size: %d mac_ctx->reject_addba_req: %d",
+		       qos_aggr->rx_aggregation_size, mac_ctx->reject_addba_req);
+	} else if (LIM_IS_STA_ROLE(session) && !mac_ctx->usr_cfg_ba_buff_size) {
+		frm.addba_param_set.buff_size =
+			QDF_MIN(qos_aggr->rx_aggregation_size, calc_buff_size);
+	} else {
+		sta_ds = dph_lookup_hash_entry(mac_ctx, peer_mac, &aid,
+					       &session->dph.dphHashTable);
+		if (sta_ds && lim_is_session_he_capable(session))
+			he_cap = lim_is_sta_he_capable(sta_ds);
 
-	sta_ds = dph_lookup_hash_entry(mac_ctx, peer_mac, &aid,
-				       &session->dph.dphHashTable);
-	if (sta_ds && lim_is_session_he_capable(session))
-		he_cap = lim_is_sta_he_capable(sta_ds);
-
-	if (he_cap)
-		frm.addba_param_set.buff_size = MAX_BA_BUFF_SIZE;
-	else
-		frm.addba_param_set.buff_size = SIR_MAC_BA_DEFAULT_BUFF_SIZE;
-
-	if (mac_ctx->usr_cfg_ba_buff_size)
-		frm.addba_param_set.buff_size = mac_ctx->usr_cfg_ba_buff_size;
-
-	if (frm.addba_param_set.buff_size > MAX_BA_BUFF_SIZE)
-		frm.addba_param_set.buff_size = MAX_BA_BUFF_SIZE;
-
-	if (frm.addba_param_set.buff_size > SIR_MAC_BA_DEFAULT_BUFF_SIZE) {
-		if (session->active_ba_64_session) {
+		if (sta_ds && sta_ds->staType == STA_ENTRY_NDI_PEER)
+			frm.addba_param_set.buff_size = calc_buff_size;
+		else if (he_cap)
+			frm.addba_param_set.buff_size = MAX_BA_BUFF_SIZE;
+		else
 			frm.addba_param_set.buff_size =
-				SIR_MAC_BA_DEFAULT_BUFF_SIZE;
+					SIR_MAC_BA_DEFAULT_BUFF_SIZE;
+
+		if (mac_ctx->usr_cfg_ba_buff_size)
+			frm.addba_param_set.buff_size =
+					mac_ctx->usr_cfg_ba_buff_size;
+
+		if (frm.addba_param_set.buff_size > MAX_BA_BUFF_SIZE)
+			frm.addba_param_set.buff_size = MAX_BA_BUFF_SIZE;
+
+		if (frm.addba_param_set.buff_size > SIR_MAC_BA_DEFAULT_BUFF_SIZE) {
+			if (session->active_ba_64_session) {
+				frm.addba_param_set.buff_size =
+					SIR_MAC_BA_DEFAULT_BUFF_SIZE;
+			}
+		} else if (!session->active_ba_64_session) {
+			session->active_ba_64_session = true;
 		}
-	} else if (!session->active_ba_64_session) {
-		session->active_ba_64_session = true;
-	}
-	if (buff_size && (frm.addba_param_set.buff_size > buff_size)) {
-		pe_debug("buff size: %d larger than peer's capability: %d",
-			 frm.addba_param_set.buff_size, buff_size);
-		frm.addba_param_set.buff_size = buff_size;
+		if (buff_size && (frm.addba_param_set.buff_size > buff_size)) {
+			pe_debug("buff size: %d larger than peer's capability: %d",
+				 frm.addba_param_set.buff_size, buff_size);
+			frm.addba_param_set.buff_size = buff_size;
+		}
 	}
 
+	frm.addba_param_set.tid = tid;
 	/* Enable RX AMSDU only in HE mode if supported */
 	if (mac_ctx->is_usr_cfg_amsdu_enabled &&
 	    ((IS_PE_SESSION_HE_MODE(session) &&
@@ -5698,6 +5717,8 @@ static void lim_tx_mgmt_frame(struct mac_context *mac_ctx, uint8_t vdev_id,
 	enum rateid min_rid = RATEID_DEFAULT;
 	uint16_t channel_freq = 0;
 	uint16_t auth_algo;
+	qdf_freq_t pre_auth_freq_value;
+	qdf_freq_t *pre_auth_freq = NULL;
 
 	session = pe_find_session_by_vdev_id(mac_ctx, vdev_id);
 	if (!session) {
@@ -5711,17 +5732,24 @@ static void lim_tx_mgmt_frame(struct mac_context *mac_ctx, uint8_t vdev_id,
 		   session->peSessionId, 0);
 
 	mac_ctx->auth_ack_status = LIM_ACK_NOT_RCD;
-	min_rid = lim_get_min_session_txrate(session);
 
 	if (fc->subType == SIR_MAC_MGMT_AUTH) {
 		auth_algo = *(uint16_t *)(frame +
 					sizeof(tSirMacMgmtHdr));
-		if ((auth_algo == eSIR_AUTH_TYPE_SAE)
-		    && (session->ftPEContext.pFTPreAuthReq))
-			channel_freq = session->ftPEContext.
-				pFTPreAuthReq->pre_auth_channel_freq;
+		if (auth_algo == eSIR_AUTH_TYPE_SAE) {
+			tpSirFTPreAuthReq pre_auth_req;
+			if (session->ftPEContext.pFTPreAuthReq) {
+				pre_auth_req =
+					session->ftPEContext.pFTPreAuthReq;
+				channel_freq =
+					pre_auth_req->pre_auth_channel_freq;
+			}
+			pre_auth_freq_value = channel_freq;
+			pre_auth_freq = &pre_auth_freq_value;
+		}
 		pe_debug("TX SAE pre-auth frame on freq %d", channel_freq);
 	}
+	min_rid = lim_get_min_session_txrate(session, pre_auth_freq);
 
 	qdf_status = wma_tx_frameWithTxComplete(mac_ctx, packet,
 					 (uint16_t)msg_len,

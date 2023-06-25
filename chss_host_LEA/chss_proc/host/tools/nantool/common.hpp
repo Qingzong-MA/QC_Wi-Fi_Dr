@@ -32,7 +32,7 @@ int validate_sleep_duration(int sleep_time);
 int validate_iterations_count(int iter_count);
 
 wifi_interface_handle wifi_get_iface_handle(wifi_handle handle, char *name);
-extern wifi_hal_fn fn;
+//extern wifi_hal_fn fn;
 
 static inline void read_int(int *num)
 {

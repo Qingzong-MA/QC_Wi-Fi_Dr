@@ -12,6 +12,40 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted (subject to the limitations in the
+ * disclaimer below) provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *
+ *   * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+ * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+ * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <stdint.h>
@@ -30,17 +64,15 @@
 #include <netlink/object-api.h>
 #include <netlink/netlink.h>
 #include <netlink/socket.h>
-#if 0
-#include <netlink-private/object-api.h>
-#include <netlink-private/types.h>
-#endif
+//#include <netlink-private/object-api.h>
+//#include <netlink-private/types.h>
 
-#include <linux/nl80211.h>
+#include "nl80211_copy.h"
 
 #include <dirent.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <cld80211_lib.h>
+//#include <cld80211_lib.h>
 
 #include <sys/types.h>
 #include "list.h"
@@ -51,15 +83,14 @@
 #define LOG_TAG  "WifiHAL"
 
 #include "wifi_hal.h"
-#include "wifi_hal_ctrl.h"
+//#include "wifi_hal_ctrl.h"
 #include "common.h"
 #include "cpp_bindings.h"
 #include "ifaceeventhandler.h"
-#if 0
-#include "wifiloggercmd.h"
-#include "tcp_params_update.h"
-#endif
+//#include "wifiloggercmd.h"
+//#include "tcp_params_update.h"
 #include <bsd/string.h>
+
 
 /*
  BUGBUG: normally, libnl allocates ports for all connections it makes; but
@@ -81,6 +112,7 @@
 #define POLL_DRIVER_DURATION_US (100000)
 #define POLL_DRIVER_MAX_TIME_MS (10000)
 
+#if 0
 static int attach_monitor_sock(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg);
 
 static int dettach_monitor_sock(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg);
@@ -88,11 +120,14 @@ static int dettach_monitor_sock(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg
 static int register_monitor_sock(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg, int attach);
 
 static int send_nl_data(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg);
+#endif
 
 static int internal_pollin_handler(wifi_handle handle, struct nl_sock *sock);
 
+#if 0
 static void internal_event_handler_app(wifi_handle handle, int events,
                                        struct ctrl_sock *sock);
+#endif
 
 static void internal_event_handler(wifi_handle handle, int events,
                                    struct nl_sock *sock);
@@ -115,7 +150,15 @@ wifi_error wifi_get_wake_reason_stats(wifi_interface_handle iface,
 static int wifi_is_nan_ext_cmd_supported(wifi_interface_handle handle);
 
 wifi_error
-	wifi_init_tcp_param_change_event_handler(wifi_interface_handle iface);
+    wifi_init_tcp_param_change_event_handler(wifi_interface_handle iface);
+
+#ifndef TARGET_SUPPORTS_WEARABLES
+wifi_error wifi_get_supported_iface_combination(wifi_interface_handle iface_handle);
+
+wifi_error wifi_get_supported_iface_concurrency_matrix(
+        wifi_handle handle,
+        wifi_iface_concurrency_matrix *iface_concurrency_matrix);
+#endif /* TARGET_SUPPORTS_WEARABLES */
 
 /* Initialize/Cleanup */
 
@@ -160,6 +203,7 @@ static nl_sock * wifi_create_nl_socket(int port, int protocol)
     return sock;
 }
 
+#if 0
 void wifi_create_ctrl_socket(hal_info *info)
 {
 #ifdef ANDROID
@@ -258,6 +302,7 @@ out:
   info->wifihal_ctrl_sock.s = 0;
   return;
 }
+#endif
 
 int ack_handler(struct nl_msg *msg, void *arg)
 {
@@ -386,7 +431,29 @@ static wifi_error wifi_get_capabilities(wifi_interface_handle handle)
     return ret;
 }
 
-#if 0
+static wifi_error wifi_get_sar_version(wifi_interface_handle handle)
+{
+    wifi_error ret;
+    wifi_handle wifiHandle = getWifiHandle(handle);
+
+    WifihalGeneric *sarVersion = new WifihalGeneric(
+                            wifiHandle,
+                            0,
+                            OUI_QCA,
+                            QCA_NL80211_VENDOR_SUBCMD_GET_SAR_CAPABILITY);
+    if (!sarVersion) {
+        ALOGE("%s: Failed to create object of WifihalGeneric class", __FUNCTION__);
+        return WIFI_ERROR_OUT_OF_MEMORY;
+    }
+
+
+    ret = sarVersion->getSarVersion(handle);
+
+    delete sarVersion;
+    return ret;
+}
+
+
 static wifi_error get_firmware_bus_max_size_supported(
                                                 wifi_interface_handle iface)
 {
@@ -418,10 +485,8 @@ static wifi_error get_firmware_bus_max_size_supported(
 cleanup:
     return ret;
 }
-#endif
 
-#define WIFI_HAL_USER_SOCK_PORT    646
-
+#if 0
 static wifi_error wifi_init_user_sock(hal_info *info)
 {
     struct nl_sock *user_sock =
@@ -487,10 +552,453 @@ static wifi_error wifi_init_cld80211_sock_cb(hal_info *info)
     return WIFI_SUCCESS;
 }
 
+static uint32_t get_frequency_from_channel(uint32_t channel, wlan_mac_band band)
+{
+  uint32_t freq = 0;
+
+  switch (band)
+  {
+    case WLAN_MAC_2_4_BAND:
+      if (!(channel >= 1 && channel <= 14))
+        goto failure;
+      //special handling for channel 14 by filling freq here
+      if (channel == 14)
+        freq = 2484;
+      else
+        freq = 2407 + (channel * 5);
+      break;
+    case WLAN_MAC_5_0_BAND:
+      if (!((channel >= 34 && channel < 65) ||
+          (channel > 99 && channel <= 196)))
+        goto failure;
+      freq = 5000 + (channel * 5);
+      break;
+    case WLAN_MAC_6_0_BAND:
+      if (!(channel >= 1 && channel <= 233))
+        goto failure;
+      freq = 5950 + (channel * 5);
+      break;
+    default:
+      break;
+  }
+
+failure:
+  return freq;
+}
+
+static u32 get_nl_ifmask_from_coex_restriction_mask(u32 in_mask)
+{
+    u32 op_mask = 0;
+
+    if (!in_mask)
+       return op_mask;
+    if (in_mask & SOFTAP)
+         op_mask |= BIT(NL80211_IFTYPE_AP);
+    if (in_mask & WIFI_DIRECT)
+         op_mask |= BIT(NL80211_IFTYPE_P2P_GO);
+    if (in_mask & WIFI_AWARE)
+         op_mask |= BIT(NL80211_IFTYPE_NAN);
+
+    return op_mask;
+}
+
+wifi_error wifi_set_coex_unsafe_channels(wifi_handle handle, u32 num_channels,
+                                         wifi_coex_unsafe_channel *unsafeChannels,
+                                         u32 restrictions)
+{
+    wifi_error ret = WIFI_ERROR_UNKNOWN;
+    WifihalGeneric *cmd = NULL;
+    struct nlattr *nl_data = NULL;
+    struct nlattr *nl_attr_unsafe_chan = NULL;
+    struct nlattr *unsafe_channels_attr = NULL;
+    hal_info *info = NULL;
+
+    if (!handle) {
+         ALOGE("%s: Error, wifi_handle NULL", __FUNCTION__);
+         goto cleanup;
+    }
+
+    info = getHalInfo(handle);
+    if (!info || info->num_interfaces < 1) {
+         ALOGE("%s: Error, wifi_handle NULL or base wlan interface not present",
+               __FUNCTION__);
+         goto cleanup;
+    }
+
+    cmd = new WifihalGeneric(handle, get_requestid(), OUI_QCA,
+                             QCA_NL80211_VENDOR_SUBCMD_AVOID_FREQUENCY_EXT);
+    if (cmd == NULL) {
+         ALOGE("%s: Error, created command NULL", __FUNCTION__);
+         ret = WIFI_ERROR_OUT_OF_MEMORY;
+         goto cleanup;
+    }
+
+    /* Create the NL message. */
+    ret = cmd->create();
+    if (ret < 0) {
+         ALOGE("%s: failed to create NL msg due to error: (%d)",
+               __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    /* Add the vendor specific attributes for the NL command. */
+    nl_data = cmd->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nl_data) {
+         ALOGE("%s: failed attr_start for NL80211_ATTR_VENDOR_DATA",
+               __FUNCTION__);
+         ret = WIFI_ERROR_OUT_OF_MEMORY;
+         goto cleanup;
+    }
+
+    nl_attr_unsafe_chan = cmd->attr_start(
+        QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_RANGE);
+    if (!nl_attr_unsafe_chan) {
+         ALOGE("%s: failed attr_start for"
+               " QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_RANGE", __FUNCTION__);
+         ret = WIFI_ERROR_OUT_OF_MEMORY;
+         goto cleanup;
+    }
+    ALOGD("%s: num_channels:%d, restrictions:%x", __FUNCTION__, num_channels,
+          restrictions);
+    if (num_channels == 0) {
+         unsafe_channels_attr = cmd->attr_start(0);
+         if (!unsafe_channels_attr) {
+              ALOGE("%s: failed attr_start for unsafe_channels_attr when"
+                    " trying to clear usafe channels clear", __FUNCTION__);
+              ret = WIFI_ERROR_OUT_OF_MEMORY;
+              goto cleanup;
+         }
+         ret = cmd->put_u32(
+               QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_START, 0);
+         if (ret != WIFI_SUCCESS) {
+              ALOGE("%s: Failed to put frequency start, ret:%d",
+                    __FUNCTION__, ret);
+              goto cleanup;
+         }
+         ret = cmd->put_u32(
+               QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_END, 0);
+         if (ret != WIFI_SUCCESS) {
+              ALOGE("%s: Failed to put frequency end, ret:%d",
+                    __FUNCTION__, ret);
+              goto cleanup;
+         }
+         cmd->attr_end(unsafe_channels_attr);
+    }
+    else {
+        if (!unsafeChannels) {
+            ALOGE("%s: unsafe channels buffer should not be NULL when"
+                  " there are unsafe channels", __FUNCTION__);
+            ret = WIFI_ERROR_INVALID_ARGS;
+            goto cleanup;
+        }
+    }
+    for (int i = 0; i < num_channels; i++) {
+         unsafe_channels_attr = cmd->attr_start(i);
+         if (!unsafe_channels_attr) {
+              ALOGE("%s: failed attr_start for unsafe_channels_attr of"
+                    " index:%d", __FUNCTION__, i);
+              ret = WIFI_ERROR_OUT_OF_MEMORY;
+              goto cleanup;
+         }
+         u32 freq = get_frequency_from_channel(unsafeChannels[i].channel,
+               unsafeChannels[i].band);
+         if (!freq) {
+              ALOGE("%s: Failed to get frequency of band:%d, channel:%d",
+                        __FUNCTION__, (int)unsafeChannels[i].band,
+                        unsafeChannels[i].channel);
+              ret = WIFI_ERROR_INVALID_ARGS;
+              goto cleanup;
+         }
+         ret = cmd->put_u32(
+               QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_START, freq);
+         if (ret != WIFI_SUCCESS) {
+              ALOGE("%s: Failed to put frequency start, ret:%d",
+                    __FUNCTION__, ret);
+              goto cleanup;
+         }
+         ret = cmd->put_u32(
+               QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_END, freq);
+         if (ret != WIFI_SUCCESS) {
+              ALOGE("%s: Failed to put frequency end, ret:%d",
+                    __FUNCTION__, ret);
+              goto cleanup;
+         }
+         /**
+          * WIFI_COEX_NO_POWER_CAP (0x7FFFFFF) is specific to android
+          * framework, this value denotes that framework/wifihal is not
+          * providing any power cap and allow driver/firmware to operate on
+          * current power cap dbm. As driver is supposed to work on with
+          * LA/LE etc, we are skipping to send 0x7FFFFFF down to driver,
+          * hence driver will be operating as per current power cap calculated
+          * based on regulatory or other constraints.
+          */
+         if (unsafeChannels[i].power_cap_dbm != WIFI_COEX_NO_POWER_CAP) {
+             ret = cmd->put_s32(
+                   QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_POWER_CAP_DBM,
+                   unsafeChannels[i].power_cap_dbm);
+             if (ret != WIFI_SUCCESS) {
+                 ALOGE("%s: Failed to put power_cap_dbm, ret:%d",
+                       __FUNCTION__, ret);
+                 goto cleanup;
+             }
+         }
+         cmd->attr_end(unsafe_channels_attr);
+         ALOGD("%s: channel:%d, freq:%d, power_cap_dbm:%d, band:%d",
+               __FUNCTION__, unsafeChannels[i].channel, freq,
+               unsafeChannels[i].power_cap_dbm, unsafeChannels[i].band);
+    }
+    cmd->attr_end(nl_attr_unsafe_chan);
+    if (num_channels > 0) {
+        ret = cmd->put_u32(QCA_WLAN_VENDOR_ATTR_AVOID_FREQUENCY_IFACES_BITMASK,
+                       get_nl_ifmask_from_coex_restriction_mask(restrictions));
+        if (ret != WIFI_SUCCESS) {
+            ALOGE("%s: Failed to put restrictions mask, ret:%d",
+                  __FUNCTION__, ret);
+            goto cleanup;
+        }
+    }
+    cmd->attr_end(nl_data);
+
+    /* Send the msg and wait for a response. */
+    ret = cmd->requestResponse();
+    if (ret != WIFI_SUCCESS) {
+         ALOGE("%s: Error %d waiting for response.", __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+cleanup:
+    if (cmd)
+        delete cmd;
+    return ret;
+}
+
+wifi_error wifi_set_dtim_config(wifi_interface_handle handle, u32 multiplier)
+{
+    wifi_error ret = WIFI_ERROR_INVALID_ARGS;
+    WifihalGeneric *cmd = NULL;
+    struct nlattr *nlData = NULL;
+    interface_info *ifaceInfo = NULL;
+    wifi_handle wifiHandle = NULL;
+
+    if (!handle) {
+         ALOGE("%s: Error, wifi_interface_handle NULL", __FUNCTION__);
+         goto cleanup;
+    }
+    ALOGD("%s: multiplier:%d", __FUNCTION__, multiplier);
+    wifiHandle = getWifiHandle(handle);
+    cmd = new WifihalGeneric(wifiHandle, get_requestid(), OUI_QCA,
+                             QCA_NL80211_VENDOR_SUBCMD_SET_WIFI_CONFIGURATION);
+    if (cmd == NULL) {
+        ALOGE("%s: Error WifihalGeneric NULL", __FUNCTION__);
+        ret = WIFI_ERROR_OUT_OF_MEMORY;
+        goto cleanup;
+    }
+
+    /* Create the NL message. */
+    ret = cmd->create();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: failed to create NL msg. Error:%d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+    ifaceInfo = getIfaceInfo(handle);
+    if (!ifaceInfo) {
+        ALOGE("%s: getIfaceInfo is NULL", __FUNCTION__);
+        ret = WIFI_ERROR_OUT_OF_MEMORY;
+        goto cleanup;
+    }
+
+    /* Set the interface Id of the message. */
+    ret = cmd->set_iface_id(ifaceInfo->name);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: failed to set iface id. Error:%d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+
+    /* Add the vendor specific attributes for the NL command. */
+    nlData = cmd->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nlData) {
+        ALOGE("%s: failed attr_start for VENDOR_DATA", __FUNCTION__);
+        ret = WIFI_ERROR_OUT_OF_MEMORY;
+        goto cleanup;
+    }
+
+    ret = cmd->put_u32(QCA_WLAN_VENDOR_ATTR_CONFIG_DYNAMIC_DTIM, multiplier);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: failed to put vendor data. Error:%d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+    cmd->attr_end(nlData);
+
+    /* Send the NL msg. */
+    ret = cmd->requestResponse();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: requestResponse Error:%d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+
+cleanup:
+    if (cmd)
+        delete cmd;
+    return ret;
+}
+
+static u32 get_nl_band_mask(u32 in_mask)
+{
+    u32 op_mask = 0;
+
+    if (in_mask & WLAN_MAC_2_4_BAND)
+         op_mask |= BIT(NL80211_BAND_2GHZ);
+    if (in_mask & WLAN_MAC_5_0_BAND)
+         op_mask |= BIT(NL80211_BAND_5GHZ);
+    if (in_mask & WLAN_MAC_6_0_BAND)
+         op_mask |= BIT(NL80211_BAND_6GHZ);
+    if (in_mask & WLAN_MAC_60_0_BAND)
+         op_mask |= BIT(NL80211_BAND_60GHZ);
+
+    return op_mask;
+}
+
+static u32 get_nl_iftype_mode_masks(u32 in_mask)
+{
+    u32 op_mask = 0;
+
+    if (in_mask & BIT(WIFI_INTERFACE_STA) ||
+        in_mask & BIT(WIFI_INTERFACE_TDLS))
+         op_mask |= BIT(NL80211_IFTYPE_STATION);
+    if (in_mask & BIT(WIFI_INTERFACE_SOFTAP))
+         op_mask |= BIT(NL80211_IFTYPE_AP);
+    if (in_mask & BIT(WIFI_INTERFACE_P2P_CLIENT))
+         op_mask |= BIT(NL80211_IFTYPE_P2P_CLIENT);
+    if (in_mask & BIT(WIFI_INTERFACE_P2P_GO))
+         op_mask |= BIT(NL80211_IFTYPE_P2P_GO);
+    if (in_mask & BIT(WIFI_INTERFACE_NAN))
+         op_mask |= BIT(NL80211_IFTYPE_NAN);
+
+    return op_mask;
+}
+
+static u32 get_vendor_filter_mask(u32 in_mask)
+{
+    u32 op_mask = 0;
+
+    if (in_mask & WIFI_USABLE_CHANNEL_FILTER_CELLULAR_COEXISTENCE)
+         op_mask |= BIT(QCA_WLAN_VENDOR_FILTER_CELLULAR_COEX);
+    if (in_mask & WIFI_USABLE_CHANNEL_FILTER_CONCURRENCY)
+         op_mask |= BIT(QCA_WLAN_VENDOR_FILTER_WLAN_CONCURRENCY);
+
+    return op_mask;
+}
+
+wifi_error wifi_get_usable_channels(wifi_handle handle, u32 band_mask,
+                                    u32 iface_mode_mask, u32 filter_mask,
+                                    u32 max_size, u32* size,
+                                    wifi_usable_channel* channels)
+{
+    wifi_error ret = WIFI_ERROR_UNKNOWN;
+    WifihalGeneric *cmd = NULL;
+    struct nlattr *nl_data = NULL;
+    hal_info *info = NULL;
+    u32 band = 0, iface_mask = 0, filter = 0;
+
+    if (!handle) {
+         ALOGE("%s: Error, wifi_handle NULL", __FUNCTION__);
+         goto cleanup;
+    }
+
+    info = getHalInfo(handle);
+    if (!info || info->num_interfaces < 1) {
+         ALOGE("%s: Error, wifi_handle NULL or base wlan interface not present",
+               __FUNCTION__);
+         goto cleanup;
+    }
+
+    if (!max_size) {
+         ALOGE("%s: max channel size is zero", __FUNCTION__);
+         ret = WIFI_ERROR_INVALID_ARGS;
+         goto cleanup;
+    }
+
+    if (!channels) {
+         ALOGE("%s: user input channel buffer NULL", __FUNCTION__);
+         ret = WIFI_ERROR_INVALID_ARGS;
+         goto cleanup;
+    }
+
+    cmd = new WifihalGeneric(handle, get_requestid(), OUI_QCA,
+                             QCA_NL80211_VENDOR_SUBCMD_USABLE_CHANNELS);
+    if (cmd == NULL) {
+         ALOGE("%s: Error, created command NULL", __FUNCTION__);
+         ret = WIFI_ERROR_OUT_OF_MEMORY;
+         goto cleanup;
+    }
+
+    /* Create the NL message. */
+    ret = cmd->create();
+    if (ret < 0) {
+         ALOGE("%s: failed to create NL msg due to error: (%d)",
+               __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    /* Add the vendor specific attributes for the NL command. */
+    nl_data = cmd->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nl_data) {
+         ALOGE("%s: failed attr_start for VENDOR_DATA due to error",
+               __FUNCTION__);
+         ret = WIFI_ERROR_OUT_OF_MEMORY;
+         goto cleanup;
+    }
+
+    band = get_nl_band_mask(band_mask);
+    ret = cmd->put_u32(QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_BAND_MASK,
+                       band);
+    if (ret != WIFI_SUCCESS) {
+         ALOGE("%s: failed to put vendor data due to error:%d",
+               __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    iface_mask = get_nl_iftype_mode_masks(iface_mode_mask);
+    ret = cmd->put_u32(QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_IFACE_MODE_MASK,
+                       iface_mask);
+    if (ret != WIFI_SUCCESS) {
+         ALOGE("%s: failed to put vendor data due to error:%d",
+               __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    filter = get_vendor_filter_mask(filter_mask);
+    ret = cmd->put_u32(QCA_WLAN_VENDOR_ATTR_USABLE_CHANNELS_FILTER_MASK,
+                       filter);
+    if (ret != WIFI_SUCCESS) {
+         ALOGE("%s: failed to put vendor data due to error:%d",
+               __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    cmd->attr_end(nl_data);
+
+    /* Populate the input received from caller/framework. */
+    cmd->setMaxSetSize(max_size);
+    cmd->set_channels_buff(channels);
+
+    /* Send the msg and wait for a response. */
+    ret = cmd->requestResponse();
+    if (ret != WIFI_SUCCESS) {
+         ALOGE("%s: Error %d waiting for response.", __FUNCTION__, ret);
+         goto cleanup;
+    }
+
+    *size = cmd->get_results_size();
+
+cleanup:
+    if (cmd)
+        delete cmd;
+    return ret;
+}
 
 /*initialize function pointer table with Qualcomm HAL API*/
 wifi_error init_wifi_vendor_hal_func_table(wifi_hal_fn *fn) {
-#if 0
     if (fn == NULL) {
         return WIFI_ERROR_UNKNOWN;
     }
@@ -592,7 +1100,17 @@ wifi_error init_wifi_vendor_hal_func_table(wifi_hal_fn *fn) {
     fn->wifi_virtual_interface_delete = wifi_virtual_interface_delete;
     fn->wifi_set_latency_mode = wifi_set_latency_mode;
     fn->wifi_set_thermal_mitigation_mode = wifi_set_thermal_mitigation_mode;
-#endif
+    fn->wifi_multi_sta_set_primary_connection = wifi_multi_sta_set_primary_connection;
+    fn->wifi_multi_sta_set_use_case = wifi_multi_sta_set_use_case;
+    fn->wifi_set_coex_unsafe_channels = wifi_set_coex_unsafe_channels;
+    fn->wifi_set_dtim_config = wifi_set_dtim_config;
+    fn->wifi_get_usable_channels = wifi_get_usable_channels;
+    fn->wifi_get_supported_radio_combinations_matrix =
+                                wifi_get_supported_radio_combinations_matrix;
+#ifndef TARGET_SUPPORTS_WEARABLES
+    fn->wifi_get_supported_iface_concurrency_matrix =
+                                wifi_get_supported_iface_concurrency_matrix;
+#endif /* TARGET_SUPPORTS_WEARABLES */
 
     return WIFI_SUCCESS;
 }
@@ -611,6 +1129,7 @@ static void cld80211lib_cleanup(hal_info *info)
     cld80211_deinit(info->cldctx);
     info->cldctx = NULL;
 }
+#endif
 
 static int wifi_get_iface_id(hal_info *info, const char *iface)
 {
@@ -623,7 +1142,7 @@ static int wifi_get_iface_id(hal_info *info, const char *iface)
 
 wifi_error wifi_initialize(wifi_handle *handle)
 {
-    wifi_error ret = WIFI_SUCCESS;
+    wifi_error ret = WIFI_ERROR_UNKNOWN;
     wifi_interface_handle iface_handle;
     struct nl_sock *cmd_sock = NULL;
     struct nl_sock *event_sock = NULL;
@@ -720,6 +1239,7 @@ wifi_error wifi_initialize(wifi_handle *handle)
     wifi_add_membership(*handle, "regulatory");
     wifi_add_membership(*handle, "vendor");
 
+#if 0
     info->wifihal_ctrl_sock.s = 0;
 
     wifi_create_ctrl_socket(info);
@@ -777,6 +1297,7 @@ wifi_error wifi_initialize(wifi_handle *handle)
             goto unload;
         }
     }
+#endif
 
     ret = wifi_init_interfaces(*handle);
     if (ret != WIFI_SUCCESS) {
@@ -798,6 +1319,7 @@ wifi_error wifi_initialize(wifi_handle *handle)
             free(info->interfaces[i]);
         }
         ALOGE("%s no iface with wlan0", __func__);
+        ret = WIFI_ERROR_UNKNOWN;
         goto unload;
     }
     iface_handle = (wifi_interface_handle)info->interfaces[index];
@@ -812,7 +1334,6 @@ wifi_error wifi_initialize(wifi_handle *handle)
         ret = WIFI_SUCCESS;
     }
 
-#if 0
     ret = acquire_driver_supported_features(iface_handle,
                                   &info->driver_supported_features);
     if (ret != WIFI_SUCCESS) {
@@ -820,6 +1341,7 @@ wifi_error wifi_initialize(wifi_handle *handle)
         ret = WIFI_SUCCESS;
     }
 
+#if 0
     ret =  wifi_get_logger_supported_feature_set(iface_handle,
                          &info->supported_logger_feature_set);
     if (ret != WIFI_SUCCESS)
@@ -927,11 +1449,28 @@ wifi_error wifi_initialize(wifi_handle *handle)
     ALOGV("support_nan_ext_cmd is %d",
           info->support_nan_ext_cmd);
 
+#if 0
+#ifndef TARGET_SUPPORTS_WEARABLES
+    ret = wifi_get_supported_iface_combination(iface_handle);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("Failed to get driver supported interface combinations");
+        goto unload;
+    }
+#endif /* TARGET_SUPPORTS_WEARABLES */
+
+    ret = wifi_get_sar_version(iface_handle);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("Failed to  get  SAR Version, Setting it to default.");
+        info->sar_version = QCA_WLAN_VENDOR_SAR_VERSION_1;
+        ret = WIFI_SUCCESS;
+    }
+
 cld80211_cleanup:
     if (status != 0 || ret != WIFI_SUCCESS) {
         ret = WIFI_ERROR_UNKNOWN;
         cld80211lib_cleanup(info);
     }
+#endif
 unload:
     if (ret != WIFI_SUCCESS) {
         if (cmd_sock)
@@ -939,19 +1478,20 @@ unload:
         if (event_sock)
             nl_socket_free(event_sock);
         if (info) {
+#if 0
             if (info->cldctx) {
                 cld80211lib_cleanup(info);
             } else if (info->user_sock) {
                 nl_socket_free(info->user_sock);
             }
-#if 0
             if (info->pkt_stats) free(info->pkt_stats);
             if (info->rx_aggr_pkts) free(info->rx_aggr_pkts);
+            if (info->wifihal_ctrl_sock.s) close(info->wifihal_ctrl_sock.s);
             wifi_logger_ring_buffers_deinit(info);
             cleanupGscanHandlers(info);
             cleanupRSSIMonitorHandler(info);
             cleanupRadioHandler(info);
-	    cleanupTCPParamCommand(info);
+            cleanupTCPParamCommand(info);
 #endif
             free(info->event_cb);
             if (info->driver_supported_features.flags) {
@@ -985,12 +1525,14 @@ static int wifi_update_driver_state(const char *state) {
     if (fd < 0) {
         ALOGE("Failed to open driver state control param at %s",
               WIFI_DRIVER_STATE_CTRL_PARAM);
+        close(fd);
         return -1;
     }
     len = strlen(state) + 1;
     if (TEMP_FAILURE_RETRY(write(fd, state, len)) != len) {
         ALOGE("Failed to write driver state control param at %s",
               WIFI_DRIVER_STATE_CTRL_PARAM);
+        close(fd);
         ret = -1;
     }
     close(fd);
@@ -1045,7 +1587,9 @@ static void internal_cleaned_up_handler(wifi_handle handle)
 {
     hal_info *info = getHalInfo(handle);
     wifi_cleaned_up_handler cleaned_up_handler = info->cleaned_up_handler;
+#if 0
     wifihal_mon_sock_t *reg, *tmp;
+#endif
 
     if (info->cmd_sock != 0) {
         nl_socket_free(info->cmd_sock);
@@ -1054,6 +1598,7 @@ static void internal_cleaned_up_handler(wifi_handle handle)
         info->event_sock = NULL;
     }
 
+#if 0
     if (info->wifihal_ctrl_sock.s != 0) {
         close(info->wifihal_ctrl_sock.s);
         unlink(info->wifihal_ctrl_sock.local.sun_path);
@@ -1064,6 +1609,7 @@ static void internal_cleaned_up_handler(wifi_handle handle)
         del_from_list(&reg->list);
         free(reg);
     }
+#endif
 
     if (info->interfaces) {
         for (int i = 0; i < info->num_interfaces; i++)
@@ -1071,6 +1617,7 @@ static void internal_cleaned_up_handler(wifi_handle handle)
         free(info->interfaces);
     }
 
+#if 0
     if (info->cldctx != NULL) {
         cld80211lib_cleanup(info);
     } else if (info->user_sock != 0) {
@@ -1078,7 +1625,6 @@ static void internal_cleaned_up_handler(wifi_handle handle)
         info->user_sock = NULL;
     }
 
-#if 0
     if (info->pkt_stats)
         free(info->pkt_stats);
     if (info->rx_aggr_pkts)
@@ -1143,18 +1689,8 @@ void wifi_cleanup(wifi_handle handle, wifi_cleaned_up_handler handler)
 }
 
 
-#define ANI_NL_MSG_BASE     0x10
 
-typedef enum eAniNlModuleTypes {
-    ANI_NL_MSG_PUMAC = ANI_NL_MSG_BASE + 0x01,// PTT Socket App
-    ANI_NL_MSG_PTT = ANI_NL_MSG_BASE + 0x07,// Quarky GUI
-    WLAN_NL_MSG_BTC,
-    WLAN_NL_MSG_OEM,
-    ANI_NL_MSG_CNSS_DIAG = ANI_NL_MSG_BASE + 0x0B,
-    ANI_NL_MSG_LOG,
-    ANI_NL_MSG_MAX
-} tAniNlModTypes;
-
+#if 0
 static int validate_cld80211_msg(nlmsghdr *nlh, int family, int cmd)
 {
     //! Enhance this API
@@ -1207,18 +1743,6 @@ static int validate_genl_msg(nlmsghdr *nlh, int family, int cmd)
       return -1;
     }
 }
-
-struct nl_msg
-{
-       int                     nm_protocol;
-       int                     nm_flags;
-       struct sockaddr_nl      nm_src;
-       struct sockaddr_nl      nm_dst;
-       struct ucred            nm_creds;
-       struct nlmsghdr *       nm_nlh;
-       size_t                  nm_size;
-       int                     nm_refcnt;
-};
 
 static int send_nl_data(wifi_handle handle, wifihal_ctrl_req_t *ctrl_msg)
 {
@@ -1535,6 +2059,7 @@ static int internal_pollin_handler_app(wifi_handle handle,  struct ctrl_sock *so
         }
       return res;
 }
+#endif
 
 static int internal_pollin_handler(wifi_handle handle, struct nl_sock *sock)
 {
@@ -1547,6 +2072,7 @@ static int internal_pollin_handler(wifi_handle handle, struct nl_sock *sock)
     return res;
 }
 
+#if 0
 static void internal_event_handler_app(wifi_handle handle, int events,
                                     struct ctrl_sock *sock)
 {
@@ -1562,6 +2088,7 @@ static void internal_event_handler_app(wifi_handle handle, int events,
         ALOGE("Unknown event - %0x", events);
     }
 }
+#endif
 
 static void internal_event_handler(wifi_handle handle, int events,
                                    struct nl_sock *sock)
@@ -1608,16 +2135,20 @@ void wifi_event_loop(wifi_handle handle)
     pfd[0].fd = nl_socket_get_fd(info->event_sock);
     pfd[0].events = POLLIN;
 
+#if 0
     pfd[1].fd = nl_socket_get_fd(info->user_sock);
     pfd[1].events = POLLIN;
+#endif
 
     pfd[2].fd = info->exit_sockets[1];
     pfd[2].events = POLLIN;
 
+#if 0
     if(info->wifihal_ctrl_sock.s > 0) {
       pfd[3].fd = info->wifihal_ctrl_sock.s ;
       pfd[3].events = POLLIN;
     }
+#endif
     /* TODO: Add support for timeouts */
 
     do {
@@ -1636,9 +2167,11 @@ void wifi_event_loop(wifi_handle handle)
             if (pfd[1].revents & (POLLIN | POLLHUP | POLLERR)) {
                 internal_event_handler(handle, pfd[1].revents, info->user_sock);
             }
+#if 0
             if ((info->wifihal_ctrl_sock.s > 0) && (pfd[3].revents & (POLLIN | POLLHUP | POLLERR))) {
                 internal_event_handler_app(handle, pfd[3].revents, &info->wifihal_ctrl_sock);
             }
+#endif
             if (pfd[2].revents & POLLIN) {
                 if (exit_event_handler(pfd[2].fd)) {
                     break;
@@ -1651,15 +2184,17 @@ void wifi_event_loop(wifi_handle handle)
     ALOGI("wifi_event_loop() exits success");
 }
 
+#if 0
 static int user_sock_message_handler(nl_msg *msg, void *arg)
 {
     wifi_handle handle = (wifi_handle)arg;
     hal_info *info = getHalInfo(handle);
 
-    //diag_message_handler(info, msg);
+    diag_message_handler(info, msg);
 
     return NL_OK;
 }
+#endif
 
 static int internal_valid_message_handler(nl_msg *msg, void *arg)
 {
@@ -1687,6 +2222,7 @@ static int internal_valid_message_handler(nl_msg *msg, void *arg)
                   event.get_cmdString(), vendor_id, subcmd);
         }
     }
+#if 0
     else if((info->wifihal_ctrl_sock.s > 0) && (cmd == NL80211_CMD_FRAME))
     {
        struct genlmsghdr *genlh;
@@ -1743,6 +2279,7 @@ static int internal_valid_message_handler(nl_msg *msg, void *arg)
         }
         free(ctrl_evt);
     }
+#endif
 
     else {
         ALOGV("event received %s", event.get_cmdString());
@@ -1967,7 +2504,6 @@ wifi_error wifi_get_ifaces(wifi_handle handle, int *num,
 {
     hal_info *info = (hal_info *)handle;
 
-#ifdef WCNSS_QTI_AOSP
     /* In case of dynamic interface add/remove, interface handles need to be
      * updated so that, interface specific APIs could be instantiated.
      * Reload here to get interfaces which are dynamically added. */
@@ -1983,7 +2519,6 @@ wifi_error wifi_get_ifaces(wifi_handle handle, int *num,
         ALOGE("Failed to init interfaces while wifi_get_ifaces");
         return ret;
     }
-#endif
 
     *interfaces = (wifi_interface_handle *)info->interfaces;
     *num = info->num_interfaces;
@@ -2054,8 +2589,10 @@ wifi_error wifi_get_concurrency_matrix(wifi_interface_handle handle,
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     ret = vCommand->put_u32(
           QCA_WLAN_VENDOR_ATTR_GET_CONCURRENCY_MATRIX_CONFIG_PARAM_SET_SIZE_MAX,
@@ -2081,6 +2618,73 @@ cleanup:
     return ret;
 }
 
+wifi_error wifi_get_supported_radio_combinations_matrix(
+                wifi_handle handle, u32 max_size, u32 *size,
+                wifi_radio_combination_matrix *radio_combination_matrix)
+{
+    wifi_error ret = WIFI_ERROR_UNKNOWN;;
+    struct nlattr *nlData;
+    WifihalGeneric *vCommand = NULL;
+    hal_info *info = NULL;
+
+    ALOGI("%s: enter", __FUNCTION__);
+    if (!handle) {
+         ALOGE("%s: Error, wifi_handle NULL", __FUNCTION__);
+         return WIFI_ERROR_UNKNOWN;
+    }
+
+    info = getHalInfo(handle);
+    if (!info || info->num_interfaces < 1) {
+         ALOGE("%s: Error, wifi_handle NULL or base wlan interface not present",
+               __FUNCTION__);
+         return WIFI_ERROR_UNKNOWN;
+    }
+
+    if (size == NULL || radio_combination_matrix == NULL) {
+        ALOGE("%s: NULL set pointer provided. Exit.",
+            __func__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    if (max_size < sizeof(u32)) {
+        ALOGE("%s: Invalid max size value %d", __func__, max_size);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    vCommand = new WifihalGeneric(handle, get_requestid(), OUI_QCA,
+                        QCA_NL80211_VENDOR_SUBCMD_GET_RADIO_COMBINATION_MATRIX);
+    if (vCommand == NULL) {
+        ALOGE("%s: Error vCommand NULL", __FUNCTION__);
+        return WIFI_ERROR_OUT_OF_MEMORY;
+    }
+
+    ret = vCommand->create();
+    if (ret != WIFI_SUCCESS)
+        goto cleanup;
+
+    nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
+        goto cleanup;
+    }
+
+    vCommand->attr_end(nlData);
+
+    /* Populate the input received from caller/framework. */
+    vCommand->set_radio_matrix_max_size(max_size);
+    vCommand->set_radio_matrix_size(size);
+    vCommand->set_radio_matrix(radio_combination_matrix);
+
+    ret = vCommand->requestResponse();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: requestResponse() error: %d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+
+cleanup:
+    delete vCommand;
+    return ret;
+}
 
 wifi_error wifi_set_nodfs_flag(wifi_interface_handle handle, u32 nodfs)
 {
@@ -2109,8 +2713,10 @@ wifi_error wifi_set_nodfs_flag(wifi_interface_handle handle, u32 nodfs)
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     /* Add the fixed part of the mac_oui to the nl command */
     ret = vCommand->put_u32(QCA_WLAN_VENDOR_ATTR_SET_NO_DFS_FLAG, nodfs);
@@ -2157,8 +2763,10 @@ wifi_error wifi_start_sending_offloaded_packet(wifi_request_id id,
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     ret = vCommand->put_u32(
             QCA_WLAN_VENDOR_ATTR_OFFLOADED_PACKETS_SENDING_CONTROL,
@@ -2230,8 +2838,10 @@ wifi_error wifi_stop_sending_offloaded_packet(wifi_request_id id,
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     ret = vCommand->put_u32(
             QCA_WLAN_VENDOR_ATTR_OFFLOADED_PACKETS_SENDING_CONTROL,
@@ -2256,7 +2866,6 @@ cleanup:
     return ret;
 }
 
-#if 0
 #define PACKET_FILTER_ID 0
 
 static wifi_error wifi_set_packet_filter(wifi_interface_handle iface,
@@ -2287,8 +2896,10 @@ static wifi_error wifi_set_packet_filter(wifi_interface_handle iface,
 
         /* Add the vendor specific attributes for the NL command. */
         nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-        if (!nlData)
+        if (!nlData){
+            ret = WIFI_ERROR_UNKNOWN;
             goto cleanup;
+        }
 
         ret = vCommand->put_u32(QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_SUB_CMD,
                                 QCA_WLAN_SET_PACKET_FILTER);
@@ -2312,7 +2923,7 @@ static wifi_error wifi_set_packet_filter(wifi_interface_handle iface,
             ret = vCommand->put_bytes(
                                      QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_PROGRAM,
                                      (char *)&program[current_offset],
-                                     min(info->firmware_bus_max_size,
+                                     MIN(info->firmware_bus_max_size,
                                      len-current_offset));
             if (ret!= WIFI_SUCCESS) {
                 ALOGE("%s: failed to put program", __FUNCTION__);
@@ -2332,7 +2943,7 @@ static wifi_error wifi_set_packet_filter(wifi_interface_handle iface,
         delete vCommand;
         vCommand = NULL;
 
-        current_offset += min(info->firmware_bus_max_size, len);
+        current_offset += MIN(info->firmware_bus_max_size, len);
     } while (current_offset < len);
 
     info->apf_enabled = !!len;
@@ -2377,8 +2988,10 @@ static wifi_error wifi_get_packet_filter_capabilities(
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     ret = vCommand->put_u32(QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_SUB_CMD,
                             QCA_WLAN_GET_PACKET_FILTER);
@@ -2429,8 +3042,10 @@ static wifi_error wifi_configure_nd_offload(wifi_interface_handle iface,
 
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     ret = vCommand->put_u8(QCA_WLAN_VENDOR_ATTR_ND_OFFLOAD_FLAG, enable);
     if (ret != WIFI_SUCCESS)
@@ -2498,8 +3113,10 @@ wifi_error wifi_write_packet_filter(wifi_interface_handle iface,
 
         /* Add the vendor specific attributes for the NL command. */
         nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-        if (!nlData)
+        if (!nlData){
+             ret = WIFI_ERROR_UNKNOWN;
              goto cleanup;
+        }
 
         ret = vCommand->put_u32(QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_SUB_CMD,
                                  QCA_WLAN_WRITE_PACKET_FILTER);
@@ -2527,7 +3144,7 @@ wifi_error wifi_write_packet_filter(wifi_interface_handle iface,
         ret = vCommand->put_bytes(
                                  QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_PROGRAM,
                                  (char *)&program[current_offset],
-                                 min(info->firmware_bus_max_size,
+                                 MIN(info->firmware_bus_max_size,
                                  len - current_offset));
         if (ret!= WIFI_SUCCESS) {
             ALOGE("%s: failed to put program", __FUNCTION__);
@@ -2537,7 +3154,7 @@ wifi_error wifi_write_packet_filter(wifi_interface_handle iface,
         vCommand->attr_end(nlData);
 
         ret = vCommand->requestResponse();
-       if (ret != WIFI_SUCCESS) {
+        if (ret != WIFI_SUCCESS) {
             ALOGE("%s: requestResponse Error:%d",__func__, ret);
             goto cleanup;
         }
@@ -2546,7 +3163,7 @@ wifi_error wifi_write_packet_filter(wifi_interface_handle iface,
         delete vCommand;
         vCommand = NULL;
 
-        current_offset += min(info->firmware_bus_max_size,
+        current_offset += MIN(info->firmware_bus_max_size,
                                          len - current_offset);
     } while (current_offset < len);
 
@@ -2576,8 +3193,10 @@ wifi_error wifi_enable_packet_filter(wifi_interface_handle handle,
     }
     /* Add the vendor specific attributes for the NL command. */
     nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
-    if (!nlData)
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
         goto cleanup;
+    }
 
     subcmd = enable ? QCA_WLAN_ENABLE_PACKET_FILTER :
                       QCA_WLAN_DISABLE_PACKET_FILTER;
@@ -2597,8 +3216,7 @@ wifi_error wifi_enable_packet_filter(wifi_interface_handle handle,
     info->apf_enabled = !!enable;
 
 cleanup:
-    if (vCommand)
-        delete vCommand;
+    delete vCommand;
     return ret;
 
 }
@@ -2624,7 +3242,7 @@ cleanup:
 static wifi_error wifi_read_packet_filter(wifi_interface_handle handle,
                                           u32 src_offset, u8 *host_dst, u32 length)
 {
-    wifi_error ret = WIFI_SUCCESS;
+    wifi_error ret = WIFI_ERROR_UNKNOWN;
     struct nlattr *nlData;
     WifihalGeneric *vCommand = NULL;
     interface_info *ifaceInfo = getIfaceInfo(handle);
@@ -2688,7 +3306,7 @@ static wifi_error wifi_read_packet_filter(wifi_interface_handle handle,
         if (ret != WIFI_SUCCESS)
             break;
 
-        currentLength = min(remainingLengthToBeRead, info->firmware_bus_max_size);
+        currentLength = MIN(remainingLengthToBeRead, info->firmware_bus_max_size);
 
         ret = vCommand->put_u32(QCA_WLAN_VENDOR_ATTR_PACKET_FILTER_SIZE,
                                 currentLength);
@@ -2730,7 +3348,6 @@ static wifi_error wifi_read_packet_filter(wifi_interface_handle handle,
     delete vCommand;
     return ret;
 }
-#endif
 
 class GetSupportedVendorCmd : public WifiCommand
 {
@@ -2748,6 +3365,7 @@ public:
     virtual wifi_error create() {
         int nl80211_id = genl_ctrl_resolve(mInfo->cmd_sock, "nl80211");
         wifi_error ret = mMsg.create(nl80211_id, NL80211_CMD_GET_WIPHY, NLM_F_DUMP, 0);
+        mMsg.put_flag(NL80211_ATTR_SPLIT_WIPHY_DUMP);
 
         return ret;
     }
@@ -2826,3 +3444,537 @@ static int wifi_is_nan_ext_cmd_supported(wifi_interface_handle iface_handle)
         return cmd.isVendorCmdSupported(QCA_NL80211_VENDOR_SUBCMD_NAN_EXT);
     }
 }
+
+#if 0
+#ifndef TARGET_SUPPORTS_WEARABLES
+char *get_iface_mask_str(u32 mask, char *buf, size_t buflen) {
+    char * pos, *end;
+    int res;
+
+    pos = buf;
+    end = buf + buflen;
+
+    res = snprintf(pos, end - pos, "[ ");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "%s", (mask & BIT(WIFI_INTERFACE_TYPE_STA)) ? "STA " : "");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "%s", (mask & BIT(WIFI_INTERFACE_TYPE_AP)) ? "AP " : "");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "%s", (mask & BIT(WIFI_INTERFACE_TYPE_P2P)) ? "P2P " : "");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "%s", (mask & BIT(WIFI_INTERFACE_TYPE_NAN)) ? "NAN " : "");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "%s", (mask & BIT(WIFI_INTERFACE_TYPE_AP_BRIDGED)) ? "AP_BRIDGED " : "");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    pos += res;
+    res = snprintf(pos, end - pos, "]");
+    if (res < 0 || (res >= end - pos))
+        goto error;
+
+    return buf;
+
+error:
+    ALOGE("snprintf() error res=%d, write length=%d", res, end - pos);
+    return NULL;
+}
+
+static void dump_wifi_iface_combination(wifi_iface_concurrency_matrix *matrix) {
+
+    u32 i, j;
+    wifi_iface_combination *comb;
+    wifi_iface_limit *limit;
+    char buf[30];
+
+    if (matrix == NULL) return;
+
+    ALOGV("--- DUMP Interface Combination ---");
+    ALOGV("num_iface_combinations: %u", matrix->num_iface_combinations);
+    for (i = 0; i < matrix->num_iface_combinations; i++) {
+        comb = &matrix->iface_combinations[i];
+        ALOGV("comb%d : max_ifaces: %u iface_limit: %u", i+1, comb->max_ifaces, comb->num_iface_limits);
+        for (j = 0; j < comb->num_iface_limits; j++) {
+            limit = &comb->iface_limits[j];
+            ALOGV("    max=%u, iface:%s", limit->max_limit, get_iface_mask_str(limit->iface_mask, buf, 30) ? buf : "");
+        }
+    }
+}
+
+
+class GetSupportedIfaceCombinationCmd : public WifiCommand
+{
+private:
+    hal_info *halinfo;
+
+public:
+    GetSupportedIfaceCombinationCmd(wifi_handle handle,
+                                    hal_info *info)
+                                    : WifiCommand(handle, 0),
+                                    halinfo(info) {}
+
+    virtual wifi_error create() {
+        int nl80211_id = genl_ctrl_resolve(mInfo->cmd_sock, "nl80211");
+        wifi_error ret = mMsg.create(nl80211_id, NL80211_CMD_GET_WIPHY, NLM_F_DUMP, 0);
+        mMsg.put_flag(NL80211_ATTR_SPLIT_WIPHY_DUMP);
+
+        return ret;
+    }
+
+    virtual wifi_error requestResponse() {
+        return WifiCommand::requestResponse(mMsg);
+    }
+    virtual wifi_error set_iface_id(const char* name) {
+        unsigned ifindex = if_nametoindex(name);
+        return mMsg.set_iface_id(ifindex);
+    }
+
+    /**
+     * Derive the bridge combinations by adding the bridge interface when combination
+     * has support for more than one AP interface
+     */
+    void derive_bridge_ap_support(wifi_iface_concurrency_matrix* matrix)
+    {
+        if (matrix == NULL)
+            return;
+
+        int i, j, k, num_bridge, rem_ap;
+        int num_bridge_combination = 0;
+        wifi_iface_combination *comb;
+        wifi_iface_limit *limit;
+
+        // Add Support for bridge interface
+        for (i = 0; i < matrix->num_iface_combinations; i++) {
+            comb = &matrix->iface_combinations[i];
+
+            /* find out if this combination has support for AP > 1 */
+            bool bridge_ap_supported = false;
+            for (j = 0; j < comb->num_iface_limits; j++) {
+                limit = &comb->iface_limits[j];
+                if ((limit->iface_mask & BIT(WIFI_INTERFACE_TYPE_AP))
+                        && (limit->max_limit > 1)) {
+                    bridge_ap_supported = true;
+                    break;
+                }
+            }
+            if (bridge_ap_supported) {
+                /* Bridge combination is a new combination along with other type of ifaces */
+                num_bridge_combination++;
+                k = matrix->num_iface_combinations + num_bridge_combination;
+                if (k == MAX_IFACE_COMBINATIONS) {
+                    ALOGE("max iface combination %u limit reached. Stop processing further", k);
+                    break;
+                }
+
+                wifi_iface_combination *comb_br = &matrix->iface_combinations[k-1];
+                num_bridge = 0;
+
+                for (j = 0, k = 0; (j < comb->num_iface_limits) && (k < MAX_IFACE_LIMITS); j++, k++) {
+                    limit = &comb->iface_limits[j];
+                    /* count the possible number of bridge interface based on max_limit/2
+                     * Also maintain remaining interfaces as AP */
+                    if ((limit->iface_mask & BIT(WIFI_INTERFACE_TYPE_AP))
+                           && (limit->max_limit > 1)) {
+                        num_bridge = limit->max_limit / 2;
+                        rem_ap = limit->max_limit % 2;
+                        if (rem_ap) {
+                            comb_br->iface_limits[k].max_limit = rem_ap;
+                            comb_br->iface_limits[k].iface_mask = BIT(WIFI_INTERFACE_TYPE_AP);
+                            k++;
+                        }
+                        if (k < MAX_IFACE_LIMITS) {
+                            comb_br->iface_limits[k].iface_mask = BIT(WIFI_INTERFACE_TYPE_AP_BRIDGED);
+                            comb_br->iface_limits[k].max_limit = num_bridge;
+                        } else {
+                            ALOGE("Can't add more than %d iface limits."
+                                  " Skip adding bridged mode", MAX_IFACE_LIMITS);
+                            break;
+                        }
+                    } else {
+                        // Retain other ifaces in this combination as is
+                        comb_br->iface_limits[k].iface_mask = limit->iface_mask;
+                        comb_br->iface_limits[k].max_limit = limit->max_limit;
+                    }
+                }
+                // Reduce max ifaces which are converted to bridge iface.
+                comb_br->max_ifaces = comb->max_ifaces - num_bridge;
+                comb_br->num_iface_limits = k;
+            }
+        }
+        matrix->num_iface_combinations += num_bridge_combination;
+    }
+
+    virtual int handleResponse(WifiEvent& reply) {
+        struct nlattr **tb = reply.attributes();
+
+        if (tb[NL80211_ATTR_INTERFACE_COMBINATIONS]) {
+            if (halinfo == NULL) {
+                ALOGE("hal_info is NULL. Abort parsing");
+                return NL_SKIP;
+            }
+
+            wifi_iface_concurrency_matrix* matrix = &halinfo->iface_comb_matrix;
+            wifi_iface_combination *iface_combination;
+            wifi_iface_limit *iface_limits;
+            struct nlattr *nl_combi;
+            int rem, i = 0;
+
+            matrix->num_iface_combinations = 0;
+
+            nla_for_each_nested(nl_combi, tb[NL80211_ATTR_INTERFACE_COMBINATIONS], rem) {
+                struct nlattr *tb_comb[NUM_NL80211_IFACE_COMB];
+                struct nlattr *tb_limit[NUM_NL80211_IFACE_LIMIT];
+                struct nlattr *nl_limit, *nl_mode;
+                int err, rem_limit, rem_mode, j = 0;
+                static struct nla_policy
+                iface_combination_policy[NUM_NL80211_IFACE_COMB] = {
+                    [NL80211_IFACE_COMB_LIMITS] = { .type = NLA_NESTED },
+                    [NL80211_IFACE_COMB_MAXNUM] = { .type = NLA_U32 },
+                    [NL80211_IFACE_COMB_STA_AP_BI_MATCH] = { .type = NLA_FLAG },
+                    [NL80211_IFACE_COMB_NUM_CHANNELS] = { .type = NLA_U32 },
+                    [NL80211_IFACE_COMB_RADAR_DETECT_WIDTHS] = { .type = NLA_U32 },
+                },
+                iface_limit_policy[NUM_NL80211_IFACE_LIMIT] = {
+                    [NL80211_IFACE_LIMIT_TYPES] = { .type = NLA_NESTED },
+                    [NL80211_IFACE_LIMIT_MAX] = { .type = NLA_U32 },
+                };
+
+                err = nla_parse_nested(tb_comb, MAX_NL80211_IFACE_COMB,
+                                       nl_combi, iface_combination_policy);
+                if (err || !tb_comb[NL80211_IFACE_COMB_LIMITS] ||
+                    !tb_comb[NL80211_IFACE_COMB_MAXNUM] ||
+                    !tb_comb[NL80211_IFACE_COMB_NUM_CHANNELS]) {
+                        ALOGE("Broken iface combination detected. skip it");
+                        continue; /* broken combination */
+                }
+
+                iface_combination = &matrix->iface_combinations[i];
+                iface_combination->max_ifaces = nla_get_u32(tb_comb[NL80211_IFACE_COMB_MAXNUM]);
+                iface_limits = iface_combination->iface_limits;
+                nla_for_each_nested(nl_limit, tb_comb[NL80211_IFACE_COMB_LIMITS],
+                                    rem_limit) {
+                    if (j == MAX_IFACE_LIMITS) {
+                        ALOGE("Can't parse more than %d iface limits", MAX_IFACE_LIMITS);
+                        continue;
+                    }
+
+                    err = nla_parse_nested(tb_limit, MAX_NL80211_IFACE_LIMIT,
+                                           nl_limit, iface_limit_policy);
+                    if (err || !tb_limit[NL80211_IFACE_LIMIT_TYPES]) {
+                        ALOGE("Broken iface limt types detected. skip it");
+                        continue; /* broken combination */
+                    }
+
+                    iface_limits[j].iface_mask = 0;
+                    iface_limits[j].max_limit = nla_get_u32(tb_limit[NL80211_IFACE_LIMIT_MAX]);
+                    bool is_p2p_go = false, is_p2p_client = false;
+                    nla_for_each_nested(nl_mode,
+                                        tb_limit[NL80211_IFACE_LIMIT_TYPES],
+                                        rem_mode) {
+                        int ift = nla_type(nl_mode);
+                        switch (ift) {
+                        case NL80211_IFTYPE_STATION:
+                            iface_limits[j].iface_mask |= BIT(WIFI_INTERFACE_TYPE_STA);
+                            break;
+                        case NL80211_IFTYPE_P2P_GO:
+                            is_p2p_go = true;
+                            iface_limits[j].iface_mask |= BIT(WIFI_INTERFACE_TYPE_P2P);
+                            break;
+                        case NL80211_IFTYPE_P2P_CLIENT:
+                            is_p2p_client = true;
+                            iface_limits[j].iface_mask |= BIT(WIFI_INTERFACE_TYPE_P2P);
+                            break;
+                        case NL80211_IFTYPE_AP:
+                            iface_limits[j].iface_mask |= BIT(WIFI_INTERFACE_TYPE_AP);
+                            break;
+                        case NL80211_IFTYPE_NAN:
+                            iface_limits[j].iface_mask |= BIT(WIFI_INTERFACE_TYPE_NAN);
+                            break;
+                        case NL80211_IFTYPE_P2P_DEVICE:
+                            ALOGI("Ignore p2p_device iface type");
+                            iface_limits[j].max_limit--;
+                            break;
+                        default:
+                            ALOGI("Ignore unsupported iface type: %d", ift);
+                            break;
+                        }
+                    }
+                    // Remove P2P if both client/Go are not set.
+                    if ((iface_limits[j].iface_mask & BIT(WIFI_INTERFACE_TYPE_P2P))
+                            && (!is_p2p_client || !is_p2p_go))
+                        iface_limits[j].iface_mask &= ~BIT(WIFI_INTERFACE_TYPE_P2P);
+
+                    // Ignore Unsupported Ifaces (ex Monitor interface)
+                    if (iface_limits[j].iface_mask)
+                        j++;
+                }
+                iface_combination->num_iface_limits = j;
+                i++;
+                if (i == MAX_IFACE_COMBINATIONS) {
+                    ALOGE("%s max iface combination %u limit reached. Stop processing further", __func__, i);
+                    break;
+                }
+            }
+            matrix->num_iface_combinations = i;
+            derive_bridge_ap_support(matrix);
+        }
+        return NL_SKIP;
+    }
+};
+
+wifi_error wifi_get_supported_iface_combination(wifi_interface_handle iface_handle)
+{
+    wifi_error ret;
+    wifi_handle handle = getWifiHandle(iface_handle);
+    hal_info *info = (hal_info *) handle;
+    interface_info *iface_info = getIfaceInfo(iface_handle);
+
+    GetSupportedIfaceCombinationCmd cmd(handle, info);
+
+    ret = cmd.create();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: create command failed", __func__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ret = cmd.set_iface_id(iface_info->name);
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: set iface id failed", __func__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ret = cmd.requestResponse();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("Failed to query supported iface combination, ret=%d", ret);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    dump_wifi_iface_combination(&info->iface_comb_matrix);
+
+    return ret;
+}
+#endif /* TARGET_SUPPORTS_WEARABLES */
+#endif
+
+wifi_error wifi_get_radar_history(wifi_interface_handle handle,
+       radar_history_result *resultBuf, int resultBufSize, int *numResults)
+{
+    wifi_error ret;
+    struct nlattr *nlData;
+    WifihalGeneric *vCommand = NULL;
+    interface_info *ifaceInfo = NULL;
+    wifi_handle wifiHandle = NULL;
+
+    ALOGI("%s: enter", __FUNCTION__);
+
+    if (!handle) {
+        ALOGE("%s: Error, wifi_interface_handle NULL", __FUNCTION__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ifaceInfo = getIfaceInfo(handle);
+    if (!ifaceInfo) {
+        ALOGE("%s: Error, interface_info NULL", __FUNCTION__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    wifiHandle = getWifiHandle(handle);
+    if (!wifiHandle) {
+        ALOGE("%s: Error, wifi_handle NULL", __FUNCTION__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    if (resultBuf == NULL || numResults == NULL) {
+        ALOGE("%s: Error, resultsBuf/numResults NULL pointer", __FUNCTION__);
+        return WIFI_ERROR_INVALID_ARGS;
+    }
+
+    vCommand = new WifihalGeneric(wifiHandle, 0,
+            OUI_QCA,
+            QCA_NL80211_VENDOR_SUBCMD_GET_RADAR_HISTORY);
+    if (vCommand == NULL) {
+        ALOGE("%s: Error vCommand NULL", __FUNCTION__);
+        return WIFI_ERROR_OUT_OF_MEMORY;
+    }
+
+    /* Create the message */
+    ret = vCommand->create();
+    if (ret != WIFI_SUCCESS)
+        goto cleanup;
+
+    ret = vCommand->set_iface_id(ifaceInfo->name);
+    if (ret != WIFI_SUCCESS)
+        goto cleanup;
+
+    /* Add the vendor specific attributes for the NL command. */
+    nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nlData){
+        ret = WIFI_ERROR_UNKNOWN;
+        goto cleanup;
+    }
+
+    vCommand->attr_end(nlData);
+
+    ret = vCommand->requestResponse();
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: requestResponse() error: %d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+
+    /* No more data, copy the parsed results into the caller's results buffer */
+    ret = vCommand->copyCachedRadarHistory(
+            resultBuf, resultBufSize, numResults);
+
+cleanup:
+    vCommand->freeCachedRadarHistory();
+    delete vCommand;
+    return ret;
+}
+
+#define SIZEOF_TLV_HDR 4
+#define OEM_DATA_TLV_TYPE_HEADER 1
+#define OEM_DATA_CMD_SET_SKIP_CAC   18
+
+struct oem_data_header {
+    u16 cmd_id;
+    u16 request_idx;
+};
+
+static int wifi_add_oem_data_head(int cmd_id, u8* oem_buf, size_t max)
+{
+    struct oem_data_header oem_hdr;
+    oem_hdr.cmd_id = cmd_id;
+    oem_hdr.request_idx = 0;
+
+    if ((SIZEOF_TLV_HDR + sizeof(oem_hdr)) > max) {
+        return 0;
+    }
+
+    wifi_put_le16(oem_buf, OEM_DATA_TLV_TYPE_HEADER);
+    oem_buf += 2;
+    wifi_put_le16(oem_buf, sizeof(oem_hdr));
+    oem_buf += 2;
+    memcpy(oem_buf, (u8 *)&oem_hdr, sizeof(oem_hdr));
+    oem_buf += sizeof(oem_hdr);
+
+    return (SIZEOF_TLV_HDR + sizeof(oem_hdr));
+}
+
+
+/**
+ * This cmd takes effect on the interface the cmd is sent to.
+ * This cmd loses effect when interface is down. (i.e. set mac addr)
+ */
+wifi_error wifi_disable_next_cac(wifi_interface_handle handle) {
+    wifi_error ret;
+    interface_info *ifaceInfo = NULL;
+    struct nlattr *nlData;
+    WifiVendorCommand *vCommand = NULL;
+    u8 oem_buf[16];
+    int oem_buf_len = 0;
+
+    if (!handle) {
+        ALOGE("%s: Error, wifi_interface_handle NULL", __FUNCTION__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ifaceInfo = getIfaceInfo(handle);
+    if (!ifaceInfo) {
+        ALOGE("%s: Error, interface_info NULL", __FUNCTION__);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ALOGI("%s: enter - iface=%s", __FUNCTION__, ifaceInfo->name);
+    oem_buf_len = wifi_add_oem_data_head(
+            OEM_DATA_CMD_SET_SKIP_CAC, oem_buf, sizeof(oem_buf));
+    if (oem_buf_len <= 0) {
+        ALOGE("%s: fill oem data head failed, cmd=%d", __func__,
+                OEM_DATA_CMD_SET_SKIP_CAC);
+        return WIFI_ERROR_UNKNOWN;
+    }
+
+    ret = initialize_vendor_cmd(handle, get_requestid(),
+                                QCA_NL80211_VENDOR_SUBCMD_OEM_DATA,
+                                &vCommand);
+
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: Initialization failed", __func__);
+        return ret;
+    }
+
+    /* Add the vendor specific attributes for the NL command. */
+    nlData = vCommand->attr_start(NL80211_ATTR_VENDOR_DATA);
+    if (!nlData) {
+        ret = WIFI_ERROR_OUT_OF_MEMORY;
+        goto cleanup;
+    }
+
+    ret = vCommand->put_bytes(QCA_WLAN_VENDOR_ATTR_OEM_DATA_CMD_DATA,
+                              (char *)oem_buf, oem_buf_len);
+    if (ret != WIFI_SUCCESS)
+        goto cleanup;
+
+    vCommand->attr_end(nlData);
+    ret = vCommand->requestResponse();
+
+    if (ret != WIFI_SUCCESS) {
+        ALOGE("%s: requestResponse() error: %d", __FUNCTION__, ret);
+        goto cleanup;
+    }
+
+cleanup:
+    delete vCommand;
+    return ret;
+}
+
+#ifndef TARGET_SUPPORTS_WEARABLES
+wifi_error wifi_get_supported_iface_concurrency_matrix(
+        wifi_handle handle, wifi_iface_concurrency_matrix *iface_comb_matrix)
+{
+    wifi_error ret = WIFI_ERROR_UNKNOWN;
+    hal_info *info = (hal_info *) handle;
+    wifi_iface_combination *comb;
+    wifi_iface_limit *limit;
+
+    if (info == NULL) {
+        ALOGE("Wifi not initialized yet.");
+        return ret;
+    }
+
+    if (iface_comb_matrix == NULL) {
+        ALOGE("Interface combination matrix not initialized.");
+        return ret;
+    }
+
+    ALOGI("Get supported concurrency capabilities");
+    // Copy over from info to input param.
+    iface_comb_matrix->num_iface_combinations =
+            info->iface_comb_matrix.num_iface_combinations;
+    for (int i = 0; i < iface_comb_matrix->num_iface_combinations; i++) {
+        comb = &iface_comb_matrix->iface_combinations[i];
+        comb->max_ifaces = info->iface_comb_matrix.iface_combinations[i].max_ifaces;
+        comb->num_iface_limits = info->iface_comb_matrix.iface_combinations[i].num_iface_limits;
+        for (int j = 0; j < comb->num_iface_limits; j++) {
+            limit = &comb->iface_limits[j];
+            limit->max_limit = info->iface_comb_matrix.iface_combinations[i].iface_limits[j].max_limit;
+            limit->iface_mask = info->iface_comb_matrix.iface_combinations[i].iface_limits[j].iface_mask;
+        }
+    }
+    return WIFI_SUCCESS;
+}
+#endif /* TARGET_SUPPORTS_WEARABLES */

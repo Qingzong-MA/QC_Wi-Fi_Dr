@@ -309,9 +309,7 @@ def test_ap_wpa2_eap_sim_imsi_identity(dev, apdev, params):
     prefix = params['prefix']
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     imsi = "232010000000000"
     realm = "wlan.mnc232.mcc02.3gppnetwork.org"
@@ -347,15 +345,11 @@ def test_ap_wpa2_eap_sim_imsi_identity(dev, apdev, params):
 
 def test_ap_wpa2_eap_sim_imsi_privacy_key(dev, apdev):
     """WPA2-Enterprise connection using EAP-SIM and imsi_privacy_cert"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     eap_connect(dev[0], hapd, "SIM",
                 "1232010000000000@wlan.mnc232.mcc02.3gppnetwork.org",
@@ -365,15 +359,11 @@ def test_ap_wpa2_eap_sim_imsi_privacy_key(dev, apdev):
 
 def test_ap_wpa2_eap_sim_imsi_privacy_attr(dev, apdev):
     """WPA2-Enterprise connection using EAP-SIM and imsi_privacy_cert/attr"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     eap_connect(dev[0], hapd, "SIM",
                 "1232010000000000@wlan.mnc232.mcc02.3gppnetwork.org",
@@ -1112,9 +1102,7 @@ def test_ap_wpa2_eap_aka_imsi_identity(dev, apdev, params):
     prefix = params['prefix']
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     imsi = "232010000000000"
     realm = "wlan.mnc232.mcc02.3gppnetwork.org"
@@ -1150,15 +1138,11 @@ def test_ap_wpa2_eap_aka_imsi_identity(dev, apdev, params):
 
 def test_ap_wpa2_eap_aka_imsi_privacy_key(dev, apdev):
     """WPA2-Enterprise connection using EAP-AKA and imsi_privacy_cert"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     eap_connect(dev[0], hapd, "AKA",
                 "0232010000000000@wlan.mnc232.mcc02.3gppnetwork.org",
@@ -1168,15 +1152,11 @@ def test_ap_wpa2_eap_aka_imsi_privacy_key(dev, apdev):
 
 def test_ap_wpa2_eap_aka_imsi_privacy_attr(dev, apdev):
     """WPA2-Enterprise connection using EAP-AKA and imsi_privacy_cert/attr"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     eap_connect(dev[0], hapd, "AKA",
                 "0232010000000000@wlan.mnc232.mcc02.3gppnetwork.org",
@@ -1186,17 +1166,13 @@ def test_ap_wpa2_eap_aka_imsi_privacy_attr(dev, apdev):
 
 def test_ap_wpa2_eap_aka_imsi_privacy_key_expired(dev, apdev):
     """WPA2-Enterprise connection using EAP-AKA and expired imsi_privacy_cert"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = int_eap_server_params()
     params['eap_sim_db'] = 'unix:/tmp/hlr_auc_gw.sock'
     params['imsi_privacy_key'] = 'auth_serv/imsi-privacy-key-2.pem'
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     dev[0].connect("test-wpa2-eap", key_mgmt="WPA-EAP WPA-EAP-SHA256",
                    eap="AKA",
@@ -1427,9 +1403,7 @@ def test_ap_wpa2_eap_aka_prime_imsi_identity(dev, apdev, params):
     prefix = params['prefix']
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     imsi = "555444333222111"
     realm = "wlan.mnc555.mcc44.3gppnetwork.org"
@@ -1465,15 +1439,11 @@ def test_ap_wpa2_eap_aka_prime_imsi_identity(dev, apdev, params):
 
 def test_ap_wpa2_eap_aka_prime_imsi_privacy_key(dev, apdev):
     """WPA2-Enterprise connection using EAP-AKA' and imsi_privacy_cert"""
-    tls = dev[0].request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(dev[0])
     check_hlr_auc_gw_support()
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
-    tls = hapd.request("GET tls_library")
-    if not tls.startswith("OpenSSL"):
-        raise HwsimSkip("IMSI privacy not supported with this TLS library: " + tls)
+    check_imsi_privacy_support(hapd)
 
     eap_connect(dev[0], hapd, "AKA'",
                 "6555444333222111@wlan.mnc555.mcc44.3gppnetwork.org",
@@ -3001,7 +2971,7 @@ def test_ap_wpa2_eap_ttls_server_cert_hash(dev, apdev):
     """WPA2-Enterprise connection using EAP-TTLS and server certificate hash"""
     check_cert_probe_support(dev[0])
     skip_with_fips(dev[0])
-    srv_cert_hash = "37bbb34133f7a3aa56056aae457a0ec7f55ed59fe8fd71107f8ad4a9c81e339f"
+    srv_cert_hash = "645830f9c128146bd1420aadc5179ffc4d4f0ef34f63075cefdd7d14a6c5af79"
     params = hostapd.wpa2_eap_params(ssid="test-wpa2-eap")
     hapd = hostapd.add_ap(apdev[0], params)
     dev[0].connect("test-wpa2-eap", key_mgmt="WPA-EAP", eap="TTLS",
@@ -4446,7 +4416,7 @@ def ocsp_req(outfile):
            "-reqout", outfile,
            '-issuer', 'auth_serv/ca.pem',
            '-sha256',
-           '-serial', '0xD8D3E3A6CBE3CD73',
+           '-serial', '0xD8D3E3A6CBE3CD7D',
            '-no_nonce']
     run_openssl(arg)
     if not os.path.exists(outfile):

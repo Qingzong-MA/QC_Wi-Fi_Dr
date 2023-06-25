@@ -299,11 +299,9 @@ else
 endif
 
 #################################################################################################################################
-all: $(TARGET_ALL)
+all: $(TARGET_ALL) firmware_install
 
 clean: $(TARGET_CLEAN)
-
-MakeThreads ?= -j$(shell expr `cat /proc/cpuinfo |grep "physical id"|sort|uniq|wc -l` \* `cat /proc/cpuinfo |grep "cpu cores"|uniq|wc -l` \* `cat /proc/cpuinfo |grep "processor"|wc -l`)
 
 # backport build for cfg80211
 backports_build:
@@ -332,16 +330,16 @@ qcacld_clean:
 
 qcacld_3_2_build:
 ifeq ($(CONFIG_CORE_TECH_DEPEND),y)
-	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers KBUILD_EXTRA_SYMBOLS=${CORE_TECH_TOPDIR}/Module.symvers modules  $(KBUILD_OPTIONS_CLD_3_2) $(MakeThreads)
+	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers KBUILD_EXTRA_SYMBOLS=${CORE_TECH_TOPDIR}/Module.symvers modules  $(KBUILD_OPTIONS_CLD_3_2)
 else
-	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers modules  $(KBUILD_OPTIONS_CLD_3_2) $(MakeThreads)
+	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers modules  $(KBUILD_OPTIONS_CLD_3_2)
 endif
 
 qcacld_3_2_clean:
 	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) $(KBUILD_OPTIONS_CLD_3_2) clean
 
 core_tech_modules_build:
-	${MAKEARCH} -C $(CORE_TECH_TOPDIR) $(KBUILD_OPTIONS_CORE_TECH) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers $(MakeThreads)
+	${MAKEARCH} -C $(CORE_TECH_TOPDIR) $(KBUILD_OPTIONS_CORE_TECH) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers
 
 core_tech_modules_clean:
 	${MAKEARCH} -C $(KERNELPATH) M=$(CORE_TECH_TOPDIR) clean

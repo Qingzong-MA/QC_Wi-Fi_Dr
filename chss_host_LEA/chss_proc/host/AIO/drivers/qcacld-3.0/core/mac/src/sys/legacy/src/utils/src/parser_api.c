@@ -45,6 +45,7 @@
 #include "wlan_mlme_public_struct.h"
 #include "wlan_mlme_ucfg_api.h"
 #include "wlan_mlme_api.h"
+#include "wlan_reg_services_api.h"
 
 #define RSN_OUI_SIZE 4
 /* ////////////////////////////////////////////////////////////////////// */
@@ -265,64 +266,217 @@ populate_dot11_supp_operating_classes(struct mac_context *mac_ptr,
 
 void
 populate_dot11f_tx_power_env(struct mac_context *mac,
-			     tDot11fIEtransmit_power_env *pDot11f,
-			     enum phy_ch_width ch_width, uint32_t chan_freq,
-			     uint16_t *num_tpe, bool is_ch_switch)
+			     tDot11fIEtransmit_power_env *tpe_ptr,
+			     enum phy_ch_width chan_width, uint32_t chan_freq,
+			     uint16_t *num_tpe, bool is_chan_switch)
 {
-	uint8_t num_tx_power, i, tx_power;
-	int reg_max;
+	uint8_t count;
+	uint16_t eirp_power, reg_power;
+	int power_for_bss;
+	bool add_eirp_power = false;
+	struct ch_params chan_params;
+	bool psd_tpe = false;
+	uint32_t bw_threshold, bw_val;
+	int num_tpe_ies = 0;
+	uint32_t num_tx_power, num_tx_power_psd;
+	uint32_t max_tx_pwr_count, max_tx_pwr_count_psd;
+	qdf_freq_t psd_start_freq;
 
-	if (!is_ch_switch)
-		*num_tpe = 1;
+	if (!wlan_reg_is_6ghz_chan_freq(chan_freq)) {
+		psd_tpe = false;
+	} else {
+		wlan_reg_get_client_power_for_6ghz_ap(mac->pdev,
+						      REG_DEFAULT_CLIENT,
+						      chan_freq,
+						      &psd_tpe,
+						      &reg_power, &eirp_power);
+		pe_debug("chan_freq %d, reg_power %d, psd_power %d",
+			 chan_freq, reg_power, eirp_power);
+	}
 
-	switch (ch_width) {
+	switch (chan_width) {
 	case CH_WIDTH_20MHZ:
-		/* Max Transmit Power count = 0 (20 MHz) */
-		num_tx_power = 0;
-		break;
-	case CH_WIDTH_40MHZ:
-		/* Max Transmit Power count = 1 (20, 40 MHz) */
+		max_tx_pwr_count = 0;
+		max_tx_pwr_count_psd = 1;
 		num_tx_power = 1;
+		num_tx_power_psd = 1;
 		break;
-	case CH_WIDTH_80MHZ:
-		/* Max Transmit Power count = 2 (20, 40, and 80 MHz) */
+
+	case CH_WIDTH_40MHZ:
+		max_tx_pwr_count = 1;
+		max_tx_pwr_count_psd = 2;
 		num_tx_power = 2;
+		num_tx_power_psd = 2;
 		break;
+
+	case CH_WIDTH_80MHZ:
+		max_tx_pwr_count = 2;
+		max_tx_pwr_count_psd = 3;
+		num_tx_power = 3;
+		num_tx_power_psd = 4;
+		break;
+
 	case CH_WIDTH_160MHZ:
 	case CH_WIDTH_80P80MHZ:
-		/* Max Transmit Power count = 3 (20, 40, 80, 160/80+80 MHz) */
-		num_tx_power = 3;
+		max_tx_pwr_count = 3;
+		max_tx_pwr_count_psd = 4;
+		num_tx_power = 4;
+		num_tx_power_psd = 8;
 		break;
 	default:
 		return;
 	}
 
-	reg_max = wlan_reg_get_channel_reg_power_for_freq(mac->pdev, chan_freq);
+	if (!psd_tpe) {
+		reg_power = wlan_reg_get_channel_reg_power_for_freq(
+			mac->pdev, chan_freq);
 
-	/* in 0.5 dB steps */
-	reg_max *= 2;
-	if (reg_max > 127)
-		/* 63.5 has special meaning of 63.5 dBm or higher */
-		reg_max = 127;
+		tpe_ptr->present = 1;
+		tpe_ptr->max_tx_pwr_count = max_tx_pwr_count;
+		tpe_ptr->max_tx_pwr_interpret = 0;
+		tpe_ptr->max_tx_pwr_category = 0;
+		tpe_ptr->num_tx_power = num_tx_power;
+		for (count = 0; count < num_tx_power; count++)
+			tpe_ptr->tx_power[count] = reg_power;
 
-	if (reg_max < -128)
-		reg_max = -128;
+		num_tpe_ies++;
+		tpe_ptr++;
+	} else {
 
-	if (reg_max < 0)
-		tx_power = 0x80 + reg_max + 128;
-	else
-		tx_power = reg_max;
+		bw_val = wlan_reg_get_bw_value(chan_width);
+		bw_threshold = 20;
+		power_for_bss = eirp_power + 13;
 
-	/* Ignore EID field */
-	pDot11f[0].present = 1;
-	pDot11f[0].num_tx_power = num_tx_power + 2;
-	/*
-	 * Max Transmit Power count and
-	 * Max Transmit Power units = 0 (EIRP)
-	 */
-	pDot11f[0].tx_power[0] = num_tx_power;
-	for (i = 0; i <= num_tx_power; i++)
-		pDot11f[0].tx_power[i + 1] = tx_power;
+		while ((reg_power > power_for_bss) &&
+		       (bw_threshold < bw_val)) {
+			bw_threshold = 2 * bw_threshold;
+			power_for_bss += 3;
+		}
+		if (bw_threshold < bw_val)
+			add_eirp_power = true;
+
+		pe_debug("bw_threshold %d", bw_threshold);
+
+		if (add_eirp_power) {
+			tpe_ptr->present = 1;
+			tpe_ptr->max_tx_pwr_count = max_tx_pwr_count;
+			tpe_ptr->max_tx_pwr_interpret = 2;
+			tpe_ptr->max_tx_pwr_category = 0;
+			tpe_ptr->num_tx_power = num_tx_power;
+			for (count = 0; count < num_tx_power; count++) {
+				tpe_ptr->tx_power[count] = reg_power * 2;
+				pe_debug("non-psd default TPE %d %d",
+					 count, tpe_ptr->tx_power[count]);
+			}
+			num_tpe_ies++;
+			tpe_ptr++;
+		}
+
+		wlan_reg_get_client_power_for_6ghz_ap(mac->pdev,
+						      REG_SUBORDINATE_CLIENT,
+						      chan_freq,
+						      &psd_tpe,
+						      &reg_power,
+						      &eirp_power);
+
+		if (reg_power) {
+			bw_val = wlan_reg_get_bw_value(chan_width);
+			bw_threshold = 20;
+			power_for_bss = eirp_power + 13;
+
+			while ((reg_power > power_for_bss) &&
+			       (bw_threshold < bw_val)) {
+				bw_threshold = 2 * bw_threshold;
+				power_for_bss += 3;
+			}
+			if (bw_threshold < bw_val)
+				add_eirp_power = true;
+
+			if (add_eirp_power) {
+				tpe_ptr->present = 1;
+				tpe_ptr->max_tx_pwr_count = max_tx_pwr_count;
+				tpe_ptr->max_tx_pwr_interpret = 2;
+				tpe_ptr->max_tx_pwr_category = 1;
+				tpe_ptr->num_tx_power = num_tx_power;
+				for (count = 0; count < num_tx_power; count++) {
+					tpe_ptr->tx_power[count] =
+							reg_power * 2;
+					pe_debug("non-psd subord TPE %d %d",
+						 count,
+						 tpe_ptr->tx_power[count]);
+				}
+				num_tpe_ies++;
+				tpe_ptr++;
+			}
+		}
+
+		tpe_ptr->present = 1;
+		tpe_ptr->max_tx_pwr_count = max_tx_pwr_count_psd;
+		tpe_ptr->max_tx_pwr_interpret = 3;
+		tpe_ptr->max_tx_pwr_category = 0;
+		tpe_ptr->num_tx_power = num_tx_power_psd;
+
+		chan_params.ch_width = chan_width;
+		bw_val = wlan_reg_get_bw_value(chan_width);
+		wlan_reg_set_channel_params_for_freq(mac->pdev, chan_freq,
+						     chan_freq,
+						     &chan_params);
+
+		if (chan_params.mhz_freq_seg1)
+			psd_start_freq =
+				chan_params.mhz_freq_seg1 - bw_val / 2 + 10;
+		else
+			psd_start_freq =
+				chan_params.mhz_freq_seg0 - bw_val / 2 + 10;
+
+		for (count = 0; count < num_tx_power_psd; count++) {
+			wlan_reg_get_client_power_for_6ghz_ap(
+							mac->pdev,
+							REG_DEFAULT_CLIENT,
+							psd_start_freq +
+							20 * count,
+							&psd_tpe,
+							&reg_power,
+							&eirp_power);
+			tpe_ptr->tx_power[count] = eirp_power * 2;
+			pe_debug("psd default TPE %d %d",
+				 count, tpe_ptr->tx_power[count]);
+		}
+		num_tpe_ies++;
+		tpe_ptr++;
+
+		wlan_reg_get_client_power_for_6ghz_ap(mac->pdev,
+						      REG_SUBORDINATE_CLIENT,
+						      chan_freq,
+						      &psd_tpe,
+						      &reg_power,
+						      &eirp_power);
+
+		if (eirp_power) {
+			tpe_ptr->present = 1;
+			tpe_ptr->max_tx_pwr_count = max_tx_pwr_count_psd;
+			tpe_ptr->max_tx_pwr_interpret = 3;
+			tpe_ptr->max_tx_pwr_category = 1;
+			tpe_ptr->num_tx_power = num_tx_power_psd;
+
+			for (count = 0; count < num_tx_power_psd; count++) {
+				wlan_reg_get_client_power_for_6ghz_ap(
+							mac->pdev,
+							REG_SUBORDINATE_CLIENT,
+							psd_start_freq +
+							20 * count,
+							&psd_tpe,
+							&reg_power,
+							&eirp_power);
+				tpe_ptr->tx_power[count] = eirp_power * 2;
+				pe_debug("psd subord TPE %d %d",
+					 count, tpe_ptr->tx_power[count]);
+			}
+			num_tpe_ies++;
+			tpe_ptr++;
+		}
+	}
+	*num_tpe = num_tpe_ies;
 }
 
 void
@@ -330,6 +484,7 @@ populate_dot11f_chan_switch_wrapper(struct mac_context *mac,
 				    tDot11fIEChannelSwitchWrapper *pDot11f,
 				    struct pe_session *pe_session)
 {
+	uint16_t num_tpe;
 	/*
 	 * The new country subelement is present only when
 	 * 1. AP performs Extended Channel switching to new country.
@@ -367,7 +522,7 @@ populate_dot11f_chan_switch_wrapper(struct mac_context *mac,
 				&pDot11f->transmit_power_env,
 				pe_session->gLimChannelSwitch.ch_width,
 				pe_session->gLimChannelSwitch.sw_target_freq,
-				NULL, true);
+				&num_tpe, true);
 	}
 }
 
@@ -394,15 +549,17 @@ populate_dot11f_country(struct mac_context *mac,
 	uint8_t code[REG_ALPHA2_LEN + 1];
 	uint8_t cur_triplet_num_chans = 0;
 	int chan_enum, chan_num, chan_spacing = 0;
-	struct regulatory_channel *cur_chan_list;
+	struct regulatory_channel *sec_cur_chan_list;
 	struct regulatory_channel *cur_chan, *start, *prev;
 	enum reg_wifi_band rf_band = REG_BAND_UNKNOWN;
 	uint8_t buffer_triplets[81][3];
 	uint8_t i, j, num_triplets = 0;
 	QDF_STATUS status = QDF_STATUS_SUCCESS;
+	bool six_gig_started = false;
 
-	cur_chan_list = qdf_mem_malloc(NUM_CHANNELS * sizeof(*cur_chan_list));
-	if (!cur_chan_list)
+	sec_cur_chan_list = qdf_mem_malloc(NUM_CHANNELS *
+					   sizeof(*sec_cur_chan_list));
+	if (!sec_cur_chan_list)
 		return QDF_STATUS_E_NOMEM;
 
 	lim_get_rf_band_new(mac, &rf_band, pe_session);
@@ -420,8 +577,9 @@ populate_dot11f_country(struct mac_context *mac,
 		goto out;
 	}
 
-	chan_num = wlan_reg_get_band_channel_list(mac->pdev, BIT(rf_band),
-						  cur_chan_list);
+	chan_num = wlan_reg_get_secondary_band_channel_list(mac->pdev,
+							    BIT(rf_band),
+							    sec_cur_chan_list);
 	if (!chan_num) {
 		pe_err("failed to get cur_chan list");
 		status = QDF_STATUS_E_FAILURE;
@@ -437,10 +595,18 @@ populate_dot11f_country(struct mac_context *mac,
 	start = NULL;
 	prev = NULL;
 	for (chan_enum = 0; chan_enum < chan_num; chan_enum++) {
-		cur_chan = &cur_chan_list[chan_enum];
+		cur_chan = &sec_cur_chan_list[chan_enum];
 
 		if (cur_chan->chan_flags & REGULATORY_CHAN_DISABLED)
 			continue;
+
+		if (wlan_reg_is_6ghz_chan_freq(cur_chan->center_freq) &&
+		    !six_gig_started) {
+			buffer_triplets[num_triplets][0] = OP_CLASS_ID_201;
+			buffer_triplets[num_triplets][1] = OP_CLASS_131;
+			num_triplets++;
+			six_gig_started = true;
+		}
 
 		if (start && prev &&
 		    prev->chan_num + chan_spacing == cur_chan->chan_num &&
@@ -466,6 +632,20 @@ populate_dot11f_country(struct mac_context *mac,
 				status = QDF_STATUS_E_FAILURE;
 				goto out;
 			}
+		}
+
+		if ((chan_enum == NUM_CHANNELS - 1) && (six_gig_started)) {
+			buffer_triplets[num_triplets][0] = OP_CLASS_ID_201;
+			buffer_triplets[num_triplets][1] = OP_CLASS_132;
+			num_triplets++;
+
+			buffer_triplets[num_triplets][0] = OP_CLASS_ID_201;
+			buffer_triplets[num_triplets][1] = OP_CLASS_133;
+			num_triplets++;
+
+			buffer_triplets[num_triplets][0] = OP_CLASS_ID_201;
+			buffer_triplets[num_triplets][1] = OP_CLASS_134;
+			num_triplets++;
 		}
 
 		/* Start new group */
@@ -500,7 +680,7 @@ populate_dot11f_country(struct mac_context *mac,
 	ctry_ie->present = 1;
 
 out:
-	qdf_mem_free(cur_chan_list);
+	qdf_mem_free(sec_cur_chan_list);
 	return status;
 } /* End populate_dot11f_country. */
 
@@ -4343,6 +4523,8 @@ sir_convert_beacon_frame2_struct(struct mac_context *mac,
 		pBeaconStruct->chan_freq = wlan_reg_chan_band_to_freq(mac->pdev,
 						pBeacon->he_op.oper_info_6g.info.primary_ch,
 						BIT(REG_BAND_6G));
+		pBeaconStruct->ap_power_type =
+				pBeacon->he_op.oper_info_6g.info.reg_info;
 	} else if (pBeacon->DSParams.present) {
 		pBeaconStruct->dsParamsPresent = 1;
 		pBeaconStruct->chan_freq =
@@ -4513,6 +4695,14 @@ sir_convert_beacon_frame2_struct(struct mac_context *mac,
 		qdf_mem_copy(&pBeaconStruct->he_op,
 			     &pBeacon->he_op,
 			     sizeof(tDot11fIEhe_op));
+	}
+
+	pBeaconStruct->num_transmit_power_env = pBeacon->num_transmit_power_env;
+	if (pBeacon->num_transmit_power_env) {
+		qdf_mem_copy(pBeaconStruct->transmit_power_env,
+			     pBeacon->transmit_power_env,
+			     pBeacon->num_transmit_power_env *
+			     sizeof(tDot11fIEtransmit_power_env));
 	}
 
 	convert_bcon_bss_color_change_ie(pBeacon, pBeaconStruct);
@@ -6199,6 +6389,7 @@ QDF_STATUS
 populate_dot11f_he_operation(struct mac_context *mac_ctx,
 			     struct pe_session *session, tDot11fIEhe_op *he_op)
 {
+	enum reg_6g_ap_type ap_pwr_type;
 	qdf_mem_copy(he_op, &session->he_op, sizeof(*he_op));
 
 	he_op->present = 1;
@@ -6221,6 +6412,8 @@ populate_dot11f_he_operation(struct mac_context *mac_ctx,
 					      session->curr_op_freq);
 		he_op->oper_info_6g.info.dup_bcon = 0;
 		he_op->oper_info_6g.info.min_rate = 0;
+		wlan_reg_get_cur_6g_ap_pwr_type(mac_ctx->pdev, &ap_pwr_type);
+		he_op->oper_info_6g.info.reg_info = ap_pwr_type;
 	}
 	lim_log_he_op(mac_ctx, he_op, session);
 

@@ -41,6 +41,7 @@ static enum sigma_cmd_result cmd_traffic_send_ping(struct sigma_dut *dut,
 	int dscp = 0, use_dscp = 0;
 	char extra[100], int_arg[100], intf_arg[100], ip_dst[100], ping[100];
 	struct in6_addr ip6_addr;
+	bool broadcast = false;
 
 	val = get_param(cmd, "Type");
 	if (!val)
@@ -78,6 +79,18 @@ static enum sigma_cmd_result cmd_traffic_send_ping(struct sigma_dut *dut,
 	if (val == NULL)
 		return INVALID_SEND_STATUS;
 	size = atoi(val);
+	if (type != 2 && strcmp(dst, BROADCAST_ADDR) == 0) {
+		if (size > 1472) {
+			send_resp(dut, conn, SIGMA_ERROR,
+				  "ErrorCode,Unsupported broadcast ping frame size");
+			return STATUS_SENT;
+		}
+		broadcast = true;
+		snprintf(buf, sizeof(buf),
+			 "ip route add 255.255.255.255 dev %s",
+			 get_station_ifname(dut));
+		run_system(dut, buf);
+	}
 
 	val = get_param(cmd, "frameRate");
 	if (val == NULL)
@@ -141,10 +154,11 @@ static enum sigma_cmd_result cmd_traffic_send_ping(struct sigma_dut *dut,
 	else
 		intf_arg[0] = '\0';
 	fprintf(f, "#!" SHELL "\n"
-		"ping%s -b -c %d%s -s %d%s -q%s %s > %s"
+		"ping%s%s -c %d%s -s %d%s -q%s %s > %s"
 		"/sigma_dut-ping.%d &\n"
 		"echo $! > %s/sigma_dut-ping-pid.%d\n",
-		type == 2 ? "6" : "", pkts, int_arg, size, extra,
+		type == 2 ? "6" : "", broadcast ? " -b" : "",
+		pkts, int_arg, size, extra,
 		intf_arg, dst, dut->sigma_tmpdir, id, dut->sigma_tmpdir, id);
 
 	fclose(f);
@@ -401,7 +415,7 @@ static enum sigma_cmd_result cmd_traffic_start_iperf(struct sigma_dut *dut,
 						     struct sigma_cmd *cmd)
 {
 	const char *val, *dst, *domain_name = NULL;
-	const char *iptype;
+	const char *iptype, *binary;
 	int duration, dst_port = 0, src_port = 0;
 	const char *proto;
 	char buf[256];
@@ -561,13 +575,27 @@ static enum sigma_cmd_result cmd_traffic_start_iperf(struct sigma_dut *dut,
 		return STATUS_SENT;
 	}
 
+	binary = "iperf3";
 	if (server) {
 		/* write server side command to shell file */
+		if (ipv6 && dst && (strncmp(dst, "ff", 2) == 0)) {
+			/* open IPv6 multicast server socket using iperf */
+			iptype = "-V";
+			binary = "iperf";
+			snprintf(buf, sizeof(buf), "-u -B %s%%%s", dst, ifname);
+		} else if (dst) {
+			/* open IPv4 multicast server socket using iperf3 */
+			snprintf(buf, sizeof(buf), "-B %s", dst);
+		} else {
+			buf[0] = '\0';
+		}
+
 		fprintf(f, "#!" SHELL "\n"
-			"iperf3 -s %s %s > %s"
+			"%s -s %s %s %s > %s"
 			"/sigma_dut-iperf &\n"
 			"echo $! > %s/sigma_dut-iperf-pid\n",
-			port_str, iptype, dut->sigma_tmpdir, dut->sigma_tmpdir);
+			binary, port_str, iptype, buf, dut->sigma_tmpdir,
+			dut->sigma_tmpdir);
 	} else {
 		/* write client side command to shell file */
 		if (!dst)
@@ -576,11 +604,17 @@ static enum sigma_cmd_result cmd_traffic_start_iperf(struct sigma_dut *dut,
 			snprintf(buf, sizeof(buf), "%s%%%s", dst, ifname);
 		else
 			snprintf(buf, sizeof(buf), "%s", dst);
+
+		if (ipv6 && (strncmp(dst, "ff", 2) == 0)) {
+			iptype = "-V";
+			binary = "iperf";
+		}
+
 		fprintf(f, "#!" SHELL "\n"
-			"iperf3 -c %s -t %d %s %s%s %s%s%s%s > %s"
+			"%s -c %s -t %d %s %s%s %s%s%s%s > %s"
 			"/sigma_dut-iperf &\n"
 			"echo $! > %s/sigma_dut-iperf-pid\n",
-			buf, duration, iptype, proto, bitrate, port_str,
+			binary, buf, duration, iptype, proto, bitrate, port_str,
 			client_port_str, tos, reverse ? " -R" : "",
 			dut->sigma_tmpdir, dut->sigma_tmpdir);
 	}
@@ -666,7 +700,7 @@ static enum sigma_cmd_result cmd_traffic_stop_iperf(struct sigma_dut *dut,
 		if (pos)
 			*pos = '\0';
 		sigma_dut_print(dut, DUT_MSG_DEBUG, "iperf: %s", buf);
-		pos = strstr(buf, "  sec  ");
+		pos = strstr(buf, " sec  ");
 		if (pos)
 			strlcpy(summary_buf, buf, sizeof(summary_buf));
 	}

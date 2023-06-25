@@ -37,7 +37,7 @@ when       who       what, where, why
 #endif
 
 #include "testcmd6174.h"
-#include "libtcmd.h"
+#include <libtcmd.h>
 
 #include "myftm_wlan.h"
 #include "myftm_qtip.h"
@@ -104,7 +104,7 @@ void cmdReplyFunc(void *buf, int len)
 	rcvbuffer2[1] = (len >> 8) & 0xFF;
 	rcvbuffer2[2] = (len >> 16) & 0xFF;
 	rcvbuffer2[3] = (len >> 24) & 0xFF;
-	fprintf(stderr, "TLV length got %d bytes from target\n",rcvbufferlen);
+	printf("TLV length got %d bytes from target\n",rcvbufferlen);
 	replyReceived = 1;
 }
 
@@ -115,15 +115,15 @@ void prtStream(char *stream, int streamLen)
 	int n;
 	for (n=0; n<streamLen; n++)
 	{
-		if (n == 0)	fprintf(stderr, "    *-------------*\n");
-		if (n == 32) fprintf(stderr, "    *-------------*\n");
-		if (n%4 == 0) fprintf(stderr, "%3d |", n);
-		fprintf(stderr, " %02x",(unsigned char)stream[n]);
+		if (n == 0)	printf("    *-------------*\n");
+		if (n == 32) printf("    *-------------*\n");
+		if (n%4 == 0) printf("%3d |", n);
+		printf(" %02x",(unsigned char)stream[n]);
 		if (n%4 == 3)
-			fprintf(stderr, " | %u\n",
+			printf(" | %u\n",
 				*((unsigned int *)&stream[n-3]));
 		if (n == streamLen - 1)
-			fprintf(stderr, "    *-------------*\n");
+			printf("    *-------------*\n");
 	}
 }
 
@@ -133,7 +133,7 @@ void clientHandler(void* arg)
 	unsigned int timeout = 0;
 	int flag_socketactive = 1;
 	int clientSocket = (int)*((int*)arg);
-	fprintf(stderr, "%s: Socket: %d \n", __func__, clientSocket);
+	printf("%s: Socket: %d \n", __func__, clientSocket);
 
 	tcmd_tx_init(ifname, cmdReplyFunc);
 	while(flag_socketactive)
@@ -146,7 +146,7 @@ void clientHandler(void* arg)
 					sizeof(rcvbuffer));
 			if(len_read < 0)
 			{
-				fprintf(stderr, "Error: socket read %d\n",
+				printf("Error: socket read %d\n",
 					errno);
 				flag_socketactive = 0;
 				break;
@@ -158,7 +158,7 @@ void clientHandler(void* arg)
 			}
 			if (timeout > 1000) // 1sec
 			{
-				fprintf(stderr, "socket hw timeout... \n");
+				printf("socket hw timeout... \n");
 				flag_socketactive = 0;
 				break;
 			}
@@ -166,8 +166,7 @@ void clientHandler(void* arg)
 
 		if (len_read >= MAXSTREAMLENGTH - 4)
 		{
-			fprintf(stderr,
-				"Error: stream too long (%d)... "
+			printf("Error: stream too long (%d)... "
 				"closing socket\n", MAXSTREAMLENGTH);
 			flag_socketactive = 0;
 			break;
@@ -175,15 +174,15 @@ void clientHandler(void* arg)
 
 		if (len_read > 0)
 		{
-			fprintf(stderr, "%d, %d, %d, %d\n", rcvbuffer[0],
+			printf("%d, %d, %d, %d\n", rcvbuffer[0],
 				rcvbuffer[1], rcvbuffer[2], rcvbuffer[3]);
 			if (verbose)
 			{
-				fprintf(stderr, "         RECV\n");
+				printf("         RECV\n");
 				prtStream(rcvbuffer, len_read);
 			}
 			else
-				fprintf(stderr, "read, %d bytes\n",
+				printf("read, %d bytes\n",
 					len_read); // print message length
 
 			// MUTEX WAIT
@@ -206,11 +205,11 @@ void clientHandler(void* arg)
 			replyReceived = 0;
 			if (verbose)
 			{
-				fprintf(stderr, "         SEND\n");
+				printf("         SEND\n");
 				prtStream(rcvbuffer2, rcvbufferlen + 4);
 			}
 			else
-				fprintf(stderr, "sent, %d bytes\n",
+				printf("sent, %d bytes\n",
 					rcvbufferlen + 4);
 
 			write(clientSocket, (rcvbuffer2), rcvbufferlen + 4);
@@ -224,7 +223,7 @@ void clientHandler(void* arg)
 		}
 	}
 
-	fprintf(stderr, "closing socket\n");
+	printf("closing socket\n");
 	//shutdown(clientSocket,SD_SEND);
 	close(clientSocket);
 
@@ -258,13 +257,13 @@ void qtip()
 	listenSocket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 	if(listenSocket < 0)
 	{
-		fprintf(stderr, "listenSocket creation failed.\n");
+		printf("listenSocket creation failed.\n");
 		return;
 	}
 	if(bind(listenSocket, (struct sockaddr *)(&serverInf),
 				sizeof(serverInf)) < 0)
 	{
-		fprintf(stderr, "Unable to bind socket!\n");
+		printf("Unable to bind socket!\n");
 		close(listenSocket);
 		return;
 	}
@@ -280,13 +279,12 @@ void qtip()
 		clientSocket = 0;
 		while(clientSocket == 0)
 		{
-			fprintf(stderr,
-				"Waiting for incoming connections...\n");
+			printf("Waiting for incoming connections...\n");
 			clientSocket=accept(listenSocket,NULL,NULL);
 		}
 		pthread_t clientHandler_thread;
 		tempSocket = clientSocket;
-		fprintf(stderr, "%s: Client connected! Socket: %d \n",
+		printf("%s: Client connected! Socket: %d \n",
 				__func__, tempSocket);
 		if (pthread_create(&clientHandler_thread, NULL,
 					(void *) clientHandler, &tempSocket))

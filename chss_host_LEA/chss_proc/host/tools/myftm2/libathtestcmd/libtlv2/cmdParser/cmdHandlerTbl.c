@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018 Qualcomm Technologies, Inc.
+ * Copyright (c) 2016, 2018-2020, 2022 Qualcomm Technologies, Inc.
  *
  * All Rights Reserved.
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
@@ -130,7 +130,8 @@ CMD_HANDLER_ENTRY CmdHandlerTbl[] = {
     {NULL, NULL, NULL},
     {NULL, NULL, NULL},
     {NULL, NULL, NULL},
-    {NULL, NULL, NULL},
+    {initNOISEFLOORREADOpParms, NOISEFLOORREADOp, NULL},
+    {initNOISEFLOORREADRSPOpParms, NOISEFLOORREADRSPOp, NULL},
     {NULL, NULL, NULL},
     {NULL, NULL, NULL},
     {NULL, NULL, NULL},

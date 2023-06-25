@@ -20,10 +20,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This file content is copied from https://source.codeaurora.org/quic/la/platform/external/iw/tree/genl.c?h=LA.AU.0.0.1_rb1.22
+ *
+ * Copyright (c) 2007, 2008	Johannes Berg
+ * Copyright (c) 2007		Andy Lutomirski
+ * Copyright (c) 2007		Mike Kershaw
+ * Copyright (c) 2008-2009		Luis R. Rodriguez
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef __WIN__
 #include <net/if.h>
-#endif
 #include "nl_cmd_wrapper.h"
 #include <inttypes.h>
 
@@ -136,7 +153,7 @@ int string_to_hex(char *dest, int max_len, char *src, int src_len)
     int i, j;
     if (src_len & 1)    // Don't process odd length hex data
         return -1;
-    for (i=0, j=0; i<max_len && j<src_len; i++, j+=2) {
+    for (i=0, j=0; ((i<max_len) && (j<src_len)); i++, j+=2) {
         dest[i] = get_byte(src[j], src[j+1]);
     }
     return 0;
@@ -151,6 +168,14 @@ static status fillAttribute(struct cmd_params *cmd, int *c,
 {
     switch (cmd->data_type[*c])
     {
+        case FLAG:
+        {
+            if (nla_put_flag(nlmsg, cmd->attr_id[*c]) != SUCCESS) {
+                printf("nla_put failed for attr: %d\n", cmd->attr_id[*c]);
+                return MEM_NOT_AVAILABLE;
+            }
+        }
+        break;
         case U8:
         {
             uint8_t value;
@@ -331,7 +356,7 @@ int populateAttribute(int argc, char **argv, struct cmd_params *cmd,
     struct nlattr *nlNestData = NULL;
 
     // Fill if it is simple data type or process if it is NESTED attribute type
-    if (cmd->data_type[*c] >= U8 && cmd->data_type[*c] <= BLOB) {
+    if (cmd->data_type[*c] >= U8 && cmd->data_type[*c] <= FLAG) {
         fillAttribute(cmd, c, nlmsg, 0);
     } else if (cmd->data_type[*c] == NESTED ||
                cmd->entry[*c].ctrl_option == O_NESTED_AUTO) {
@@ -402,17 +427,17 @@ static void parseAttributeNL (struct cmd_params *response,
                               struct nlattr *tb_vendor,
                               int index)
 {
-#ifdef __WIN__
-    static once = 1;
+#ifdef __IPQ__
+    static int once = 1;
     if (once) {
-        printf ("%s:", get_attr_name(response, index));
+        printf ("%s\t%s:", response->iface, get_attr_name(response, index));
         once = 0;
     } else {
         printf("\t\t");
     }
 #else
     printf ("%s: ", get_attr_name(response, index));
-#endif /* __WIN__ */
+#endif /* __IPQ__ */
 
     switch (get_attr_type(response, index) )
     {
@@ -441,7 +466,7 @@ static void parseAttributeNL (struct cmd_params *response,
             printf ("%"PRId64"\n", get_s64(tb_vendor));
             break;
         case STRING:
-            printf ("%s\n", (char *)nla_data(tb_vendor));
+            printf ("%s\n", (char *) nla_data(tb_vendor));
             break;
         case MAC_ADDR:
         {
@@ -463,7 +488,7 @@ static void parseAttributeNL (struct cmd_params *response,
 }
 
 
-static void parseNested(struct cmd_params *response, struct nlattr *tb_vendor,
+void parseNested(struct cmd_params *response, struct nlattr *tb_vendor,
                  int index)
 {
     struct nlattr *attr;
@@ -489,12 +514,13 @@ static void parseNested(struct cmd_params *response, struct nlattr *tb_vendor,
 
 
 static int parseVendata(char *vendata, int datalen,
-                        int cmd_id, struct cmd_params *response)
+                        int cmd_id, struct cmd_params *response,
+                        enum cmd_type type)
 {
     struct nlattr *tb_vendor[MAX_ATTR];
     int index, i, xmlindex;
 
-    index = get_long_option_index(response, cmd_id, RESPONSE);
+    index = get_long_option_index(response, cmd_id, type);
     if (index<0) {
         printf("failed to get long option index\n");
         return -1;
@@ -523,7 +549,7 @@ static status set_iface_id(struct nl_msg *nlmsg, char *iface)
 }
 
 #ifdef __linux__
-#define socket_set_local_port(a,b) /* no-op */
+#define socket_set_local_port /* no-op */
 #else
 static void socket_set_local_port(struct nl_sock *sock, uint32_t port)
 {
@@ -547,9 +573,9 @@ static struct nl_sock * create_nl_socket(int port, int protocol)
         printf("Failed to create NL socket\n");
         return NULL;
     }
-
+#ifndef __linux__
     socket_set_local_port(sock, port);
-
+#endif
     if (nl_connect(sock, protocol)) {
         printf("Could not connect handle\n");
         nl_socket_free(sock);
@@ -559,11 +585,63 @@ static struct nl_sock * create_nl_socket(int port, int protocol)
     return sock;
 }
 
+#ifdef SUPPORT_VENDOR_EVENT
+#define OUI_QCA 0x001374
+static void nl80211_vendor_event(struct nlIfaceInfo *info,
+				 struct nlattr **tb, char *ifname)
+{
+    uint32_t vendor_id, subcmd;
+    uint8_t *data = NULL;
+    size_t len = 0;
+
+    if (!tb[NL80211_ATTR_VENDOR_ID] || !tb[NL80211_ATTR_VENDOR_SUBCMD])
+        return;
+
+    vendor_id = nla_get_u32(tb[NL80211_ATTR_VENDOR_ID]);
+    subcmd = nla_get_u32(tb[NL80211_ATTR_VENDOR_SUBCMD]);
+
+    if (tb[NL80211_ATTR_VENDOR_DATA]) {
+        data = nla_data(tb[NL80211_ATTR_VENDOR_DATA]);
+        len = nla_len(tb[NL80211_ATTR_VENDOR_DATA]);
+    }
+
+    if (vendor_id == OUI_QCA && subcmd == info->event_id) {
+        printf("Parsing Vendor Event %d\n", info->event_id);
+        parseVendata((char *)data, len, info->event_id, &info->event_params,
+                     VEN_EVENT);
+        info->event_thread_running = 0;
+    }
+}
+#endif /* SUPPORT_VENDOR_EVENT */
 
 static int internal_valid_message_handler(struct nl_msg *msg, void *arg)
 {
+#ifdef SUPPORT_VENDOR_EVENT
+    struct nlIfaceInfo *info = (struct nlIfaceInfo *)arg;
+    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *tb[NL80211_ATTR_MAX + 1];
+    int ifidx = -1;
+    char ifname[IFACE_LEN] = {0};
+
+    nla_parse(tb, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+              genlmsg_attrlen(gnlh, 0), NULL);
+
+    if (tb[NL80211_ATTR_IFINDEX])
+        ifidx = nla_get_u32(tb[NL80211_ATTR_IFINDEX]);
+
+    if (ifidx != -1)
+        if_indextoname(ifidx, ifname);
+    if (memcmp(info->ifname, ifname, IFACE_LEN))
+        return NL_SKIP;
+
+    switch (gnlh->cmd) {
+    case NL80211_CMD_VENDOR:
+        nl80211_vendor_event(info, tb, ifname);
+        break;
+    }
+#endif /* SUPPORT_VENDOR_EVENT */
     printf("Valid handler called\n");
-    return NL_OK;
+    return NL_SKIP;
 }
 
 
@@ -572,9 +650,20 @@ static int response_handler(struct nl_msg *msg, void *arg)
 {
     int i, res;
     struct resp_event_info *resp_info = (struct resp_event_info *)arg;
+    struct genlmsghdr *mHeader;
     struct nlattr *mAttributes[NL80211_ATTR_MAX_INTERNAL + 1];
     char *vendata = NULL;
+    int result = 0;
     int datalen;
+
+    mHeader = (struct genlmsghdr *)nlmsg_data(nlmsg_hdr(msg));
+    result = nla_parse(mAttributes, NL80211_ATTR_MAX_INTERNAL, genlmsg_attrdata(mHeader, 0),
+          genlmsg_attrlen(mHeader, 0), NULL);
+
+    if (result) {
+        printf ("In %s:  nla_parse() failed with %d value", __func__, result);
+        return -1;
+    }
 
     if (mAttributes[NL80211_ATTR_VENDOR_DATA]) {
         vendata = ((char *)nla_data(mAttributes[NL80211_ATTR_VENDOR_DATA]));
@@ -590,10 +679,11 @@ static int response_handler(struct nl_msg *msg, void *arg)
 
     if (resp_info->num_responses) {
         for (i=0; i<resp_info->num_responses; i++) {
-#ifndef __WIN__
+#ifndef __IPQ__
             printf("Received response: %d\n", resp_info->response[i]);
-#endif /* __WIN__ */
-            res = parseVendata (vendata, datalen, resp_info->response[i], resp_info->rsp);
+#endif /* __IPQ__ */
+            res = parseVendata(vendata, datalen, resp_info->response[i],
+                    resp_info->rsp, RESPONSE);
             if (res < 0) {
                 printf("Failed to parse reply message for response id = %d %d\n", resp_info->response[i], res);
             }
@@ -640,6 +730,101 @@ static int no_seq_check(struct nl_msg *msg, void *arg)
     return NL_OK;
 }
 
+#ifdef SUPPORT_VENDOR_EVENT
+static int family_handler(struct nl_msg *msg, void *arg)
+{
+    struct handler_args *grp = arg;
+    struct nlattr *tb[CTRL_ATTR_MAX + 1];
+    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *mcgrp;
+    int rem_mcgrp;
+
+    nla_parse(tb, CTRL_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+              genlmsg_attrlen(gnlh, 0), NULL);
+
+    if (!tb[CTRL_ATTR_MCAST_GROUPS])
+        return NL_SKIP;
+
+    nla_for_each_nested(mcgrp, tb[CTRL_ATTR_MCAST_GROUPS], rem_mcgrp) {
+        struct nlattr *tb_mcgrp[CTRL_ATTR_MCAST_GRP_MAX + 1];
+
+        nla_parse(tb_mcgrp, CTRL_ATTR_MCAST_GRP_MAX, nla_data(mcgrp),
+                  nla_len(mcgrp), NULL);
+
+        if (!tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME] ||
+            !tb_mcgrp[CTRL_ATTR_MCAST_GRP_ID])
+            continue;
+        else
+            grp->id = nla_get_u32(tb_mcgrp[CTRL_ATTR_MCAST_GRP_ID]);
+
+        if (strncmp(nla_data(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME]), grp->group,
+                    nla_len(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME])))
+            continue;
+
+        grp->id = nla_get_u32(tb_mcgrp[CTRL_ATTR_MCAST_GRP_ID]);
+            break;
+    }
+
+    return NL_SKIP;
+}
+
+static int nl_get_multicast_id(struct nl_sock *sock, const char *family,
+                               const char *group)
+{
+    struct nl_msg *msg;
+    struct nl_cb *cb;
+    int ret, ctrlid;
+    struct handler_args grp = {
+        .group = group,
+        .id = -ENOENT,
+    };
+
+    msg = nlmsg_alloc();
+    if (!msg)
+        return -ENOMEM;
+
+    cb = nl_cb_alloc(NL_CB_DEFAULT);
+    if (!cb) {
+        ret = -ENOMEM;
+        goto out_fail_cb;
+    }
+
+    ctrlid = genl_ctrl_resolve(sock, "nlctrl");
+
+#ifdef ANDROID
+    genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, GENL_ID_CTRL, 0, 0,
+                CTRL_CMD_GETFAMILY, 1);
+#else
+    genlmsg_put(msg, 0, 0, ctrlid, 0, 0, CTRL_CMD_GETFAMILY, 0);
+#endif
+
+    ret = -ENOBUFS;
+    NLA_PUT_STRING(msg, CTRL_ATTR_FAMILY_NAME, family);
+
+    ret = nl_send_auto_complete(sock, msg);
+    if (ret < 0)
+        goto out;
+
+    ret = 1;
+
+    nl_cb_err(cb, NL_CB_CUSTOM, error_handler, &ret);
+    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, ack_handler, &ret);
+    nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, finish_handler, &ret);
+    nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, family_handler, &grp);
+
+    while (ret > 0)
+        nl_recvmsgs(sock, cb);
+
+    if (ret == 0)
+        ret = grp.id;
+nla_put_failure:
+out:
+    nl_cb_put(cb);
+out_fail_cb:
+    nlmsg_free(msg);
+    return ret;
+}
+#endif /* SUPPORT_VENDOR_EVENT */
 
 struct nlIfaceInfo *NCT_initialize()
 {
@@ -674,6 +859,20 @@ struct nlIfaceInfo *NCT_initialize()
         goto cleanup;
     }
 
+#ifdef SUPPORT_VENDOR_EVENT
+    err = nl_get_multicast_id(event_sock, "nl80211", "vendor");
+    if (err >= 0) {
+        err = nl_socket_add_membership(event_sock, err);
+        if (err) {
+            printf("failed to join testmode group!\n");
+            goto cleanup;
+        }
+    } else {
+        printf("nl_get_multicast_id failed\n");
+        goto cleanup;
+    }
+#endif /* SUPPORT_VENDOR_EVENT */
+
     /* Set the socket buffer size */
     if (nl_socket_set_buffer_size(event_sock, (256*1024), 0) < 0) {
         printf("Could not set nl_socket RX buffer size for event_sock: %s\n",
@@ -694,7 +893,7 @@ struct nlIfaceInfo *NCT_initialize()
     nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, ack_handler, &err);
 
     nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, internal_valid_message_handler,
-            info);
+              info);
     nl_cb_put(cb);
 
     info->cmd_sock = cmd_sock;
@@ -762,17 +961,6 @@ static void internal_event_handler(struct nlIfaceInfo *info, int events,
 }
 
 
-void internal_cleanup_handler(struct nlIfaceInfo *info)
-{
-    if (info->cmd_sock != 0) {
-        nl_socket_free(info->cmd_sock);
-        nl_socket_free(info->event_sock);
-        info->cmd_sock = NULL;
-        info->event_sock = NULL;
-    }
-}
-
-
 struct nl_msg *prepareNLMsg(struct nlIfaceInfo *info, int cmdid, char *iface)
 {
     int res;
@@ -792,9 +980,9 @@ struct nl_msg *prepareNLMsg(struct nlIfaceInfo *info, int cmdid, char *iface)
         goto cleanup;
     }
 
-#ifndef __WIN__
+#ifndef __IPQ__
     printf("Vendor sub command: %d\n", cmdid);
-#endif /* __WIN__ */
+#endif /* __IPQ__ */
     res = nla_put(nlmsg, NL80211_ATTR_VENDOR_SUBCMD, sizeof(uint32_t), &cmdid);
     if (res < 0) {
         printf("Failed to put vendor sub command\n");
@@ -827,7 +1015,7 @@ void freeNLMsg(struct nl_msg *nlmsg)
 
 struct nlattr * attr_start(struct nl_msg *nlmsg, int attribute)
 {
-    return nla_nest_start(nlmsg, attribute);
+    return nla_nest_start(nlmsg, NLA_F_NESTED | (attribute));
 }
 
 
@@ -947,25 +1135,41 @@ int stopmonitorResponse(struct resp_event_info *resp_info, u32 attr_id)
     return 0;
 }
 
-
-int startMonitorForEvent(struct resp_event_info *event_info, int attr_id)
+#ifdef SUPPORT_VENDOR_EVENT
+static void *event_thread(void *arg)
 {
-    u32 *events;
+    struct nlIfaceInfo *info = arg;
+
+    info->event_thread_running = 1;
+    while (info->event_thread_running) {
+        nl_recvmsgs_default(info->event_sock);
+    }
+
+    return NULL;
+}
+
+int startMonitorForEvent(struct nlIfaceInfo *info,
+                         struct resp_event_info *event_info, int attr_id)
+{
     if (!event_info) {
         printf("event_info is null\n");
         return -1;
     }
 
-    events = (u32 *)malloc(event_info->num_events + 1);
-    if (event_info->num_events) {
-        free (event_info->events);
+    info->event_id = attr_id;
+    memcpy(&info->event_params, event_info->rsp, sizeof(info->event_params));
+
+    if (pthread_create(&info->event_thread_handle, NULL, event_thread, info)) {
+        printf("Failed to create thread\n");
+        return -1;
     }
-    event_info->events = events;
-    event_info->num_events++;
+    while(!info->event_thread_running);
+
+    while(info->event_thread_running);
 
     return 0;
 }
-
+#endif /* SUPPORT_VENDOR_EVENT */
 
 int stopMonitorForEvent(struct resp_event_info *event_info, u32 attr_id)
 {

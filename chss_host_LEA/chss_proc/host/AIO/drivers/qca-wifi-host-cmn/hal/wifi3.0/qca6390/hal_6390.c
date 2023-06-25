@@ -104,6 +104,10 @@
 	WBM_RELEASE_RING_6_TX_RATE_STATS_INFO_TX_RATE_STATS_OFFSET
 #define UNIFIED_WBM_RELEASE_RING_6_TX_RATE_STATS_INFO_TX_RATE_STATS_LSB \
 	WBM_RELEASE_RING_6_TX_RATE_STATS_INFO_TX_RATE_STATS_LSB
+#define WMAC0_R0_TSF_L_BASE 0xAAA360
+#define WMAC0_R0_TSF_H_BASE 0xAAA364
+#define WMAC1_R0_TSF_L_BASE 0xB2A360
+#define WMAC1_R0_TSF_H_BASE 0xB2A364
 
 #include "hal_6390_tx.h"
 #include "hal_6390_rx.h"
@@ -1090,6 +1094,43 @@ void hal_compute_reo_remap_ix2_ix3_6390(uint32_t *ring, uint32_t num_rings,
 	}
 }
 
+#ifdef WLAN_FEATURE_TSF_BY_REG
+/**
+ * hal_read_tsf64_6390(): Function to read tsf register 64bit value
+ * @hal_soc: Pointer to hal_soc
+ * @mac_id: mac id
+ * @tsf_id: tsf id
+ *
+ * Return: 64bit tsf register value
+ */
+static uint64_t hal_read_tsf64_6390(struct hal_soc *hal_soc, uint32_t mac_id,
+				    uint32_t tsf_id)
+{
+	uint32_t datal = 0;
+	uint32_t datah = 0;
+	uint32_t tsf_addr_offset = 0;
+
+	if (tsf_id > TSF64_ID_MAX) {
+		hal_err("tsf_id greater than maximum\n");
+		return 0;
+	}
+
+	tsf_addr_offset = tsf_id * TSF64_REG_OFFSET_STEP;
+	if (mac_id == WMAC_ID_0) {
+		datal = hal_read32_mb(hal_soc, WMAC0_R0_TSF_L_BASE +
+				      tsf_addr_offset);
+		datah = hal_read32_mb(hal_soc, WMAC0_R0_TSF_H_BASE +
+				      tsf_addr_offset);
+	} else if (mac_id == WMAC_ID_1) {
+		datal = hal_read32_mb(hal_soc, WMAC1_R0_TSF_L_BASE +
+				      tsf_addr_offset);
+		datah = hal_read32_mb(hal_soc, WMAC1_R0_TSF_H_BASE +
+				      tsf_addr_offset);
+	}
+	return datal + ((uint64_t)datah << 32);
+}
+#endif
+
 struct hal_hw_txrx_ops qca6390_hal_hw_txrx_ops = {
 	/* init and setup */
 	.hal_srng_dst_hw_init = hal_srng_dst_hw_init_generic,
@@ -1206,6 +1247,9 @@ struct hal_hw_txrx_ops qca6390_hal_hw_txrx_ops = {
 	.hal_rx_pkt_tlv_offset_get = hal_rx_pkt_tlv_offset_get_generic,
 #endif
 	.hal_compute_reo_remap_ix2_ix3 = hal_compute_reo_remap_ix2_ix3_6390,
+#ifdef WLAN_FEATURE_TSF_BY_REG
+	.hal_read_tsf64 = hal_read_tsf64_6390,
+#endif
 };
 
 struct hal_hw_srng_config hw_srng_table_6390[] = {

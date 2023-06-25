@@ -34,7 +34,7 @@ EXTRA_HANDLER_SRCS := cmdTPCCALHandler.c cmdTPCCALPWRHandler.c cmdRegReadHandler
 	cmdDPDTrainingQuality.c cmdDPDAgc2Pwr.c cmdLMHWCALRSPHandler.c cmdLMHWCALHandler.c  \
 	cmdMoreSegmentHandler.c sysCmdTestData.c sysCmdGeneric.c sysCmdSetChannel.c  cmdLMRxHandler.c cmdLMTxHandler.c \
 	cmdAdcCaptureHandler.c cmdCalCalTimeHandler.c cmdRxDcoHandler.c cmdGenWaveformHandler.c cmdEnableDfeHandler.c cmdLMChannelListAndRspHandler.c	\
-	cmdLMGoHandler.c cmdLMQueryHandler.c cmdLMTxInitHandler.c
+	cmdLMGoHandler.c cmdLMQueryHandler.c cmdLMTxInitHandler.c cmdRSTcalHandler.c
 
 ifeq ($(OS),)
 OS := Linux

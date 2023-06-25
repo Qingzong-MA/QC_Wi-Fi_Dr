@@ -2,12 +2,11 @@
 
                      FTM WLAN Source File
 
-# Copyright (c) 2011, 2013-2020 by Qualcomm Technologies, Inc.
+# Copyright (c) 2011, 2013-2022 Qualcomm Technologies, Inc.
 # All Rights Reserved.
-# Qualcomm Technologies Proprietary and Confidential.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
 
 ===========================================================================*/
-
 /*===========================================================================
 
                          Edit History
@@ -73,7 +72,6 @@ when       who       what, where, why
 #else
 #define MODE_PARAM    "con_mode_ftm"
 #endif
-
 #if defined(ANDROID)
 #if defined(BOARD_HAS_ATH_WLAN_AR6320)
 #if BOARD_HAS_ATH_WLAN_AR6320
@@ -90,7 +88,6 @@ when       who       what, where, why
 #define FTM_WLAN_UNLOAD_CMD     "/sbin/rmmod wlan"
 #endif
 
-
 typedef enum {
     SUBCMD_DRIVER_LOAD      = 'L',
     SUBCMD_DRIVER_UNLOAD    = 'U',
@@ -102,7 +99,6 @@ extern _CMD_PARM gCmd;
 static int load_wifi_driver_testmode(void);
 static int unload_wifi_driver(void);
 static bool is_wifi_driver_loaded(char *mod_tag);
-static bool flag_driver_auto_load = false;
 #endif /* CONFIG_FTM_WLAN_AUTOLOAD */
 
 bool ifs_init[32]  = {false};
@@ -162,7 +158,9 @@ static int load_wifi_driver_testmode(void)
         return ret;
     }
 #else
+#ifndef WIN_AP_HOST
 #error "FTM_WLAN_LOAD_CMD is not defined!"
+#endif
 #endif
 
     DPRINTF(FTM_DBG_TRACE, "WLAN driver loaded in FTM mode successfully!\n");
@@ -196,7 +194,9 @@ static int unload_wifi_driver(void)
             return ret;
         }
 #else
+#ifndef WIN_AP_HOST
 #error "FTM_WLAN_UNLOAD_CMD is not defined!"
+#endif
 #endif
     }
 
@@ -534,8 +534,6 @@ bdf_write_out:
 static int myftm_wlan_cal_file_create(char *cal_file_name, void* buf, uint32_t length)
 {
 	FILE *fp = NULL;
-	struct stat st;
-	unsigned long file_size;
 	int ret = 0;
 
 	if ((NULL == buf) || (NULL == cal_file_name)) {
@@ -1005,7 +1003,7 @@ void WlanATSetWlanMode(int val)
 
 void WlanATSetLPreamble()
 {
-    DPRINTF(FTM_DBG_TRACE, "%s: Set preamble as (%d)\n", __func__);
+    DPRINTF(FTM_DBG_TRACE, "%s: Set preamble as ()\n", __func__);
     qca6174SetLPreamble();
 }
 
@@ -1245,7 +1243,7 @@ void WlanATCmdSET_DUTYCYCLE(uint8_t val)
 }
 
 /* Command SET OFDMA UPLINK TX CONFIG */
-int WlanATCmdSET_OFDMAULTX()
+int WlanATCmdSET_OFDMAULTX(void)
 {
 	int ret = 0;
 	DPRINTF(FTM_DBG_TRACE, "%s: Set Command ofdma uplinlk Tx command\n", __func__);
@@ -1279,7 +1277,7 @@ int WlanATCmdREAD_REGISTER(uint32_t reg)
 }
 
 /* Command to send low power configuration*/
-int WlanATCmdSET_LOWPOWER()
+int WlanATCmdSET_LOWPOWER(void)
 {
 	DPRINTF(FTM_DBG_TRACE, "%s: Set Command to send LOW POWER\n", __func__);
 	return qca6174Cmd_LOWPOWER();
@@ -1328,10 +1326,61 @@ void WlanATCmdSET_RSTDIR(uint8_t val)
 }
 
 /* Command to send CMD_RST command to start RSSI self test */
-void WlanATCmd_RST()
+void WlanATCmd_RST(void)
 {
 	DPRINTF(FTM_DBG_TRACE, "%s: RSSI self test\n", __func__);
 	qca6174RssiSelfTest();
+}
+
+/* Command to set aifsn number */
+void WlanTCmdSET_AIFSN(uint8_t val)
+{
+	DPRINTF(FTM_DBG_TRACE, "%s: set aifsn number \n", __func__);
+	qca6174SetAifsNum(val);
+}
+
+/* Command to set 6g power mode */
+void WlanATCmdSET6GPwMode(uint8_t val)
+{
+	DPRINTF(FTM_DBG_TRACE, "%s: set 6g power mode: %d \n", __func__, val);
+	qca6174SetPwMode6G(val);
+}
+
+/* Command to get dpd complete */
+void WlanATCmdGetDpdComplete(void)
+{
+	qca6174GetDpdComplete();
+}
+
+/* Command to set puncture bandwidth pattern */
+void WlanATCmdSet_PUNCBW(uint32_t val)
+{
+        DPRINTF(FTM_DBG_TRACE, "%s: set puncture bandwidth pattern: 0x%X\n", __func__, val);
+        qca6174SetPuncBw(val);
+}
+
+/* Command to stop rx  */
+void WlanATSetSkipRxStop(uint8_t val)
+{
+	qca6174SetSkipRxStop(val);
+}
+
+/* Command to get Noise Floor */
+void WlanATCmdGetNoiseFloor()
+{
+	qca6174GetNoiseFloor();
+}
+
+/* Command to set xlna ctrl */
+void WlanATCmdSetxlnaCtrl(char *val)
+{
+	qca6174SetxlnaCtrl(val);
+}
+
+/* Command to set Noise Floor Read*/
+void WlanATCmdSetNoiseFloorRead(char *val)
+{
+	qca6174SetNoiseFloorRead(val);
 }
 
 void WlanATinit()

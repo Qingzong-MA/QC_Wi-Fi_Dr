@@ -2,7 +2,7 @@
  * File: QCA_Debug_STATLog.dh
  * QCA Bluetooth Firmware Logging Parser.
  *
- * Copyright (c) 2015-2021 Qualcomm Technologies, Inc.
+ * Copyright (c) 2015-2022 Qualcomm Technologies, Inc.
  * 2015-2016 Qualcomm Atheros, Inc.
  * All Rights Reserved
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
@@ -63,8 +63,33 @@ TABLE tQca_StatLogID APPENDS_ONLY tQca_EnhLogID
     {0x0648 "LOG_ID_STATS_A2DP_CXM_DENIAL_STATS"   "LOG_ID_STATS_A2DP_CXM_DENIAL_STATS"  0 gQca_STAT_A2DPCxmDenialStats}
     {0x0649 "LOG_ID_STATS_WAR_DEVICE_EXT"       "LOG_ID_STATS_WAR_DEVICE_EXT"      0 gQca_STAT_WarDeviceExt}
     {0x06F1 "LOG_ID_STATS_DBFW_FRAG_INIT_BUFF_INDEX"  "LOG_ID_STATS_DBFW_FRAG_INIT_BUFF_INDEX"     0 gQca_STATS_FragBuffIndex}
+    {0x0650 "LOG_ID_STATS_RX_DBG"  "LOG_ID_STATS_RX_DBG"     0 gQca_statsRxDbg}
     {0x06FF "STATS End"}
 ENDTABLE
+
+GROUP gQca_statsRxDbg "CIS RX DBG"
+{
+    FIELD fQca_statsRxDbg_cisId          (Fixed 1 Bytes)  (Decimal)            "CIS ID"
+    RESERVED                             (Fixed 1 Bytes)
+    FIELD fQca_statsRxDbg_eventCount     (Fixed 2 Bytes)  (Decimal)            "Event Count"
+
+    GROUP gQca_statsRxDbg_status REPEAT COUNT (Fixed 10 Times) "Rx status"
+    {
+        FIELD fQca_statsRxDbg_rx            (Fixed 0 Bytes)     (Decimal)         "0::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        FIELD fQca_statsRxDbg_rxAgc         (Fixed 4 Bytes)     (HEX)             "Rx AGC"
+        FIELD fQca_statsRxDbg_rxRssi        (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal)         "Rx RSSI"
+        FIELD fQca_statsRxDbg_rxFreq        (Fixed 1 Bytes)     (Decimal)         "Rx Freq"
+        FIELD fQca_statsRxDbg_rxChain       (Fixed 1 Bit)       (Decimal)         "Rx Chain"
+        FIELD fQca_statsRxDbg_CRC           (Fixed 1 Bit)       (Decimal)         "CRC"
+        FIELD fQca_statsRxDbg_pktAbortHdr   (Fixed 1 Bit)       (Decimal)         "Packet About Due to no Rx"
+        FIELD fQca_statsRxDbg_pktAbortRx1   (Fixed 1 Bit)       (Decimal)         "Packet About Due to Rx1"
+        FIELD fQca_statsRxDbg_pktAbortRx2   (Fixed 1 Bit)       (Decimal)         "Packet About Due to Rx2"
+        FIELD fQca_statsRxDbg_pktAbortRx3   (Fixed 1 Bit)       (Decimal)         "Packet About Due to Rx3"
+        FIELD fQca_statsRxDbg_pktAbortRx4   (Fixed 1 Bit)       (Decimal)         "Packet About Due to Rx4"
+        RESERVED                            (Fixed 1 Bit)
+        RESERVED                            (Fixed 1 Bytes)
+    }
+}
 
 GROUP gQca_STAT_leScanInfo "LE SCAN STATS"
 {
@@ -948,9 +973,11 @@ GROUP gQca_STAT_IsoConnStats "ISO Stats"
         {
             FIELD fQca_IsoStatsAcked                  (Fixed 4 Bytes)       (Decimal)          "Acked"
             FIELD fQca_IsoStatsTxFlush                (Fixed 4 Bytes)       (Decimal)          "Flush"
-            FIELD fQca_IsoStatsUnacked                (Fixed 4 Bytes)       (Decimal)          "Unacked"
+            FIELD fQca_IsoStatsUnacked                (Fixed 4 Bytes)       (Decimal)          "Flush Due to Unacked"
             FIELD fQca_IsoStatsLastSub                (Fixed 4 Bytes)       (Decimal)          "Tx In Last Subevent"
             FIELD fQca_IsoStatsRetrans                (Fixed 4 Bytes)       (Decimal)          "Retransmission"
+            FIELD fQca_IsoStatsTotalTx                (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsAcked fQca_IsoStatsUnacked) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_IsoStatsTotalTx1               (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsTotalTx fQca_IsoStatsRetrans) (Decimal) SUPPRESS_DETAIL
         }
         GROUP gQca_STAT_CisRxStats "RX"
         {
@@ -959,9 +986,17 @@ GROUP gQca_STAT_IsoConnStats "ISO Stats"
             FIELD fQca_IsoStatsMiss                   (Fixed 4 Bytes)       (Decimal)          "Missing(No Packet Received)"
             FIELD fQca_IsoStatsAbort                  (Fixed 4 Bytes)       (Decimal)          "Abort(Due to Unexpected Length)"
             FIELD fQca_IsoStatsCrcBad                 (Fixed 4 Bytes)       (Decimal)          "CRC Bad"
-            FIELD fQca_IsoStatsDuplicate              (Fixed 4 Bytes)       (Decimal)          "Retransmission"
+            FIELD fQca_IsoStatsDuplicate              (Fixed 4 Bytes)       (Decimal)          "Retransmission(Duplicated PDU)"
+            FIELD fQca_IsoStatsTotalRx                (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsGood fQca_IsoStatsMiss) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_IsoStatsTotalRx1               (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsTotalRx fQca_IsoStatsAbort) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_IsoStatsTotalRx2               (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsTotalRx1 fQca_IsoStatsCrcBad) (Decimal) SUPPRESS_DETAIL 
+            FIELD fQca_IsoStatsTotalRx3               (Fixed 0) RETRIEVE (AddFieldToField fQca_IsoStatsTotalRx2 fQca_IsoStatsDuplicate) (Decimal) SUPPRESS_DETAIL 
         }
-        
+        FIELD fQca_IsoStatsTotalSubevent              (Fixed 0) IF(CompareFields fQca_IsoStatsTotalTx1 LessThan fQca_IsoStatsTotalRx3)
+                                                       RETRIEVE (StoreField fQca_IsoStatsTotalRx3) (Decimal) "Total Subevents (Rough reference value)" 
+        FIELD fQca_IsoStatsTotalSubevent1             (Fixed 0) IF(CompareFields fQca_IsoStatsTotalRx3 LessThanOrEqualTo fQca_IsoStatsTotalTx1)
+                                                       RETRIEVE (StoreField fQca_IsoStatsTotalTx1) (Decimal) "Total Subevents (Rough reference value)" 
+
         GROUP gQca_STAT_CisDispatchStats "Dispatch"
         {
             FIELD fQca_IsoStatDispatch_missEvent       (Fixed 4 Bytes)      (Decimal)          "missEvent"
@@ -1459,29 +1494,46 @@ GROUP gQca_STAT_RxAgcRegInfo "Rx AGC Register Info"
     FIELD Qca_STAT_ctrl_0                       (Fixed 4 Byte)   (Hex)   "HZ_MDM_BT_RX_CTRL_0"
 }
 
-TABLE t_IsoPduRxStatus
-    {0 "Unknow_Err"}
-    {1 "AC_err"}
-    {2 "CRC_err"}
-    {3 "CRC_good"}
-    {4 "Rx Buf Not Available"}
-    {5 "Rx Retrans"}
-    {6 "Rx Nak"}
-    {7 "Rx Ack"}
+TABLE t_ISO_SduTxStatus
+    {0  "Not Transmitted"}
+    {1  "Stuff SDU"}
+    {2  "Datapath Disabled"}
+    {3  "No Memory"}
+    {4  "Exceed Max SDU Limitation"}
+    {5  "Drop Late SDU"}
+    {6  "All PDU Acked"}
+    {7  "Some PDU Rx Nothing/CRC error"}
+    {8  "Some PDU Not Acked"}
+    {9  "Some PDU didn't Tx"}
+    {10 "SDU Comes Late"}
 ENDTABLE
 
-TABLE t_CIS_SduTxStatus
-    {0  "Unknow_Err"}
-    {1  "Flush Instead Of Stuff"}
-    {2  "Flush Disable Path"}
-    {3  "Flush No Memory"}
-    {4  "Flush Exceed Limit"}
-    {5  "Flush Handle Late"}
-    {6  "All PDU be Ack"}
-    {7  "Some PDU Rx Nothing/CRC error"}
-    {8  "Some PDU be Nak"}
-    {9  "Some PDU didn't Tx"}
-    {10 "SDU come late"}
+TABLE t_ISO_SduRxStatus
+    {0x00 "Success"}
+    {0x01 "Miss"}
+    {0x02 "MissSync"}
+    {0x03 "FailSeqn"}
+    {0x04 "Unexpected Length"}
+ENDTABLE
+
+TABLE t_ISO_PduTxStatus
+    {0x00 "Not Scheduled"}
+    {0x01 "Command Late"}
+    {0x02 "COEX Abort"}
+    {0x03 "NULL PDU"}
+    {0x04 "PDU"}
+ENDTABLE
+
+TABLE t_ISO_PduRxStatus
+    {0x00 "Not Scheduled"}
+    {0x01 "Command Late"}
+    {0x02 "No Rx"}
+    {0x03 "Access Code Error"}
+    {0x04 "CRC Error"}
+    {0x05 "NULL PDU"}
+    {0x06 "Empty PDU"}
+    {0x07 "Retransmission PDU"}
+    {0x08 "New PDU"}
 ENDTABLE
 
 TABLE t_BIS_SduTxStatus
@@ -1494,204 +1546,103 @@ ENDTABLE
 
 GROUP gQca_STAT_IsoSduTxDbg "ISO SDU Tx Dbg"
 {
-    FIELD fQca_STAT_IsoSduTxDbg_handle          (Fixed 1 Bytes) (Decimal)   "handle"
-    FIELD fQca_STAT_IsoSduTxDbg_isoType         (Fixed 1 Bytes) (TABLE tQca_IsoType)   "isoType"
-    FIELD fQca_STAT_IsoSduTxDbg_isFrame         (Fixed 1 Bytes) (TABLE t_IsoFrameType)        "frame"
-    GROUP gQca_STAT_IsoSduTxDbg_CIS_sduStatus IF (Fieldis NotEqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
+    FIELD fQca_STAT_IsoSduDbg_handle          (Fixed 1 Bytes) (Decimal)                                            "Handle"
+    FIELD fQca_IsoType;
+    FIELD fQca_STAT_IsoSduDbg_txSduStatus     (Fixed 1 Bytes) (Table t_ISO_SduTxStatus)                            "Status"
+    FIELD fQca_STAT_IsoSduDbg_nse             (Fixed 1 Bytes) (Decimal)                                            "NSE"
+    FIELD fQca_STAT_IsoSduDbg_sduSeqn         (Fixed 2 Bytes) (Decimal)                                            "SDU Sequence"
+    FIELD fQca_STAT_IsoSduDbg_sduLength       (Fixed 2 Bytes) (Decimal)                                            "SDU Length"
+    FIELD fQca_STAT_IsoSduDbg_arrivalTime     (Fixed 4 Bytes) (Decimal) ALSO (Constant "us")                       "Arrival Time"
+    //FIELD fQca_STAT_IsoSduDbg_scheduleTime    (Fixed 4 Bytes) (Decimal) ALSO (Constant "us")                       "Schedule Time"
+    FIELD fQca_STAT_IsoSduDbg_flushTime       (Fixed 4 Bytes) (Decimal) ALSO (Constant "us")                       "Flushed Time"
+    FIELD fQca_STAT_IsoSduDbg_flushTimeN      (Fixed 4 Bytes) (HEX)                                                "Flushed CLKN"
+    FIELD fQca_STAT_IsoSduDbg_flushTimeEvent  (Fixed 2 Bytes) (Decimal)                                            "Flushed EventCount"
+    FIELD fQca_STAT_IsoSduDbg_beginPduSeqn    (Fixed 1 Bytes) (Decimal)                                            "Begin Pdu Sequence"
+    FIELD fQca_STAT_IsoSduDbg_endPduSeqn      (Fixed 1 Bytes) (Decimal)                                            "End Pdu Sequence"
+    FIELD fQca_STAT_IsoSduDbg_headEvent       (Fixed 2 Bytes) (Decimal)                                            "Head EventCount"
+    FIELD fQca_STAT_IsoSduDbg_headSubEvent    (Fixed 1 Bytes) RETRIEVE(AddInteger 1) (Decimal)                     "Head SubEvent"
+    Reserved                                  (Fixed 6 Bits)
+    FIELD fQca_STAT_IsoSduDbg_rxAvailable     (Fixed 1 Bits)  (Decimal)     SUPPRESS_DETAIL
+    FIELD fQca_STAT_IsoSduDbg_txAvailable     (Fixed 1 Bits)  (Decimal)     SUPPRESS_DETAIL             
+    FIELD fQca_STAT_IsoSduDbg_count           (Fixed 1 Bytes) (Decimal)                                            "Count"
+    Reserved                                  (Fixed 3 bytes)
+    FIELD fQca_STAT_IsoSduDbg_eventInit       (Fixed 0) RETRIEVE(StoreField fQca_STAT_IsoSduDbg_headEvent) (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_event
+    FIELD fQca_STAT_IsoSduDbg_subEventInit    (Fixed 0) RETRIEVE(StoreField fQca_STAT_IsoSduDbg_headSubEvent) (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_subEvent
+    FIELD fQca_STAT_IsoSduDbg_txOffsetInit    (Fixed 0) RETRIEVE(MultiplyIntegerByField 2 fQca_STAT_IsoSduDbg_count) (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_txOffset
+    FIELD fQca_STAT_IsoSduDbg_rxOffsetInit    (Fixed 0) RETRIEVE(StoreInteger 0) (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_rxOffset
+
+    GROUP gQca_STAT_IsoSduDbg_seStatus REPEAT COUNT (FromField Times fQca_STAT_IsoSduDbg_count) "SubEvent Status"
     {
-        /* CIS */
-        FIELD fQca_STAT_IsoSduTxDbg_CIS_sduStatus        (Fixed 1 Bytes) (TABLE t_CIS_SduTxStatus)   "sduStatus"
-    }
+        FIELD fQca_STAT_IsoSduDbg_eventPrint  (Fixed 0) IF (Fieldis EqualTo 0 fQca_STAT_IsoSduDbg_subEvent) RETRIEVE (StoreField fQca_STAT_IsoSduDbg_event) (Decimal)  "##########EventCount"
+        FIELD fQca_STAT_IsoSduDbg_subEventRollback (Fixed 0) IF (Fieldis EqualTo 0 fQca_STAT_IsoSduDbg_subEvent)RETRIEVE(StoreField fQca_STAT_IsoSduDbg_nse)
+                                                   (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_subEvent
+        FIELD fQca_STAT_IsoSduDbg_subEventPrint  (Fixed 0) RETRIEVE(StoreField fQca_STAT_IsoSduDbg_subEvent) (Decimal)      "----------SubEvent"
 
-    GROUP gQca_STAT_IsoSduTxDbg_BIS_sduStatus IF (Fieldis EqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
-    {
-        /* BIS */
-        FIELD fQca_STAT_IsoSduTxDbg_BIS_sduStatus        (Fixed 1 Bytes) (TABLE t_BIS_SduTxStatus)   "sduStatus"
-    }
-
-    FIELD fQca_STAT_IsoSduTxDbg_sduSeqn          (Fixed 2 Bytes) (Decimal)   "sduSeqn"
-    FIELD fQca_STAT_IsoSduTxDbg_sduLength        (Fixed 2 Bytes) (Decimal)   "sduLength"
-    FIELD fQca_STAT_IsoSduTxDbg_cxmDenials       (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)   "cxmDenials"
-    Reserved (Fixed 2 bytes)
-    FIELD fQca_STAT_IsoSduTxDbg_arrivalTime      (Fixed 4 Bytes) (Decimal)   "arrivalTime"
-    FIELD fQca_STAT_IsoSduTxDbg_scheduleTime     (Fixed 4 Bytes) (Decimal)   "scheduleTime"
-    FIELD fQca_STAT_IsoSduTxDbg_flushAckTime     (Fixed 4 Bytes) (Decimal)   "flushAckTime"
-
-    GROUP gQca_STAT_IsoSduTxDbg_moreData IF(MoreBytes)
-    {
-        FIELD fQca_STAT_IsoSduTxDbg_LastFlushAckTime (Fixed 4 Bytes) (Decimal)   "LastFlushAckTime"
-        FIELD fQca_STAT_IsoSduTxDbg_deltaFlushAckTime (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_LastFlushAckTime) (Decimal) "delta FlushAckTime (us)"
-
-        GROUP  gQca_STAT_IsoSduTxDbg_Latency_Summary "ISO_Latency_Summary"
+        GROUP gQca_STAT_IsoSduDbg_seTxStatus IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduDbg_txAvailable) "Tx"
         {
-            FIELD fQca_STAT_IsoSduTxDbg_Arrival_To_Schedule_us   (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_scheduleTime fQca_STAT_IsoSduTxDbg_arrivalTime) (Decimal) "Arrive To Schedule (us)"
-            FIELD fQca_STAT_IsoSduTxDbg_Schedule_To_FlushAcke_us (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_scheduleTime) (Decimal) "Schedule To  FlushAck (us)"
-            FIELD fQca_STAT_IsoSduTxDbg_us (Fixed 0) RETRIEVE (SubtractFieldMinusField fQca_STAT_IsoSduTxDbg_flushAckTime fQca_STAT_IsoSduTxDbg_arrivalTime) (Decimal) "Iso Latency (us)"
+            FIELD fQca_STAT_IsoSduDbg_txOffsetUpdate  (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduDbg_txOffset) ALSO (AddInteger 2)(Hex) SUPPRESS_DETAIL
+                                                      STORE fQca_STAT_IsoSduDbg_txOffset
+
+            FIELD fQca_STAT_IsoSduDbg_moveToTx        START_BIT (FromEndSizeFromField fQca_STAT_IsoSduDbg_txOffset) (Fixed 0) (HEX) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduDbg_pduSeqn         (Fixed 1 Bytes) (Decimal)                       "PDU Sequence"
+            FIELD fQca_STAT_IsoSduDbg_txStatus        (Fixed 4 Bits)  (Table t_ISO_PduTxStatus)       "Status"
+            Reserved                                  (Fixed 2 Bits)
+            FIELD fQca_STAT_IsoSduDbg_CIE             (Fixed 1 Bits)  (Decimal)                       "CIE"
+            FIELD fQca_STAT_IsoSduDbg_ACK             (Fixed 1 Bits)  (Decimal)                       "ACK"
         }
 
-        FIELD fQca_STAT_IsoSduTxDbg_missDispatch     (Fixed 1 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)   "missDispatch"
-        FIELD fQca_STAT_IsoSduTxDbg_pduCnt           (Fixed 1 Bytes) (Decimal)   "pduCnt"
-        FIELD fQca_STAT_IsoSduTxDbg_pduLogCnt        (Fixed 1 Bytes) (Decimal)   "pduLogCnt"
-        FIELD fQca_STAT_IsoSduTxDbg_beginPduSeqn     (Fixed 1 Bytes) (Decimal)   "beginPduSeqn"
 
-        GROUP gQca_STAT_IsoSduTxDbg_scheduleInfo_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduTxDbg_missDispatch)
+        GROUP gQca_STAT_IsoSduDbg_seRxStatus IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduDbg_rxAvailable) "Rx"
         {
-            GROUP gQca_STAT_Iso_scheduleInfo "miss Dispatch Since Task: "
-            {
-                FIELD fQca_STAT_IsoSduTxDbg_scheduleInfo_opcode          (Fixed 1 Bytes) (TABLE tQca_DispatchOpCode)   "opcode"
-                FIELD fQca_STAT_IsoSduTxDbg_scheduleInfo_priority        (Fixed 1 Bytes) (Decimal)   "priority"
-            }
+            FIELD fQca_STAT_IsoSduDbg_rxOffsetUpdate  (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduDbg_rxOffset) ALSO (AddInteger 2)(Hex) SUPPRESS_DETAIL
+                                                      STORE fQca_STAT_IsoSduDbg_rxOffset
+
+            FIELD fQca_STAT_IsoSduDbg_moveToRx        START_BIT (FromEndSizeFromField fQca_STAT_IsoSduDbg_rxOffset) (Fixed 0) (HEX) SUPPRESS_DETAIL
+            FIELD fQca_STAT_IsoSduDbg_pduSeqn;
+            FIELD fQca_STAT_IsoSduDbg_rxStatus        (Fixed 4 Bits)  (Table t_ISO_PduRxStatus)       "Status"
+            Reserved                                  (Fixed 2 Bits)
+            FIELD fQca_STAT_IsoSduDbg_CIE;
+            FIELD fQca_STAT_IsoSduDbg_ACK;
         }
 
-        GROUP gQca_STAT_IsoSduTxDbg_pduStat_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduTxDbg_pduLogCnt)
-        {
-            FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn_init (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreInteger 0xFFFFFFFF)
-
-            GROUP gQca_STAT_IsoSduTxDbg_pduStat REPEAT COUNT (FromField Times fQca_STAT_IsoSduTxDbg_pduLogCnt 0) "PDU status"
-            {
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_rxStatus_tmp     (Fixed 3 bits)  (Decimal) SUPPRESS_DETAIL
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt_tmp     (Fixed 4 bits)  (Decimal) SUPPRESS_DETAIL
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp     (Fixed 1 bits)  (Decimal) SUPPRESS_DETAIL
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp         (Fixed 1 bytes) (Decimal) SUPPRESS_DETAIL
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_event_tmp        (Fixed 2 bytes) (Decimal) SUPPRESS_DETAIL
-
-                FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn (Fixed 0) RETRIEVE (StoreField lastPduSeqnValue) (Decimal) SUPPRESS_DETAIL
-
-                GROUP gQca_STAT_IsoSduTxDbg_pduStat_seqn_show IF (CompareFields fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp NotEqualTo fQca_STAT_IsoSduTxDbg_LastPduSeqn)
-                {
-                    FIELD fQca_STAT_IsoSduTxDbg_pduStat_seqn         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_seqn_tmp) (Decimal) "------------ PDU seqn --------"
-                    FIELD fQca_STAT_IsoSduTxDbg_LastPduSeqn_set (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_seqn)
-                }
-
-                GROUP gQca_STAT_IsoSduTxDbg_pduStat_schedule IF (Fieldis EqualTo 0 fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp)
-                {
-                    FIELD fQca_STAT_IsoSduTxDbg_pduStat_schedule     (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_schedule_tmp)   (Decimal)   "scheduled"
-                }
-
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_event     (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_event_tmp)      (Decimal)   "streamEvent"
-                FIELD fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt  (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_txSubEvt_tmp)   (Decimal)   "subEvt"
-
-                /* show rxStatus if it's not BIS_M */
-                GROUP gQca_STAT_IsoSduTxDbg_pduStat_rxStatus_show IF (Fieldis NotEqualTo 2 fQca_STAT_IsoSduTxDbg_isoType)
-                {
-                    FIELD fQca_STAT_IsoSduTxDbg_pduStat_rxStatus         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduTxDbg_pduStat_rxStatus_tmp)   (TABLE t_IsoPduRxStatus)   "rxStatus"
-                }
-            }
-        }
+        FIELD fQca_STAT_IsoSduDbg_subEventDec    (Fixed 0) RETRIEVE(StoreField fQca_STAT_IsoSduDbg_subEvent)ALSO(SubtractInteger 1) (HEX)  SUPPRESS_DETAIL
+                                                  STORE  fQca_STAT_IsoSduDbg_subEvent
+        FIELD fQca_STAT_IsoSduDbg_eventDec  (Fixed 0) IF (Fieldis EqualTo 0 fQca_STAT_IsoSduDbg_subEvent) RETRIEVE (StoreField fQca_STAT_IsoSduDbg_event)
+                                            ALSO (SubtractInteger 1) ALSO (AndMask 0xffff) (HEX) SUPPRESS_DETAIL STORE fQca_STAT_IsoSduDbg_event
     }
+
+    FIELD fQca_STAT_IsoSduDbg_moveToEnd START_BIT (FromEnd 0 Bytes) (Fixed 0) (HEX) SUPPRESS_DETAIL
 }
-
-TABLE t_IsoFrameType
-    {0 "UNFRAMED"}
-    {1 "FRAMED"}
-ENDTABLE
-
-TABLE t_ISO_SduRxStatus
-    {0x00 "Success"     "Success"       0   gQca_STAT_IsoSduRxDbg_Success}
-    {0x01 "Miss"        "Miss"          0   gQca_STAT_IsoSduRxDbg_Miss}
-    {0x02 "MissSync"    "MissSync"      0   gQca_STAT_IsoSduRxDbg_MissSync}
-    {0x03 "FailSeqn"    "FailSeqn"      0   gQca_STAT_IsoSduRxDbg_FailSeqn}
-    {0x04 "FailLen"     "FailLen"       0   gQca_STAT_IsoSduRxDbg_FailLen}
-ENDTABLE
 
 GROUP gQca_STAT_IsoSduRxDbg "ISO SDU Rx Dbg"
 {
-    FIELD fQca_STAT_IsoSduRxDbg_handle         (Fixed 1 Bytes) (Decimal)                       "handle"
-    FIELD fQca_STAT_IsoSduRxDbg_isoType        (Fixed 1 Bytes) (TABLE tQca_IsoType)            "isoType"
-    FIELD fQca_STAT_IsoSduRxDbg_isFrame        (Fixed 1 Bytes) (TABLE t_IsoFrameType)          "frame"
-    FIELD fQca_STAT_IsoSduRxDbg_sduStatus      (Fixed 1 Bytes) (TABLE t_ISO_SduRxStatus)       "sduStatus"
-    FIELD fQca_STAT_IsoSduRxDbg_cxmDenials     (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)      "cxmDenials"
-    Reserved (Fixed 2 bytes)
-    FIELD fQca_STAT_IsoSduRxDbg_missDispatch   (Fixed 1 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal)      "missDispatch"
-    FIELD fQca_STAT_IsoSduRxDbg_pduCnt         (Fixed 1 Bytes) (Decimal)                       "pduCnt"
-    FIELD fQca_STAT_IsoSduRxDbg_pduLogCnt      (Fixed 1 Bytes) (Decimal)                       "pduLogCnt"
-    FIELD fQca_STAT_IsoSduRxDbg_startPduSeqn   (Fixed 1 Bytes) (Decimal)                       "startPduSeqn"
+    FIELD fQca_STAT_IsoSduDbg_handle;
+    FIELD fQca_IsoType;
+    FIELD fQca_STAT_IsoSduDbg_rxSduStatus     (Fixed 1 Bytes) (Table t_ISO_SduRxStatus)       "Status"
+    FIELD fQca_STAT_IsoSduDbg_nse;
+    FIELD fQca_STAT_IsoSduDbg_sduSeqn;
+    FIELD fQca_STAT_IsoSduDbg_sduLength;
+    Reserved                                  (Fixed 4 Bytes)
+    //FIELD fQca_STAT_IsoSduDbg_scheduleTime;
+    FIELD fQca_STAT_IsoSduDbg_flushTime;
+    FIELD fQca_STAT_IsoSduDbg_flushTimeN;
+    FIELD fQca_STAT_IsoSduDbg_flushTimeEvent;
+    FIELD fQca_STAT_IsoSduDbg_beginPduSeqn;
+    FIELD fQca_STAT_IsoSduDbg_endPduSeqn;
+    FIELD fQca_STAT_IsoSduDbg_headEvent;
+    FIELD fQca_STAT_IsoSduDbg_headSubEvent;
+    Reserved                                  (Fixed 6 Bits)
+    FIELD fQca_STAT_IsoSduDbg_rxAvailable;
+    FIELD fQca_STAT_IsoSduDbg_txAvailable;
+    FIELD fQca_STAT_IsoSduDbg_count;
+    Reserved                                  (Fixed 3 bytes)
+    FIELD fQca_STAT_IsoSduDbg_eventInit;
+    FIELD fQca_STAT_IsoSduDbg_subEventInit;
+    FIELD fQca_STAT_IsoSduDbg_txOffsetInit;  
+    FIELD fQca_STAT_IsoSduDbg_rxOffsetInit; 
 
-    BRANCH (FromTable   t_ISO_SduRxStatus   fQca_STAT_IsoSduRxDbg_sduStatus)
-
-    GROUP gQca_STAT_IsoSduRxDbg_schedule_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_missDispatch)
-    {
-        GROUP gQca_STAT_Iso_scheduleInfo;
-    }
-
-    GROUP gQca_STAT_IsoSduRxDbg_rxPduLog_Field IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_pduLogCnt)
-    {
-        FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn_init (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreInteger 0xFFFFFFFF)
-
-        GROUP gQca_STAT_IsoSduRxDbg_pduStat REPEAT COUNT (FromField Times fQca_STAT_IsoSduRxDbg_pduLogCnt 0) "PDU status"
-        {
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_rxStatus_tmp     (Fixed 3 bits)  (Decimal) SUPPRESS_DETAIL
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt_tmp     (Fixed 4 bits)  (Decimal) SUPPRESS_DETAIL
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_schedule_tmp     (Fixed 1 bits)  (Decimal) SUPPRESS_DETAIL
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp         (Fixed 1 bytes) (Decimal) SUPPRESS_DETAIL
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_event_tmp        (Fixed 2 bytes) (Decimal) SUPPRESS_DETAIL
-
-            FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn (Fixed 0) RETRIEVE (StoreField lastPduSeqnValue) (Decimal) SUPPRESS_DETAIL
-
-            GROUP gQca_STAT_IsoSduRxDbg_pduStat_seqn_show IF (CompareFields fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp NotEqualTo fQca_STAT_IsoSduRxDbg_LastPduSeqn)
-            {
-                FIELD fQca_STAT_IsoSduRxDbg_pduStat_seqn         (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_seqn_tmp) (Decimal) "------------ PDU seqn --------"
-                FIELD fQca_STAT_IsoSduRxDbg_LastPduSeqn_set (Fixed 0) (Hex) SUPPRESS_DETAIL STORE lastPduSeqnValue RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_seqn)
-            }
-
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_event       (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_event_tmp)      (Decimal)   "streamEvent"
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt    (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_txSubEvt_tmp)   (Decimal)   "subEvt"
-            FIELD fQca_STAT_IsoSduRxDbg_pduStat_rxStatus    (Fixed 0) RETRIEVE (StoreField fQca_STAT_IsoSduRxDbg_pduStat_rxStatus_tmp)   (TABLE t_IsoPduRxStatus)   "rxStatus"
-        }
-    }
-}
-
-GROUP gQca_STAT_IsoSduRxDbg_Success  "RX Success"
-{
-    FIELD fQca_STAT_IsoSduRxDbg_Success_SduSeqn         (Fixed 2 Bytes)   (Decimal) "SduSeqn"
-    FIELD fQca_STAT_IsoSduRxDbg_Success_SduLen          (Fixed 2 Bytes)   (Decimal) "SduLen"
-}
-
-GROUP gQca_STAT_IsoSduRxDbg_Miss  "RX Miss"
-{
-    FIELD fQca_STAT_IsoSduRxDbg_UnFrameMiss_SduSeqn     (Fixed 2 Bytes)   (Decimal) "SduSeqn"
-    FIELD fQca_STAT_IsoSduRxDbg_UnFrameMiss_SduLen      (Fixed 2 Bytes)   (Decimal) "SduLen"
-}
-
-GROUP gQca_STAT_IsoSduRxDbg_MissSync  "RX MissSync"
-{
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_missSduSeqn        (Fixed 2 Bytes)   (Decimal) "missSduSeqn"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_cnt                (Fixed 2 Bytes)   (Decimal) "missCnt"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_lastLocalSduSeqn   (Fixed 2 Bytes)   (Decimal) "lastLocalSduSeqn"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_currSduSeqn        (Fixed 2 Bytes)   (Decimal) "currSduSeqn"
-
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_rxPduTime          (Fixed 4 Bytes)   (Decimal) "currRxPduTime"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_rxPduOffset        (Fixed 4 Bytes)   (Decimal) "currRxOffset"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_lastRxSyncRef      (Fixed 4 Bytes)   (Decimal) "last SDU Sync Ref"
-    FIELD fQca_STAT_IsoSduRxDbg_Miss_deltaToRxSyncRef   (Fixed 4 Bytes)   (Decimal) "delta to last SDU Sync Ref"
-}
-
-GROUP gQca_STAT_IsoSduRxDbg_FailSeqn "RX Fail Seqn"
-{
-    Group gQca_STAT_IsoSduRxDbg_FailSeqn_FrameCase IF (Fieldis NotEqualTo 0 fQca_STAT_IsoSduRxDbg_isFrame)
-    {
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_expectSduSeqn    (Fixed 2 Bytes)   (Decimal) "expectSduSeqn"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_currSduLen       (Fixed 2 Bytes)   (Decimal) "currSduLen"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_frame_currSduSeqn      (Fixed 2 Bytes)   (Decimal) "currSduSeqn"
-        Reserved (Fixed 4 bytes)
-    }
-
-    Group gQca_STAT_IsoSduRxDbg_FailSeqn_UnframeCase IF (Fieldis EqualTo 0 fQca_STAT_IsoSduRxDbg_isFrame)
-    {
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_localSduSeqn   (Fixed 2 Bytes)   (Decimal) "SduSeqn"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_currSduLen     (Fixed 2 Bytes)   (Decimal) "SduLen"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_rxPayloadCnt_SduWidth (Fixed 2 Bytes)   (Decimal) "rx PayloadCnt/SduWidth"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_currPduSeqn    (Fixed 2 Bytes)   (Decimal) "currPduSeqn"
-        FIELD fQca_STAT_IsoSduRxDbg_FailSeqn_unframe_rxSduWidth     (Fixed 1 Bytes)   (Decimal) "SduWidth"
-        Reserved (Fixed 1 byte)
-    }
-}
-
-GROUP gQca_STAT_IsoSduRxDbg_FailLen "RX Fail Len"
-{
-    FIELD fQca_STAT_IsoSduRxDbg_FailLen_localSduSeqn    (Fixed 2 Bytes)   (Decimal) "SduSeqn"
-    FIELD fQca_STAT_IsoSduRxDbg_FailLen_currSduLen      (Fixed 2 Bytes)   (Decimal) "currSduLen"
-    FIELD fQca_STAT_IsoSduRxDbg_FailLen_expectSduLen    (Fixed 2 Bytes)   (Decimal) "expectSduLen"
+    GROUP gQca_STAT_IsoSduDbg_seStatus;
+    FIELD fQca_STAT_IsoSduDbg_moveToEnd;
 }
 
 GROUP gQca_STAT_ACLFlushStats "ACL/A2DP Flush Stats based on Naks"
@@ -1787,6 +1738,7 @@ GROUP gQca_STAT_leScan "LE Scan Stats"
 	FIELD fQca_STAT_initConReqTxCnt (Fixed 2 Bytes)   (Decimal)   "initate Connect IND TX Count"
 	FIELD fQca_STAT_initConReqAbortCnt (Fixed 2 Bytes) (Decimal)  "initate Connect IND abort Count"
 	FIELD fQca_STAT_allocFailCnt    (Fixed 2 Bytes)   (Decimal)   "malloc hci events unsuccessfully  Count"
+	FIELD fQca_STAT_filterOutCnt    (Fixed 4 Bytes)   (Decimal)   "APCF Filter Out Count"
 }
 
 TABLE tQca_RxAgcInfoxLNA

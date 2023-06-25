@@ -305,10 +305,12 @@ typedef struct {
     } body;
 } NanSecurityKeyInfo;
 
-/* NAN Shared Key Security Cipher Suites Mask */
-#define NAN_CIPHER_SUITE_SHARED_KEY_NONE 0x00
-#define NAN_CIPHER_SUITE_SHARED_KEY_128_MASK  0x01
-#define NAN_CIPHER_SUITE_SHARED_KEY_256_MASK  0x02
+/* NAN Security Cipher Suites Mask */
+#define NAN_CIPHER_SUITE_SHARED_KEY_NONE               0x00
+#define NAN_CIPHER_SUITE_SHARED_KEY_128_MASK           0x01
+#define NAN_CIPHER_SUITE_SHARED_KEY_256_MASK           0x02
+#define NAN_CIPHER_SUITE_PUBLIC_KEY_2WDH_128_MASK      0x04
+#define NAN_CIPHER_SUITE_PUBLIC_KEY_2WDH_256_MASK      0x08
 
 /* NAN ranging indication condition MASKS */
 #define NAN_RANGING_INDICATE_CONTINUOUS_MASK   0x01
@@ -389,6 +391,7 @@ typedef struct {
     u32 max_sdea_service_specific_info_len;
     u32 max_subscribe_address;
     u32 ndpe_attr_supported;
+    bool is_instant_mode_supported;
 } NanCapabilities;
 
 /*
@@ -1032,6 +1035,24 @@ typedef struct {
     */
     u8 config_ndpe_attr;
     u32 use_ndpe_attr;
+    /*
+        Enable NAN v3.1 instant communication mode.
+        0 - Disable
+        1 - Enable
+    */
+    u8 config_enable_instant_mode;
+    u32 enable_instant_mode;
+    /*
+        Config NAN v3.1 instant communication channel frequency selected over NFC/OOB method.
+        If dual band is supported default channel is 149 or 44 as per regulatory domain,
+        else channel 6 (send frequency in MHz).
+        Sometimes depending on country code retrictions, even 149/44 may be restricted
+        in those cases instant channel will be operational only in 2.4GHz.
+        Use wifi_get_usable_channels() API to get supported bands/channels before
+        Instant mode NFC handshake is triggered
+    */
+    u8 config_instant_mode_channel;
+    wifi_channel instant_mode_channel;
 } NanEnableRequest;
 
 /*
@@ -1516,6 +1537,24 @@ typedef struct {
     */
     u8 config_ndpe_attr;
     u32 use_ndpe_attr;
+    /*
+            Enable NAN v3.1 instant communication mode.
+            0 - Disable
+            1 - Enable
+    */
+    u8 config_enable_instant_mode;
+    u32 enable_instant_mode;
+    /*
+        Config NAN v3.1 instant communication channel selected over NFC/OOB method.
+        If dual band is supported default channel is 149 or 44 as per regulatory domain,
+        else channel 6 (send frequency in MHz).
+        Sometimes depending on country code retrictions, even 149/44 may be restricted
+        in those cases instant channel will be operational only in 2.4GHz.
+        Use wifi_get_usable_channels() API to get supported bands/channels before
+        Instant mode NFC handshake is triggered
+    */
+    u8 config_instant_mode_channel;
+    wifi_channel instant_mode_channel;
 } NanConfigRequest;
 
 /*
@@ -2206,6 +2245,18 @@ typedef struct {
        is not associated with the NDP (out-of-band discovery).
     */
     u8 service_name[NAN_MAX_SERVICE_NAME_LEN];
+
+    /* Security Context Identifiers length */
+    u32 scid_len;
+    /*
+       Security Context Identifier attribute contains PMKID
+       shall be included in NDP setup and response messages.
+       Security Context Identifier, Identifies the Security
+       Context. For NAN Shared Key Cipher Suite, this field
+       contains the 16 octet PMKID identifying the PMK used
+       for setting up the Secure Data Path.
+    */
+    u8 scid[NAN_MAX_SCID_BUF_LEN];
 } NanDataPathInitiatorRequest;
 
 /*
@@ -2246,6 +2297,18 @@ typedef struct {
        is not associated with the NDP (out-of-band discovery).
     */
     u8 service_name[NAN_MAX_SERVICE_NAME_LEN];
+
+    /* Security Context Identifiers length */
+    u32 scid_len;
+    /*
+       Security Context Identifier attribute contains PMKID
+       shall be included in NDP setup and response messages.
+       Security Context Identifier, Identifies the Security
+       Context. For NAN Shared Key Cipher Suite, this field
+       contains the 16 octet PMKID identifying the PMK used
+       for setting up the Secure Data Path.
+    */
+    u8 scid[NAN_MAX_SCID_BUF_LEN];
 } NanDataPathIndicationResponse;
 
 /* NDP termination info */
@@ -2281,6 +2344,18 @@ typedef struct {
     NanDataPathCfg ndp_cfg;
     /* App/Service information of the initiator */
     NanDataPathAppInfo app_info;
+
+    /* Security Context Identifiers length */
+    u32 scid_len;
+    /*
+       Security Context Identifier attribute contains PMKID
+       shall be included in NDP setup and response messages.
+       Security Context Identifier, Identifies the Security
+       Context. For NAN Shared Key Cipher Suite, this field
+       contains the 16 octet PMKID identifying the PMK used
+       for setting up the Secure Data Path.
+    */
+    u8 scid[NAN_MAX_SCID_BUF_LEN];
 } NanDataPathRequestInd;
 
 /*

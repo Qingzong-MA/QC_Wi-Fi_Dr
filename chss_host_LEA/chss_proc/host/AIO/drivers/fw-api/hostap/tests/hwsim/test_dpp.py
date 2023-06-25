@@ -922,6 +922,140 @@ def test_dpp_config_legacy_gen_psk(dev, apdev):
                                  init_extra="conf=sta-psk psk=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                                  require_conf_success=True)
 
+def test_dpp_config_legacy_gen_two_conf(dev, apdev):
+    """Generate DPP Config Object for legacy network (two config objects)"""
+    ssid1 = "test1"
+    pass1 = "passphrase for psk"
+    ssid2 = "test-2"
+    pass2 = "password for sae"
+    ssid1h = binascii.hexlify(ssid1.encode()).decode()
+    pass1h = binascii.hexlify(pass1.encode()).decode()
+    ssid2h = binascii.hexlify(ssid2.encode()).decode()
+    pass2h = binascii.hexlify(pass2.encode()).decode()
+    extra = "conf=sta-psk pass=%s ssid=%s @CONF-OBJ-SEP@ conf=sta-sae pass=%s ssid=%s" % (pass1h, ssid1h, pass2h, ssid2h)
+    try:
+        dev[0].set("dpp_config_processing", "1")
+        run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
+                                     init_extra=extra,
+                                     require_conf_success=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=5)
+    if ev is None or ev.split()[1] != "psk":
+        raise Exception("Unexpected confobj 1 AKM: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-SSID"], timeout=5)
+    if ev is None or ev.split()[1] != ssid1:
+        raise Exception("Unexpected confobj 1 SSID: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-PASS"], timeout=5)
+    if ev is None or ev.split()[1] != pass1h:
+        raise Exception("Unexpected confobj 1 pass: " + str(ev))
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=5)
+    if ev is None or ev.split()[1] != "sae":
+        raise Exception("Unexpected confobj 2 AKM: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-SSID"], timeout=5)
+    if ev is None or ev.split()[1] != ssid2:
+        raise Exception("Unexpected confobj 2 SSID: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-PASS"], timeout=5)
+    if ev is None or ev.split()[1] != pass2h:
+        raise Exception("Unexpected confobj 2 pass: " + str(ev))
+
+    val = dev[0].get_network(0, "ssid")
+    if val != '"' + ssid1 + '"':
+        raise Exception("Unexpected network 1 ssid: " + val)
+    val = dev[0].get_network(0, "key_mgmt")
+    if val != "WPA-PSK FT-PSK WPA-PSK-SHA256":
+        raise Exception("Unexpected network 1 key_mgmt: " + val)
+
+    val = dev[0].get_network(1, "ssid")
+    if val != '"' + ssid2 + '"':
+        raise Exception("Unexpected network 2 ssid: " + val)
+    val = dev[0].get_network(1, "key_mgmt")
+    if val != "SAE FT-SAE":
+        raise Exception("Unexpected network 2 key_mgmt: " + val)
+
+def test_dpp_config_legacy_gen_two_conf_psk(dev, apdev):
+    """Generate DPP Config Object for legacy network (two config objects, psk)"""
+    ssid1 = "test1"
+    psk1 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    ssid2 = "test-2"
+    pass2 = "password for sae"
+    ssid1h = binascii.hexlify(ssid1.encode()).decode()
+    ssid2h = binascii.hexlify(ssid2.encode()).decode()
+    pass2h = binascii.hexlify(pass2.encode()).decode()
+    extra = "conf=sta-psk psk=%s ssid=%s @CONF-OBJ-SEP@ conf=sta-sae pass=%s ssid=%s" % (psk1, ssid1h, pass2h, ssid2h)
+    try:
+        dev[0].set("dpp_config_processing", "1")
+        run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
+                                     init_extra=extra,
+                                     require_conf_success=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=5)
+    if ev is None or ev.split()[1] != "psk":
+        raise Exception("Unexpected confobj 1 AKM: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-SSID"], timeout=5)
+    if ev is None or ev.split()[1] != ssid1:
+        raise Exception("Unexpected confobj 1 SSID: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-PSK"], timeout=5)
+    if ev is None or ev.split()[1] != psk1:
+        raise Exception("Unexpected confobj 1 psk: " + str(ev))
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=5)
+    if ev is None or ev.split()[1] != "sae":
+        raise Exception("Unexpected confobj 2 AKM: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-SSID"], timeout=5)
+    if ev is None or ev.split()[1] != ssid2:
+        raise Exception("Unexpected confobj 2 SSID: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-PASS"], timeout=5)
+    if ev is None or ev.split()[1] != pass2h:
+        raise Exception("Unexpected confobj 2 pass: " + str(ev))
+
+    val = dev[0].get_network(0, "ssid")
+    if val != '"' + ssid1 + '"':
+        raise Exception("Unexpected network 1 ssid: " + val)
+    val = dev[0].get_network(0, "key_mgmt")
+    if val != "WPA-PSK FT-PSK WPA-PSK-SHA256":
+        raise Exception("Unexpected network 1 key_mgmt: " + val)
+
+    val = dev[0].get_network(1, "ssid")
+    if val != '"' + ssid2 + '"':
+        raise Exception("Unexpected network 2 ssid: " + val)
+    val = dev[0].get_network(1, "key_mgmt")
+    if val != "SAE FT-SAE":
+        raise Exception("Unexpected network 2 key_mgmt: " + val)
+
+def test_dpp_config_legacy_gen_sta_ap_conf(dev, apdev):
+    """Generate DPP Config Object for legacy network (sta and ap config)"""
+    ssid1 = "test-AP"
+    pass1 = "password for AP sae"
+    ssid2 = "test-STA"
+    pass2 = "password for STA sae"
+    ssid1h = binascii.hexlify(ssid1.encode()).decode()
+    pass1h = binascii.hexlify(pass1.encode()).decode()
+    ssid2h = binascii.hexlify(ssid2.encode()).decode()
+    pass2h = binascii.hexlify(pass2.encode()).decode()
+    extra = "conf=ap-sae pass=%s ssid=%s @CONF-OBJ-SEP@ conf=sta-sae pass=%s ssid=%s" % (pass1h, ssid1h, pass2h, ssid2h)
+    run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
+                                 init_extra=extra,
+                                 require_conf_success=True)
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=5)
+    if ev is None or ev.split()[1] != "sae":
+        raise Exception("Unexpected confobj 2 AKM: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-SSID"], timeout=5)
+    if ev is None or ev.split()[1] != ssid2:
+        raise Exception("Unexpected confobj 2 SSID: " + str(ev))
+    ev = dev[0].wait_event(["DPP-CONFOBJ-PASS"], timeout=5)
+    if ev is None or ev.split()[1] != pass2h:
+        raise Exception("Unexpected confobj 2 pass: " + str(ev))
+
+    ev = dev[0].wait_event(["DPP-CONFOBJ-AKM"], timeout=1)
+    if ev is not None:
+        raise Exception("Unexpected second confobj")
+
 def test_dpp_config_dpp_gen_prime256v1(dev, apdev):
     """Generate DPP Config Object for DPP network (P-256)"""
     run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
@@ -1036,6 +1170,28 @@ def test_dpp_config_dpp_gen_expired_key(dev, apdev):
     run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
                                  init_extra="conf=sta-dpp expiry=%d" % (time.time() - 10),
                                  require_conf_failure=True,
+                                 configurator=True)
+
+def test_dpp_config_dpp_gen_3rd_party(dev, apdev):
+    """Generate DPP Config Object for DPP network with 3rd party information"""
+    check_dpp_capab(dev[0])
+    check_dpp_capab(dev[1])
+    try:
+        dev[0].set("dpp_extra_conf_req_name", "org.example")
+        json = '{"c":1,"d":"test"}'
+        dev[0].set("dpp_extra_conf_req_value", json)
+        run_dpp_config_dpp_gen_3rd_party(dev, apdev)
+    finally:
+        dev[0].set("dpp_extra_conf_req_name", "", allow_fail=True)
+        dev[0].set("dpp_extra_conf_req_value", "", allow_fail=True)
+
+def run_dpp_config_dpp_gen_3rd_party(dev, apdev):
+    extra = "conf_extra_name=org.example conf_extra_value="
+    json = '{"a":1,"b":"test"}'
+    extra += binascii.hexlify(json.encode()).decode()
+    run_dpp_qr_code_auth_unicast(dev, apdev, "prime256v1",
+                                 init_extra="conf=sta-dpp " + extra,
+                                 require_conf_success=True,
                                  configurator=True)
 
 def test_dpp_config_dpp_override_prime256v1(dev, apdev):
@@ -1596,6 +1752,9 @@ def run_dpp_akm(dev, apdev, pmk_len):
     if "OK" not in hapd.request(cmd):
         raise Exception("PMKSA_ADD failed (hostapd)")
 
+    cmd = "PMKSA_ADD %d %s %s %s 30240 43200 %d 0" % (id, bssid, pmkid, pmk, akmp)
+    if "OK" not in dev[0].request(cmd):
+        raise Exception("PMKSA_ADD failed (wpa_supplicant)")
     dev[0].select_network(id, freq="2412")
     dev[0].wait_connected()
     val = dev[0].get_status_field("key_mgmt")
@@ -1607,6 +1766,7 @@ params1_ap_connector = "eyJ0eXAiOiJkcHBDb24iLCJraWQiOiJzOEFrYjg5bTV4UGhoYk5UbTVm
 params1_ap_netaccesskey = "30770201010420f6531d17f29dfab655b7c9e923478d5a345164c489aadd44a3519c3e9dcc792da00a06082a8648ce3d030107a14403420004d3cab13525c6e15ce0056a5c506309839b37a2520d4d19444f98438ba0c972f751a85a5c0cc911940131786d4c1c9879893d9086fdf4fd3b43f32aa125154932"
 params1_sta_connector = "eyJ0eXAiOiJkcHBDb24iLCJraWQiOiJzOEFrYjg5bTV4UGhoYk5UbTVmVVo0eVBzNU5VMkdxYXNRY3hXUWhtQVFRIiwiYWxnIjoiRVMyNTYifQ.eyJncm91cHMiOlt7Imdyb3VwSWQiOiIqIiwibmV0Um9sZSI6InN0YSJ9XSwibmV0QWNjZXNzS2V5Ijp7Imt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiZWMzR3NqQ3lQMzVBUUZOQUJJdEltQnN4WXVyMGJZX1dES1lfSE9zUGdjNCIsInkiOiJTRS1HVllkdWVnTFhLMU1TQXZNMEx2QWdLREpTNWoyQVhCbE9PMTdUSTRBIn19.PDK9zsGlK-e1pEOmNxVeJfCS8pNeay6ckIS1TXCQsR64AR-9wFPCNVjqOxWvVKltehyMFqVAtOcv0IrjtMJFqQ"
 params1_sta_netaccesskey = "30770201010420bc33380c26fd2168b69cd8242ed1df07ba89aa4813f8d4e8523de6ca3f8dd28ba00a06082a8648ce3d030107a1440342000479cdc6b230b23f7e40405340048b48981b3162eaf46d8fd60ca63f1ceb0f81ce484f8655876e7a02d72b531202f3342ef020283252e63d805c194e3b5ed32380"
+params1_sta_pk_hash = "38f1ba82b3b49ef1c9ab616e5e94a914c75af3a4d6e25b7f112741e530f3b8e6"
 
 def test_dpp_network_introduction(dev, apdev):
     """DPP network introduction"""
@@ -1634,6 +1794,16 @@ def test_dpp_network_introduction(dev, apdev):
     val = dev[0].get_status_field("key_mgmt")
     if val != "DPP":
         raise Exception("Unexpected key_mgmt: " + val)
+
+    ev = hapd.wait_sta(dev[0].own_addr())
+    if "dpp_pkhash=" + params1_sta_pk_hash not in ev:
+        raise Exception("dpp_pkhash not reported correctly: " + ev)
+
+    sta = hapd.get_sta(dev[0].own_addr())
+    if 'dpp_pkhash' not in sta:
+        raise Exception("dpp_pkhash not included in STA info")
+    if sta['dpp_pkhash'] != params1_sta_pk_hash:
+        raise Exception("Incorrect dpp_pkhash in STA info: " + sta['dpp_pkhash'])
 
 def test_dpp_network_introduction_expired(dev, apdev):
     """DPP network introduction with expired netaccesskey"""
@@ -1675,6 +1845,48 @@ def test_dpp_network_introduction_expired(dev, apdev):
     hapd.enable()
     dev[0].request("RECONNECT")
     dev[0].wait_connected()
+
+def test_dpp_network_introduction_clear_ap(dev, apdev):
+    """DPP network introduction with PMKSA cleared on AP"""
+    check_dpp_capab(dev[0])
+    check_dpp_capab(dev[1])
+
+    params = {"ssid": "dpp",
+              "wpa": "2",
+              "wpa_key_mgmt": "DPP",
+              "ieee80211w": "2",
+              "rsn_pairwise": "CCMP",
+              "dpp_connector": params1_ap_connector,
+              "dpp_csign": params1_csign,
+              "dpp_netaccesskey": params1_ap_netaccesskey}
+    try:
+        hapd = hostapd.add_ap(apdev[0], params)
+    except:
+        raise HwsimSkip("DPP not supported")
+
+    id = dev[0].connect("dpp", key_mgmt="DPP", scan_freq="2412",
+                        ieee80211w="2",
+                        dpp_csign=params1_csign,
+                        dpp_connector=params1_sta_connector,
+                        dpp_netaccesskey=params1_sta_netaccesskey)
+    dev[0].request("DISCONNECT")
+    dev[0].wait_disconnected()
+    dev[0].request("RECONNECT")
+    ev = dev[0].wait_event(["CTRL-EVENT-CONNECTED", "DPP-INTRO"], timeout=10)
+    if ev is None:
+        raise Exception("Reconnection timed out")
+    if "DPP-INTRO" in ev:
+        raise Exception("Unexpected network introduction on reconnection")
+    dev[0].request("DISCONNECT")
+    dev[0].wait_disconnected()
+
+    hapd.request("PMKSA_FLUSH")
+    dev[0].request("RECONNECT")
+    ev = dev[0].wait_event(["CTRL-EVENT-CONNECTED", "DPP-INTRO"], timeout=10)
+    if ev is None:
+        raise Exception("Reconnection timed out")
+    if "DPP-INTRO" not in ev:
+        raise Exception("No network introduction on reconnection(2)")
 
 def test_dpp_and_sae_akm(dev, apdev):
     """DPP and SAE AKMs"""
@@ -1784,7 +1996,16 @@ def test_dpp_ap_config_reconfig_configurator(dev, apdev):
     """DPP and AP configuration with Configurator reconfiguration"""
     run_dpp_ap_config(dev, apdev, reconf_configurator=True)
 
+def test_dpp_ap_config_sae(dev, apdev):
+    """DPP and AP configuration for SAE"""
+    run_dpp_ap_config(dev, apdev, sae=True)
+
 def update_hapd_config(hapd):
+    ev = hapd.wait_event(["DPP-CONFOBJ-AKM"], timeout=1)
+    if ev is None:
+        raise Exception("AKM not reported (AP)")
+    akm = ev.split(' ')[1]
+
     ev = hapd.wait_event(["DPP-CONFOBJ-SSID"], timeout=1)
     if ev is None:
         raise Exception("SSID not reported (AP)")
@@ -1794,6 +2015,12 @@ def update_hapd_config(hapd):
     if ev is None:
         raise Exception("Connector not reported (AP)")
     connector = ev.split(' ')[1]
+
+    if akm == "sae":
+        ev = hapd.wait_event(["DPP-CONFOBJ-PASS"], timeout=1)
+        if ev is None:
+            raise Exception("Password not reported (AP)")
+        password = ev.split(' ')[1]
 
     ev = hapd.wait_event(["DPP-C-SIGN-KEY"], timeout=1)
     if ev is None:
@@ -1808,12 +2035,16 @@ def update_hapd_config(hapd):
     net_access_key = p[1]
     net_access_key_expiry = p[2] if len(p) > 2 else None
 
-    logger.info("Update AP configuration to use key_mgmt=DPP")
+    logger.info("Update AP configuration")
     hapd.disable()
     hapd.set("ssid", ssid)
     hapd.set("utf8_ssid", "1")
     hapd.set("wpa", "2")
-    hapd.set("wpa_key_mgmt", "DPP")
+    if akm == "sae":
+        hapd.set("wpa_key_mgmt", "SAE")
+        hapd.set("sae_password", binascii.unhexlify(password).decode())
+    else:
+        hapd.set("wpa_key_mgmt", "DPP")
     hapd.set("ieee80211w", "2")
     hapd.set("rsn_pairwise", "CCMP")
     hapd.set("dpp_connector", connector)
@@ -1824,7 +2055,13 @@ def update_hapd_config(hapd):
     hapd.enable()
 
 def run_dpp_ap_config(dev, apdev, curve=None, conf_curve=None,
-                      reconf_configurator=False):
+                      reconf_configurator=False, sae=False):
+    if sae:
+        check_sae_capab(dev[0])
+        check_sae_capab(dev[1])
+        dev[0].set("sae_groups", "")
+        dev[1].set("sae_groups", "")
+
     brainpool = (curve and "BP-" in curve) or \
         (conf_curve and "BP-" in conf_curve)
     check_dpp_capab(dev[0], brainpool)
@@ -1842,7 +2079,11 @@ def run_dpp_ap_config(dev, apdev, curve=None, conf_curve=None,
         if "FAIL" in csign or len(csign) == 0:
             raise Exception("DPP_CONFIGURATOR_GET_KEY failed")
 
-    dev[0].dpp_auth_init(uri=uri, conf="ap-dpp", configurator=conf_id)
+    if sae:
+        dev[0].dpp_auth_init(uri=uri, conf="ap-sae", configurator=conf_id,
+                             passphrase="secret SAE password")
+    else:
+        dev[0].dpp_auth_init(uri=uri, conf="ap-dpp", configurator=conf_id)
     wait_auth_success(hapd, dev[0], configurator=dev[0], enrollee=hapd)
     update_hapd_config(hapd)
 
@@ -1854,9 +2095,15 @@ def run_dpp_ap_config(dev, apdev, curve=None, conf_curve=None,
         conf_id = dev[0].dpp_configurator_add(curve=conf_curve, key=csign)
 
     dev[1].dpp_listen(2412)
-    dev[0].dpp_auth_init(uri=uri1, conf="sta-dpp", configurator=conf_id)
-    wait_auth_success(dev[1], dev[0], configurator=dev[0], enrollee=dev[1],
-                      stop_responder=True)
+    if sae:
+        dev[0].dpp_auth_init(uri=uri1, conf="sta-sae", configurator=conf_id,
+                             passphrase="secret SAE password")
+    else:
+        dev[0].dpp_auth_init(uri=uri1, conf="sta-dpp", configurator=conf_id)
+    res = wait_auth_success(dev[1], dev[0],
+                            configurator=dev[0], enrollee=dev[1],
+                            stop_responder=True)
+    sta_pk_hash = res['initiator-auth-success-pkhash']
 
     ev = dev[1].wait_event(["DPP-CONFOBJ-SSID"], timeout=1)
     if ev is None:
@@ -1883,17 +2130,50 @@ def run_dpp_ap_config(dev, apdev, curve=None, conf_curve=None,
 
     dev[1].dump_monitor()
 
-    id = dev[1].connect(ssid, key_mgmt="DPP", ieee80211w="2", scan_freq="2412",
-                        only_add_network=True)
-    dev[1].set_network_quoted(id, "dpp_connector", connector)
-    dev[1].set_network(id, "dpp_csign", csign)
-    dev[1].set_network(id, "dpp_netaccesskey", net_access_key)
-    if net_access_key_expiry:
-        dev[1].set_network(id, "dpp_netaccess_expiry", net_access_key_expiry)
+    if sae:
+        id = dev[1].connect(ssid, key_mgmt="SAE", ieee80211w="2",
+                            scan_freq="2412",
+                            sae_password="secret SAE password",
+                            only_add_network=True)
+    else:
+        id = dev[1].connect(ssid, key_mgmt="DPP", ieee80211w="2",
+                            scan_freq="2412",
+                            only_add_network=True)
+        dev[1].set_network_quoted(id, "dpp_connector", connector)
+        dev[1].set_network(id, "dpp_csign", csign)
+        dev[1].set_network(id, "dpp_netaccesskey", net_access_key)
+        if net_access_key_expiry:
+            dev[1].set_network(id, "dpp_netaccess_expiry",
+                               net_access_key_expiry)
 
     logger.info("Check data connection")
     dev[1].select_network(id, freq="2412")
     dev[1].wait_connected()
+
+    if not sae:
+        ev = hapd.wait_sta(dev[1].own_addr())
+        if "dpp_pkhash=" + sta_pk_hash not in ev:
+            raise Exception("dpp_pkhash not reported correctly: " + ev)
+
+        sta = hapd.get_sta(dev[1].own_addr())
+        if 'dpp_pkhash' not in sta:
+            raise Exception("dpp_pkhash not included in STA info")
+        if sta['dpp_pkhash'] != sta_pk_hash:
+            raise Exception("Incorrect dpp_pkhash in STA info: " + sta['dpp_pkhash'])
+
+        dev[1].request("DISCONNECT")
+        dev[1].wait_disconnected()
+        dev[1].request("RECONNECT")
+        dev[1].wait_connected()
+        ev = hapd.wait_sta(dev[1].own_addr())
+        if "dpp_pkhash=" + sta_pk_hash not in ev:
+            raise Exception("dpp_pkhash not reported correctly(2): " + ev)
+
+        sta = hapd.get_sta(dev[1].own_addr())
+        if 'dpp_pkhash' not in sta:
+            raise Exception("dpp_pkhash not included in STA info(2)")
+        if sta['dpp_pkhash'] != sta_pk_hash:
+            raise Exception("Incorrect dpp_pkhash in STA info(2): " + sta['dpp_pkhash'])
 
 def test_dpp_auto_connect_1(dev, apdev):
     """DPP and auto connect (1)"""
@@ -2202,6 +2482,19 @@ def run_dpp_qr_code_hostapd_init_offchannel(dev, apdev, extra):
     hapd.dpp_auth_init(uri=uri0, role="enrollee", extra=extra)
     wait_auth_success(dev[0], hapd, configurator=dev[0], enrollee=hapd,
                       stop_responder=True)
+
+def test_dpp_qr_code_hostapd_init_offchannel_configurator(dev, apdev):
+    """DPP QR Code and hostapd as initiator/Configurator (offchannel)"""
+    check_dpp_capab(dev[0])
+    hapd = hostapd.add_ap(apdev[0], {"ssid": "unconfigured",
+                                     "channel": "11"})
+    check_dpp_capab(hapd)
+    id0 = dev[0].dpp_bootstrap_gen(chan="81/1")
+    uri0 = dev[0].request("DPP_BOOTSTRAP_GET_URI %d" % id0)
+    dev[0].dpp_listen(2412)
+    conf_id = hapd.dpp_configurator_add()
+    hapd.dpp_auth_init(uri=uri0, configurator=conf_id, conf="sta-dpp")
+    wait_auth_success(dev[0], hapd, configurator=hapd, enrollee=dev[0])
 
 def test_dpp_qr_code_hostapd_ignore_mismatch(dev, apdev):
     """DPP QR Code and hostapd ignoring netaccessKey mismatch"""
@@ -2725,8 +3018,7 @@ def test_dpp_pkex_hostapd_errors(dev, apdev):
         raise Exception("Failed to add PKEX responder")
     if "OK" not in hapd.request("DPP_PKEX_REMOVE " + res):
         raise Exception("Failed to remove PKEX responder")
-    if "FAIL" not in hapd.request("DPP_PKEX_REMOVE " + res):
-        raise Exception("Unknown PKEX responder removal accepted")
+    hapd.request("DPP_PKEX_REMOVE " + res)
 
     res = hapd.request("DPP_PKEX_ADD own=%d code=foo" % id0)
     if "FAIL" in res:
@@ -4584,9 +4876,19 @@ def wait_auth_success(responder, initiator, configurator=None, enrollee=None,
     ev = responder.wait_event(["DPP-AUTH-SUCCESS", "DPP-FAIL"], timeout=timeout)
     if ev is None or "DPP-AUTH-SUCCESS" not in ev:
         raise Exception("DPP authentication did not succeed (Responder)")
+    for i in ev.split(' '):
+        a = i.split('=')
+        if len(a) < 2:
+            continue
+        res['responder-auth-success-' + a[0]] = a[1]
     ev = initiator.wait_event(["DPP-AUTH-SUCCESS", "DPP-FAIL"], timeout=5)
     if ev is None or "DPP-AUTH-SUCCESS" not in ev:
         raise Exception("DPP authentication did not succeed (Initiator)")
+    for i in ev.split(' '):
+        a = i.split('=')
+        if len(a) < 2:
+            continue
+        res['initiator-auth-success-' + a[0]] = a[1]
     if configurator:
         ev = configurator.wait_event(["DPP-CONF-SENT",
                                       "DPP-CONF-FAILED"], timeout=5)
@@ -5413,13 +5715,28 @@ def test_dpp_controller_relay_chirp(dev, apdev, params):
         dev[0].set("dpp_config_processing", "0", allow_fail=True)
         dev[1].request("DPP_CONTROLLER_STOP")
 
-def run_dpp_controller_relay(dev, apdev, params, chirp=False):
+def test_dpp_controller_relay_chirp_duplicate(dev, apdev, params):
+    """DPP Controller/Relay with chirping (duplicate)"""
+    try:
+        run_dpp_controller_relay(dev, apdev, params, chirp=True,
+                                 duplicate=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+        dev[1].request("DPP_CONTROLLER_STOP")
+
+def test_dpp_controller_relay_discover(dev, apdev, params):
+    """DPP Controller/Relay with need to discover Controller"""
+    try:
+        run_dpp_controller_relay(dev, apdev, params, chirp=True, discover=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+        dev[1].request("DPP_CONTROLLER_STOP")
+
+def run_dpp_controller_relay(dev, apdev, params, chirp=False, discover=False,
+                             duplicate=False):
     check_dpp_capab(dev[0], min_ver=2)
     check_dpp_capab(dev[1], min_ver=2)
-    prefix = "dpp_controller_relay"
-    if chirp:
-        prefix += "_chirp"
-    cap_lo = os.path.join(params['logdir'], prefix + ".lo.pcap")
+    cap_lo = params['prefix'] + ".lo.pcap"
 
     wt = WlantestCapture('lo', cap_lo)
 
@@ -5443,8 +5760,11 @@ def run_dpp_controller_relay(dev, apdev, params, chirp=False):
 
     # Relay
     params = {"ssid": "unconfigured",
-              "channel": "6",
-              "dpp_controller": "ipaddr=127.0.0.1 pkhash=" + pkhash}
+              "channel": "6"}
+    if discover:
+        params["dpp_relay_port"] = "11111"
+    else:
+        params["dpp_controller"] = "ipaddr=127.0.0.1 pkhash=" + pkhash
     if chirp:
         params["channel"] = "11"
         params["dpp_configurator_connectivity"] = "1"
@@ -5472,8 +5792,21 @@ def run_dpp_controller_relay(dev, apdev, params, chirp=False):
         uri = dev[0].request("DPP_BOOTSTRAP_GET_URI %d" % id1)
         idc = dev[1].dpp_qr_code(uri)
         dev[1].dpp_bootstrap_set(idc, conf="sta-dpp", configurator=conf_id)
+        if duplicate:
+            relay.set("ext_mgmt_frame_handling", "1")
         if "OK" not in dev[0].request("DPP_CHIRP own=%d iter=5" % id1):
             raise Exception("DPP_CHIRP failed")
+        if duplicate:
+            for i in range(10):
+                msg = relay.mgmt_rx(timeout=10)
+                if msg is None:
+                    raise Exception("MGMT RX wait timed out")
+                relay.request("MGMT_RX_PROCESS freq=2462 datarate=0 ssi_signal=-30 frame=" + binascii.hexlify(msg['frame']).decode())
+                if msg['subtype'] == 13:
+                    # Process duplicate Presence Announcement
+                    relay.request("MGMT_RX_PROCESS freq=2462 datarate=0 ssi_signal=-30 frame=" + binascii.hexlify(msg['frame']).decode())
+                    break
+            relay.set("ext_mgmt_frame_handling", "0")
         ev = relay.wait_event(["DPP-RX"], timeout=10)
         if ev is None:
             raise Exception("Presence Announcement not seen")
@@ -5481,9 +5814,18 @@ def run_dpp_controller_relay(dev, apdev, params, chirp=False):
             raise Exception("Unexpected DPP frame received: " + ev)
     else:
         dev[0].dpp_auth_init(uri=uri_c, role="enrollee")
+    if discover:
+        ev = relay.wait_event(["DPP-RELAY-NEEDS-CONTROLLER"], timeout=30)
+        if ev is None:
+            raise Exception("Relay did not indicate need for a Controller")
+        cmd = "DPP_RELAY_ADD_CONTROLLER 127.0.0.1 " + pkhash
+        if "OK" not in relay.request(cmd):
+            raise Exception("Could not add Controller to Relay")
+
     wait_auth_success(dev[1], dev[0], configurator=dev[1], enrollee=dev[0],
                       allow_enrollee_failure=True,
-                      allow_configurator_failure=True)
+                      allow_configurator_failure=True,
+                      timeout=100 if discover else 5)
     ev = dev[0].wait_event(["DPP-NETWORK-ID"], timeout=1)
     if ev is None:
         raise Exception("DPP network id not reported")
@@ -5503,6 +5845,116 @@ def run_dpp_controller_relay(dev, apdev, params, chirp=False):
     if network == network2:
         raise Exception("Network ID did not change")
     dev[0].wait_connected()
+
+    time.sleep(0.5)
+    wt.close()
+
+def test_dpp_controller_init_through_relay(dev, apdev, params):
+    """DPP Controller initiating through Relay"""
+    try:
+        run_dpp_controller_init_through_relay(dev, apdev, params)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+        dev[1].request("DPP_CONTROLLER_STOP")
+
+def test_dpp_controller_init_through_relay_dynamic(dev, apdev, params):
+    """DPP Controller initiating through Relay (dynamic addition)"""
+    try:
+        run_dpp_controller_init_through_relay(dev, apdev, params, dynamic=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+        dev[1].request("DPP_CONTROLLER_STOP")
+
+def test_dpp_controller_init_through_relay_add(dev, apdev, params):
+    """DPP Controller initiating through Relay (add Controller connection)"""
+    try:
+        run_dpp_controller_init_through_relay(dev, apdev, params, add=True)
+    finally:
+        dev[0].set("dpp_config_processing", "0", allow_fail=True)
+        dev[1].request("DPP_CONTROLLER_STOP")
+
+def run_dpp_controller_init_through_relay(dev, apdev, params, dynamic=False,
+                                          add=False):
+    check_dpp_capab(dev[0], min_ver=2)
+    check_dpp_capab(dev[1], min_ver=2)
+    cap_lo = os.path.join(params['prefix'], ".lo.pcap")
+
+    wt = WlantestCapture('lo', cap_lo)
+
+    # Controller
+    conf_id = dev[1].dpp_configurator_add()
+    dev[1].set("dpp_configurator_params",
+               "conf=sta-dpp configurator=%d" % conf_id)
+    if not dynamic:
+        id_c = dev[1].dpp_bootstrap_gen()
+        res = dev[1].request("DPP_BOOTSTRAP_INFO %d" % id_c)
+        pkhash = None
+        for line in res.splitlines():
+            name, value = line.split('=')
+            if name == "pkhash":
+                pkhash = value
+                break
+        if not pkhash:
+            raise Exception("Could not fetch public key hash from Controller")
+    if "OK" not in dev[1].request("DPP_CONTROLLER_START"):
+        raise Exception("Failed to start Controller")
+
+    # Relay
+    port = 11111
+    params = {"ssid": "unconfigured",
+              "channel": "6",
+              "dpp_relay_port": str(port)}
+    if not dynamic and not add:
+        params["dpp_controller"] = "ipaddr=127.0.0.1 pkhash=" + pkhash
+    relay = hostapd.add_ap(apdev[0], params)
+    check_dpp_capab(relay)
+
+    # Enroll Relay to the network
+    # TODO: Do this over TCP once direct Enrollee-over-TCP case is supported
+    id_h = relay.dpp_bootstrap_gen(chan="81/6", mac=True)
+    uri_r = relay.request("DPP_BOOTSTRAP_GET_URI %d" % id_h)
+    dev[1].dpp_auth_init(uri=uri_r, conf="ap-dpp", configurator=conf_id)
+    wait_auth_success(relay, dev[1], configurator=dev[1], enrollee=relay)
+    update_hapd_config(relay)
+
+    dev[0].flush_scan_cache()
+
+    # Initiate from Controller with broadcast DPP Authentication Request
+    dev[0].set("dpp_config_processing", "2")
+    dev[0].dpp_listen(2437)
+    id_e = dev[0].dpp_bootstrap_gen()
+    uri_e = dev[0].request("DPP_BOOTSTRAP_GET_URI %d" % id_e)
+    dev[1].dpp_auth_init(uri=uri_e, conf="sta-dpp", configurator=conf_id,
+                         tcp_addr="127.0.0.1", tcp_port=str(port))
+    wait_auth_success(dev[1], dev[0], configurator=dev[1], enrollee=dev[0],
+                      allow_enrollee_failure=True,
+                      allow_configurator_failure=True)
+    ev = dev[0].wait_event(["DPP-NETWORK-ID"], timeout=1)
+    if ev is None:
+        raise Exception("DPP network id not reported")
+    network = int(ev.split(' ')[1])
+    dev[0].wait_connected()
+    dev[0].dump_monitor()
+    dev[0].request("DISCONNECT")
+    dev[0].wait_disconnected()
+    dev[0].dump_monitor()
+
+    if add:
+        cmd = "DPP_RELAY_ADD_CONTROLLER 127.0.0.1 " + pkhash
+        if "OK" not in relay.request(cmd):
+            raise Exception("Could not add Controller to Relay")
+    if not dynamic:
+        if "OK" not in dev[0].request("DPP_RECONFIG %s" % network):
+            raise Exception("Failed to start reconfiguration")
+        ev = dev[0].wait_event(["DPP-NETWORK-ID"], timeout=15)
+        if ev is None:
+            raise Exception("DPP network id not reported for reconfiguration")
+        network2 = int(ev.split(' ')[1])
+        if network == network2:
+            raise Exception("Network ID did not change")
+        dev[0].wait_connected()
+    if add:
+        relay.request("DPP_RELAY_REMOVE_CONTROLLER 127.0.0.1")
 
     time.sleep(0.5)
     wt.close()
@@ -6454,6 +6906,10 @@ def test_dpp_chirp_ap_5g(dev, apdev):
         idc = dev[0].dpp_qr_code(uri)
         dev[0].dpp_bootstrap_set(idc, conf="ap-dpp", configurator=conf_id)
         dev[0].dpp_listen(5200)
+        # Workaround for some strange issues in the Authentication Request frame
+        # not getting transmitted. An extra wait of one second here seems to
+        # avoid that?!
+        time.sleep(1)
         if "OK" not in hapd.request("DPP_CHIRP own=%d iter=5" % id_h):
             raise Exception("DPP_CHIRP failed")
         wait_auth_success(hapd, dev[0], configurator=dev[0], enrollee=hapd,

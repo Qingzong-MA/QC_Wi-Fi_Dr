@@ -94,6 +94,7 @@ struct sigma_dut;
 #define MAX_RADIO 3
 
 #define NAN_AWARE_IFACE "wifi-aware0"
+#define BROADCAST_ADDR "255.255.255.255"
 
 /* Set default operating channel width 80 MHz */
 #define VHT_DEFAULT_OPER_CHWIDTH AP_80_VHT_OPER_CHWIDTH
@@ -357,6 +358,8 @@ enum akm_suite_values {
 	AKM_FILS_SHA384 = 15,
 	AKM_FT_FILS_SHA256 = 16,
 	AKM_FT_FILS_SHA384 = 17,
+	AKM_SAE_EXT_KEY = 24,
+	AKM_FT_SAE_EXT_KEY = 25,
 
 };
 
@@ -402,6 +405,72 @@ enum dpp_mdns_role {
 	DPP_MDNS_RELAY,
 	DPP_MDNS_CONTROLLER,
 	DPP_MDNS_BOOTSTRAPPING,
+};
+
+enum loc_i2r_lmr_policy {
+	LOC_USE_DEFAULT_I2R_LMR_POLICY = 0,
+	LOC_FORCE_FTM_I2R_LMR_POLICY = 1,
+	LOC_ABORT_ON_I2R_LMR_POLICY_MISMATCH = 2,
+};
+
+#define NAN_MAX_COOKIE_LEN 64
+#define NAN_MAX_PASSWORD_LEN 63
+#define NAN_NIK_LEN 16
+
+enum nan_bootstrapping_state {
+	NAN_BOOTSTRAP_IDLE,
+	NAN_BOOTSTRAP_REQ_SENT,
+	NAN_BOOTSTRAP_REQ_RECVD,
+	NAN_BOOTSTRAP_COMEBACK_RSP_SENT,
+	NAN_BOOTSTRAP_COMEBACK_RSP_RECVD,
+	NAN_BOOTSTRAP_COMEBACK_REQ_SENT,
+	NAN_BOOTSTRAPPING_DONE,
+};
+
+enum secure_nan_role {
+	SECURE_NAN_IDLE,
+	SECURE_NAN_BOOTSTRAPPING_INITIATOR,
+	SECURE_NAN_BOOTSTRAPPING_RESPONDER,
+	SECURE_NAN_PAIRING_INITIATOR,
+	SECURE_NAN_PAIRING_RESPONDER,
+};
+
+struct device_pairing_info {
+	bool pairing_setup;
+	bool npk_nik_caching;
+	bool pairing_verification;
+	int bootstrapping_methods;
+	int dialog_token;
+	bool password_valid;
+	char password[NAN_MAX_PASSWORD_LEN];
+	bool nik_valid;
+	char nik[NAN_NIK_LEN];
+	enum secure_nan_role role;
+	bool trigger_verification;
+};
+
+enum nan_akm {
+	NAN_AKM_SAE,
+	NAN_AKM_PASN = 1
+};
+
+struct peer_pairing_info {
+	u16 publish_subscribe_id;
+	int pairing_instance_id;
+	char peer_mac_addr[ETH_ALEN];
+	bool pairing_setup;
+	bool npk_nik_caching;
+	bool pairing_verification;
+	int supported_bootstrap_methods;
+	int selected_bootstrap_method;
+	enum nan_bootstrapping_state bs_state;
+	bool nik_valid;
+	char nik[NAN_NIK_LEN];
+	enum secure_nan_role role;
+	int cookie_len;
+	char cookie[NAN_MAX_COOKIE_LEN];
+	enum nan_akm akm;
+	bool is_paired;
 };
 
 struct sigma_dut {
@@ -901,6 +970,9 @@ struct sigma_dut {
 		PROGRAM_HS2_R3,
 		PROGRAM_QM,
 		PROGRAM_HS2_R4,
+		PROGRAM_HS2_2022,
+		PROGRAM_LOCR2,
+		PROGRAM_EHT,
 	} program;
 
 	enum device_type {
@@ -926,6 +998,13 @@ struct sigma_dut {
 		WPS_BAND_60G,
 	} band;
 
+	enum dev_mode {
+		MODE_UNKNOWN = 0,
+		MODE_11AC,
+		MODE_11AX,
+		MODE_11BE,
+	} device_mode;
+
 	int wps_disable; /* Used for 60G to disable PCP from sending WPS IE */
 	int wsc_fragment; /* simulate WSC IE fragmentation */
 	int eap_fragment; /* simulate EAP fragmentation */
@@ -942,6 +1021,7 @@ struct sigma_dut {
 	const char *version;
 	int no_ip_addr_set;
 	int sta_channel;
+	int data_ch_freq;
 
 	const char *summary_log;
 	const char *hostapd_entropy_log;
@@ -1052,6 +1132,11 @@ struct sigma_dut {
 	int dscp_use_iptables;
 	int autoconnect_default;
 	int dhcp_client_running;
+	int i2rlmr_iftmr;
+	int i2rlmrpolicy;
+	int rnm_mfp;
+	struct device_pairing_info dev_info;
+	struct peer_pairing_info peer_info;
 };
 
 
@@ -1221,6 +1306,9 @@ void get_ver(const char *cmd, char *buf, size_t buflen);
 
 /* utils.c */
 enum sigma_program sigma_program_to_enum(const char *prog);
+enum dev_mode dev_mode_to_enum(const char *mode);
+bool is_passpoint_r2_or_newer(enum sigma_program prog);
+bool is_passpoint(enum sigma_program prog);
 int hex_byte(const char *str);
 int parse_hexstr(const char *hex, unsigned char *buf, size_t buflen);
 int parse_mac_address(struct sigma_dut *dut, const char *arg,
@@ -1282,6 +1370,8 @@ int loc_cmd_sta_preset_testparameters(struct sigma_dut *dut,
 				      struct sigma_cmd *cmd);
 int lowi_cmd_sta_reset_default(struct sigma_dut *dut, struct sigma_conn *conn,
 			       struct sigma_cmd *cmd);
+int loc_r2_cmd_sta_exec_action(struct sigma_dut *dut, struct sigma_conn *conn,
+			       struct sigma_cmd *cmd);
 
 /* dpp.c */
 enum sigma_cmd_result dpp_dev_exec_action(struct sigma_dut *dut,
@@ -1327,5 +1417,6 @@ int set_ipv6_addr(struct sigma_dut *dut, const char *ip, const char *mask,
 		  const char *ifname);
 void kill_pid(struct sigma_dut *dut, const char *pid_file);
 int get_ip_addr(const char *ifname, int ipv6, char *buf, size_t len);
+bool is_6ghz_freq(int freq);
 
 #endif /* SIGMA_DUT_H */

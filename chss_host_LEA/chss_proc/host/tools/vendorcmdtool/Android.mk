@@ -6,13 +6,17 @@ include $(CLEAR_VARS)
 LOCAL_REQUIRED_MODULES :=
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-int-to-pointer-cast
 LOCAL_CFLAGS += -Wno-maybe-uninitialized -Wno-parentheses
+LOCAL_CFLAGS += -Werror
+LOCAL_CFLAGS += -DSUPPORT_VENDOR_EVENT
 
 ifeq ($(PRODUCT_VENDOR_MOVE_ENABLED),true)
 LOCAL_PROPRIETARY_MODULE := true
 endif
 LOCAL_MODULE := vendor_cmd_tool
 LOCAL_CLANG := true
+LOCAL_VENDOR_MODULE := true
 LOCAL_MODULE_TAGS := optional
+#LOCAL_CFLAGS = -DDEBUG
 
 LOCAL_C_INCLUDES :=
 LOCAL_C_INCLUDES += \
@@ -35,6 +39,7 @@ LOCAL_SRC_FILES += nl_cmd_wrapper.c
 LOCAL_SRC_FILES += ven_cmd_tool.c
 
 LOCAL_LDLIBS += -Lpthread
+LOCAL_SANITIZE := integer_overflow
 
 include $(BUILD_EXECUTABLE)
 

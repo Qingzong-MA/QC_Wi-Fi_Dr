@@ -204,6 +204,7 @@ ifneq ($(CONFIG_MULTI_CARD),)
 endif
 
 CDEFINES :=	-Wall\
+		-Werror
 KBUILD_CPPFLAGS += $(CDEFINES)
 
 ifneq ($(CONFIG_WLAN_CNSS_CORE), y)

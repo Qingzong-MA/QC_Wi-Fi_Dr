@@ -47,6 +47,7 @@ TABLE tQca_LLMLogID APPENDS_ONLY tQca_EnhLogID
     {0x0730 "LOG_ID_PFAL_RM_RRI_ERR_INFO"    "LOG_ID_PFAL_RM_RRI_ERR_INFO"              0 gQca_PFAL_RM_RRI_ERR}
     {0x0732 "LOG_ID_PFAL_MRC_STATS"          "LOG_ID_PFAL_MRC_STATS"            	0 gQca_PFAL_Rtsc_MrcStats}
     {0x0733 "LOG_ID_PFAL_MEM_POOL_ALLOC_FAIL"    "LOG_ID_PFAL_MEM_POOL_ALLOC_FAIL"        0 gQca_PFAL_MemPoolAllocFail}
+    {0x0734 "LOG_ID_PFAL_RM_G3G4_BLOCK_STATISTIC"   "LOG_ID_PFAL_RM_G3G4_BLOCK_STATISTIC" 0   gQca_PFAL_RM_g3g4BlockStatistic}
     {0x07FE "LOG_ID_PFAL_XFEM_REGDUMP"  	"LOG_ID_PFAL_XFEM_REGDUMP"  	0 	gQca_PFAL_xFEM_Regdump}
 	
     {0x07FF "PFAL End"}
@@ -682,5 +683,19 @@ GROUP gQca_PFAL_MemPoolAllocFail "FMB Pool Alloc Fail"
 			FIELD fQca_PFAL_PoolCntrIncr (Fixed 0) RETRIEVE (StoreField PoolCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE PoolCntr
 		}
 	}
+}
+
+GROUP gQca_PFAL_RM_g3g4BlockStatistic  "PFAL RM G3G4 Block Statistic"
+{
+    FIELD fQca_PFAL_RM_g3g4Block               (Fixed 2 Bytes)  (Decimal)   "Block Count"
+    FIELD fQca_PFAL_RM_g3g4Unblock             (Fixed 2 Bytes)  (Decimal)   "Unblock Count"
+/*
+    GROUP gQca_PFAL_RM_totalIpower REPEAT COUNT(Fixed 20 times)
+    {
+        FIELD fQca_PFAL_RM_totalIpower          (Fixed 1 Byte)   RETRIEVE (SignExtension 8) (Decimal) ALSO (Constant "dbm")  "Total Power" 
+    }
+    FIELD fQca_PFAL_RM_totalIpowerIndex         (Fixed 1 Byte)  (Decimal)   "Index" 
+    FIELD fQca_PFAL_RM_threshold                (Fixed 1 Byte)   RETRIEVE (SignExtension 8) (Decimal) ALSO (Constant "dbm")  "Threshold" 
+*/
 }
 

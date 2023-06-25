@@ -62,6 +62,7 @@ enum attr_type {
     STRING,
     MAC_ADDR,
     BLOB,
+    FLAG,
     NESTED,
 };
 
@@ -108,10 +109,10 @@ union default_values {
     char *val;
 };
 
-#ifdef __WIN__
+#ifdef __IPQ__
 #define MAX_OPTIONS 5000
 #else
-#define MAX_OPTIONS 100
+#define MAX_OPTIONS 200
 #endif
 struct cmd_params {
     union entry_type entry[MAX_OPTIONS];
@@ -121,6 +122,7 @@ struct cmd_params {
     int attr_max[MAX_OPTIONS];  //Applicable only for response, events and attributes
     union default_values default_val[MAX_OPTIONS];
     int num_entries;
+    char iface[IFACE_LEN];
 };
 
 struct cb_info;
@@ -136,7 +138,11 @@ int sendNLMsg(struct nlIfaceInfo *mInfo, struct nl_msg *nlmsg,
 int startmonitorResponse(struct resp_event_info *resp_info, int attr_id);
 int waitForEvent();
 void hexdump(void *buf, u16 len);
-int startMonitorForEvent(struct resp_event_info *event_info, int attr_id);
+
+#ifdef SUPPORT_VENDOR_EVENT
+int startMonitorForEvent(struct nlIfaceInfo *info,
+                         struct resp_event_info *event_info, int attr_id);
+#endif /* SUPPORT_VENDOR_EVENT */
 int populateAttribute(int argc, char **argv, struct cmd_params *cmd,
                       int *option_index, int *c, struct nl_msg *nlmsg,
                       int nest_index);

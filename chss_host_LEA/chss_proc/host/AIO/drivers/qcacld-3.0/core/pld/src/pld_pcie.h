@@ -659,7 +659,8 @@ static inline void pld_pcie_link_down(struct device *dev)
 }
 #endif
 
-#if 0 // Add by Qingzong, 20221108
+#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)) && \
+		(LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0)))
 static inline int pld_pcie_get_reg_dump(struct device *dev, uint8_t *buf,
 					uint32_t len)
 {

@@ -8,6 +8,10 @@ if USE_GLIB
 AM_CFLAGS += -DUSE_GLIB $(GLIB_CFLAGS)
 endif
 
+if MDM_SET
+AM_CFLAGS += -DMDM
+endif
+
 c_sources = os.c \
             nl80211.c \
             libtcmd.c

@@ -3238,17 +3238,31 @@ static int tls_set_conn_flags(struct tls_connection *conn, unsigned int flags,
 	}
 	if (flags & (TLS_CONN_SUITEB | TLS_CONN_SUITEB_NO_ECDH)) {
 #ifdef OPENSSL_IS_BORINGSSL
-		uint16_t sigalgs[1] = { SSL_SIGN_RSA_PKCS1_SHA384 };
+		uint16_t sigalgs[3] = { SSL_SIGN_RSA_PKCS1_SHA384 };
+		int num = 1;
+
+		if (!(flags & TLS_CONN_DISABLE_TLSv1_3)) {
+#ifdef SSL_SIGN_ECDSA_SECP384R1_SHA384
+			sigalgs[num++] = SSL_SIGN_ECDSA_SECP384R1_SHA384;
+#endif
+#ifdef SSL_SIGN_RSA_PSS_RSAE_SHA384
+			sigalgs[num++] = SSL_SIGN_RSA_PSS_RSAE_SHA384;
+#endif
+		}
 
 		if (SSL_CTX_set_verify_algorithm_prefs(conn->ssl_ctx, sigalgs,
-						       1) != 1) {
+						       num) != 1) {
 			wpa_printf(MSG_INFO,
 				   "OpenSSL: Failed to set Suite B sigalgs");
 			return -1;
 		}
 #else /* OPENSSL_IS_BORINGSSL */
 		/* ECDSA+SHA384 if need to add EC support here */
-		if (SSL_set1_sigalgs_list(ssl, "RSA+SHA384") != 1) {
+		const char *algs = "RSA+SHA384";
+
+		if (!(flags & TLS_CONN_DISABLE_TLSv1_3))
+			algs = "RSA+SHA384:ecdsa_secp384r1_sha384:rsa_pss_rsae_sha384";
+		if (SSL_set1_sigalgs_list(ssl, algs) != 1) {
 			wpa_printf(MSG_INFO,
 				   "OpenSSL: Failed to set Suite B sigalgs");
 			return -1;
@@ -5377,6 +5391,10 @@ int tls_connection_set_params(void *tls_ctx, struct tls_connection *conn,
 			   __func__, ERR_error_string(err, NULL));
 	}
 
+	if (tls_set_conn_flags(conn, params->flags,
+			       params->openssl_ciphers) < 0)
+		return -1;
+
 	if (engine_id) {
 		wpa_printf(MSG_DEBUG, "SSL: Initializing TLS engine %s",
 			   engine_id);
@@ -5475,10 +5493,6 @@ int tls_connection_set_params(void *tls_ctx, struct tls_connection *conn,
 #endif /* OPENSSL_IS_BORINGSSL */
 	}
 
-	if (tls_set_conn_flags(conn, params->flags,
-			       params->openssl_ciphers) < 0)
-		return -1;
-
 #ifdef OPENSSL_IS_BORINGSSL
 	if (params->flags & TLS_CONN_REQUEST_OCSP) {
 		SSL_enable_ocsp_stapling(conn->ssl);
@@ -5551,8 +5565,9 @@ static const char * openssl_pkey_type_str(const EVP_PKEY *pkey)
 		return "DH";
 	case EVP_PKEY_EC:
 		return "EC";
+	default:
+		return "?";
 	}
-	return "?";
 }
 
 

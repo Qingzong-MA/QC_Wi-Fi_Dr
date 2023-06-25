@@ -37,7 +37,7 @@
 #include <netlink/socket.h>
 #include <net/if.h>
 
-#include <linux/nl80211.h>
+#include "nl80211_copy.h"
 #include <ctype.h>
 
 #include "wifi_hal.h"
@@ -507,7 +507,7 @@ void WifiEvent::log() {
 
     for (int i = 0; i < len; i += 16) {
         char line[81];
-        int linelen = min(16, len - i);
+        int linelen = MIN(16, len - i);
         int offset = 0;
         appendFmt(line, sizeof(line), offset, "%02x", data[i]);
         for (int j = 1; j < linelen; j++) {

@@ -3266,7 +3266,7 @@ static inline qdf_dma_addr_t qdf_nbuf_tso_map_frag(
 	map_status =
 		qdf_mem_map_nbytes_single(osdev,
 					  tso_frag_vaddr,
-					  QDF_DMA_TO_DEVICE,
+					  dir,
 					  nbytes,
 					  &tso_frag_paddr);
 	if (unlikely(map_status != QDF_STATUS_SUCCESS)) {
@@ -3294,8 +3294,8 @@ static inline void qdf_nbuf_tso_unmap_frag(
 	uint32_t nbytes, qdf_dma_dir_t dir)
 {
 	qdf_record_nbuf_nbytes(nbytes, dir, false);
-	dma_unmap_single(osdev->dev, tso_frag_paddr,
-			 nbytes, __qdf_dma_dir_to_os(dir));
+	qdf_mem_unmap_nbytes_single(osdev, tso_frag_paddr,
+				    dir, nbytes);
 }
 
 /**

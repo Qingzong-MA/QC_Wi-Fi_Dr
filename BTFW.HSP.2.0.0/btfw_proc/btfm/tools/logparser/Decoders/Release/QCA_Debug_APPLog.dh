@@ -1,0 +1,388 @@
+/************************************************
+ * File: QCA_Debug_APPLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) 2016, 2020 Qualcomm Technologies, Inc
+ *               2016  Qualcomm Atheros, Inc.
+ * All Rights Reserved. 
+ * Confidential and Proprietary - Qualcomm Technologies, Inc
+************************************************/
+
+/************************************************
+ * APP log main table
+************************************************/
+TABLE tQca_APPLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0500 "APP Begin"}
+    {0x0501 "LOG_ID_APP_DS_CMD"           "LOG_ID_APP_DS_CMD"          0 gQca_Dualstack_Cmd}
+    {0x0502 "LOG_ID_APP_DS_EVT"           "LOG_ID_APP_DS_EVT"          0 gQca_Dualstack_Evt}
+    {0x0503 "LOG_ID_APP_DS_STATE"         "LOG_ID_APP_DS_STATE"        0 gQca_Dualstack_State}
+    {0x0504 "LOG_ID_APP_DS_DBGCNT"        "LOG_ID_APP_DS_DBGCNT"       0 gQca_Dualstack_DbgCnt}
+    {0x0505 "LOG_ID_APP_DS_DBGFAILCNT"    "LOG_ID_APP_DS_DBGFAILCNT"   0 gQca_Dualstack_DbgFailCnt}
+
+    {0x0580 "LOG_ID_WIP_PRU_EN_PWR_APPLY"     "LOG_ID_WIP_PRU_EN_PWR_APPLY"     0   gQca_WiPower_EnPowerApply}
+    {0x0581 "LOG_ID_WIP_PRU_PWR_EVENT"        "LOG_ID_WIP_PRU_PWR_EVENT"        0   gQca_WiPower_PowerEvent}
+    {0x0582 "LOG_ID_WIP_PRU_NOTIFY_PWR_EVENT" "LOG_ID_WIP_PRU_NOTIFY_PWR_EVENT" 0   gQca_WiPower_NotifyPowerEvent}
+
+    {0x0583 "LOG_ID_WIP_PRU_APP_PARAM"    "LOG_ID_WIP_PRU_APP_PARAM" 0 	gQca_WiPower_PruAppParam}
+    {0x0584 "LOG_ID_WIP_PRU_ALERT"        "LOG_ID_WIP_PRU_ALERT"     0  gQca_WiPower_PruAlert}
+    {0x0585 "LOG_ID_WIP_PRU_STATIC_PARAM" "LOG_ID_WIP_PRU_STATIC_PARAM"     0 gQca_WiPower_PruStaticParam}
+    {0x0586 "LOG_ID_WIP_PRU_DYNAMIC_PARAM" "LOG_ID_WIP_PRU_DYNAMIC_PARAM" 0 gQca_WiPower_PruDynamicParam}
+    {0x0587 "LOG_ID_WIP_PRU_P_SETTING" "LOG_ID_WIP_PRU_P_SETTING" 0 gQca_WiPower_PruPlatSetting}
+    {0x0588 "LOG_ID_WIP_PRU_E_SETTING" "LOG_ID_WIP_PRU_E_SETTING" 0 gQca_WiPower_PruEmbedSetting}
+    {0x0589 "LOG_ID_WIP_PRU_LINK_STATE" "LOG_ID_WIP_PRU_LINK_STATE" 0 gQca_WiPower_PruLinkState}
+    {0x058A "LOG_ID_WIP_PRU_DISABLE_BUCK" "LOG_ID_WIP_PRU_DISABLE_BUCK" 0 gQca_WiPower_PruDisableBuck}
+    {0x058B "LOG_ID_WIP_PRU_SETSTATE" "LOG_ID_WIP_PRU_SETSTATE" 0 gQca_WiPower_PruSetState}
+
+    {0x058C "LOG_ID_WIP_PRU_HAL_COND_DETECT" "LOG_ID_WIP_PRU_HAL_COND_DETECT" 0 gQca_WiPower_PruHalDetect}
+    {0x058D "LOG_ID_WIP_PRU_HAL_API" "LOG_ID_WIP_PRU_HAL_API" 0 gQca_WiPower_PruHalApi}
+
+
+    {0x05FF "APP End"}
+ENDTABLE
+
+TABLE tQca_Dualstack_Evt_Id
+    {0x05 "HCI_DISCONNECTION_COMPLETE_EVENT"}
+    {0x13 "HCI_NOCP_EVENT"}
+    {0x3E "HCI_LE_EVENT"}
+    {Default "Unparsed"}
+ENDTABLE
+
+TABLE tQca_Dualstack_LE_Evt_Id
+    {0x01 "HCI_LE_CONNECTION_COMPLETE_EVENT"}
+    {0x0A "HCI_LE_ENH_CONNECTION_COMPLETE_EVENT"}
+    {Default "Unparsed"}
+ENDTABLE
+
+GROUP gQca_Dualstack_Evt "Event Id"
+{
+    FIELD fQca_Dualstack_Evt           (Fixed 1 Byte)  (Table tQca_Dualstack_Evt_Id)  "Event Id"
+    FIELD fQca_Dualstack_LE_Evt_Len    (Fixed 1 Byte)  (Hex)  "Length"
+
+    GROUP fQca_Dualstack_LE_Evt IF (FieldIs EqualTo 0x3E fQca_Dualstack_Evt) "LE Event"
+    {
+	    FIELD fQca_Dualstack_LE_Evt_Code   (Fixed 1 Byte) (Table tQca_Dualstack_LE_Evt_Id)  "LE Event Id"
+    }
+
+    FIELD fQca_Dualstack_Evt_Invalid  (toendoflayer) IF(MoreBytes) (stringofhex) "This is unparsed data"
+}
+
+TABLE tQca_VS_WIP_Cmd
+    {0x17 "PRUI_SetChargeOutput"}
+    {0x18 "PRUI_GetChargeOutput"}
+    {0x19 "PRUI_EnableDataNotify"}
+    {0x27 "PRUI_BeaconDetection"}
+    {0x28 "PRUI_SetZlimit"}
+    {0x29 "PRUI_SetPowerLimit"}
+    {0x2A "PRUI_SetPowerAdjust"}
+    {Default "Unknown, pls check it!"}
+ENDTABLE
+
+
+GROUP gQca_Dualstack_Cmd "Cmd Opcode"
+{
+    FIELD fQca_Dualstack_Cmd               (Fixed 2 Bytes)     (Hex) "Opcode"
+
+    GROUP fQca_Dualstack_Wip_Cmd IF (FieldIs EqualTo 0xFC1F fQca_Dualstack_Cmd) "WiP HCI VS Cmd"
+    {
+	    FIELD fQca_VS_WIP_Cmd   (Fixed 1 Bytes)     (Table tQca_VS_WIP_Cmd) "Cmd"
+    }
+
+    GROUP fQca_Dualstack_AdvEn_Cmd IF (FieldIs EqualTo 0x200A fQca_Dualstack_Cmd) "LE Adv Enable"
+    {
+	    FIELD fQca_Wip_enable;
+    }
+    FIELD fQca_Dualstack_Cmd_MoreData   (toendoflayer) IF(MoreBytes) (stringofhex) "This is unparsed data"
+}
+
+TABLE tQca_Dualstack_State
+    {0x00 "INIT"}
+    {0x01 "ATTACH"}
+    {0x02 "DETACH"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_Dualstack_State "Dualstack State"
+{
+    FIELD fQca_Dualstack_State          (Fixed 1 Byte)  (Table tQca_Dualstack_State) "State"
+    FIELD fQca_Dualstack_initCnt        (Fixed 1 Byte)  (Decimal)   "Init Count"
+    FIELD fQca_Dualstack_attachCnt      (Fixed 1 Byte)  (Decimal)   "Attach Count"
+    FIELD fQca_Dualstack_detachCnt      (Fixed 1 Byte)  (Decimal)   "Detach Count"
+    FIELD fQca_Dualstack_ConnHandle     (Fixed 2 Byte)  (Decimal)   "ConnHandle"
+}
+
+GROUP gQca_Dualstack_DbgCnt "Dualstack Debug Count"
+{
+    FIELD fQca_Dualstack_TxCmdCnt	(Fixed 2 Byte)  (Decimal)   "Tx Cmd Count"
+    FIELD fQca_Dualstack_RxEvtCnt	(Fixed 2 Byte)  (Decimal)   "Rx Evt Count"
+    FIELD fQca_Dualstack_TxAclCnt	(Fixed 2 Byte)  (Decimal)   "Tx ACL Count"
+    FIELD fQca_Dualstack_RxAclCnt	(Fixed 2 Byte)  (Decimal)   "Rx ACL Count"
+
+    FIELD fQca_Dualstack_HIF_RxCmdCnt	(Fixed 2 Byte)  (Decimal)   "HIF Rx Cmd Count"
+    FIELD fQca_Dualstack_APP_RxEvtCnt	(Fixed 2 Byte)  (Decimal)   "APP Rx Evt Count"
+    FIELD fQca_Dualstack_APP_RxAclCnt	(Fixed 2 Byte)  (Decimal)   "APP Rx ACL Count"
+}
+
+GROUP gQca_Dualstack_DbgFailCnt "Dualstack Debug Fail Count"
+{
+    FIELD fQca_Dualstack_CmdAllocCnt	(Fixed 1 Byte)  (Decimal)   "Alloc Cmd Failure Count"
+    FIELD fQca_Dualstack_AclAllocCnt	(Fixed 1 Byte)  (Decimal)   "Alloc Acl Failure Count"
+    FIELD fQca_Dualstack_CmdCondCnt	(Fixed 1 Byte)  (Decimal)   "Cmd Condition error Count"
+    FIELD fQca_Dualstack_DummyCnt	(Fixed 1 Byte)  (Decimal)   "DUMMY"
+
+    FIELD fQca_Dualstack_I2CFailCnt     (Fixed 2 Byte)  (Decimal)   "I2C Read Error"
+}
+
+TABLE tQca_Wip_EnableDisable
+    {0x00 "Disable"}
+    {0x01 "Enable"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_Wip_UpDown
+    {0x00 "Down"}
+    {0x01 "Up"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_WiPower_EnPowerApply "Enable Power Apply"
+{
+    FIELD fQca_Wip_enable               (Fixed 1 Bytes)     (Table tQca_Wip_EnableDisable) "enable"
+    FIELD fQca_Wip_powerUpApply         (Fixed 1 Bytes)     (Table tQca_Wip_UpDown) "powerApply"
+    FIELD fQca_Wip_delayTime            (Fixed 2 Bytes)     (Decimal) ALSO (Constant "ms") "delayTime"
+}
+
+GROUP gQca_WiPower_PowerEvent "Power Event"
+{
+    FIELD fQca_Wip_powerUp               (Fixed 1 Bytes)     (Table tQca_Wip_UpDown) "power"
+    FIELD fQca_Wip_delayTime;
+}
+
+GROUP gQca_WiPower_NotifyPowerEvent "Notify Power Event"
+{
+    FIELD fQca_Wip_trigger               (Fixed 1 Bytes)     (Table tQca_Wip_UpDown) "trigger"
+}
+
+TABLE tQca_Wip_PruState
+    {0x00 "BOOT"}
+    {0x01 "ON"}
+    {0x02 "OPTIMAL_VOLTAGE"}
+    {0x03 "LOW_VOLTAGE"}
+    {0x04 "HIGH_VOLTAGE"}
+    {0x05 "OVER_VOLTAGE"}
+    {0x06 "FAULT"}
+    {0x07 "UNDER_VOLTAGE"}
+    {0x08 "NULL"}
+    {Default "Invalid"}
+ENDTABLE
+
+
+GROUP gQca_WiPower_PruAppParam "WiPower PRU APP Parameter"
+{
+    FIELD fQca_WiP_PruAppParam_proto_rev          (Fixed 1 Bytes)     (Hex) "Protocol Revision"
+    FIELD fQca_WiP_PruAppParam_temp_high          (Fixed 1 Bytes)     (Hex) "N/A Temp High"
+    FIELD fQca_WiP_PruAppParam_temp_low           (Fixed 1 Bytes)     (Hex) "N/A Temp Low"
+    FIELD fQca_WiP_PruAppParam_temp_alert         (Fixed 1 Bytes)     (Hex) "N/A Temp Alert"
+
+    FIELD fQca_WiP_PruAppParam_charge_complete_alert (Fixed 1 Bytes)  (Decimal) "isChargeCompleteAlert"
+    FIELD fQca_WiP_PruAppParam_mode_trans         (Fixed 1 Bytes)     (Decimal) "isModeTrans"
+    FIELD fQca_WiP_PruAppParam_mode_trans_dis_count (Fixed 1 Bytes)     (Hex) "ModeTrans Disconnect Counter"
+    FIELD fQca_WiP_PruAppParam_vrect_over_voltage (Fixed 1 Bytes)     (Decimal) "isVrectOverVoltage"
+
+    FIELD fQca_WiP_PruAppParam_vout_over_voltage  (Fixed 1 Bytes)     (Decimal) "isVoutOverVoltage"
+    FIELD fQca_WiP_PruAppParam_over_current       (Fixed 1 Bytes)     (Decimal) "isOverCurrent"
+    FIELD fQca_WiP_PruAppParam_over_temp          (Fixed 1 Bytes)     (Decimal) "isOverTemp"
+    FIELD fQca_WiP_PruAppParam_charge_complete    (Fixed 1 Bytes)     (Decimal) "isChargeComplete"
+
+    FIELD fQca_WiP_PruAppParam_wire_charge        (Fixed 1 Bytes)     (Decimal) "isWireCharge"
+    FIELD fQca_WiP_PruAppParam_temp_control       (Fixed 1 Bytes)     (Decimal) "isTempControl"
+    FIELD fQca_WiP_PruAppParam_adjust_pwr_resp    (Fixed 1 Bytes)     (Decimal) "isAdjustPwrResp"
+    FIELD fQca_WiP_PruAppParam_self_protect       (Fixed 1 Bytes)     (Decimal) "isSelfProtect"
+
+    FIELD fQca_WiP_PruAppParam_pwr_enable         (Fixed 1 Bytes)     (Decimal) "isPwrEnable"
+    FIELD fQca_WiP_PruAppParam_output_enable      (Fixed 1 Bytes)     (Decimal) "isOutputEnable"
+    FIELD fQca_WiP_PruAppParam_power_adjust       (Fixed 1 Bytes)     (Hex) "Power Adjust"
+    FIELD fQca_WiP_PruAppParam_category           (Fixed 1 Bytes)     (Hex) "PRU Category"
+
+    FIELD fQca_WiP_PruAppParam_dyn_missed         (Fixed 1 Bytes)     (Hex) "Dynamic missed"
+    FIELD fQca_WiP_PruAppParam_ocp_cnt            (Fixed 1 Bytes)     (Hex) "OCP Count"
+    FIELD fQca_WiP_PruAppParam_rssi               (Fixed 1 Bytes)     (Decimal) "RSSI"
+    FIELD fQca_WiP_PruAppParam_pru_state          (Fixed 1 Bytes)     (Table tQca_Wip_PruState) "PRU State"
+    FIELD fQca_WiP_PruAppParam_my_addr            (Fixed 6 Bytes)     (Hex) "Local Address"
+    FIELD fQca_WiP_PruAppParam_peer_addr          (Fixed 6 Bytes)     (Hex) "Peer Address"
+
+    FIELD fQca_WiP_PruAppParam_company_id         (Fixed 2 Bytes)     (Hex) "Company ID"
+    FIELD fQca_WiP_PruAppParam_vrect_min          (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_Min"
+    FIELD fQca_WiP_PruAppParam_vrect_high         (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_High"
+    FIELD fQca_WiP_PruAppParam_vrect_set          (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_Set"
+    FIELD fQca_WiP_PruAppParam_prect_min          (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mW") "Prect_Min"
+    FIELD fQca_WiP_PruAppParam_prect_max          (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mW") "Prect_Max"
+    FIELD fQca_WiP_PruAppParam_vrect_min_prect_min (Fixed 2 Bytes) (Decimal) ALSO (Constant "mV") "Vrect_Min (Prect_Max)"
+    FIELD fQca_WiP_PruAppParam_vrect_min_prect_max (Fixed 2 Bytes) (Decimal) ALSO (Constant "mV") "Vrect_Min (Prect_Min)"
+    FIELD fQca_WiP_PruAppParam_vrect              (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect"
+    FIELD fQca_WiP_PruAppParam_irect              (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mA") "Irect"
+    FIELD fQca_WiP_PruAppParam_prect              (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mW") "Prect"
+    FIELD fQca_WiP_PruAppParam_iout               (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mA") "Iout"
+    FIELD fQca_WiP_PruAppParam_vout               (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vout"
+    FIELD fQca_WiP_PruAppParam_temp               (Fixed 2 Bytes)     (Decimal) "Temp"
+    FIELD fQca_WiP_PruAppParam_zlimit             (Fixed 2 Bytes)     (Decimal) ALSO (Constant "ohm") "PRU zLimit"
+    FIELD fQca_WiP_PruAppParam_gapHandle          (Fixed 2 Bytes)     (Hex) "Gap Connection Handle"
+    FIELD fQca_WiP_PruAppParam_vrect_slope        (Fixed 4 Bytes)     (Float) "Vrect Slope"
+}
+
+GROUP gQca_WiPower_PruAlert "WiPower PRU Alert"
+{
+    FIELD  fQca_WiP_Alert_mode_trans   (Fixed 2 Bits)     (Hex)     "Mode Transition"
+    FIELD  fQca_WiP_Alert_wire_charge  (Fixed 1 Bits)     (Hex)     "Wire Charge"
+    FIELD  fQca_WiP_Alert_charge_complete  (Fixed 1 Bits) (Hex)     "Charge Complete"
+    FIELD  fQca_WiP_Alert_self_protect (Fixed 1 Bits)     (Hex)     "Self Protect"
+    FIELD  fQca_WiP_Alert_over_temp    (Fixed 1 Bits)     (Hex)     "Over Temp"
+    FIELD  fQca_WiP_Alert_over_current (Fixed 1 Bits)     (Hex)     "Over Current"
+    FIELD  fQca_WiP_Alert_over_voltage (Fixed 1 Bits)     (Hex)     "Over Voltage"
+}
+
+GROUP gQca_WiPower_PruStaticParam "WiPower PRU Static Parameter"
+{
+    FIELD fQca_WiP_PruSParam_flags           (Fixed 1 Bytes)     (Hex) "Flags"
+    FIELD fQca_WiP_PruSParam_proto_ver       (Fixed 1 Bytes)     (Hex) "BSS revision"
+    FIELD fQca_WiP_PruSParam_rfu1            (Fixed 1 Bytes)     (Hex) "RFU"
+    FIELD fQca_WiP_PruSParam_category        (Fixed 1 Bytes)     (Hex) "Category"
+    FIELD fQca_WiP_PruSParam_rfu2            (Fixed 1 Bytes)     (Hex) "RFU"
+    FIELD fQca_WiP_PruSParam_hw_rev          (Fixed 1 Bytes)     (Hex) "H/W Rev"
+    FIELD fQca_WiP_PruSParam_fw_rev          (Fixed 1 Bytes)     (Hex) "F/W Rev"
+    FIELD fQca_WiP_PruSParam_power_desired   (Fixed 1 Bytes)     (Decimal) ALSO (Constant " * 100mW") "Power Desired"
+    FIELD fQca_WiP_PruSParam_vrect_min       (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_min"
+    FIELD fQca_WiP_PruSParam_vrect_high      (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_high"
+    FIELD fQca_WiP_PruSParam_vrect_set       (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_set"
+    FIELD fQca_WiP_PruSParam_company_id      (Fixed 2 Bytes)     (Hex) "Company ID"
+    FIELD fQca_WiP_PruSParam_rfu3            (Fixed 4 Bytes)     (Hex) "RFU"
+}
+
+TABLE tQca_Wip_DynAlert
+    {0x00 "Closed"}
+    {0x01 "New"}
+    {0x02 "Connecting"}
+    {0x03 "Connected"}
+    {0x04 "Failed"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_WiPower_PruDynamicParam "WiPower PRU Dynamic Parameter"
+{
+    FIELD fQca_WiP_PruDParam_vrect           (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect"
+    FIELD fQca_WiP_PruDParam_vrect_min       (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_min"
+    FIELD fQca_WiP_PruDParam_vrect_set       (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect_set"
+    FIELD fQca_WiP_PruDParam_irect           (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mA") "Irect"
+
+    FIELD fQca_WiP_PruDParam_Alert_ov   (Fixed 1 Bits) (Decimal)     "Over Voltage"
+    FIELD fQca_WiP_PruDParam_Alert_oc   (Fixed 1 Bits) (Decimal)     "Over Current"
+    FIELD fQca_WiP_PruDParam_Alert_ot   (Fixed 1 Bits) (Decimal)     "Over Temp"
+    FIELD fQca_WiP_PruDParam_Alert_self_protect      (Fixed 1 Bits) (Decimal)     "PRU Self-protection"
+    FIELD fQca_WiP_PruDParam_Alert_charge_complete   (Fixed 1 Bits) (Decimal)     "Charge Complete"
+    FIELD fQca_WiP_PruDParam_Alert_wired_charger_detect (Fixed 1 Bits) (Decimal)     "Wired_Charger_Detect"
+    FIELD fQca_WiP_PruDParam_Alert_pru_charge_port   (Fixed 1 Bits) (Decimal)     "PRU Charge Port"
+    FIELD fQca_WiP_PruDParam_Alert_adjust_power_resp (Fixed 1 Bits) (Decimal)     "Adjust Power Response"
+
+    FIELD fQca_WiP_PruDParam_rfu             (Fixed 1 Bytes)     (Hex) "RFU"
+}
+/*
+GROUP gQca_WiPower_PruDynamicParam "WiPower PRU Dynamic Parameter"
+{
+    FIELD fQca_WiP_PruDParam_flags           (Fixed 1 Bytes)     (Hex) "Flags"
+    FIELD fQca_WiP_PruDParam_vrect           (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vrect"
+    FIELD fQca_WiP_PruDParam_irect           (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mA") "Irect"
+    FIELD fQca_WiP_PruDParam_vout            (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vout"
+    FIELD fQca_WiP_PruDParam_iout            (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mA") "Iout"
+    FIELD fQca_WiP_PruDParam_temp            (Fixed 1 Bytes)     (Hex) "Temp"
+    FIELD fQca_WiP_PruDParam_vrect_min       (Fixed 2 Bytes)     (Hex) ALSO (Constant "mV") "Vrect_min"
+    FIELD fQca_WiP_PruDParam_vrect_set       (Fixed 2 Bytes)     (Hex) ALSO (Constant "mV") "Vrect_set"
+    FIELD fQca_WiP_PruDParam_vrect_high      (Fixed 2 Bytes)     (Hex) ALSO (Constant "mV") "Vrect_high"
+    FIELD fQca_WiP_PruDParam_alert           (Fixed 1 Bytes)     (Hex) "Alert"
+    FIELD fQca_WiP_PruDParam_test_cmd        (Fixed 2 Bytes)     (Hex) "N/A Test Cmd"
+    FIELD fQca_WiP_PruDParam_rfu             (Fixed 2 Bytes)     (Hex) "RFU"
+}
+*/
+
+GROUP gQca_WiPower_PruPlatSetting "WiPower PRU Platform Setting"
+{
+    FIELD fQca_WiP_PruDPlatSetting_na1       (Fixed 2 Bytes)     (Decimal) "N/A"
+    FIELD fQca_WiP_PruDPlatSetting_vreg_min  (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vreg_min"
+    FIELD fQca_WiP_PruDPlatSetting_vreg_set  (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vreg_set"
+    FIELD fQca_WiP_PruDPlatSetting_vreg_high (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mV") "Vreg_high"
+    FIELD fQca_WiP_PruDPlatSetting_na2       (Fixed 4 Bytes)     (Decimal) "N/A"
+}
+
+GROUP gQca_WiPower_PruEmbedSetting "WiPower PRU Embeded Setting"
+{
+    FIELD fQca_WiP_PruDEmbedSetting_preg_min (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mW") "Preg_min"
+    FIELD fQca_WiP_PruDEmbedSetting_preg_max (Fixed 2 Bytes)     (Decimal) ALSO (Constant "mW") "Preg_max"
+    FIELD fQca_WiP_PruDEmbedSetting_vreg_min_preg_max (Fixed 2 Bytes) (Decimal) ALSO (Constant "mV") "Vreg_min(Preg_max)"
+    FIELD fQca_WiP_PruDEmbedSetting_vreg_min_preg_min (Fixed 2 Bytes) (Decimal) ALSO (Constant "mV") "Vreg_min(Preg_min)"
+    FIELD fQca_WiP_PruDEmbedSetting_na1      (Fixed 2 Bytes)     (Decimal) "N/A"
+    FIELD fQca_WiP_PruDEmbedSetting_zLimit   (Fixed 2 Bytes)     (Decimal) ALSO (Constant "ohm") "zLimit"
+
+    FIELD fQca_WiP_PruDEmbedSetting_na2      (Fixed 4 Bytes)     (Decimal) "N/A"
+    FIELD fQca_WiP_PruDEmbedSetting_na3      (Fixed 2 Bytes)     (Decimal) "N/A"
+}
+
+TABLE tQca_Wip_LinkState
+    {0x00 "Closed"}
+    {0x01 "New"}
+    {0x02 "Connecting"}
+    {0x03 "Connected"}
+    {0x04 "Failed"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_WiPower_PruLinkState "WiPower PRU Link State"
+{
+    FIELD fQca_WiP_PruLinkState       (Fixed 1 Byte)  (Table tQca_Wip_LinkState) "State"
+}
+
+GROUP gQca_WiPower_PruDisableBuck "WiPower PRU Disable Buck"
+{
+    FIELD fQca_WiP_PruDisableBuckReason    (Fixed 1 Byte)  (Hex) "Reason"
+}
+
+GROUP gQca_WiPower_PruSetState "WiPower PRU Set State"
+{
+    FIELD fQca_WiP_PruSetState_old    (Fixed 1 Byte)  (Table tQca_Wip_PruState) "Old State"
+    FIELD fQca_WiP_PruSetState_new    (Fixed 1 Byte)  (Table tQca_Wip_PruState) "New State"
+}
+
+TABLE tQca_Wip_PruhalDetect
+    {0x00 "Kailua Reset"}
+    {Default "Invalid"}
+ENDTABLE
+
+
+GROUP gQca_WiPower_PruHalDetect "WiPower PRUHAL Detection"
+{
+    FIELD fQca_WiP_PruHalDetect    (Fixed 1 Byte)  (Table tQca_Wip_PruhalDetect) "Detect"
+}
+
+TABLE tQca_Wip_PruhalApiIdx
+    {0x00 "Init"}
+    {0x01 "SetCurrentLimit"}
+    {0x02 "SetChargeOutput"}
+    {0x03 "GetCurrentLimit"}
+    {0x04 "GetChargeOutput"}
+    {0x05 "GetDynamicParams"}
+    {0x06 "CheckChargeComplete"}
+    {0x07 "SetPowerLimit"}
+    {0x08 "SetPowerAdjust"}
+    {0x09 "SetZLimit"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_Wip_PruhalApiRet
+    {0x00 "Failure"}
+    {0x01 "Success"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_WiPower_PruHalApi "WiPower PRUHAL API"
+{
+    FIELD fQca_WiP_PruHalApiIdx    (Fixed 1 Byte)  (Table tQca_Wip_PruhalApiIdx) "API"
+    FIELD fQca_WiP_PruHalApiRet    (Fixed 1 Byte)  (Table tQca_Wip_PruhalApiRet) "Result"
+    FIELD fQca_WiP_PruHalApiRest   (toendoflayer) IF(MoreBytes) (stringofhex) "This is useless data"
+}

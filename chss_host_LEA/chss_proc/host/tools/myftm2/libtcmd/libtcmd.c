@@ -46,9 +46,8 @@ err_out:
 
 static void tcmd_expire(union sigval sig)
 {
-	sig;
 	/* tcmd expired, do something */
-	A_DBG("timer expired\n");
+	A_DBG("timer expired %d\n",sig.sival_int);
 	tcmd_cfg.timeout = true;
 }
 
@@ -121,7 +120,15 @@ int tcmd_init(char *iface, void (*rx_cb)(void *buf, int len), ...)
 
 	return 0;
 }
+int tcmd_tx_start( void )
+{
+	return nl80211_tcmd_start(&tcmd_cfg);
+}
 
+int tcmd_tx_stop( void )
+{
+	return nl80211_tcmd_stop(&tcmd_cfg);
+}
 int tcmd_tx_init(char *iface, void (*rx_cb)(void *buf, int len))
 {
 	return tcmd_init(iface, rx_cb, TCMD_EP_TCMD);

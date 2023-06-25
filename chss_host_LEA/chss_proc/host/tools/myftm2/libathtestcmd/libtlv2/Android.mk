@@ -62,6 +62,7 @@ LOCAL_SRC_FILES = \
                    cmdParser/sysCmdtlvCaptureCtrl.c \
                    cmdParser/cmdDPDLoopbackInfo.c \
                    cmdParser/cmdRSTcalHandler.c \
+                   cmdParser/cmdNoiseFloorRead.c \
                    common/cmdRspParmsDict.c \
                    common/cmdRspParmsInternal.c \
                    common/sysCmdRspParmsDict.c \

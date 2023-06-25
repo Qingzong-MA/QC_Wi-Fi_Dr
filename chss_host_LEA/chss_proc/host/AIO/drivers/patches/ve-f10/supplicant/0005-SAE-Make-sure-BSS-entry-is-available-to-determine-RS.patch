@@ -1,0 +1,43 @@
+From 3f8c83a65e3b55c82cea732f4c0bd0137767806b Mon Sep 17 00:00:00 2001
+From: Shivani Baranwal <quic_shivbara@quicinc.com>
+Date: Tue, 7 Dec 2021 13:55:24 +0530
+Subject: [PATCH] SAE: Make sure BSS entry is available to determine RSNXE
+ information
+
+wpa_supplicant may use wrong SAE authentication method if it doesn't
+have the scan result for the target BSS since RSNXE information is not
+available.
+
+For example, STA might use the hunting-and-pecking loop method for SAE
+authentication even though AP supports SAE H2E and STA is configured
+with sae_pwe=2.
+
+This is possible in cases like EXTERNAL_AUTH triggered by the driver
+during roaming. To avoid this update scan results to fetch the target
+BSS scan result from the driver.
+
+Signed-off-by: Shivani Baranwal <quic_shivbara@quicinc.com>
+---
+ wpa_supplicant/sme.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/wpa_supplicant/sme.c b/wpa_supplicant/sme.c
+index 7f28708de..1dc7001a7 100644
+--- a/wpa_supplicant/sme.c
++++ b/wpa_supplicant/sme.c
+@@ -137,6 +137,12 @@ static struct wpabuf * sme_auth_build_sae_commit(struct wpa_supplicant *wpa_s,
+ 	}
+ 
+ 	bss = wpa_bss_get_bssid_latest(wpa_s, bssid);
++	if (!bss) {
++		wpa_printf(MSG_DEBUG,
++			   "SAE: BSS not available, update scan result to get BSS");
++		wpa_supplicant_update_scan_results(wpa_s);
++		bss = wpa_bss_get_bssid_latest(wpa_s, bssid);
++	}
+ 	if (bss) {
+ 		const u8 *rsnxe;
+ 
+-- 
+2.25.1
+

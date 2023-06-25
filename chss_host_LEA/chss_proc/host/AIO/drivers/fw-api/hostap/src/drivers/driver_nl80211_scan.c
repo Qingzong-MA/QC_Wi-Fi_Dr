@@ -21,7 +21,7 @@
 #include "driver_nl80211.h"
 
 
-#define MAX_NL80211_NOISE_FREQS 50
+#define MAX_NL80211_NOISE_FREQS 100
 
 struct nl80211_noise_info {
 	u32 freq[MAX_NL80211_NOISE_FREQS];
@@ -41,7 +41,7 @@ static int get_noise_for_scan_results(struct nl_msg *msg, void *arg)
 	struct nl80211_noise_info *info = arg;
 
 	if (info->count >= MAX_NL80211_NOISE_FREQS)
-		return NL_STOP;
+		return NL_SKIP;
 
 	nla_parse(tb, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
 		  genlmsg_attrlen(gnlh, 0), NULL);
@@ -412,7 +412,7 @@ int wpa_driver_nl80211_scan(struct i802_bss *bss,
 	drv->scan_state = SCAN_REQUESTED;
 	/* Not all drivers generate "scan completed" wireless event, so try to
 	 * read results after a timeout. */
-	timeout = 10;
+	timeout = drv->uses_6ghz ? 15 : 10;
 	if (drv->scan_complete_events) {
 		/*
 		 * The driver seems to deliver events to notify when scan is
@@ -911,8 +911,21 @@ static void nl80211_check_bss_status(struct wpa_driver_nl80211_data *drv,
 			   "nl80211: Local state (associated with " MACSTR
 			   ") does not match with BSS state",
 			   MAC2STR(drv->bssid));
-		clear_state_mismatch(drv, r->bssid);
-		clear_state_mismatch(drv, drv->bssid);
+
+		if (os_memcmp(drv->sta_mlo_info.ap_mld_addr, drv->bssid,
+			      ETH_ALEN) != 0) {
+			clear_state_mismatch(drv, r->bssid);
+
+			if (!is_zero_ether_addr(drv->sta_mlo_info.ap_mld_addr))
+				clear_state_mismatch(
+					drv, drv->sta_mlo_info.ap_mld_addr);
+			else
+				clear_state_mismatch(drv, drv->bssid);
+
+		} else {
+			wpa_printf(MSG_DEBUG,
+				   "nl80211: BSSID is the MLD address");
+		}
 	}
 }
 

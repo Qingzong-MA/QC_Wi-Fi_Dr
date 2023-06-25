@@ -5,7 +5,7 @@
 Description
   The header file includes enums, struct definitions for WLAN FTM packets
 
- Copyright (c) 2010, 2014-2020 Qualcomm Technologies, Inc.
+ Copyright (c) 2010, 2014-2020, 2022 Qualcomm Technologies, Inc.
  All Rights Reserved.
  Confidential and Proprietary - Qualcomm Technologies, Inc.
 ===========================================================================*/
@@ -166,6 +166,15 @@ typedef enum
 	MYFTM_OPT_CMD_SET_DACGAIN = 530,
 	MYFTM_OPT_CMD_SET_RSTDIR = 531,
 	MYFTM_OPT_CMD_RST = 532,
+	MYFTM_OPT_CMD_SET_AIFSN = 533,
+	MYFTM_OPT_CMD_SET_PW_MODE_6G = 534,
+	MYFTM_OPT_CMD_GET_DPD_COMPLETE = 535,
+	MYFTM_OPT_CMD_SET_PUNC_BW = 536,
+	MYFTM_OPT_CMD_SET_SKIP_RX_STOP = 537,
+	MYFTM_OPT_CMD_GET_NOISEFLOOR = 538,
+	MYFTM_OPT_CMD_SET_XLNACTRL = 539,
+	MYFTM_OPT_CMD_SET_NOISEFLOORREAD = 540,
+
 } myftm_cmd_line_options;
 
 /*Enable WIFI, return value:  success: 0 fail: -1 */
@@ -258,7 +267,7 @@ void WlanATCmdSETLINKDIR(uint8_t val);
 /* Command SETOFDMA TONEPLAN */
 int WlanATCmdSET_TONEPLAN(char *val);
 /* Command SET OFDMA UPLINK TX CONFIG */
-int WlanATCmdSET_OFDMAULTX();
+int WlanATCmdSET_OFDMAULTX(void);
 
 /*Command prefecpad */
 void WlanATCmdSET_PREFECPAD(uint8_t val);
@@ -275,7 +284,7 @@ int WlanATCmdWRITE_REGISTER(uint32_t reg);
 int WlanATCmdREAD_REGISTER(uint32_t reg);
 
 /*Command to configured low power mode */
-int WlanATCmdSET_LOWPOWER();
+int WlanATCmdSET_LOWPOWER(void);
 void WlanATCmdSET_LOWPOWER_MODE(char *val);
 void WlanATCmdSET_PHYIDMASK(uint8_t val);
 void WlanATCmdSET_LOWEPOWER_FEATUREMASK(uint32_t mask);
@@ -284,7 +293,24 @@ void WlanATCmdSET_LOWEPOWER_FEATUREMASK(uint32_t mask);
 void WlanATCmdSET_CALTXGAIN(uint32_t val);
 void WlanATCmdSET_FORCEDRXIDX(uint32_t val);
 void WlanATCmdSET_RSTDIR(uint8_t val);
-void WlanATCmd_RST();
+void WlanATCmd_RST(void);
+
+/* Command to set aifsn number */
+void WlanTCmdSET_AIFSN(uint8_t val);
+/* Command to set 6g power mode */
+void WlanATCmdSET6GPwMode(uint8_t val);
+/* command to send DPD complete */
+void WlanATCmdGetDpdComplete(void);
+/* Command to set puncture bandwidth pattern */
+void WlanATCmdSet_PUNCBW(uint32_t mask);
+/* command to Set Skip Rx Stop */
+void WlanATSetSkipRxStop(uint8_t);
+/* Command to get Noise Floor */
+void WlanATCmdGetNoiseFloor();
+/* Command to set xlna ctrl */
+void WlanATCmdSetxlnaCtrl(char *val);
+/* Command to set Noise Floor Read*/
+void WlanATCmdSetNoiseFloorRead(char *val);
 
 /* for unit test of test usage */
 void unittest(void);

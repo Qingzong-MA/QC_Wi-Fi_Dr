@@ -47,7 +47,8 @@ def start_pasn_ap(apdev, params):
             raise HwsimSkip("PASN not supported")
         raise
 
-def check_pasn_ptk(dev, hapd, cipher, fail_ptk=False, clear_keys=True):
+def check_pasn_ptk(dev, hapd, cipher, fail_ptk=False, clear_keys=True,
+                   require_kdk=False):
     sta_ptksa = dev.get_ptksa(hapd.own_addr(), cipher)
     ap_ptksa = hapd.get_ptksa(dev.own_addr(), cipher)
 
@@ -61,9 +62,11 @@ def check_pasn_ptk(dev, hapd, cipher, fail_ptk=False, clear_keys=True):
 
     if sta_ptksa['tk'] != ap_ptksa['tk'] or sta_ptksa['kdk'] != ap_ptksa['kdk']:
         raise Exception("TK/KDK mismatch")
-    elif fail_ptk:
+    if fail_ptk:
         raise Exception("TK/KDK match although key derivation should have failed")
-    elif clear_keys:
+    if require_kdk and sta_ptksa['kdk'] == '':
+        raise Exception("KDK was not derived")
+    if clear_keys:
         cmd = "PASN_DEAUTH bssid=%s" % hapd.own_addr()
         dev.request(cmd)
 
@@ -105,6 +108,11 @@ def check_pasn_akmp_cipher(dev, hapd, akmp="PASN", cipher="CCMP",
 
     if status:
         return
+
+    # There is a small window for a race condition here since the hostapd side
+    # might not yet have processed the PASN message 3 and added the PTKSA entry,
+    # so wait a bit before checking the results.
+    time.sleep(0.1)
 
     check_pasn_ptk(dev, hapd, cipher, fail_ptk)
 
@@ -309,6 +317,7 @@ def test_pasn_sae_kdk(dev, apdev):
         hapd = start_pasn_ap(apdev[0], params)
 
         dev[0].set("force_kdk_derivation", "1")
+        dev[0].set("sae_groups", "")
         dev[0].set("sae_pwe", "2")
         dev[0].connect("test-sae", psk="12345678", key_mgmt="SAE",
                        scan_freq="2412")
@@ -318,6 +327,57 @@ def test_pasn_sae_kdk(dev, apdev):
         dev[0].set("force_kdk_derivation", "0")
         dev[0].set("sae_pwe", "0")
 
+def test_pasn_sae_kdk_ft(dev, apdev):
+    """Station authentication with SAE AP with KDK derivation during connection with FT protocol"""
+    check_pasn_capab(dev[0])
+    check_sae_capab(dev[0])
+
+    try:
+        params = hostapd.wpa2_params(ssid="test-sae",
+                                     passphrase="12345678")
+        params['wpa_key_mgmt'] = 'FT-SAE'
+        params['sae_pwe'] = "2"
+        params['force_kdk_derivation'] = "1"
+        params['nas_identifier'] = "nas1.w1.fi"
+        params['r1_key_holder'] = "000102030405"
+        params['r0kh'] = ["02:00:00:00:03:00 nas1.w1.fi 100102030405060708090a0b0c0d0e0f100102030405060708090a0b0c0d0e0f",
+                          "02:00:00:00:04:00 nas2.w1.fi 300102030405060708090a0b0c0d0e0f300102030405060708090a0b0c0d0e0f"]
+        params['r1kh'] = "02:00:00:00:04:00 00:01:02:03:04:06 200102030405060708090a0b0c0d0e0f200102030405060708090a0b0c0d0e0f"
+        hapd = start_pasn_ap(apdev[0], params)
+
+        dev[0].set("force_kdk_derivation", "1")
+        dev[0].set("sae_groups", "")
+        dev[0].set("sae_pwe", "2")
+        dev[0].connect("test-sae", psk="12345678", key_mgmt="FT-SAE",
+                       scan_freq="2412")
+
+        check_pasn_ptk(dev[0], hapd, "CCMP", clear_keys=False)
+
+        params = hostapd.wpa2_params(ssid="test-sae",
+                                     passphrase="12345678")
+        params['wpa_key_mgmt'] = 'FT-SAE'
+        params['sae_pwe'] = "2"
+        params['force_kdk_derivation'] = "1"
+        params['nas_identifier'] = "nas2.w1.fi"
+        params['r1_key_holder'] = "000102030406"
+        params['r0kh'] = ["02:00:00:00:03:00 nas1.w1.fi 200102030405060708090a0b0c0d0e0f200102030405060708090a0b0c0d0e0f",
+                          "02:00:00:00:04:00 nas2.w1.fi 000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"]
+        params['r1kh'] = "02:00:00:00:03:00 00:01:02:03:04:05 300102030405060708090a0b0c0d0e0f300102030405060708090a0b0c0d0e0f"
+        hapd2 = start_pasn_ap(apdev[1], params)
+
+        bssid = hapd2.own_addr()
+        dev[0].scan_for_bss(bssid, freq="2412")
+        dev[0].roam(bssid)
+
+        check_pasn_ptk(dev[0], hapd2, "CCMP", clear_keys=False)
+
+        bssid = hapd.own_addr()
+        dev[0].roam(bssid)
+
+        check_pasn_ptk(dev[0], hapd, "CCMP", clear_keys=False)
+    finally:
+        dev[0].set("force_kdk_derivation", "0")
+        dev[0].set("sae_pwe", "0")
 
 def check_pasn_fils_kdk(dev, apdev, params, key_mgmt):
     check_fils_capa(dev[0])
@@ -852,3 +912,100 @@ def test_pasn_kdk_derivation(dev, apdev):
         check_pasn_akmp_cipher(dev[0], hapd1, "PASN", "CCMP")
     finally:
         dev[0].set("force_kdk_derivation", "0")
+
+def test_pasn_sae_kdk_secure_ltf(dev, apdev):
+    """Station authentication with SAE AP with KDK derivation during connection based on Secure LTF support"""
+    params = hostapd.wpa2_params(ssid="test-sae",
+                                 passphrase="12345678")
+    params['wpa_key_mgmt'] = 'SAE'
+    params['sae_pwe'] = "2"
+    params['driver_params'] = "secure_ltf=1"
+    hapd = start_pasn_ap(apdev[0], params)
+
+    wpas = WpaSupplicant(global_iface='/tmp/wpas-wlan5')
+    wpas.interface_add("wlan5", drv_params="secure_ltf=1")
+    check_pasn_capab(wpas)
+    check_sae_capab(wpas)
+
+    try:
+        wpas.set("sae_groups", "")
+        wpas.set("sae_pwe", "2")
+        wpas.connect("test-sae", psk="12345678", key_mgmt="SAE",
+                     scan_freq="2412")
+
+        check_pasn_ptk(wpas, hapd, "CCMP", clear_keys=False, require_kdk=True)
+    finally:
+        wpas.set("sae_pwe", "0")
+
+def test_pasn_owe_kdk_secure_ltf(dev, apdev):
+    """Station authentication with OWE AP with KDK derivation during connection based on Secure LTF support"""
+    params = {"ssid": "owe",
+              "wpa": "2",
+              "ieee80211w": "2",
+              "wpa_key_mgmt": "OWE",
+              "rsn_pairwise": "CCMP"}
+    params['driver_params'] = "secure_ltf=1"
+    hapd = start_pasn_ap(apdev[0], params)
+
+    wpas = WpaSupplicant(global_iface='/tmp/wpas-wlan5')
+    wpas.interface_add("wlan5", drv_params="secure_ltf=1")
+    check_pasn_capab(wpas)
+    if "OWE" not in wpas.get_capability("key_mgmt"):
+        raise HwsimSkip("OWE not supported")
+
+    wpas.connect("owe", key_mgmt="OWE", ieee80211w="2", scan_freq="2412")
+
+    check_pasn_ptk(wpas, hapd, "CCMP", clear_keys=False, require_kdk=True)
+
+def test_pasn_owe_tm_kdk_secure_ltf(dev, apdev):
+    """Station authentication with OWE transition mode AP with KDK derivation during connection based on Secure LTF support"""
+    params = {"ssid": "owe-random",
+              "wpa": "2",
+              "ieee80211w": "2",
+              "wpa_key_mgmt": "OWE",
+              "rsn_pairwise": "CCMP",
+              "owe_transition_bssid": apdev[1]['bssid'],
+              "owe_transition_ssid": '"owe-test"',
+              "ignore_broadcast_ssid": "1",
+              'driver_params': "secure_ltf=1"}
+    hapd = start_pasn_ap(apdev[0], params)
+    bssid = hapd.own_addr()
+
+    params = {"ssid": "owe-test",
+              "owe_transition_bssid": apdev[0]['bssid'],
+              "owe_transition_ssid": '"owe-random"',
+              'driver_params': "secure_ltf=1"}
+    hapd2 = hostapd.add_ap(apdev[1], params)
+    bssid2 = hapd2.own_addr()
+
+    wpas = WpaSupplicant(global_iface='/tmp/wpas-wlan5')
+    wpas.interface_add("wlan5", drv_params="secure_ltf=1")
+    check_pasn_capab(wpas)
+    if "OWE" not in wpas.get_capability("key_mgmt"):
+        raise HwsimSkip("OWE not supported")
+    wpas.flush_scan_cache()
+
+    wpas.scan_for_bss(bssid, freq="2412")
+    wpas.scan_for_bss(bssid2, freq="2412")
+
+    wpas.connect("owe-test", key_mgmt="OWE", ieee80211w="2", scan_freq="2412")
+
+    check_pasn_ptk(wpas, hapd, "CCMP", clear_keys=False, require_kdk=True)
+
+    wpas.scan(type="ONLY", freq=2412)
+
+    wpas.request("DISCONNECT")
+    wpas.wait_disconnected()
+    wpas.request("RECONNECT")
+    wpas.wait_connected()
+    check_pasn_ptk(wpas, hapd, "CCMP", clear_keys=False, require_kdk=True)
+
+def test_pasn_noauth_0(dev, apdev):
+    """PASN without mutual authentication disabled on the AP"""
+    check_pasn_capab(dev[0])
+
+    params = pasn_ap_params("PASN", "CCMP", "19")
+    params["pasn_noauth"] = "0"
+    hapd = start_pasn_ap(apdev[0], params)
+
+    check_pasn_akmp_cipher(dev[0], hapd, "PASN", "CCMP", status=1)

@@ -477,6 +477,7 @@ static int wpa_supplicant_wps_cred(void *ctx,
 
 	wpa_config_set_network_defaults(ssid);
 	ssid->wps_run = wpa_s->wps_run;
+	ssid->scan_ssid=1;
 
 	os_free(ssid->ssid);
 	ssid->ssid = os_malloc(cred->ssid_len);

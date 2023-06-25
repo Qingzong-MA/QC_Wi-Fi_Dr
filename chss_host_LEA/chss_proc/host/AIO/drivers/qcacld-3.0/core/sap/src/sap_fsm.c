@@ -57,6 +57,8 @@
 #include "wlan_mlme_ucfg_api.h"
 #include "wlan_policy_mgr_ucfg.h"
 #include "cfg_ucfg_api.h"
+#include <wlan_cmn_ieee80211.h>
+#include "wlan_vdev_mgr_utils_api.h"
 
 /*----------------------------------------------------------------------------
  * Preprocessor Definitions and Constants
@@ -815,12 +817,9 @@ sap_validate_chan(struct sap_context *sap_context,
 					sap_context->chan_freq,
 					sap_context->csr_roamProfile.phyMode,
 					sap_context->cc_switch_mode);
-			sap_debug("After check overlap: con_ch:%d",
-				  con_ch_freq);
+			sap_debug("After check overlap: sap freq %d con freq:%d",
+				  sap_context->chan_freq, con_ch_freq);
 			ch_params = sap_context->ch_params;
-			if (con_ch_freq &&
-			    WLAN_REG_IS_24GHZ_CH_FREQ(con_ch_freq))
-				ch_params.ch_width = CH_WIDTH_20MHZ;
 
 			if (sap_context->cc_switch_mode !=
 		QDF_MCC_TO_SCC_SWITCH_FORCE_PREFERRED_WITHOUT_DISCONNECTION) {
@@ -834,15 +833,12 @@ sap_validate_chan(struct sap_context *sap_context,
 					return QDF_STATUS_E_ABORTED;
 				}
 			}
-			sap_debug("After check concurrency: con_ch:%d",
+
+			sap_debug("After check concurrency: con freq:%d",
 				  con_ch_freq);
 			sta_sap_scc_on_dfs_chan =
 				policy_mgr_is_sta_sap_scc_allowed_on_dfs_chan(
 						mac_ctx->psoc);
-			ch_params = sap_context->ch_params;
-			if (con_ch_freq &&
-			    WLAN_REG_IS_24GHZ_CH_FREQ(con_ch_freq))
-				ch_params.ch_width = CH_WIDTH_20MHZ;
 			if (con_ch_freq &&
 			    (policy_mgr_sta_sap_scc_on_lte_coex_chan(
 						mac_ctx->psoc) ||
@@ -852,20 +848,13 @@ sap_validate_chan(struct sap_context *sap_context,
 					mac_ctx->pdev, &ch_params,
 					con_ch_freq) ||
 			    sta_sap_scc_on_dfs_chan)) {
-				sap_debug("Override ch freq %d to %d due to CC Intf",
+
+				sap_debug("Override ch freq %d (bw %d) to %d (bw %d) due to CC Intf",
 					  sap_context->chan_freq,
-					con_ch_freq);
+					  sap_context->ch_params.ch_width,
+					  con_ch_freq, ch_params.ch_width);
 				sap_context->chan_freq = con_ch_freq;
-				sap_context->ch_params.ch_width =
-				    wlan_sap_get_concurrent_bw(mac_ctx->pdev,
-							       mac_ctx->psoc,
-							       con_ch_freq,
-					       sap_context->ch_params.ch_width);
-				wlan_reg_set_channel_params_for_freq(
-					mac_ctx->pdev,
-					sap_context->chan_freq,
-					0,
-					&sap_context->ch_params);
+				sap_context->ch_params = ch_params;
 			}
 		}
 #endif
@@ -1288,6 +1277,7 @@ static void sap_handle_acs_scan_event(struct sap_context *sap_context,
  * Function to fill OWE IE in assoc indication
  * @assoc_ind: SAP STA association indication
  * @sme_assoc_ind: SME association indication
+ * @reassoc: True if it is reassoc frame
  *
  * This function is to get OWE IEs (RSN IE, DH IE etc) from assoc request
  * and fill them in association indication.
@@ -1295,19 +1285,37 @@ static void sap_handle_acs_scan_event(struct sap_context *sap_context,
  * Return: true for success and false for failure
  */
 static bool sap_fill_owe_ie_in_assoc_ind(tSap_StationAssocIndication *assoc_ind,
-					 struct assoc_ind *sme_assoc_ind)
+					 struct assoc_ind *sme_assoc_ind,
+					 bool reassoc)
 {
 	uint32_t owe_ie_len, rsn_ie_len, dh_ie_len;
 	const uint8_t *rsn_ie, *dh_ie;
+	uint8_t *assoc_req_ie;
+	uint16_t assoc_req_ie_len;
 
-	if (assoc_ind->assocReqLength < ASSOC_REQ_IE_OFFSET) {
-		sap_err("Invalid assoc req");
-		return false;
+	if (reassoc) {
+		if (assoc_ind->assocReqLength < WLAN_REASSOC_REQ_IES_OFFSET) {
+			sap_err("Invalid reassoc req");
+			return false;
+		}
+
+		assoc_req_ie = assoc_ind->assocReqPtr +
+			       WLAN_REASSOC_REQ_IES_OFFSET;
+		assoc_req_ie_len = assoc_ind->assocReqLength -
+				   WLAN_REASSOC_REQ_IES_OFFSET;
+	} else {
+		if (assoc_ind->assocReqLength < WLAN_ASSOC_REQ_IES_OFFSET) {
+			sap_err("Invalid assoc req");
+			return false;
+		}
+
+		assoc_req_ie = assoc_ind->assocReqPtr +
+			       WLAN_ASSOC_REQ_IES_OFFSET;
+		assoc_req_ie_len = assoc_ind->assocReqLength -
+				   WLAN_ASSOC_REQ_IES_OFFSET;
 	}
-
 	rsn_ie = wlan_get_ie_ptr_from_eid(DOT11F_EID_RSN,
-			       assoc_ind->assocReqPtr + ASSOC_REQ_IE_OFFSET,
-			       assoc_ind->assocReqLength - ASSOC_REQ_IE_OFFSET);
+					  assoc_req_ie, assoc_req_ie_len);
 	if (!rsn_ie) {
 		sap_err("RSN IE is not present");
 		return false;
@@ -1320,8 +1328,7 @@ static bool sap_fill_owe_ie_in_assoc_ind(tSap_StationAssocIndication *assoc_ind,
 	}
 
 	dh_ie = wlan_get_ext_ie_ptr_from_ext_id(DH_OUI_TYPE, DH_OUI_TYPE_SIZE,
-		   assoc_ind->assocReqPtr + ASSOC_REQ_IE_OFFSET,
-		   (uint16_t)(assoc_ind->assocReqLength - ASSOC_REQ_IE_OFFSET));
+						assoc_req_ie, assoc_req_ie_len);
 	if (!dh_ie) {
 		sap_err("DH IE is not present");
 		return false;
@@ -1452,7 +1459,8 @@ QDF_STATUS sap_signal_hdd_event(struct sap_context *sap_ctx,
 		}
 		if (csr_roaminfo->owe_pending_assoc_ind) {
 			if (!sap_fill_owe_ie_in_assoc_ind(assoc_ind,
-					 csr_roaminfo->owe_pending_assoc_ind)) {
+					 csr_roaminfo->owe_pending_assoc_ind,
+					 csr_roaminfo->fReassocReq)) {
 				sap_err("Failed to fill OWE IE");
 				qdf_mem_free(csr_roaminfo->
 					     owe_pending_assoc_ind);
@@ -2607,7 +2615,13 @@ static QDF_STATUS sap_fsm_state_starting(struct sap_context *sap_ctx,
 	} else if (msg == eSAP_DFS_CHANNEL_CAC_RADAR_FOUND) {
 		qdf_status = sap_fsm_handle_radar_during_cac(sap_ctx, mac_ctx);
 	} else if (msg == eSAP_DFS_CHANNEL_CAC_END) {
-		qdf_status = sap_cac_end_notify(mac_handle, roam_info);
+		if (sap_ctx->vdev &&
+		    wlan_util_vdev_mgr_get_cac_timeout_for_vdev(sap_ctx->vdev)) {
+			qdf_status = sap_cac_end_notify(mac_handle, roam_info);
+		} else {
+			sap_debug("cac duration is zero");
+			qdf_status = QDF_STATUS_SUCCESS;
+		}
 	} else {
 		sap_err("in state %s, invalid event msg %d", "SAP_STARTING",
 			 msg);

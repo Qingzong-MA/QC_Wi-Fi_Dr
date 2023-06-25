@@ -27,7 +27,7 @@
 #include <time.h>
 
 #include "athtestcmd.h"
-#include "libtcmd.h"
+#include <libtcmd.h>
 #include "testcmd.h"
 #include "sinit_eep.h"
 #include "sinit_common.h"

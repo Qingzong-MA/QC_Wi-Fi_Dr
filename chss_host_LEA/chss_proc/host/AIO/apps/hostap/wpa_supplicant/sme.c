@@ -138,6 +138,12 @@ static struct wpabuf * sme_auth_build_sae_commit(struct wpa_supplicant *wpa_s,
 	}
 
 	bss = wpa_bss_get_bssid_latest(wpa_s, bssid);
+	if (!bss) {
+		wpa_printf(MSG_DEBUG,
+			   "SAE: BSS not available, update scan result to get BSS");
+		wpa_supplicant_update_scan_results(wpa_s);
+		bss = wpa_bss_get_bssid_latest(wpa_s, bssid);
+	}
 	if (bss) {
 		const u8 *rsnxe;
 
@@ -147,6 +153,9 @@ static struct wpabuf * sme_auth_build_sae_commit(struct wpa_supplicant *wpa_s,
 	}
 
 	if (ssid->sae_password_id && wpa_s->conf->sae_pwe != 3)
+		use_pt = 1;
+	if (bss && is_6ghz_freq(bss->freq) &&
+	    wpa_s->conf->sae_pwe != 3)
 		use_pt = 1;
 #ifdef CONFIG_SAE_PK
 	if ((rsnxe_capa & BIT(WLAN_RSNX_CAPAB_SAE_PK)) &&

@@ -59,9 +59,9 @@ namespace NAN_TEST
         NanCallbackHandler callbackHandler =
         {
             .NotifyResponse = NanTestSuite::nanNotifyResponse,
-//#if QTI_BSP
+#if QTI_BSP
             .EventPublishReplied = NanTestSuite::nanEventPublishReplied,
-//#endif
+#endif
             .EventPublishTerminated = NanTestSuite::nanEventPublishTerminated,
             .EventMatch = NanTestSuite::nanEventMatch,
             .EventMatchExpired = NanTestSuite::nanEventMatchExpired,
@@ -266,7 +266,7 @@ namespace NAN_TEST
         }
     }
 
-//#if QTI_BSP
+#if QTI_BSP
     /* Events Callback */
     void NanTestSuite::nanEventPublishReplied(NanPublishRepliedInd *event)
     {
@@ -278,7 +278,7 @@ namespace NAN_TEST
           event->rssi_value
         );
     }
-//#endif
+#endif
 
     /* Events Callback */
     void NanTestSuite::nanEventPublishTerminated(NanPublishTerminatedInd *event)
@@ -717,7 +717,7 @@ namespace NAN_TEST
         fprintf(stderr, "%s: received \n", __FUNCTION__);
         fprintf(stderr, "%s:  Publish Id: %d"
                 " Range Report MAC ADDR " MAC_ADDR_STR
-                " Range measurement %d",
+                " Range measurement %d \n",
                 __FUNCTION__,
                 event->publish_id,
                 MAC_ADDR_ARRAY(event->range_req_intf_addr),
@@ -1174,17 +1174,16 @@ namespace NAN_TEST
                     break;
                case 'm':
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PMK;
-                   req.key_info.body.pmk_info.pmk_len =
-                       (sizeof(req.key_info.body.pmk_info.pmk)/sizeof(u8));
-                   if(req.key_info.body.pmk_info.pmk_len != NAN_PMK_INFO_LEN) {
+                   size = (int)strlen(optarg) >> 1;
+                   if(size > NAN_PMK_INFO_LEN) {
 
-                       fprintf(stderr, "%s:Failed:Incorrect PMK Length = %d \n",
-                               __FUNCTION__, req.key_info.body.pmk_info.pmk_len);
+                       fprintf(stderr, "%s:Failed:PMK Length exceeded = %d \n",
+                               __FUNCTION__, size);
                        return;
                    }
-                   size = req.key_info.body.pmk_info.pmk_len;
                    nanParseHexString(optarg, &req.key_info.body.pmk_info.pmk[0],
                                      (int*)&size);
+                   req.key_info.body.pmk_info.pmk_len = size;
                    break;
                case 'y':
                    req.sdea_params.security_cfg =
@@ -1233,13 +1232,17 @@ namespace NAN_TEST
                    break;
                case 1016:
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PASSPHRASE;
-		   strlcpy((char*)req.key_info.body.passphrase_info.passphrase,
-                           optarg, NAN_SECURITY_MAX_PASSPHRASE_LEN);
-                   req.key_info.body.passphrase_info.passphrase_len =
-                    strlen((char*)req.key_info.body.passphrase_info.passphrase);
+                   req.key_info.body.passphrase_info.passphrase_len = strlen((char*)optarg);
+                   if (req.key_info.body.passphrase_info.passphrase_len > NAN_SECURITY_MAX_PASSPHRASE_LEN)
+                   {
+                       fprintf(stderr, "%s:Failed:passphrase length exceeded = %d \n",
+                               __FUNCTION__, req.key_info.body.passphrase_info.passphrase_len);
+                       return;
+                   }
+                   memcpy((char*)req.key_info.body.passphrase_info.passphrase,
+                           optarg, req.key_info.body.passphrase_info.passphrase_len);
                    fprintf(stderr, "%s: passphrase = %s and passphrase_len = %d.\n",
-                           __FUNCTION__,
-                           req.key_info.body.passphrase_info.passphrase,
+                           __FUNCTION__, (char*)optarg,
                            req.key_info.body.passphrase_info.passphrase_len);
                    break;
                case 1017:
@@ -1548,17 +1551,16 @@ namespace NAN_TEST
                    break;
                case 'q':
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PMK;
-                   req.key_info.body.pmk_info.pmk_len =
-                       (sizeof(req.key_info.body.pmk_info.pmk)/sizeof(u8));
-                   if(req.key_info.body.pmk_info.pmk_len != NAN_PMK_INFO_LEN) {
+                   size = (int)strlen(optarg) >> 1;
+                   if(size > NAN_PMK_INFO_LEN) {
 
-                       fprintf(stderr, "%s:Failed:Incorrect PMK Length = %d \n",
-                               __FUNCTION__, req.key_info.body.pmk_info.pmk_len);
+                       fprintf(stderr, "%s:Failed:PMK Length exceeded = %d \n",
+                               __FUNCTION__, size);
                        return;
                    }
-                   size = req.key_info.body.pmk_info.pmk_len;
                    nanParseHexString(optarg, &req.key_info.body.pmk_info.pmk[0],
                                      (int*)&size);
+                   req.key_info.body.pmk_info.pmk_len = size;
                    break;
                case 'u':
                    req.sdea_params.security_cfg =
@@ -1607,13 +1609,17 @@ namespace NAN_TEST
                    break;
                case 1017:
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PASSPHRASE;
-                   strlcpy((char*)req.key_info.body.passphrase_info.passphrase,
-                            optarg, NAN_SECURITY_MAX_PASSPHRASE_LEN);
-                   req.key_info.body.passphrase_info.passphrase_len =
-                    strlen((char*)req.key_info.body.passphrase_info.passphrase);
+                   req.key_info.body.passphrase_info.passphrase_len = strlen((char*)optarg);
+                   if (req.key_info.body.passphrase_info.passphrase_len > NAN_SECURITY_MAX_PASSPHRASE_LEN)
+                   {
+                       fprintf(stderr, "%s:Failed:passphrase length exceeded = %d \n",
+                               __FUNCTION__, req.key_info.body.passphrase_info.passphrase_len);
+                       return;
+                   }
+                   memcpy((char*)req.key_info.body.passphrase_info.passphrase,
+                           optarg, req.key_info.body.passphrase_info.passphrase_len);
                    fprintf(stderr, "%s: passphrase = %s and passphrase_len = %d.\n",
-                           __FUNCTION__,
-                           req.key_info.body.passphrase_info.passphrase,
+                           __FUNCTION__, (char*)optarg,
                            req.key_info.body.passphrase_info.passphrase_len);
                    break;
                case 1018:
@@ -2546,27 +2552,30 @@ namespace NAN_TEST
                     break;
                 case 'm':
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PMK;
-                   req.key_info.body.pmk_info.pmk_len =
-                       (sizeof(req.key_info.body.pmk_info.pmk)/sizeof(u8));
-                   if(req.key_info.body.pmk_info.pmk_len != NAN_PMK_INFO_LEN) {
+                   size = (int)strlen(optarg) >> 1;
+                   if(size > NAN_PMK_INFO_LEN) {
 
-                       fprintf(stderr, "%s:Failed:Incorrect PMK Length = %d \n",
-                               __FUNCTION__, req.key_info.body.pmk_info.pmk_len);
+                       fprintf(stderr, "%s:Failed:PMK Length exceeded = %d \n",
+                               __FUNCTION__, size);
                        return;
                    }
-                   size = req.key_info.body.pmk_info.pmk_len;
                    nanParseHexString(optarg, &req.key_info.body.pmk_info.pmk[0],
                                      (int*)&size);
+                   req.key_info.body.pmk_info.pmk_len = size;
                     break;
                case 1001:
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PASSPHRASE;
-                   strlcpy((char*)req.key_info.body.passphrase_info.passphrase,
-                            optarg, NAN_SECURITY_MAX_PASSPHRASE_LEN);
-                   req.key_info.body.passphrase_info.passphrase_len =
-                    strlen((char*)req.key_info.body.passphrase_info.passphrase);
+                   req.key_info.body.passphrase_info.passphrase_len = strlen((char*)optarg);
+                   if (req.key_info.body.passphrase_info.passphrase_len > NAN_SECURITY_MAX_PASSPHRASE_LEN)
+                   {
+                       fprintf(stderr, "%s:Failed:passphrase length exceeded = %d \n",
+                               __FUNCTION__, req.key_info.body.passphrase_info.passphrase_len);
+                       return;
+                   }
+                   memcpy((char*)req.key_info.body.passphrase_info.passphrase,
+                           optarg, req.key_info.body.passphrase_info.passphrase_len);
                    fprintf(stderr, "%s: passphrase = %s and passphrase_len = %d.\n",
-                           __FUNCTION__,
-                           req.key_info.body.passphrase_info.passphrase,
+                           __FUNCTION__, (char*)optarg,
                            req.key_info.body.passphrase_info.passphrase_len);
                    break;
                 case 1002:
@@ -2661,27 +2670,30 @@ namespace NAN_TEST
                     break;
                 case 'm':
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PMK;
-                   req.key_info.body.pmk_info.pmk_len =
-                       (sizeof(req.key_info.body.pmk_info.pmk)/sizeof(u8));
-                   if(req.key_info.body.pmk_info.pmk_len != NAN_PMK_INFO_LEN) {
+                   size = (int)strlen(optarg) >> 1;
+                   if(size > NAN_PMK_INFO_LEN) {
 
-                       fprintf(stderr, "%s:Failed:Incorrect PMK Length = %d \n",
-                               __FUNCTION__, req.key_info.body.pmk_info.pmk_len);
+                       fprintf(stderr, "%s:Failed:PMK Length exceeded = %d \n",
+                               __FUNCTION__, size);
                        return;
                    }
-                   size = req.key_info.body.pmk_info.pmk_len;
                    nanParseHexString(optarg, &req.key_info.body.pmk_info.pmk[0],
                                      (int*)&size);
+                   req.key_info.body.pmk_info.pmk_len = size;
                     break;
                case 1001:
                    req.key_info.key_type = NAN_SECURITY_KEY_INPUT_PASSPHRASE;
-                   strlcpy((char*)req.key_info.body.passphrase_info.passphrase,
-                           optarg, NAN_SECURITY_MAX_PASSPHRASE_LEN);
-                   req.key_info.body.passphrase_info.passphrase_len =
-                    strlen((char*)req.key_info.body.passphrase_info.passphrase);
+                   req.key_info.body.passphrase_info.passphrase_len = strlen((char*)optarg);
+                   if (req.key_info.body.passphrase_info.passphrase_len > NAN_SECURITY_MAX_PASSPHRASE_LEN)
+                   {
+                       fprintf(stderr, "%s:Failed:passphrase length exceeded = %d \n",
+                               __FUNCTION__, req.key_info.body.passphrase_info.passphrase_len);
+                       return;
+                   }
+                   memcpy((char*)req.key_info.body.passphrase_info.passphrase,
+                           optarg, req.key_info.body.passphrase_info.passphrase_len);
                    fprintf(stderr, "%s: passphrase = %s and passphrase_len = %d.\n",
-                           __FUNCTION__,
-                           req.key_info.body.passphrase_info.passphrase,
+                           __FUNCTION__, (char*)optarg,
                            req.key_info.body.passphrase_info.passphrase_len);
                    break;
                 case 1002:

@@ -4796,7 +4796,7 @@ uint8_t mlme_get_max_he_mcs_idx(enum phy_ch_width mcs_ch_width,
 			if (max_mcs < 0x03)
 				max_mcs = 7 + 2 * max_mcs;
 		}
-		/* fallthrough */
+		fallthrough;
 	case CH_WIDTH_160MHZ:
 		if (hecap_rxmcsnssmap[HECAP_TXRX_MCS_NSS_IDX_160] &&
 		    hecap_txmcsnssmap[HECAP_TXRX_MCS_NSS_IDX_160]) {
@@ -4806,7 +4806,7 @@ uint8_t mlme_get_max_he_mcs_idx(enum phy_ch_width mcs_ch_width,
 			if (max_mcs < 0x03)
 				max_mcs = 7 + 2 * max_mcs;
 		}
-		/* fallthrough */
+		fallthrough;
 	default:
 		if (hecap_rxmcsnssmap[HECAP_TXRX_MCS_NSS_IDX_80] &&
 		    hecap_txmcsnssmap[HECAP_TXRX_MCS_NSS_IDX_80]) {
@@ -4877,3 +4877,30 @@ uint8_t mlme_get_vdev_max_mcs_idx(struct wlan_objmgr_vdev *vdev)
 	return mlme_priv->max_mcs_index;
 }
 #endif /* WLAN_FEATURE_SON */
+
+bool wlan_mlme_is_local_tpe_pref(struct wlan_objmgr_psoc *psoc)
+{
+	struct wlan_mlme_psoc_ext_obj *mlme_obj;
+
+	mlme_obj = mlme_get_psoc_ext_obj(psoc);
+	if (!mlme_obj)
+		return false;
+
+	return mlme_obj->cfg.power.use_local_tpe;
+}
+
+QDF_STATUS
+wlan_mlme_get_channel_bonding_5ghz(struct wlan_objmgr_psoc *psoc,
+				   uint32_t *value)
+{
+	struct wlan_mlme_psoc_ext_obj *mlme_obj;
+
+	mlme_obj = mlme_get_psoc_ext_obj(psoc);
+	if (!mlme_obj) {
+		*value = cfg_default(CFG_CHANNEL_BONDING_MODE_5GHZ);
+		return QDF_STATUS_E_INVAL;
+	}
+
+	*value = mlme_obj->cfg.feature_flags.channel_bonding_mode_5ghz;
+	return QDF_STATUS_SUCCESS;
+}

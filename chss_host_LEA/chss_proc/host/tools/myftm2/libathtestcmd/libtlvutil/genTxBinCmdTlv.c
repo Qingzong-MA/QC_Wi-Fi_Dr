@@ -1,5 +1,11 @@
 /*
- * Copyright (c) 2014, 2016 Qualcomm Atheros, Inc.
+ * Copyright (c) 2014, 2016, 2021 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+*/
+
+/*
+ * 2014, 2016 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
  */
@@ -115,7 +121,7 @@ int addCommand(uint8_t opCode)
 		return FALSE;
 	}
 
-	if (_OP_TEST_CONFIG != opCode && opCode >= _OP_MAX) {
+	if (_OP_TEST_CONFIG != opCode && opCode >= _OP_REMAINING) {
 		printf("Error, opcode out of range %d\n", opCode);
 		return FALSE;
 	}
@@ -432,7 +438,7 @@ int commandComplete(uint8_t **rCmdStream, uint32_t *cmdStreamLen )
 	testCmdStream.cmdStreamHeader.checkSum = 0xFFFF ^ sum;
 
 	printf("TESTFLOW_CMD_STREAM_HEADER & ONE_CMD_HEADER\n");
-	print_hex_dump((void *)&testCmdStream.cmdStreamHeader, sizeof(_TESTFLOW_CMD_STREAM_HEADER) + sizeof(_ONE_CMD_HEADER));
+	print_hex_dump((void *)&testCmdStream, sizeof(_TESTFLOW_CMD_STREAM_HEADER) + sizeof(_ONE_CMD_HEADER));
 
 	commandCreated = FALSE;
 

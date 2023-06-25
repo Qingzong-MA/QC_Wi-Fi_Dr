@@ -1,5 +1,11 @@
 /*
- * Copyright (c) 2016 Qualcomm Atheros, Inc.
+ * Copyright (c) 2016, 2021 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+*/
+
+/*
+ * 2016 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
  */
@@ -32,7 +38,7 @@ void fillParmOffsetTbl(A_UINT32 parmCode, A_UINT32 offset, PARM_OFFSET_TBL *pPar
     int keyHash;
     PARM_OFFSET_FIELDS *pParmOffsetFields, *pt;
     PARM_DICT *pParmDict;
-    A_UINT32 parmIdx;
+    A_UINT32 parmIdx, maxParmNum;
 
     pParmOffsetFields = (PARM_OFFSET_FIELDS *)nextParmOffsetFields();
     pParmOffsetFields->parmCode = parmCode;
@@ -41,12 +47,19 @@ void fillParmOffsetTbl(A_UINT32 parmCode, A_UINT32 offset, PARM_OFFSET_TBL *pPar
     if (parmCode >= SYSPARM_FIRST_IDX)
     {
         parmIdx = parmCode - SYSPARM_FIRST_IDX;
+        maxParmNum = MaxSysParmDictEntries;
         pParmDict = SysParmDict;
     }
     else
     {
         parmIdx = parmCode;
+        maxParmNum = MaxParmDictEntries;
         pParmDict = ParmDict;
+    }
+    if (parmIdx >= maxParmNum)
+    {
+        A_PRINTF_ALWAYS("parmCode %d exceeds dict\n", parmCode);
+        return;
     }
 
     keyHash = pParmDict[parmIdx].keyHash;

@@ -16,8 +16,8 @@
 
 #define FILE_NAME_LEN 64
 #define FILE_PATH_LEN 256
-#ifdef __WIN__
-#define NO_OF_ELEMENTS_IN_COMMON_DATA 2
+#ifdef __IPQ__
+#define NO_OF_ELEMENTS_IN_COMMON_DATA 3
 #else
 #define NO_OF_ELEMENTS_IN_COMMON_DATA 2
 #endif
@@ -25,6 +25,8 @@
 typedef struct {
     char iface[IFACE_LEN];
     char config_file[FILE_NAME_LEN];
+    uint8_t is_vap_command;
+    uint8_t skip_cmd_table;
 } common_data;
 
 #endif

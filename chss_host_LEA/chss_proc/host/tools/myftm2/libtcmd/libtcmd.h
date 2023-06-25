@@ -1,7 +1,11 @@
 /*
-* Copyright (c) 2011-2012 Qualcomm Atheros Inc. All Rights Reserved.
-* Qualcomm Atheros Proprietary and Confidential.
-*/
+ * Copyright (c) 2011-2012, 2020 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2011-2012 Qualcomm Atheros Inc. All Rights Reserved.
+ * Qualcomm Atheros Proprietary and Confidential.
+ */
 
 #ifndef _LIBTCMD_H_
 #define _LIBTCMD_H_
@@ -28,9 +32,18 @@
 				printf(args);	\
 				exit(ret);	\
 				}
-#define A_DBG(args...) fprintf(stderr, args);
+#define A_DBG  printf
 
+#ifdef WIN_AP_HOST
+/* In 6GHz the channel list is larger,
+ * it can potentially take 60s or more so
+ * increasing timeout.
+ */
+#define TCMD_TIMEOUT 70 /* s */
+#else
 #define TCMD_TIMEOUT 16 /* s */
+#endif
+
 #define UNUSED(x) (void)(x)
 
 #ifndef CONFIG_AR6002_REV6
@@ -77,4 +90,6 @@ int tcmd_tx_init(char *iface, void (*rx_cb)(void *buf, int len));
 /* same as above, but takes optional testmode endpoint (e.g. WMI vs. TCMD) */
 int tcmd_init(char *iface, void (*rx_cb)(void *buf, int len), ...);
 #endif
+int tcmd_tx_start( void );
+int tcmd_tx_stop( void );
 #endif /* _LIBTCMD_H_ */

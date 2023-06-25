@@ -1,11 +1,21 @@
 /*
- * Copyright (c) 2016 Qualcomm Atheros, Inc.
+ * Copyright (c) 2016, 2021 Qualcomm Technologies, Inc.
+ *
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2016 Qualcomm Atheros, Inc.
+ *
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
  */
 
 #if !defined(_MASK_RATE_COMMON_H)
 #define _MASK_RATE_COMMON_H
+
+#ifndef RATE_MASK_BIT_MAX
+#define RATE_MASK_BIT_MAX 32
+#endif
 
 _AthDataRate Mask2Rate[RATE_MASK_ROW_MAX][RATE_MASK_BIT_MAX] = {
 {

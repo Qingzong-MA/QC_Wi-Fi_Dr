@@ -645,6 +645,10 @@ struct hal_hw_txrx_ops {
 					 uint32_t *fse, qdf_size_t len);
 	void (*hal_rx_msdu_get_reo_destination_indication)(uint8_t *buf,
 							   uint32_t *reo_destination_indication);
+#ifdef WLAN_FEATURE_TSF_BY_REG
+	uint64_t (*hal_read_tsf64)(struct hal_soc *hal_soc, uint32_t mac_id,
+				   uint32_t tsf_id);
+#endif
 };
 
 /**

@@ -22,6 +22,7 @@ typedef struct rst_parms {
     A_UINT8	rstDir;
     A_UINT8	phyId;
     A_UINT16	freq;
+    A_UINT16    txPwr;
 } __ATTRIB_PACK CMD_RST_PARMS;
 
 typedef struct rstrsp_parms {
@@ -38,7 +39,6 @@ A_BOOL RSTOp(void *pParms);
 
 void* initRSTRSPOpParms(A_UINT8 *pParmsCommon, PARM_OFFSET_TBL *pParmsOffset, PARM_DICT *pParmDict);
 A_BOOL RSTRSPOp(void *pParms);
-void registerRSTRSPHandler(RSTRSP_OP_FUNC fp);
 
 #if defined(WIN32) || defined(WIN64)
 #pragma pack(pop)

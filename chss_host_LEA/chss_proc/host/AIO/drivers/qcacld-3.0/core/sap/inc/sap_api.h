@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -118,6 +119,10 @@ typedef enum {
 typedef enum {
 	ADD_STA_TO_ACL = 0,       /* cmd to add STA to access control list */
 	DELETE_STA_FROM_ACL = 1,  /* cmd to del STA from access control list */
+	/* only add STA to ACL, do not trigger deauth */
+	ADD_STA_TO_ACL_NO_DEAUTH = 2,
+	/* only delete STA from ACL, do not trigger deauth */
+	DELETE_STA_FROM_ACL_NO_DEAUTH = 3,
 } eSapACLCmdType;
 
 typedef enum {
@@ -1176,12 +1181,14 @@ QDF_STATUS wlansap_get_dfs_cac_state(mac_handle_t mac_handle,
  * channel width from user configured phymode for csa
  * @sap_context: sap adapter context
  * @chan_freq: target channel frequency (MHz)
+ * @tgt_ch_params: target new channel bw parameters to be updated
  *
  * Return: phy_ch_width
  */
 enum phy_ch_width
 wlansap_get_csa_chanwidth_from_phymode(struct sap_context *sap_context,
-				       uint32_t chan_freq);
+				       uint32_t chan_freq,
+				       struct ch_params *tgt_ch_params);
 
 #ifdef FEATURE_AP_MCC_CH_AVOIDANCE
 QDF_STATUS
@@ -1321,6 +1328,24 @@ void wlansap_extend_to_acs_range(mac_handle_t mac_handle,
 				 uint32_t *bandStartChannel,
 				 uint32_t *bandEndChannel);
 
+#ifdef WLAN_FEATURE_SON
+/**
+ * wlansap_son_update_sap_config_phymode() - update sap config according to
+ *                                           phy_mode. This API is for son,
+ *                                           There is no band switching when
+ *                                           son phy mode is changed.
+ * @sap_ctx:  Pointer to Sap Context
+ * @sap_config:  Pointer to sap config
+ * @phy_mode: pointer to phy mode
+ *
+ * Return: QDF_STATUS
+ */
+QDF_STATUS
+wlansap_son_update_sap_config_phymode(struct wlan_objmgr_vdev *vdev,
+				      struct sap_config *config,
+				      enum qca_wlan_vendor_phy_mode phy_mode);
+#endif
+
 /**
  * wlansap_set_dfs_nol() - Set dfs nol
  * @sap_ctx: SAP context
@@ -1419,6 +1444,17 @@ void sap_undo_acs(struct sap_context *sap_context, struct sap_config *sap_cfg);
  * Return: sap channel width
  */
 uint32_t wlansap_get_chan_width(struct sap_context *sap_ctx);
+
+/**
+ * wlansap_get_max_bw_by_phymode() - get max channel width based on phymode
+ * @sap_ctx: pointer to the SAP context
+ *
+ * This function get max channel width of sap based on phymode.
+ *
+ * Return: channel width
+ */
+enum phy_ch_width
+wlansap_get_max_bw_by_phymode(struct sap_context *sap_ctx);
 
 /*
  * wlansap_set_invalid_session() - set session ID to invalid

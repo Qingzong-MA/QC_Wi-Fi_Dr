@@ -1,0 +1,247 @@
+/************************************************
+ * File: QCA_Debug.dec
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2019-2020 Qualcomm Technologies, Inc.
+ *               2015-2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved. 
+ * Confidential and Proprietary - Qualcomm Technologies, Inc
+************************************************/
+
+
+"QCA Legacy Logs" 0x1f000003 HOST_DATA_ORDER
+PAYLOAD_IS_BYTE_STREAM
+
+SUMMARY_COLUMNS
+{
+    "Seq Num"   100
+    "Length"    100
+	"Msg Type"  100
+	"Crash Reason"  100
+}
+
+/*
+** This identifies the next protocol.
+*/
+//NEXT_PROTOCOL (FromField sQca_Proto)
+
+/*
+** The length for the next protocol. 
+*/
+//NEXT_PROTOCOL_SIZE (ThisLayerLength fQca_ProtoLen)
+
+/*
+** Start of Decoding the Protocol
+*/
+DECODE
+
+GROUP gQCA_LegacyLog
+{
+	GROUP gQca_LegacyLogHeader;
+}
+
+END_MAIN_PATH
+
+
+GROUP gQca_LegacyLogHeader "Legacy Log Header"
+{
+    FIELD fQca_LegacyHdr_Code    (Fixed 1 Byte)     	(TABLE tLegacyEventType)                "Event Code"
+    FIELD fQca_LegacyHdr_Len     (Fixed 1 Byte)     	(Decimal)                               "Log Length"
+    FIELD fQca_LegacyHdr_LogCode (Fixed 1 Byte)     	(TABLE tLegacyEventCode)                "Vendor Event Class"	
+    FIELD fQca_LegacyHdr_MsgType (Fixed 1 Byte)     	RETRIEVE (StoreIntraframeField sQca_Legacy_LogMsgType) (TABLE tLegacyMsgType)        IN_SUMMARY "Msg Type"                            "Msg Type"
+	BRANCH (FromTable   tLegacyMsgType   fQca_LegacyHdr_MsgType)
+}
+
+TABLE tLegacyEventType
+    { 0x02    "ACL Data"    				"ACL Data"   }
+    { 0xFF    "Vendor Specific Event"    	"Vendor Specific Event"   }
+ENDTABLE
+
+TABLE tLegacyEventCode
+    { 0x01    "Data Log"    				"Data Log"   }
+ENDTABLE
+
+TABLE tLegacyMsgType
+    { 0x01    "C String"    	"C String"    	0   gQca_LegacyDefault }
+	{ 0x02    "V String"    	"V String"    	0   gQca_VString }
+	{ 0x03    "Variable"    	"Variable"    	0   gQca_LegacyDefault }
+	{ 0x04    "HexDump"    	    "HexDump"    	0   gQca_HexDump }
+	{ 0x05    "Packet"    	    "Packet"    	0   gQca_LegacyDefault }	
+	{ 0x08    "MemDump"    	    "MemDump"    	0   gQca_MemDump }	
+	{ 0x09    "CrashInfo"    	"CrashInfo"    	0   gQca_CrashInfo }	
+	{ 0x0A    "HCIBuffDump"    	"HCIBuffDump" 	0   gQca_HciBuffDump }	
+ENDTABLE
+
+TABLE tLegacyModuleType
+    { 0x00    "OSRLM_OS"    	"OSRLM_OS"   }
+	{ 0x01    "OSRLM_HCI"    	"OSRLM_HCI"   }
+	{ 0x02    "OSRLM_PRHL"    	"OSRLM_PRHL"   }
+	{ 0x03    "OSRLM_LLM"    	"OSRLM_LLM"   }
+	{ 0x04    "OSRLM_HID"    	"OSRLM_HID"   }
+	{ 0x05    "OSRLM_WIP"    	"OSRLM_WIP"   }
+	{ 0x06    "OSRLM_LLME"    	"OSRLM_LLME"   }
+	{ 0x07    "OSRLM_MCI"    	"OSRLM_MCI"   }
+	{ 0x08    "OSRLM_MWS"    	"OSRLM_MWS"   }	
+	{ 0x09    "OSRLM_BKGD"    	"OSRLM_BKGD"   }		
+ENDTABLE
+
+TABLE tLegacyLevelType
+    { 0x00    "OSLC_ERR "    	"OSLC_ERR "   }
+	{ 0x01    "OSLC_WARN "    	"OSLC_WARN "   }
+	{ 0x02    "OSLC_INFO"    	"OSLC_INFO "   }
+ENDTABLE
+GROUP gQca_VString
+{
+    FIELD fQca_LegacyHdr_Mod    	(Fixed 1 Byte)     	(TABLE tLegacyModuleType)               "Module"
+    FIELD fQca_LegacyHdr_Level     	(Fixed 1 Byte)     	(TABLE tLegacyLevelType)                "Level"
+
+	FIELD fQca_VString		 (ToEndofLayer)		 (StringofAscii)			"V String"
+}
+
+GROUP gQca_HexDump
+{
+	FIELD fQca_HexDump		 (ToEndofLayer)		 (StringofHex)			"Hex Dump"
+}
+
+GROUP gQca_LegacyDefault
+{
+	FIELD fQca_LegacyDefault		 (ToEndofLayer)		 (StringofHex)			"Hex Dump"
+}
+
+GROUP gQca_MemDump
+{
+	FIELD fQca_LegacyHdr_SeqNum  (Fixed 2 Byte)      (Decimal)       IN_SUMMARY "Seq Num"    	"Seq Num"
+	FIELD fQca_MemDump		 (ToEndofLayer)		 (StringofHex)			"Mem Dump"
+}
+
+TABLE tLegacyReasonType
+    { 0xBD81    "UNKNOWN"    				"UNKNOWN"   					0		gQca_CrashReasonDefault}
+    { 0xBD82    "SW_REQUESTED"    			"SW_REQUESTED"   				0		gQca_CrashReasonDefault}
+    { 0xBD83    "STACK_OVERFLOW"    		"STACK_OVERFLOW"    			0		gQca_CrashReasonDefault}
+	{ 0xBD84    "HARDFAULT_EXCEPTION"    	"HARDFAULT_EXCEPTION"   		0		gQca_CrashReasonDefault}
+	{ 0xBD85    "ASSERT"    				"ASSERT"   						0		gQca_CrashReasonDefault}
+	{ 0xBD86    "TRAP"    					"TRAP"   						0		gQca_CrashReasonDefault}
+	{ 0xBD87    "OS_FATAL"    				"OS_FATAL"   					0		gQca_CrashReasonDefault}
+	{ 0xBD88    "HCI_RESET"    				"HCI_RESET"   					0		gQca_CrashReasonDefault}
+	{ 0xBD89    "PATCH_RESET"    			"PATCH_RESET"   				0		gQca_CrashReasonDefault}
+    { 0xBD8A    "AHB_BUS_TIMEOUT" 	   		"AHB_BUS_TIMEOUT"				0		gQca_CrashReasonDefault}
+	{ 0xBD8B    "RAMMASK"    				"RAMMASK"   					0		gQca_CrashReasonDefault}
+	{ 0xBD8C    "PREBARK_TIMEOUT"    		"PREBARK_TIMEOUT"   			0		gQca_CrashReasonDefault}
+    { 0xBD8D    "BUSERROR"    				"BUSERROR"   					0		gQca_CrashReasonDefault}
+	{ 0xBD8E    "IOP_FATAL"    				"IOP_FATAL"   					0		gQca_CrashReasonDefault}
+	{ 0xBD8F    "SSR_CMD"    				"SSR_CMD"   					0		gQca_CrashReasonDefault}
+	{ 0xBD90    "POWERON"    				"POWERON"   					0		gQca_CrashReasonDefault}
+    { 0xBD91    "WATCHDOG_TIMEOUT" 			"WATCHDOG_TIMEOUT" 				0		gQca_CrashReasonDefault}
+    { 0xBD92    "RAMMASK_RGN1"    			"RAMMASK_RGN1 "   				0		gQca_CrashReasonDefault}
+    { 0xBD93    "RAMMASK_RGN0"    			"RAMMASK_RGN0 "   				0		gQca_CrashReasonDefault}
+    { 0xBD94    "Q6_WATCHDOG"    			"Q6_WATCHDOG "   				0		gQca_CrashReasonDefault}
+	{ 0xBDC0    "RX_INVALID_PKT_FATAL"    	"RX_INVALID_PKT_FATAL "   		0		gQca_CrashReasonDefault}
+	{ 0xBDC1    "RX_INVALID_PKT_LEN_FATAL"  "RX_INVALID_PKT_LEN_FATAL " 	0		gQca_CrashReasonDefault}
+	{ 0xBDF0    "INVALID_STACK"  			"INVALID_STACK " 				0		gQca_CrashOriginalReasonInfo}
+	{ Default   "???"						"(unknown)"						0		gQca_CrashReasonDefault}
+ENDTABLE
+
+GROUP gQca_CrashInfo
+{
+	FIELD fQca_LegacyHdr_BuildVer  		(Fixed 4 Byte)      (Hex)      		"Build Ver"
+    FIELD fQca_LegacyHdr_Reason 		(Fixed 2 Byte)     	RETRIEVE (StoreIntraframeField sQca_Legacy_ReasonType) (TABLE tLegacyReasonType)        IN_SUMMARY "Crash Reason"                           "Crash Reason"	
+	BRANCH (FromTable   tLegacyReasonType   fQca_LegacyHdr_Reason)
+}
+
+GROUP gQca_HciBuffDump
+{
+    FIELD fQca_HciBuffDumpSize  		(Fixed 1 Byte)     	(Decimal)               "HCI buffer Size"
+	FIELD fQca_HciBuffDump		 		(ToEndofLayer)		(StringofHex)			"HCI buffer Dump"	
+}
+
+GROUP gQca_CrashReasonDefault
+{
+	GROUP gQca_CrashInfo_ARM_Regs;
+	GROUP gQca_CrashInfo_CallStack;	
+}
+
+GROUP gQca_CrashOriginalReasonInfo
+{
+    FIELD fQca_LegacyHdr_OriginReason   		(Fixed 2 Byte)     	(TABLE tLegacyReasonType)                "Original Crash Reason"
+}
+
+
+GROUP gQca_CrashIopInvalidPacketInfo
+{
+	GROUP gQca_CrashInfo_ARM_Regs;
+	GROUP gQca_CrashInfo_CallStack;
+
+    FIELD fQca_IopRingbuffSize  		(Fixed 1 Byte)     	(Decimal)               "Ring buffer Size"
+	FIELD fQca_IopRingbuffDump		 	(ToEndofLayer)		(StringofHex)			"Ring Buffer Dump"	
+}
+
+GROUP gQca_CrashInfo_ARM_Regs "ARM Registers"
+{
+	FIELD fQca_LegacyHdr_ArmRegSize		(Fixed 1 Byte)      (Decimal)      	"ARM Register Size"
+
+	FIELD fQca_LegacyHdr_Arm_R1			(Fixed 4 Byte)      (Hex) 			"R1"
+	FIELD fQca_LegacyHdr_Arm_R2			(Fixed 4 Byte)      (Hex)      		"R2"
+	FIELD fQca_LegacyHdr_Arm_R3			(Fixed 4 Byte)      (Hex)      		"R3"
+	FIELD fQca_LegacyHdr_Arm_XPSR		(Fixed 4 Byte)      (Hex)      		"XPSR"
+	FIELD fQca_LegacyHdr_Arm_R4			(Fixed 4 Byte)      (Hex)      		"R4"
+	FIELD fQca_LegacyHdr_Arm_R5			(Fixed 4 Byte)      (Hex)      		"R5"
+	FIELD fQca_LegacyHdr_Arm_R6			(Fixed 4 Byte)      (Hex)      		"R6"
+	FIELD fQca_LegacyHdr_Arm_R7			(Fixed 4 Byte)      (Hex)      		"R7"
+	FIELD fQca_LegacyHdr_Arm_R8			(Fixed 4 Byte)      (Hex)      		"R8"
+	FIELD fQca_LegacyHdr_Arm_R9			(Fixed 4 Byte)      (Hex)      		"R9"
+	FIELD fQca_LegacyHdr_Arm_R10		(Fixed 4 Byte)      (Hex)      		"R10"
+	FIELD fQca_LegacyHdr_Arm_R11		(Fixed 4 Byte)      (Hex)      		"R11"
+	FIELD fQca_LegacyHdr_Arm_R12		(Fixed 4 Byte)      (Hex)      		"R12"
+	FIELD fQca_LegacyHdr_Arm_MSP		(Fixed 4 Byte)      (Hex)      		"MSP"
+	FIELD fQca_LegacyHdr_Arm_PSP		(Fixed 4 Byte)      (Hex)      		"PSP"
+	FIELD fQca_LegacyHdr_Arm_LR			(Fixed 4 Byte)      (Hex)      		"LR"
+	FIELD fQca_LegacyHdr_Arm_PC			(Fixed 4 Byte)      (Hex)      		"PC"
+	FIELD fQca_LegacyHdr_Arm_PRIMASK	(Fixed 4 Byte)      (Hex)      		"PRIMASK"
+	FIELD fQca_LegacyHdr_Arm_CONTROL	(Fixed 4 Byte)      (Hex)      		"CONTROL"
+}
+
+GROUP gQca_CrashInfo_CallStack "CallStack"
+{
+	FIELD CallStack_Size		(Fixed 1 Byte)      (Decimal)    	"Call Stack Size" VERIFY(FieldIsBetween 0 160)
+
+	FIELD fQca_LegacyHdr_Stack_off_0	(Fixed 4 Byte)      IF(MoreBytes) 	(Hex) 			"SP + 0x00"
+	FIELD fQca_LegacyHdr_Stack_off_4	(Fixed 4 Byte)      IF(MoreBytes) 	(Hex) 			"SP + 0x04"
+	FIELD fQca_LegacyHdr_Stack_off_8	(Fixed 4 Byte)      IF(MoreBytes) 	(Hex) 			"SP + 0x08"
+	FIELD fQca_LegacyHdr_Stack_off_c	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)			"SP + 0x0c"	
+	FIELD fQca_LegacyHdr_Stack_off_10	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x10"
+	FIELD fQca_LegacyHdr_Stack_off_14	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x14"
+	FIELD fQca_LegacyHdr_Stack_off_18	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x18"
+	FIELD fQca_LegacyHdr_Stack_off_1C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x1C"
+	FIELD fQca_LegacyHdr_Stack_off_20	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x20"
+	FIELD fQca_LegacyHdr_Stack_off_24	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x24"
+	FIELD fQca_LegacyHdr_Stack_off_28	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x28"
+	FIELD fQca_LegacyHdr_Stack_off_2C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x2C"
+	FIELD fQca_LegacyHdr_Stack_off_30	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x30"
+	FIELD fQca_LegacyHdr_Stack_off_34	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x34"
+	FIELD fQca_LegacyHdr_Stack_off_38	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x38"
+	FIELD fQca_LegacyHdr_Stack_off_3C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x3C"
+	FIELD fQca_LegacyHdr_Stack_off_40	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x40"
+	FIELD fQca_LegacyHdr_Stack_off_44	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x44"
+	FIELD fQca_LegacyHdr_Stack_off_48	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x48"
+	FIELD fQca_LegacyHdr_Stack_off_4C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x4C"
+	FIELD fQca_LegacyHdr_Stack_off_50	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x50"
+	FIELD fQca_LegacyHdr_Stack_off_54	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x54"
+	FIELD fQca_LegacyHdr_Stack_off_58	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x58"
+	FIELD fQca_LegacyHdr_Stack_off_5C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x5C"
+	FIELD fQca_LegacyHdr_Stack_off_60	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x60"
+	FIELD fQca_LegacyHdr_Stack_off_64	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x64"
+	FIELD fQca_LegacyHdr_Stack_off_68	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x68"
+	FIELD fQca_LegacyHdr_Stack_off_6C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x6C"	
+	FIELD fQca_LegacyHdr_Stack_off_70	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x70"
+	FIELD fQca_LegacyHdr_Stack_off_74	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x74"
+	FIELD fQca_LegacyHdr_Stack_off_78	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x78"
+	FIELD fQca_LegacyHdr_Stack_off_7C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x7C"
+	FIELD fQca_LegacyHdr_Stack_off_80	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x80"
+	FIELD fQca_LegacyHdr_Stack_off_84	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x84"
+	FIELD fQca_LegacyHdr_Stack_off_88	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x88"
+	FIELD fQca_LegacyHdr_Stack_off_8C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x8C"	
+	FIELD fQca_LegacyHdr_Stack_off_90	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x90"
+	FIELD fQca_LegacyHdr_Stack_off_94	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x94"
+	FIELD fQca_LegacyHdr_Stack_off_98	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x98"
+	FIELD fQca_LegacyHdr_Stack_off_9C	(Fixed 4 Byte)      IF(MoreBytes)	(Hex)    		"SP + 0x9C"	
+}

@@ -1,4 +1,11 @@
 /*
+ * Copyright (c) 2016, 2018-2019, 2022 Qualcomm Technologies, Inc.
+ *
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ */
+
+/*
  * Copyright (c) 2016 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  * Qualcomm Atheros Confidential and Proprietary.
@@ -92,7 +99,7 @@ _STATIC A_UINT8 currentSegment;
 _STATIC A_UINT32 currentSegIdx;
 _STATIC A_UINT32 maxSegmentSize;
 
-#if 1
+#if 0
 static void print_hex_dump(void *buf, size_t len)
 {
         A_UINT8 *ptr = buf;
@@ -126,24 +133,6 @@ static void print_hex_dump(void *buf, size_t len)
     memcpy((void*)&(pInternalPayload[streamPos]), (void*)&temp, sizeof(temp)); \
     streamPos +=4; \
 }
-
-#ifdef _HOST_SIM_TESTING
-static void prtCmdStream(A_UINT8 *stream, A_UINT32 streamLen)
-{
-    int i,num=0;
-    A_UINT32 *pt32=(A_UINT32 *)stream;
-    printf("ver2..stream: ");
-    for (i=0;i<(int)streamLen;i+=4) {
-        //printf("%d ", stream[i]);
-        pt32=(A_UINT32 *)&(stream[i]);
-        printf("%d ", (int)(*pt32));
-        num++;
-        if (!(num % 40)) printf("\n");
-    }
-    printf("\n");
-    return;
-}
-#endif //_HOST_SIM_TESTING
 
 static A_BOOL tlv2p0Enabled=FALSE;
 
@@ -558,7 +547,7 @@ TLV2_API TESTFLOW_CMD_STREAM_V2 *tlv2CompleteCmdRspSegment(A_UINT16 *streamLen)
     return(&CmdStreamV2);
 }
 
-TLV2_API TESTFLOW_CMD_STREAM_V2 *tlv2CompleteCmdRsp()
+TLV2_API TESTFLOW_CMD_STREAM_V2 *tlv2CompleteCmdRsp(void)
 {
     A_UINT16 streamLen;
 

@@ -25,7 +25,7 @@
 
 #include <time.h>
 #include "artagent.h"
-#include "libtcmd.h"
+#include <libtcmd.h>
 
 static int sid, cid, aid;
 static char ar6kifname[32];
@@ -60,7 +60,7 @@ static int wmiSend(unsigned char *cmdBuf, unsigned int len, unsigned int totalLe
     memcpy((void*)tCmd.buf, (void*)cmdBuf, len);
 
     if ((err = tcmd_tx((char*)&tCmd, sizeof(tCmd), resp))) {
-        fprintf(stderr, "tcmd_tx had error: %s!\n", strerror(err));
+        printf("tcmd_tx had error: %s!\n", strerror(err));
         return 0;
     }
 

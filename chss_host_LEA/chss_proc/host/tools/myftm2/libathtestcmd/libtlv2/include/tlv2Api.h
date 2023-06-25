@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018 Qualcomm Technologies, Inc.
+ * Copyright (c) 2016, 2018-2020, 2022 Qualcomm Technologies, Inc.
  *
  * All Rights Reserved.
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
@@ -58,7 +58,7 @@ TLV2_API A_BOOL addTLV2p0Encoder(void);
 TLV2_API A_BOOL cmdStreamParsingAndProcessing(A_UINT8 *cmdStreamBuf, A_UINT32 cmdStreamLen, A_UINT8 **pPayload, A_UINT16 *payloadLen);
 TLV2_API void tlv2CreateCmdHeader(A_UINT32 cmdCode);
 TLV2_API void tlv2AddParms(int numArgs, ...);
-TLV2_API TESTFLOW_CMD_STREAM_V2 *tlv2CompleteCmdRsp();
+TLV2_API TESTFLOW_CMD_STREAM_V2 *tlv2CompleteCmdRsp(void);
 
 TLV2_API A_BOOL cmdStreamParsingAndProcessingExt(A_UINT8 *cmdStreamBuf, A_UINT32 cmdStreamLen, A_UINT8 **pPayload, A_UINT16 *payloadLen, A_UINT8 *numRemainSegs);
 TLV2_API TLV_ENCODER_ENUM tlv2CreateCmdHeaderExt(A_UINT32 maxSize, A_UINT32 maxStreamSize, A_UINT32 cmdCode);
@@ -248,5 +248,9 @@ TLV2_API void registerSETLOWPOWERHandler(SETLOWPOWER_OP_FUNC fp);
 #include "cmdRSTcalHandler.h"
 TLV2_API void registerRSTHandler(RST_OP_FUNC fp);
 TLV2_API void registerRSTRSPHandler(RSTRSP_OP_FUNC fp);
+
+#include "cmdNoiseFloorRead.h"
+TLV2_API void registerNOISEFLOORREADHandler(NOISEFLOORREAD_OP_FUNC fp);
+TLV2_API void registerNOISEFLOORREADRSPHandler(NOISEFLOORREADRSP_OP_FUNC fp);
 
 #endif // _TLV2_API_H_ - This is the marker line. Don't modify or delete this line

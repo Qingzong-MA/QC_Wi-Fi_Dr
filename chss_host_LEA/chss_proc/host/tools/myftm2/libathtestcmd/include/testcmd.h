@@ -2,7 +2,7 @@
 
   TCMD header File
 
-# Copyright (c) 2014 Qualcomm Technologies, Inc.
+# Copyright (c) 2014, 2019 Qualcomm Technologies, Inc.
 # All Rights Reserved.
 # Qualcomm Technologies Proprietary and Confidential.
 
@@ -35,6 +35,7 @@
 #define  TESTCMD_H_
 
 #include <stdint.h>
+#include "art_utf_common.h"
 
 #if 0
 #ifdef AR6002_REV2

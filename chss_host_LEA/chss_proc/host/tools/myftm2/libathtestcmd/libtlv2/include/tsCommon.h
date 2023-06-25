@@ -29,7 +29,7 @@
 
 #ifdef _DEBUG
 #ifdef Linux
-#define debug(msg)          fputs(__FILE__ ":" num2Str(__LINE__) " - " msg, stderr)
+#define debug(msg)          fputs(__FILE__ ":" num2Str(__LINE__) " - " msg, stdout)
 #else
 #define debug	            printf
 #endif //Linux

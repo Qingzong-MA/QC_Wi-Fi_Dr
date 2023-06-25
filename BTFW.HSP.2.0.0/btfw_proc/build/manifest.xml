@@ -1,0 +1,10 @@
+<config>
+  <image_tree>
+    <name>BTFW.HSP.2.0.0.c6</name>
+    <build_id>BTFW.HSP.2.0.0.c6-00044-HSP_PATCHZ-1</build_id>
+    <branch_point_revision/>
+    <revision>00044</revision>
+    <spin>1</spin>
+    <client>HSP_PATCHZ</client>
+  </image_tree>
+</config>

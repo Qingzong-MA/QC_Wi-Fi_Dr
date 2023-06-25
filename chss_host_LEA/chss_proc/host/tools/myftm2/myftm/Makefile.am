@@ -17,6 +17,10 @@ AM_CFLAGS += -DUSE_GLIB $(GLIB_CFLAGS)
 requiredlibs += $(GLIB_LIBS)
 endif
 
+if MDM_SET
+AM_CFLAGS += -DMDM
+endif
+
 if MDM
 AM_CFLAGS += -DMDM
 endif
@@ -32,6 +36,7 @@ requiredlibs += -lz ../libathtestcmd/libtestcmd6174.a \
                ../libtcmd/libtcmd.a \
 			   -lnl-3 -lnl-genl-3 -lrt
 
+myftm_CFLAGS = ${AM_CFLAGS}
 myftm_LDADD = $(requiredlibs)
 myftm_SOURCES = $(c_sources)
 

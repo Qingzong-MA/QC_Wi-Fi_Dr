@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 Qualcomm Technologies, Inc.
+ * Copyright (c) 2014-2022 Qualcomm Technologies, Inc.
  * All Rights Reserved.
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
 */
@@ -50,10 +50,12 @@
 #include <ctype.h>
 #include "art_utf_common.h"
 
-#include "libtcmd.h"
+#include <libtcmd.h>
 #include "testcmd.h"
 
+#ifndef WIN_AP_HOST
 #include "cmdAllParms.h"
+#endif
 #include "cmdOpcodes.h"
 
 #include "tcmdHostInternal.h"
@@ -85,7 +87,9 @@
 #endif
 
 #ifdef USE_TLV2
-//#include "dkCmdIds.h"
+#ifdef WIN_AP_HOST
+#include "dkCmdIds.h"
+#endif
 #include "parseBinCmdStream.h"
 #include "tlv2Inc.h"
 #include "cmdRspParmsDict.h"
@@ -342,7 +346,7 @@ static int ath_ether_aton(const char *orig, uint8_t *eth)
 		int i;
 #ifdef TCMD_LIB_DEBUG
 		if (*(orig+12+5) !=0) {
-			fprintf(stderr, "%s: trailing junk '%s'!\n", __func__, orig);
+			printf("%s: trailing junk '%s'!\n", __func__, orig);
 			testcmd_error(-1, "trailing junk");
 			return -1;
 		}
@@ -2419,10 +2423,10 @@ void handleRstRSP(void *parms)
 	}
 }
 
-void qca6174RssiSelfTest()
+void qca6174RssiSelfTest(void)
 {
-	uint8_t *rCmdStream = NULL;
-	uint32_t cmdStreamLen = 0;
+	A_UINT8 *rCmdStream = NULL;
+	A_UINT32 cmdStreamLen = 0;
 	TESTFLOW_CMD_STREAM_V2 *pCmdStream;
 
 	/*Bind to TLV2 parser*/
@@ -2434,6 +2438,11 @@ void qca6174RssiSelfTest()
 
 	if (!gCmd.freq) {
 		ALOGE("\n %s(): Should specify frequency with '-f' cmd\n", __func__);
+		return;
+	}
+
+	if ((gCmd.txPwr < 0) || (gCmd.txPwr > 20)) {
+		ALOGE("\n %s(): Txpower should be in range of 0 to 20\n", __func__);
 		return;
 	}
 
@@ -2459,15 +2468,16 @@ void qca6174RssiSelfTest()
 
 	tlv2AddParms(2, PARM_PHYID, gCmd.phyid);
 	tlv2AddParms(2, PARM_FREQ, gCmd.freq);
+	tlv2AddParms(2, PARM_TXPOWER, (A_UINT16)gCmd.txPwr);
 	tlv2AddParms(2, PARM_CALTXGAIN, gCmd.calTxGain);
 	tlv2AddParms(2, PARM_FORCEDRXIDX, gCmd.forcedRXIdx);
 	tlv2AddParms(2, PARM_DACGAIN, gCmd.dacGain);
 	tlv2AddParms(2, PARM_RSTDIR, gCmd.rstDir);
 
 	if (tlv2_enabled == TRUE) {
-		ALOGE("\n %s() TLV2 CMD_RST: phyid %d freq %d calTxGain %d "
+		ALOGE("\n %s() TLV2 CMD_RST: phyid %d freq %d txPwr %d calTxGain %d "
 			"forcedRXIdx %d dacGain %d rstDir %d\n",
-			__func__,  gCmd.phyid, gCmd.freq, gCmd.calTxGain,
+			__func__,  gCmd.phyid, gCmd.freq, (A_UINT16)gCmd.txPwr, gCmd.calTxGain,
 			gCmd.forcedRXIdx, gCmd.dacGain, gCmd.rstDir);
 		/*Complete TLV2 stream by adding length, CRC, etc */
 		pCmdStream = (TESTFLOW_CMD_STREAM_V2 *) tlv2CompleteCmdRsp();
@@ -2864,7 +2874,8 @@ void qca6174SetDBS(char *dbs_val)
 	uint8_t *rCmdStream = NULL;
 	uint32_t cmdStreamLen = 0;
 	TESTFLOW_CMD_STREAM_V2 *pCmdStream;
-	int dbs_value = PHY_RF_MODE_NON_DBS_PHY0;
+	int dbs_value = -1;
+	int cmd_len = strlen(dbs_val);
 
 	/*Bind to TLV2 parser*/
 	addTLV2p0BinCmdParser();
@@ -2874,17 +2885,30 @@ void qca6174SetDBS(char *dbs_val)
 
 	tlv2CreateCmdHeader(CMD_SETPHYRFMODE);
 
-	if (strncmp(dbs_val, "dbs", 3) == 0) {
-		dbs_value = PHY_RF_MODE_DBS_PHY0_PHY1;
-	} else if (!strncmp(dbs_val, "phya", 4)) {
+	/**
+	* Handle the ambiguity of param strings here accordingly
+	* Example: dbs_dbs may take different if and sends
+	* PHY_RF_MODE_DBS_PHY0_PHY1 which is invalid if string length check
+	* is not present.
+	*/
+	if (cmd_len <= 5 && (!strncmp(dbs_val, "phya", 4))) {
 		dbs_value = PHY_RF_MODE_NON_DBS_PHY0;
-	} else if (!strncmp(dbs_val, "phyb", 4)) {
-		dbs_value = PHY_RF_MODE_NON_DBS_PHY1;
-	} else if (!strncmp(dbs_val, "sbs", 4)) {
+	} else if (cmd_len <= 4 && (!strncmp(dbs_val, "dbs", 3))) {
+		dbs_value = PHY_RF_MODE_DBS_PHY0_PHY1;
+	} else if (cmd_len <= 4 && !strncmp(dbs_val, "sbs", 3)) {
 		dbs_value = PHY_RF_MODE_SBS_PHY0_PHY1;
+	} else if (cmd_len <= 5 && !strncmp(dbs_val, "phyb", 4)) {
+		dbs_value = PHY_RF_MODE_NON_DBS_PHY1;
+	} else if (cmd_len <= 8 && (!strncmp(dbs_val, "dbs_dbs", 7))) {
+		dbs_value = PHY_RF_MODE_DBS_DBS;
+	} else if (cmd_len <= 11 && (!strncmp(dbs_val, "dbs_or_sbs", 10))) {
+		dbs_value = PHY_RF_MODE_DBS_OR_SBS;
+	} else if (cmd_len <= 14 && (!strncmp(dbs_val, "dbs_phyb_phya", 13))) {
+		dbs_value = PHY_RF_MODE_DBS_PHY1_PHY0;
 	} else {
-		//dbs_value = PHY_RF_MODE_MAX;
-		ALOGE("\n %s() Error PHY_RF_MODE_MAX", __func__);
+		ALOGE("\n %s() Invalid phy RF mode:%s received",
+			__func__, dbs_val);
+		return;
 	}
 
 	tlv2AddParms(2, PARM_PHYRFMODE, dbs_value);
@@ -3062,10 +3086,11 @@ void qca6174CmdSETREGDMN(char *val)
 		return;
 	}
 
-	tlv2AddParms(4, PARM_REGDMN, 2, 0, reg_domain);
-	ALOGE("\n %s() TLV2 CMD_SETREGDMN reg_domain-1 %x reg_domain-2 %x\n",
-		__func__, reg_domain[0], reg_domain[1]);
 	/*Complete TLV2 stream by adding length, CRC, etc */
+	tlv2AddParms(4, PARM_REGDMN, 2, 0, reg_domain);
+	tlv2AddParms(2, PARM_PWRMODE6G, gCmd.pw_mode_6g);
+	ALOGE("\n %s() TLV2 CMD_SETREGDMN reg_domain-1 %x reg_domain-2  %x pw_mode_6g %d\n",
+		__func__, reg_domain[0], reg_domain[1], gCmd.pw_mode_6g);
 	pCmdStream = (TESTFLOW_CMD_STREAM_V2 *) tlv2CompleteCmdRsp();
 	if (!pCmdStream) {
 		ALOGE("\n %s() TLV2 pCmdStream is NULL\n", __func__);
@@ -3081,6 +3106,51 @@ void qca6174CmdSETREGDMN(char *val)
 		ALOGE("\n%s() success = %d\n", __func__, gCmd.errCode);
 	} else {
 		ALOGE("\n%s() error = %d\n", __func__, gCmd.errCode);
+	}
+}
+
+static TCMD_WIFI_STANDARD get_wifi_standard(uint8_t rateBw)
+{
+
+	switch (rateBw) {
+		case TCMD_RATEBW_OFDMA_HE20:
+		case TCMD_RATEBW_OFDMA_HE40:
+		case TCMD_RATEBW_OFDMA_HE80:
+		case TCMD_RATEBW_OFDMA_HE80P80:
+		case TCMD_RATEBW_OFDMA_HE160:
+		case TCMD_RATEBW_OFDMA_HE165:
+		case TCMD_RATEBW_11AX_OFDMA_HE320:
+		case TCMD_RATEBW_11BE_OFDMA_EHT20:
+		case TCMD_RATEBW_11BE_OFDMA_EHT40:
+		case TCMD_RATEBW_11BE_OFDMA_EHT80:
+		case TCMD_RATEBW_11BE_OFDMA_EHT160:
+		case TCMD_RATEBW_11BE_OFDMA_EHT320:
+			return WIFI_STANDARD_OFDMA;
+		case TCMD_RATEBW_CCK:
+		case TCMD_RATEBW_LEGACY_OFDM:
+		case TCMD_RATEBW_HT20:
+		case TCMD_RATEBW_HT40:
+		case TCMD_RATEBW_VHT20:
+		case TCMD_RATEBW_VHT40:
+		case TCMD_RATEBW_VHT80:
+		case TCMD_RATEBW_VHT80P80:
+		case TCMD_RATEBW_HE20:
+		case TCMD_RATEBW_HE40:
+		case TCMD_RATEBW_HE80:
+		case TCMD_RATEBW_HE80P80:
+		case TCMD_RATEBW_HE160:
+		case TCMD_RATEBW_HE165:
+		case TCMD_RATEBW_VHT160:
+		case TCMD_RATEBW_VHT165:
+		case TCMD_RATEBW_11AX_HE320:
+		case TCMD_RATEBW_11BE_EHT20:
+		case TCMD_RATEBW_11BE_EHT40:
+		case TCMD_RATEBW_11BE_EHT80:
+		case TCMD_RATEBW_11BE_EHT160:
+		case TCMD_RATEBW_11BE_EHT320:
+			return WIFI_STANDARD_LEGACY_AX;
+		default:
+			return WIFI_STANDARD_DEFAULT;
 	}
 }
 
@@ -3121,6 +3191,7 @@ int qca6174TxCommand(const char *txtype)
 	} else {
 		ALOGE("%s():%d Error wrong txMode %s\n",
 				__func__, __LINE__, txtype);
+		free(Params);
 		return -1;
 	}
 
@@ -3145,15 +3216,7 @@ int qca6174TxCommand(const char *txtype)
 	if (gCmd.ldpc)
 		Params->miscFlags |= DESC_LDPC_ENA_MASK;
 
-	if ((gCmd.rateBw >= TCMD_RATEBW_OFDMA_HE20 && gCmd.rateBw <= TCMD_RATEBW_OFDMA_HE80P80) ||
-	     gCmd.rateBw == TCMD_RATEBW_OFDMA_HE160 || gCmd.rateBw == TCMD_RATEBW_OFDMA_HE165)
-			gCmd.wifistandard  = WIFI_STANDARD_OFDMA;
-	else if ((gCmd.rateBw >= TCMD_RATEBW_CCK && gCmd.rateBw <= TCMD_RATEBW_HE80P80) ||
-		  gCmd.rateBw == TCMD_RATEBW_HE160 || gCmd.rateBw == TCMD_RATEBW_HE165 ||
-		  gCmd.rateBw == TCMD_RATEBW_VHT160 || gCmd.rateBw == TCMD_RATEBW_VHT165)
-			gCmd.wifistandard  = WIFI_STANDARD_LEGACY_AX;
-	else
-			gCmd.wifistandard  = WIFI_STANDARD_DEFAULT;
+	gCmd.wifistandard = get_wifi_standard(gCmd.rateBw);
 
 	/* Update flags between wifistandard Legacy 11ax and OFDMA */
 	if (gCmd.wifistandard  == WIFI_STANDARD_LEGACY_AX ||
@@ -3351,15 +3414,13 @@ int qca6174TxCommand(const char *txtype)
 
 	if (tx_power < 0)
 		tx_power = 0;
-	if (gCmd.txPwr < 0)
-		gCmd.txPwr = 0;
 
 	if (isPowerChanged) {
 		Params->txPower[0] = tx_power * 2;
 	} else {
-		Params->txPower[0] = gCmd.txPwr * 2;
+		Params->txPower[0] = (int)(gCmd.txPwr * 2);
 	}
-	 ALOGE("%s - input pwr %.2f output pwr %d", __func__,
+	 ALOGE("%s - input pwr %.2f output pwr %hi", __func__,
 		gCmd.txPwr, Params->txPower[0]);
 
 	for (i=0; i<RATE_POWER_MAX_INDEX; i++)
@@ -3491,10 +3552,7 @@ int qca6174TxCommand(const char *txtype)
 		tlv2AddParms(2, PARM_SHORTGUARD, Params->shortGuard);
 		tlv2AddParms(2, PARM_TXNUMPACKETS, Params->numPackets);
 		tlv2AddParms(2, PARM_TPCM, Params->tpcm);
-		if (Params->txPower[0] == 0)
-			tlv2AddParms(2, PARM_TXPOWER, 0x1c);
-		else
-			tlv2AddParms(2, PARM_TXPOWER, Params->txPower[0]);
+		tlv2AddParms(2, PARM_TXPOWER, Params->txPower[0]);
 		tlv2AddParms(2, PARM_PKTSZ, gCmd.pktLen0);
 		//tlv2AddParms(2, PARM_ANTENNA, Params->antenna);
 		//tlv2AddParms(2, PARM_SCRAMBLEROFF, Params->scramblerOff);
@@ -3509,14 +3567,21 @@ int qca6174TxCommand(const char *txtype)
 			tlv2AddParms(2, PARM_GAINIDX, Params->gainIdx);
 			tlv2AddParms(2, PARM_DACGAIN, Params->dacGain);
 		}
-		if (gCmd.rateBw >= TCMD_RATEBW_HE20 &&
-		    gCmd.rateBw < TCMD_RATEBW_INVALID)
-			//for 11ax rate
-			tlv2AddParms(2, PARM_RATEBITINDEX, gCmd.rate + 5);
-		else
-			//for legacy mode
-			tlv2AddParms(2, PARM_RATEBITINDEX,
-				Params->rateMaskBitPosition[0]);
+		//Pass the rate as is in case of Wifi chips having AX support
+		if (gCmd.wifistandard >= WIFI_STANDARD_LEGACY_AX) {
+			tlv2AddParms(2, PARM_RATEBITINDEX, gCmd.rate);
+		}
+		//legacy behavior for older WiFi chips
+		else {
+			if (gCmd.rateBw >= TCMD_RATEBW_HE20 &&
+				gCmd.rateBw < TCMD_RATEBW_INVALID)
+				//for 11ax rate
+				tlv2AddParms(2, PARM_RATEBITINDEX, gCmd.rate + 5);
+			else
+				//for legacy mode
+				tlv2AddParms(2, PARM_RATEBITINDEX,
+					Params->rateMaskBitPosition[0]);
+		}
 		tlv2AddParms(4, PARM_RATEMASK, 3, 0, rMask);
 		tlv2AddParms(4, PARM_RATEMASK11AC, 5, 0, rMask11AC);
 		tlv2AddParms(2, PARM_RATEMASKAC160, rMask11AC[5]);
@@ -3527,11 +3592,14 @@ int qca6174TxCommand(const char *txtype)
 		tlv2AddParms(4, PARM_RXSTATION, ATH_MAC_LEN, 0,
 			     (uint8_t *)&Params->rxStation);
 		//WiFiStandard
-		ALOGE("\n %s() TLV2 CMD_TX add WiFiStandard %d with rateBw %d\n",
-			__func__, gCmd.wifistandard, gCmd.rateBw);
+		ALOGE("\n %s() TLV2 CMD_TX add WiFiStandard %d with rateBw %d rate:%d\n",
+			__func__, gCmd.wifistandard, gCmd.rateBw, gCmd.rate);
 		tlv2AddParms(2, PARM_WIFISTANDARD, gCmd.wifistandard);
 		tlv2AddParms(2, PARM_PREFECPAD, gCmd.fecpad);
 		tlv2AddParms(2, PARM_LDPCEXTRASYMBOL, gCmd.ldpc_exsymbol);
+
+		if(gCmd.puncBw)
+			tlv2AddParms(2, PARM_PUNCBWMASK, gCmd.puncBw);
 	}
 
 	if (tlv2_enabled == TRUE) {
@@ -3541,6 +3609,7 @@ int qca6174TxCommand(const char *txtype)
 		pCmdStream = (TESTFLOW_CMD_STREAM_V2 *) tlv2CompleteCmdRsp();
 		if (!pCmdStream) {
 			ALOGE("\n %s() TLV2 pCmdStream is NULL\n", __func__);
+			free(Params);
 			return -1;
 		}
 		cmdStreamLen = (sizeof(TESTFLOW_CMD_STREAM_HEADER_V2) +
@@ -3557,6 +3626,7 @@ int qca6174TxCommand(const char *txtype)
 		addTxParameters(Params);
 		commandComplete(&rCmdStream, &cmdStreamLen);
 	}
+	free(Params);
 
 	print_hex_dump(rCmdStream, cmdStreamLen);
 
@@ -3854,8 +3924,11 @@ int qca6174RxPacketStart(char *rx_type)
 		rMask11AC[4] = 0x3FFFFFFF;
 		rMask11AC[5] = 0x000FFFFF;
 	} else if (gCmd.rateBw != TCMD_RATEBW_INVALID) {
-		// For 11ax mode set PARM_RATEMASK[0]=31
-		rMask[0] = 31;
+		// Set the rateMask to MCS rate based on Wifi_standard
+		if (get_wifi_standard(gCmd.rateBw) >= WIFI_STANDARD_LEGACY_AX) {
+			rMask[0] = gCmd.rate;
+		}
+		ALOGE("\n %s() TLV2 rateMask %d", __func__, rMask[0]);
 	} else {
 		if (is11ACRate == FALSE ) {
 			rMask[rowIndex] = rateBitMask;
@@ -3893,16 +3966,7 @@ int qca6174RxPacketStart(char *rx_type)
 	misc_flags = (PROCESS_RATE_IN_ORDER_MASK |
 			RX_STATUS_PER_RATE_MASK);
 
-	/* wifistandard base on rateBw between Legacy 11ax and OFDMA */
-	if ((gCmd.rateBw >= TCMD_RATEBW_OFDMA_HE20 && gCmd.rateBw <= TCMD_RATEBW_OFDMA_HE80P80) ||
-	     gCmd.rateBw == TCMD_RATEBW_OFDMA_HE160 || gCmd.rateBw == TCMD_RATEBW_OFDMA_HE165)
-			gCmd.wifistandard  = WIFI_STANDARD_OFDMA;
-	else if ((gCmd.rateBw >= TCMD_RATEBW_CCK && gCmd.rateBw <= TCMD_RATEBW_HE80P80) ||
-		  gCmd.rateBw == TCMD_RATEBW_HE160 || gCmd.rateBw == TCMD_RATEBW_HE165 ||
-		  gCmd.rateBw == TCMD_RATEBW_VHT160 || gCmd.rateBw == TCMD_RATEBW_VHT165)
-			gCmd.wifistandard  = WIFI_STANDARD_LEGACY_AX;
-	else
-			gCmd.wifistandard  = WIFI_STANDARD_DEFAULT;
+	gCmd.wifistandard = get_wifi_standard(gCmd.rateBw);
 
 	/* Update flags between wifistandard Legacy 11ax and OFDMA */
 	if (gCmd.wifistandard  == WIFI_STANDARD_LEGACY_AX ||
@@ -4068,12 +4132,13 @@ int qca6174RxPacketStop(void)
 
 		// stop Rx and need report
 		tlv2CreateCmdHeader(CMD_RXSTATUS);
+		ALOGE("\n skip_rx_stop %d", gCmd.skip_rx_stop);
 		if (gCmd.phyid)
 			tlv2AddParms(6, PARM_PHYID, gCmd.phyid, PARM_STOPRX,
-					1, PARM_FREQ, gCmd.freq);
+					(gCmd.skip_rx_stop == 1) ? 0 : 1, PARM_FREQ, gCmd.freq);
 		else
 			tlv2AddParms(6, PARM_PHYID, 0, PARM_STOPRX,
-					1, PARM_FREQ, gCmd.freq);
+					(gCmd.skip_rx_stop == 1) ? 0 : 1, PARM_FREQ, gCmd.freq);
 
 		if (gCmd.ofdmalinkdir >= TCMD_DIR_UP &&
 		    gCmd.ofdmalinkdir < TCMD_DIR_INVALID) {
@@ -4085,16 +4150,7 @@ int qca6174RxPacketStop(void)
 			      gCmd.ofdmalinkdir);
 		}
 
-		/* wifistandard base on rateBw between Legacy 11ax and OFDMA */
-		if ((gCmd.rateBw >= TCMD_RATEBW_OFDMA_HE20 && gCmd.rateBw <= TCMD_RATEBW_OFDMA_HE80P80) ||
-		     gCmd.rateBw == TCMD_RATEBW_OFDMA_HE160 || gCmd.rateBw == TCMD_RATEBW_OFDMA_HE165)
-				gCmd.wifistandard  = WIFI_STANDARD_OFDMA;
-		else if ((gCmd.rateBw >= TCMD_RATEBW_CCK && gCmd.rateBw <= TCMD_RATEBW_HE80P80) ||
-			  gCmd.rateBw == TCMD_RATEBW_HE160 || gCmd.rateBw == TCMD_RATEBW_HE165 ||
-			  gCmd.rateBw == TCMD_RATEBW_VHT160 || gCmd.rateBw == TCMD_RATEBW_VHT165)
-				gCmd.wifistandard  = WIFI_STANDARD_LEGACY_AX;
-		else
-				gCmd.wifistandard  = WIFI_STANDARD_DEFAULT;
+		gCmd.wifistandard = get_wifi_standard(gCmd.rateBw);
 
 		ALOGE("\n %s() TLV2 CMD_RXSTATUS with wifistandard %d\n", __func__,
 			gCmd.wifistandard);
@@ -4158,6 +4214,21 @@ void qca6174SetLongPreamble(int enable)
 void qca6174SetAifsNum(int slot)
 {
 	gCmd.aifs = slot;
+}
+
+void qca6174SetPwMode6G(int pw_mode_6g)
+{
+	gCmd.pw_mode_6g = pw_mode_6g;
+}
+
+void qca6174SetPuncBw(int punc_bw_pattern)
+{
+        gCmd.puncBw = punc_bw_pattern;
+}
+
+void qca6174SetSkipRxStop(uint8_t skip_rx_stop)
+{
+	gCmd.skip_rx_stop = skip_rx_stop;
 }
 
 void qca6174SetAntenna(int antenna)
@@ -4677,7 +4748,7 @@ void handleOFDMATONEPLANRSP (void *parms)
  * CMD_OFDMATONEPLAN Request command by passing PHYID and TonePlan
  * parameters.
  */
-static int setqca6174Cmd_Toneplan()
+static int setqca6174Cmd_Toneplan(void)
 {
 	CMD_OFDMATONEPLAN_PARMS *Params;
 	uint8_t *rCmdStream = NULL;
@@ -4727,6 +4798,7 @@ static int setqca6174Cmd_Toneplan()
         print_hex_dump((char*)Params, sizeof(CMD_OFDMATONEPLAN_PARMS));
 
 	ALOGE("\n %s() TLV2 CMD_OFDMATONEPLAN .. \n", __func__);
+	free(Params);
 	/*Complete TLV2 stream by adding length, CRC, etc */
 	pCmdStream = tlvGetNextStream(&cmdStreamLen);
 	if (!pCmdStream) {
@@ -4754,10 +4826,14 @@ int qca6174Cmd_TONEPLAN(char *val)
 	char *temp = (char*) malloc(MAX_CLI_VAL);
 	char *token;
 	char *ptoken;
+	char *saveptr;
 	int ret = 0;
 	memset(&gCmd.toneplan, 0x0, sizeof(gCmd.toneplan));
+	if (!temp)
+		return -1;
 	strlcpy(temp, val, MAX_CLI_VAL);
-	while ((token = strtok_r(temp, ":", &temp))) {
+	token = strtok_r(temp, ":", &saveptr);
+	while (token != NULL) {
 		if (strstr(token, "ver=")) {
 		   gCmd.toneplan.version = atoi((char*)token + 4);
 		} else if (strstr(token, "bndwth=")) {
@@ -4789,7 +4865,9 @@ int qca6174Cmd_TONEPLAN(char *val)
 		} else if (strstr(token, "rsvd2=")) {
 			   parse_u8_value((char*)token + 6, gCmd.toneplan.Rsvd2, MAX_DATA_LEN);
 		}
+		token = strtok_r(NULL, ":", &saveptr);
 	}
+	free(temp);
 	ret = setqca6174Cmd_Toneplan();
 	return ret;
 }
@@ -4828,7 +4906,7 @@ void handleOFDMAULTXCONFIGRSP (void *parms)
 /* This function configured OFDMA Uplink TX Config parameter using
  * CMD_OFDMAULTXCONFIG Request command.
  */
-int qca6174Cmd_OFDMAUL_TX()
+int qca6174Cmd_OFDMAUL_TX(void)
 {
 	uint8_t *rCmdStream = NULL;
 	uint32_t cmdStreamLen = 0;
@@ -4871,6 +4949,79 @@ int qca6174Cmd_OFDMAUL_TX()
 	}
 
 	return (gCmd.errCode == 0) ? 0 : -1;
+}
+
+static const char *get_dpd_complete_status_str(A_UINT8 val)
+{
+	switch (val)
+	{
+		case 0: return "timeout";
+		case 1: return "pass";
+		case 2: return "not need";
+		default: return "invalid status";
+	}
+}
+
+void handleDpdCompleteRSP(void *parms)
+{
+	CMD_GETDPDCOMPLETERSP_PARMS *pParms =
+			(CMD_GETDPDCOMPLETERSP_PARMS *)parms;
+
+	if (pParms == NULL) {
+		printf("Invalid response pointer\n");
+		return;
+	}
+
+	ALOGE("%s Response dpdComplete %d %s\n", __func__,
+		pParms->dpdComplete,
+		get_dpd_complete_status_str(pParms->dpdComplete));
+	ALOGE("%s Response phyId 0x%.8x\n ", __func__, pParms->phyId);
+}
+
+int qca6174GetDpdComplete(void)
+{
+	uint8_t *rCmdStream = NULL;
+	uint32_t cmdStreamLen = 0;
+	TESTFLOW_CMD_STREAM_V2 *pCmdStream;
+
+	if (tlv2_enabled != TRUE) {
+		ALOGE("%s(), TLV2 need to be enabled\n", __func__);
+		return -1;
+	}
+
+	/*Bind to TLV2 parser*/
+	addTLV2p0BinCmdParser();
+	addTLV2p0Encoder();
+	registerGETDPDCOMPLETERSPHandler(handleDpdCompleteRSP);
+
+	tlv2CreateCmdHeader(CMD_GETDPDCOMPLETE);
+
+	tlv2AddParms(2, PARM_PHYID, gCmd.phyid);
+
+	ALOGE("\n %s() TLV2 CMD_GETDPDCOMPLETE phyid %u\n", __func__, gCmd.phyid);
+
+	/*Complete TLV2 stream by adding length, CRC, etc */
+	pCmdStream = (TESTFLOW_CMD_STREAM_V2 *) tlv2CompleteCmdRsp();
+	if (!pCmdStream) {
+		ALOGE("\n %s() TLV2 pCmdStream is NULL\n", __func__);
+		return -1;
+	}
+	cmdStreamLen = (sizeof(TESTFLOW_CMD_STREAM_HEADER_V2) +
+				pCmdStream->cmdStreamHeader.length);
+
+	rCmdStream = (A_UINT8 *) pCmdStream;
+
+	print_hex_dump(rCmdStream, cmdStreamLen);
+
+	doCommand(rCmdStream, cmdStreamLen);
+
+	if (gCmd.errCode == 0)
+		ALOGE("\n%s() Success = %d\n", __func__, gCmd.errCode);
+	else
+		ALOGE("\n%s() error = %d\n", __func__, gCmd.errCode);
+
+	return (gCmd.errCode == 0) ? 0 : -1;
+
 }
 
 void handleRegReadRSP(void *parms)
@@ -5033,7 +5184,7 @@ void qca6174Set_LOWPOWER_FEATUREMASK(uint32_t mask)
 	    gCmd.lpwr_fwmask = 0;
 }
 
-int qca6174Cmd_LOWPOWER()
+int qca6174Cmd_LOWPOWER(void)
 {
 	uint8_t *rCmdStream = NULL;
 	uint32_t cmdStreamLen = 0;
@@ -5081,4 +5232,90 @@ int qca6174Cmd_LOWPOWER()
 	}
 
 	return (gCmd.errCode == 0) ? 0 : -1;
+}
+
+void handleGetNoiseFloorRSP(void *parms)
+{
+	int len = 0;
+	CMD_NOISEFLOORREADRSP_PARMS *pParms =
+			(CMD_NOISEFLOORREADRSP_PARMS *)parms;
+
+	if (pParms == NULL) {
+		ALOGE("Invalid response pointer\n");
+		return;
+	}
+
+	len = (pParms->nfValuesLength < 2) ? 2 : pParms->nfValuesLength;
+	ALOGE("NOISEFLOORREADRSPOp: nfValuesLength %u len:%d\n",
+		pParms->nfValuesLength, len);
+	for (int i = 0; i < len; i++)
+	{
+		ALOGE("NOISEFLOORREADRSPOp: nfValues %u\n", pParms->nfValues[i]);
+	}
+	ALOGE("NOISEFLOORREADRSPOp: phyId %u\n", pParms->phyId);
+}
+
+int qca6174GetNoiseFloor()
+{
+	uint8_t *rCmdStream = NULL;
+	uint32_t cmdStreamLen = 0;
+	TESTFLOW_CMD_STREAM_V2 *pCmdStream;
+
+	if (tlv2_enabled != TRUE) {
+		ALOGE("%s(), TLV2 need to be enabled\n", __func__);
+		return -1;
+	}
+
+	/*Bind to TLV2 parser*/
+	addTLV2p0BinCmdParser();
+	addTLV2p0Encoder();
+	registerNOISEFLOORREADRSPHandler(handleGetNoiseFloorRSP);
+
+	tlv2CreateCmdHeader(CMD_NOISEFLOORREAD);
+
+	tlv2AddParms(2, PARM_PHYID, gCmd.phyid);
+	tlv2AddParms(2, PARM_CHAINMASK, gCmd.chain);
+	tlv2AddParms(2, PARM_FREQ, gCmd.freq);
+	tlv2AddParms(2, PARM_RATE, gCmd.rateBw);
+	if (gCmd.xlnaCtrlValid == 1)
+		tlv2AddParms(2, PARM_XLNACTRL, gCmd.xlnaCtrl);
+
+	ALOGE("\n %s() TLV2 CMD_NOISEFLOORREAD"
+	      " freq:%d chainMask:%d phyId:%d rate:%d"
+	      " xlnaCtrlValid:%d xlnaCtrl:%d\n", __func__, gCmd.freq,
+	      gCmd.chain, gCmd.phyid, gCmd.rateBw, gCmd.xlnaCtrlValid,
+	      gCmd.xlnaCtrl);
+	/*Complete TLV2 stream by adding length, CRC, etc */
+	pCmdStream = (TESTFLOW_CMD_STREAM_V2 *) tlv2CompleteCmdRsp();
+	if (!pCmdStream) {
+		ALOGE("\n %s() TLV2 pCmdStream is NULL\n", __func__);
+		return -1;
+	}
+	cmdStreamLen = (sizeof(TESTFLOW_CMD_STREAM_HEADER_V2) +
+				pCmdStream->cmdStreamHeader.length);
+
+	rCmdStream = (A_UINT8 *) pCmdStream;
+
+	print_hex_dump(rCmdStream, cmdStreamLen);
+
+	doCommand(rCmdStream, cmdStreamLen);
+
+	if (gCmd.errCode == 0)
+		ALOGE("\n%s() Success = %d\n", __func__, gCmd.errCode);
+	else
+		ALOGE("\n%s() error = %d\n", __func__, gCmd.errCode);
+
+	gCmd.xlnaCtrlValid = 0;
+	return (gCmd.errCode == 0) ? 0 : -1;
+}
+
+void qca6174SetxlnaCtrl(char *val)
+{
+	gCmd.xlnaCtrl = (int)strtol(val, NULL, 0);
+	gCmd.xlnaCtrlValid = 1;
+}
+
+void qca6174SetNoiseFloorRead(char *val)
+{
+	gCmd.noiseFloorRead = (int)strtol(val, NULL, 0);
 }

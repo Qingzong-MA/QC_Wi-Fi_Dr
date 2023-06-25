@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, 2016-2018 Qualcomm Technologies Inc.
+ * Copyright (c) 2011-2012, 2016-2018, 2021 Qualcomm Technologies Inc.
  * All Rights Reserved.
  * Confidential and Proprietary - Qualcomm Technologies, Inc.
  *
@@ -50,12 +50,24 @@ enum ar6k_testmode_attr {
 	AR6K_TM_ATTR_MAX	= __AR6K_TM_ATTR_AFTER_LAST - 1
 };
 
+#ifdef WIN_AP_HOST_OPEN
+enum ar6k_testmode_cmd {
+	AR6K_TM_CMD_VERSION		= 0,
+	AR6K_TM_CMD_START		= 1,
+	AR6K_TM_CMD_STOP		= 2,
+	AR6K_TM_CMD_WMI_CMD		= 3,
+	AR6K_TM_CMD_TCMD		= 4,
+};
+#else
 enum ar6k_testmode_cmd {
 	AR6K_TM_CMD_TCMD		= 0,
+	AR6K_TM_CMD_START		= 1,
+	AR6K_TM_CMD_STOP		= 2,
 #ifndef CONFIG_AR6002_REV6
 	AR6K_TM_CMD_WMI_CMD		= 0xF000,
 #endif
 };
+#endif
 
 static int error_handler(struct sockaddr_nl *nla, struct nlmsgerr *err,
 			 void *arg)
@@ -86,6 +98,9 @@ static int ack_handler(struct nl_msg *msg, void *arg)
 }
 
 #ifdef ANDROID
+#ifndef in_addr_t
+typedef uint32_t in_addr_t;
+#endif
 #include "netlink-private/genl.h"
 /* android's libnl_2 does not include this, define it here */
 static int android_genl_ctrl_resolve(struct nl_handle *handle,
@@ -297,7 +312,9 @@ int nl80211_rx_cb(struct nl_msg *msg, void *arg)
 		  nla_len(tb[NL80211_ATTR_TESTDATA]), NULL);
 
 	if (!td[AR6K_TM_ATTR_DATA]) {
+#ifndef WIN_AP_HOST_OPEN
 		printf("no data in reply\n");
+#endif
 		return NL_SKIP;
 	}
 
@@ -317,6 +334,9 @@ int nl80211_init(struct tcmd_cfg *cfg)
 {
 	struct nl_cb *cb;
 	int err;
+#ifdef WIN_AP_HOST_OPEN
+	int opt;
+#endif
 
 	if(cfg->nl_handle)
 		nl_handle_destroy(cfg->nl_handle);
@@ -373,11 +393,86 @@ int nl80211_init(struct tcmd_cfg *cfg)
 	/* so we can handle timeouts properly */
 	nl_socket_set_nonblocking(cfg->nl_handle);
 
+#ifdef WIN_AP_HOST_OPEN
+	/* nobuf errors are useful for identifying lost packets and doing a
+	 * resync. Such handling is not performed by libtcmd since we
+	 * do a synchronous recv after performing a tx. Since
+	 * we are listening in multicast socket and we recv/process the
+	 * data only when do a tx, there are chances we receive overrun
+	 * or ENOBUF errors which affects our data recv and better to
+	 * avoid them
+	 */
+        opt = 1;
+        setsockopt(nl_socket_get_fd(cfg->nl_handle), SOL_NETLINK,
+                   NETLINK_NO_ENOBUFS, &opt, sizeof(opt));
+#endif
+
 	return 0;
 
  out_handle_destroy:
 	nl_handle_destroy(cfg->nl_handle);
 	return err;
+}
+
+int nl80211_tcmd_connect(struct tcmd_cfg *cfg, enum ar6k_testmode_cmd cmd )
+{
+        struct nl_msg *msg;
+        struct nlattr *nest;
+        int devidx, err = 0;
+
+        /* CHANGE HERE: you may need to allocate larger messages! */
+        msg = nlmsg_alloc();
+        if (!msg) {
+                A_DBG("failed to allocate netlink message\n");
+                return 2;
+        }
+
+        genlmsg_put(msg, 0, 0, cfg->nl_id, 0,
+                    0, NL80211_CMD_TESTMODE, 0);
+
+        devidx = if_nametoindex(cfg->iface);
+        if (devidx) {
+                NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, devidx);
+        } else {
+                A_DBG("Device not found\n");
+                err = -ENOENT;
+                goto out_free_msg;
+        }
+
+        nest = nla_nest_start(msg, NL80211_ATTR_TESTDATA);
+        if (!nest) {
+                A_DBG("failed to nest\n");
+                err = -1;
+                goto out_free_msg;
+        }
+
+        NLA_PUT_U32(msg, AR6K_TM_ATTR_CMD, cmd);
+
+        nla_nest_end(msg, nest);
+
+#ifndef WIN_AP_HOST
+        A_DBG("nl80211: sending message\n");
+#endif
+        nl_send_auto_complete(cfg->nl_handle, msg);
+
+ out_free_msg:
+        nlmsg_free(msg);
+        return err;
+
+ nla_put_failure:
+        nlmsg_free(msg);
+        A_DBG("building message failed\n");
+        return 2;
+}
+
+int nl80211_tcmd_start(struct tcmd_cfg *cfg)
+{
+        return nl80211_tcmd_connect(cfg, AR6K_TM_CMD_START);
+}
+
+int nl80211_tcmd_stop(struct tcmd_cfg *cfg)
+{
+        return nl80211_tcmd_connect(cfg,AR6K_TM_CMD_STOP);
 }
 
 int nl80211_tcmd_tx(struct tcmd_cfg *cfg, void *buf, int len)
@@ -431,6 +526,7 @@ int nl80211_tcmd_tx(struct tcmd_cfg *cfg, void *buf, int len)
 	return err;
 
  nla_put_failure:
+	nlmsg_free(msg);
 	A_DBG("building message failed\n");
 	return 2;
 }

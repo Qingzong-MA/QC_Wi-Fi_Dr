@@ -28,12 +28,12 @@ fi
 echo TP_TYPE_USB=${TP_TYPE_USB}
 
 declare -A -r bt_projs_repositorys=( \
-[fluoride]="-b bt-fluoride.le.2.0 git://source.codeaurora.org/quic/la/platform/system/bt" \
-[libbt-vendor]="-b bt-fluoride.le.2.0 git://source.codeaurora.org/quic/la/platform/hardware/qcom/bt" \
-[apps]="-b bt-fluoride.le.2.0 git://source.codeaurora.org/quic/le/platform/qcom-opensource/bt" \
-[third_party/libhardware]="-b le-blast.lnx.1.2 git://source.codeaurora.org/quic/le/platform/hardware/libhardware" \
-[third_party/frameworks]="-b le-frameworks.lnx.2.0 git://source.codeaurora.org/quic/le/platform/vendor/qcom-opensource/le-framework" \
-[third_party/bluetooth]="-b bt-fluoride.le.2.0 git://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/bluetooth" \
+[fluoride]="-b caf_migration/bt-fluoride.le.2.0 https://git.codelinaro.org/clo/la/platform/system/bt" \
+[libbt-vendor]="-b caf_migration/bt-fluoride.le.2.0 https://git.codelinaro.org/clo/la/platform/hardware/qcom/bt" \
+[apps]="-b caf_migration/bt-fluoride.le.2.0 https://git.codelinaro.org/clo/le/platform/qcom-opensource/bt" \
+[third_party/libhardware]="-b caf_migration/le-blast.lnx.1.2 https://git.codelinaro.org/clo/le/platform/hardware/libhardware" \
+[third_party/frameworks]="-b caf_migration/le-frameworks.lnx.2.0 https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/le-framework" \
+[third_party/bluetooth]="-b caf_migration/bt-fluoride.le.2.0 https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/bluetooth" \
 )
 
 declare -A -r bt_projs_commits=( \
@@ -112,6 +112,7 @@ do_update_patches() {
 			pushd wlan_patches
 			git config core.sparsecheckout true
 			echo "fixce/3rdparty/patches/bt_fle20_patches" > .git/info/sparse-checkout
+			echo "fixce/3rdparty/patches/bt_usb_driver" >> .git/info/sparse-checkout
 			git read-tree -m -u HEAD
 			popd
 		fi
@@ -200,12 +201,8 @@ if [[ $1 == "d" ]]; then
 
 	if [ "${TP_TYPE_USB}" == "y" ]; then
 		if [ ! -d bt_usb_driver ]; then
-			git clone https://source.codeaurora.org/external/qtil/sba_patches
-			pushd sba_patches
-			git checkout -b dev "827854233157bdf3ce047542ea7bfe0df98c4662"
-			popd
-			tar -xavf sba_patches/csr851x-usb-driver-v1_1.tgz
-			rm -rf sba_patches
+			do_update_patches
+			tar -xavf wlan_patches/fixce/3rdparty/patches/bt_usb_driver/csr851x-usb-driver-v1_1.tgz
 			pushd bt_usb_driver
 			git init .
 			git add .

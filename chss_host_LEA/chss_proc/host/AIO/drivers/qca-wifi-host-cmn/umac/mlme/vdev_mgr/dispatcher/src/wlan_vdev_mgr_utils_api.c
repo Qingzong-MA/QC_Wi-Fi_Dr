@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -608,3 +609,29 @@ void wlan_util_vdev_get_param(struct wlan_objmgr_vdev *vdev,
 }
 
 qdf_export_symbol(wlan_util_vdev_get_param);
+
+int wlan_util_vdev_mgr_get_cac_timeout_for_vdev(struct wlan_objmgr_vdev *vdev)
+{
+	struct vdev_mlme_obj *vdev_mlme;
+
+	vdev_mlme = wlan_vdev_mlme_get_cmpt_obj(vdev);
+	if (!vdev_mlme) {
+		mlme_err("vdev_mlme is null");
+		return 0;
+	}
+
+	return vdev_mlme->mgmt.ap.cac_duration_ms;
+}
+
+void wlan_util_vdev_mgr_set_cac_timeout_for_vdev(struct wlan_objmgr_vdev *vdev,
+						 uint32_t new_chan_cac_ms)
+{
+	struct vdev_mlme_obj *vdev_mlme;
+
+	vdev_mlme = wlan_vdev_mlme_get_cmpt_obj(vdev);
+	if (!vdev_mlme) {
+		mlme_err("vdev_mlme is null");
+		return;
+	}
+	vdev_mlme->mgmt.ap.cac_duration_ms = new_chan_cac_ms;
+}

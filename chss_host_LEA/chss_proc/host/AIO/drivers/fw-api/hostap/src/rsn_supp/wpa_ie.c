@@ -109,6 +109,10 @@ u16 rsn_supp_capab(struct wpa_sm *sm)
 {
 	u16 capab = 0;
 
+	if (sm->wmm_enabled) {
+		/* Advertise 16 PTKSA replay counters when using WMM */
+		capab |= RSN_NUM_REPLAY_COUNTERS_16 << 2;
+	}
 	if (sm->mfp)
 		capab |= WPA_CAPABILITY_MFPC;
 	if (sm->mfp == 2)
@@ -191,8 +195,12 @@ static int wpa_gen_wpa_ie_rsn(u8 *rsn_ie, size_t rsn_ie_len,
 #ifdef CONFIG_SAE
 	} else if (key_mgmt == WPA_KEY_MGMT_SAE) {
 		RSN_SELECTOR_PUT(pos, RSN_AUTH_KEY_MGMT_SAE);
+	} else if (key_mgmt == WPA_KEY_MGMT_SAE_EXT_KEY) {
+		RSN_SELECTOR_PUT(pos, RSN_AUTH_KEY_MGMT_SAE_EXT_KEY);
 	} else if (key_mgmt == WPA_KEY_MGMT_FT_SAE) {
 		RSN_SELECTOR_PUT(pos, RSN_AUTH_KEY_MGMT_FT_SAE);
+	} else if (key_mgmt == WPA_KEY_MGMT_FT_SAE_EXT_KEY) {
+		RSN_SELECTOR_PUT(pos, RSN_AUTH_KEY_MGMT_FT_SAE_EXT_KEY);
 #endif /* CONFIG_SAE */
 	} else if (key_mgmt == WPA_KEY_MGMT_IEEE8021X_SUITE_B_192) {
 		RSN_SELECTOR_PUT(pos, RSN_AUTH_KEY_MGMT_802_1X_SUITE_B_192);
@@ -358,7 +366,8 @@ int wpa_gen_rsnxe(struct wpa_sm *sm, u8 *rsnxe, size_t rsnxe_len)
 	size_t flen;
 
 	if (wpa_key_mgmt_sae(sm->key_mgmt) &&
-	    (sm->sae_pwe == 1 || sm->sae_pwe == 2 || sm->sae_pk)) {
+	    (sm->sae_pwe == SAE_PWE_HASH_TO_ELEMENT ||
+	     sm->sae_pwe == SAE_PWE_BOTH || sm->sae_pk)) {
 		capab |= BIT(WLAN_RSNX_CAPAB_SAE_H2E);
 #ifdef CONFIG_SAE_PK
 		if (sm->sae_pk)
@@ -371,7 +380,7 @@ int wpa_gen_rsnxe(struct wpa_sm *sm, u8 *rsnxe, size_t rsnxe_len)
 	if (sm->secure_rtt)
 		capab |= BIT(WLAN_RSNX_CAPAB_SECURE_RTT);
 	if (sm->prot_range_neg)
-		capab |= BIT(WLAN_RSNX_CAPAB_PROT_RANGE_NEG);
+		capab |= BIT(WLAN_RSNX_CAPAB_URNM_MFPR);
 
 	flen = (capab & 0xff00) ? 2 : 1;
 	if (!capab)

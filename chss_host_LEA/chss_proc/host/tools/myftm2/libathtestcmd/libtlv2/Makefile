@@ -60,6 +60,7 @@ SRCS = \
 		cmdParser/cmdOfdmaTonePlan.c \
 		cmdParser/cmdOfdmaULTxConfig.c \
 		cmdParser/cmdLowPowerMode.c \
+		cmdParser/cmdNoiseFloorRead.c \
 		common/cmdRspParmsDict.c \
 		common/cmdRspParmsInternal.c \
 		common/sysCmdRspParmsDict.c \
@@ -122,6 +123,7 @@ OBJS = \
 		cmdDPDLoopbackInfo.o \
 		cmdRspParmsDict.o \
 		cmdRspParmsInternal.o \
+		cmdNoiseFloorRead.o \
 		sysCmdRspParmsDict.o \
 		tlvCmdRsp.o \
 		testUtil.o \

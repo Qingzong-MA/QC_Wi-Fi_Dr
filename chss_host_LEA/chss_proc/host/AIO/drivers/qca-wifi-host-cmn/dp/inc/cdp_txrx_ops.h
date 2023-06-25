@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2021 The Linux Foundation. All rights reserved.
- *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -821,10 +821,9 @@ struct cdp_mon_ops {
 		(*config_full_mon_mode)(struct cdp_soc_t *soc, uint8_t val);
 
 	/* Configure monitor status srng reap timer */
-	void
-	(*txrx_enable_mon_reap_timer)(struct cdp_soc_t *soc_hdl,
-				      uint8_t pdev_id,
-				      bool enable);
+	bool (*txrx_enable_mon_reap_timer)(struct cdp_soc_t *soc_hdl,
+					   enum cdp_mon_reap_source source,
+					   bool enable);
 };
 
 struct cdp_host_stats_ops {

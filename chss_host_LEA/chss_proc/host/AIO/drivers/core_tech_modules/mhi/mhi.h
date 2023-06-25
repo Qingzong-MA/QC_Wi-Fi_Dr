@@ -841,5 +841,7 @@ int fw_remote_mem_dump(struct mhi_device_ctxt *mhi_dev_ctxt,
 		       char *file_full_path);
 
 void mhi_dump_event_ring(struct mhi_device_ctxt *mhi_dev_ctxt);
+
 void mhi_dump_irq(struct mhi_device_ctxt *mhi_dev_ctxt);
+
 #endif

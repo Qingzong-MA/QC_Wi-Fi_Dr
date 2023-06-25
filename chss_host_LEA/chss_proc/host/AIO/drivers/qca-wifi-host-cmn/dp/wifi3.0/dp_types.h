@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-2021 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1587,6 +1588,10 @@ struct dp_soc {
 	/*interrupt timer*/
 	qdf_timer_t mon_reap_timer;
 	uint8_t reap_timer_init;
+	qdf_spinlock_t reap_timer_lock;
+
+	/* Bitmap to record trigger sources of the reap timer */
+	qdf_bitmap(mon_reap_src_bitmap, CDP_MON_REAP_SOURCE_NUM);
 	qdf_timer_t lmac_reap_timer;
 	uint8_t lmac_timer_init;
 	qdf_timer_t int_timer;
@@ -2224,7 +2229,6 @@ struct dp_pdev {
 	/* mirror copy mode */
 	enum m_copy_mode mcopy_mode;
 	bool cfr_rcc_mode;
-	bool enable_reap_timer_non_pkt;
 	bool bpr_enable;
 
 	/* enable time latency check for tx completion */

@@ -117,7 +117,7 @@ drivers_firmware_transfer:
 
 drivers_clean:
 	@echo Clean drivers
-	cd ${WLAN_DRIVER_TOPDIR} && ${MAKEARCH} driver_clean
+	cd ${WLAN_DRIVER_TOPDIR} && ${MAKEARCH} clean
 
 common_patch: wpa_supplicant_patch
 	@echo Start Common Patches
@@ -159,7 +159,7 @@ hostapd: rootfs_prep hostapd_clean
 ifneq ($(BUILD_APP_WLAN_HOSTAP_2_4), n)
 	@echo Build hostapd
 	cd $(WPA_SUPPLICANT_TOPDIR)/hostapd && \
-	${MAKEARCH} CC=$(TOOLPREFIX)gcc AR=$(TOOLPREFIX)ar LD=$(TOOLPREFIX)ld && \
+	${MAKEARCH} CC=$(TOOLPREFIX)gcc AR=$(TOOLPREFIX)ar LD=$(TOOLPREFIX)ld EXTRA_CFLAGS=-DWPA_IGNORE_CONFIG_ERRORS && \
 	cp -f hostapd $(INSTALL_ROOT)/sbin && \
 	cp -f hostapd_cli $(INSTALL_ROOT)/sbin
 endif
@@ -331,35 +331,35 @@ ifneq ("$(wildcard ${PATCH_TOPDIR}/qcacld-3.0/*.patch)","")
 	@for file in `ls ${PATCH_TOPDIR}/qcacld-3.0/*.patch`; \
 	do \
 		cd ${WLAN_DRIVER_TOPDIR}/qcacld-3.0 && \
-		patch -s -p1 < $$file; \
+		git am $$file; \
 	done
 endif
 ifneq ("$(wildcard ${PATCH_TOPDIR}/qca-wifi-host-cmn/*.patch)","")
 	@for file in `ls ${PATCH_TOPDIR}/qca-wifi-host-cmn/*.patch`; \
 	do \
 		cd ${WLAN_DRIVER_TOPDIR}/qca-wifi-host-cmn && \
-		patch -s -p1 < $$file; \
+		git am $$file; \
 	done
 endif
 ifneq ("$(wildcard ${PATCH_TOPDIR}/fw-api/*.patch)","")
 	@for file in `ls ${PATCH_TOPDIR}/fw-api/*.patch`; \
 	do \
 		cd ${WLAN_DRIVER_TOPDIR}/fw-api && \
-		patch -s -p1 < $$file; \
+		git am $$file; \
 	done
 endif
 ifneq ("$(wildcard ${PATCH_TOPDIR}/core_tech_modules/*.patch)","")
 	@for file in `ls ${PATCH_TOPDIR}/core_tech_modules/*.patch`; \
 	do \
 		cd ${WLAN_DRIVER_TOPDIR}/core_tech_modules && \
-		patch -s -p1 < $$file; \
+		git am $$file; \
 	done
 endif
 ifneq ("$(wildcard ${PATCH_TOPDIR}/*.patch)","")
 	@for file in `ls ${PATCH_TOPDIR}/*.patch`; \
 	do \
 		cd ${WLAN_DRIVER_TOPDIR} && \
-		patch -s -p0 < $$file; \
+		git am $$file; \
 	done
 endif
 

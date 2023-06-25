@@ -35,6 +35,7 @@
 #include <wlan_dfs_utils_api.h>
 #include <wlan_vdev_mgr_ucfg_api.h>
 #include <qdf_module.h>
+#include <wlan_vdev_mgr_utils_api.h>
 
 static QDF_STATUS vdev_mgr_create_param_update(
 					struct vdev_mlme_obj *mlme_obj,
@@ -114,6 +115,14 @@ static inline bool vdev_mgr_is_49G_5G_6G_chan_freq(uint16_t chan_freq)
 	return true;
 }
 #endif
+
+static void
+vdev_mgr_start_param_update_cac_ms(struct wlan_objmgr_vdev *vdev,
+				   struct vdev_start_params *param)
+{
+	param->cac_duration_ms =
+			wlan_util_vdev_mgr_get_cac_timeout_for_vdev(vdev);
+}
 
 static QDF_STATUS vdev_mgr_start_param_update(
 					struct vdev_mlme_obj *mlme_obj,
@@ -220,7 +229,7 @@ static QDF_STATUS vdev_mgr_start_param_update(
 
 	if (mlme_obj->mgmt.generic.type == WLAN_VDEV_MLME_TYPE_AP) {
 		param->hidden_ssid = mlme_obj->mgmt.ap.hidden_ssid;
-		param->cac_duration_ms = mlme_obj->mgmt.ap.cac_duration_ms;
+		vdev_mgr_start_param_update_cac_ms(vdev, param);
 	}
 	wlan_vdev_mlme_get_ssid(vdev, param->ssid.ssid, &param->ssid.length);
 

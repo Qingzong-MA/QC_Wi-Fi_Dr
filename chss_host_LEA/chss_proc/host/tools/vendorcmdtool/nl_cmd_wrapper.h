@@ -31,20 +31,34 @@ struct cb_info {
     void *cb_arg;
 };
 
+#ifdef SUPPORT_VENDOR_EVENT
+struct handler_args {
+    const char *group;
+    int id;
+};
+#endif
+
 struct nlIfaceInfo {
     struct nl_sock *cmd_sock;                       // command socket object
     struct nl_sock *event_sock;                     // event socket object
-    struct cb_info *event_cb;                              // event callbacks
+    struct cb_info *event_cb;                       // event callbacks
     int num_event_cb;                               // number of event callbacks
     int alloc_event_cb;                             // number of allocated callback objects
+#ifdef SUPPORT_VENDOR_EVENT
+    int event_id;
+    struct cmd_params event_params;
+    volatile int event_thread_running;              // event thread running flag
+#endif
+    pthread_t event_thread_handle;                  // event thread handle
     pthread_mutex_t cb_lock;                        // mutex for the event_cb access
     int nl80211_family_id;                          // family id for 80211 driver
     u8 clean_up;
     u8 in_event_loop;
+    char ifname[IFACE_LEN];
 };
 
 struct nlattr * attr_start(struct nl_msg *nlmsg, int attribute);
 void attr_end(struct nl_msg *nlmsg, struct nlattr *attr);
-static void parseNested(struct cmd_params *response, struct nlattr *tb_vendor,
+void parseNested(struct cmd_params *response, struct nlattr *tb_vendor,
                  int index);
 #endif

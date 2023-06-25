@@ -1,11 +1,19 @@
-CC := $(ATH_CROSS_COMPILE_TYPE)gcc
+CC ?= gcc
 
-all:
-	$(CC) -g3 -Wall  \
-		-I ./libnl-3.2.25/include \
-		-I ./libxml2-2.9.8/include \
-		-D __linux__ \
-		nl_cmd_wrapper.c ven_cmd_tool.c libnl-3.a libnl-genl-3.a libxml2.a -o vendor_cmd_tool -static -lpthread
+OBJS = ven_cmd_tool.o nl_cmd_wrapper.o
+CFLAGS += -Wall -Werror
+all: cfg80211tool.1
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $< $(LDFLAGS)
+
+ifeq ($(CONFIG_SUPPORT_LIBROXML),1)
+cfg80211tool.1: $(OBJS)
+	$(CC) $(LDFLAGS) -lroxml -lpthread  -o $@ $(OBJS)
+else
+cfg80211tool.1: $(OBJS)
+	$(CC) $(LDFLAGS) -lpthread -o $@ $(OBJS)
+endif
 
 clean:
-	rm -f vendor_cmd_tool
+	rm -rf *.o

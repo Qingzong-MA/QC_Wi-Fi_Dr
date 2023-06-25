@@ -169,6 +169,7 @@ void hostapd_config_defaults_bss(struct hostapd_bss_config *bss)
 #ifdef CONFIG_PASN
 	/* comeback after 10 TUs */
 	bss->pasn_comeback_after = 10;
+	bss->pasn_noauth = 1;
 #endif /* CONFIG_PASN */
 }
 
@@ -479,9 +480,11 @@ int hostapd_setup_sae_pt(struct hostapd_bss_config *conf)
 	struct hostapd_ssid *ssid = &conf->ssid;
 	struct sae_password_entry *pw;
 
-	if ((conf->sae_pwe == 0 && !hostapd_sae_pw_id_in_use(conf) &&
+	if ((conf->sae_pwe == SAE_PWE_HUNT_AND_PECK &&
+	     !hostapd_sae_pw_id_in_use(conf) &&
+	     !wpa_key_mgmt_sae_ext_key(conf->wpa_key_mgmt) &&
 	     !hostapd_sae_pk_in_use(conf)) ||
-	    conf->sae_pwe == 3 ||
+	    conf->sae_pwe == SAE_PWE_FORCE_HUNT_AND_PECK ||
 	    !wpa_key_mgmt_sae(conf->wpa_key_mgmt))
 		return 0; /* PT not needed */
 
@@ -795,6 +798,7 @@ void hostapd_config_free_bss(struct hostapd_bss_config *conf)
 	os_free(conf->radius_req_attr_sqlite);
 	os_free(conf->rsn_preauth_interfaces);
 	os_free(conf->ctrl_interface);
+	os_free(conf->config_id);
 	os_free(conf->ca_cert);
 	os_free(conf->server_cert);
 	os_free(conf->server_cert2);
@@ -947,6 +951,8 @@ void hostapd_config_free_bss(struct hostapd_bss_config *conf)
 #ifdef CONFIG_DPP
 	os_free(conf->dpp_name);
 	os_free(conf->dpp_mud_url);
+	os_free(conf->dpp_extra_conf_req_name);
+	os_free(conf->dpp_extra_conf_req_value);
 	os_free(conf->dpp_connector);
 	wpabuf_free(conf->dpp_netaccesskey);
 	wpabuf_free(conf->dpp_csign);
@@ -1206,6 +1212,14 @@ static bool hostapd_config_check_bss_6g(struct hostapd_bss_config *bss)
 		return false;
 	}
 
+#ifdef CONFIG_SAE
+	if (wpa_key_mgmt_sae(bss->wpa_key_mgmt) &&
+	    bss->sae_pwe == SAE_PWE_HUNT_AND_PECK) {
+		wpa_printf(MSG_INFO, "SAE: Enabling SAE H2E on 6 GHz");
+		bss->sae_pwe = SAE_PWE_BOTH;
+	}
+#endif /* CONFIG_SAE */
+
 	return true;
 }
 
@@ -1432,6 +1446,13 @@ static int hostapd_config_check_bss(struct hostapd_bss_config *bss,
 
 #ifdef CONFIG_FILS
 	if (full_config && bss->fils_discovery_max_int &&
+	    (!conf->ieee80211ax || bss->disable_11ax)) {
+		wpa_printf(MSG_ERROR,
+			   "Currently IEEE 802.11ax support is mandatory to enable FILS discovery transmission.");
+		return -1;
+	}
+
+	if (full_config && bss->fils_discovery_max_int &&
 	    bss->unsol_bcast_probe_resp_interval) {
 		wpa_printf(MSG_ERROR,
 			   "Cannot enable both FILS discovery and unsolicited broadcast Probe Response at the same time");
@@ -1446,6 +1467,12 @@ static int hostapd_config_check_bss(struct hostapd_bss_config *bss,
 			   "Disabling IEEE 802.11be as IEEE 802.11ax is disabled for this BSS");
 	}
 #endif /* CONFIG_IEEE80211BE */
+
+	if (full_config && bss->ignore_broadcast_ssid && conf->mbssid) {
+		wpa_printf(MSG_ERROR,
+			   "Hidden SSID is not suppored when MBSSID is enabled");
+		return -1;
+	}
 
 	return 0;
 }
@@ -1529,6 +1556,12 @@ int hostapd_config_check(struct hostapd_config *conf, int full_config)
 		return -1;
 	}
 #endif /* CONFIG_IEEE80211BE */
+
+	if (full_config && conf->mbssid && !conf->ieee80211ax) {
+		wpa_printf(MSG_ERROR,
+			   "Cannot enable multiple BSSID support without ieee80211ax");
+		return -1;
+	}
 
 	for (i = 0; i < conf->num_bss; i++) {
 		if (hostapd_config_check_bss(conf->bss[i], conf, full_config))

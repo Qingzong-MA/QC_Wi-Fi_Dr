@@ -92,6 +92,15 @@ extern "C" {
 #define WPA_EVENT_CHANNEL_SWITCH_STARTED "CTRL-EVENT-STARTED-CHANNEL-SWITCH "
 /** Channel switch (followed by freq=<MHz> and other channel parameters) */
 #define WPA_EVENT_CHANNEL_SWITCH "CTRL-EVENT-CHANNEL-SWITCH "
+/** MLO link channel switch started (followed by freq=<MHz> and other channel
+ * parameters)
+ */
+#define WPA_EVENT_LINK_CHANNEL_SWITCH_STARTED \
+	"CTRL-EVENT-STARTED-LINK-CHANNEL-SWITCH "
+/** MLO link channel switch (followed by freq=<MHz> and other channel
+ * parameters)
+ */
+#define WPA_EVENT_LINK_CHANNEL_SWITCH "CTRL-EVENT-LINK-CHANNEL-SWITCH "
 /** SAE authentication failed due to unknown password identifier */
 #define WPA_EVENT_SAE_UNKNOWN_PASSWORD_IDENTIFIER \
 	"CTRL-EVENT-SAE-UNKNOWN-PASSWORD-IDENTIFIER "
@@ -101,6 +110,10 @@ extern "C" {
 #define WPA_EVENT_DO_ROAM "CTRL-EVENT-DO-ROAM "
 /** Decision made to skip a within-ESS roam */
 #define WPA_EVENT_SKIP_ROAM "CTRL-EVENT-SKIP-ROAM "
+/** TID-to-link mapping response event */
+#define WPA_EVENT_T2LM_UPDATE "CTRL-EVENT-T2LM-UPDATE "
+/** MLO link reconfiguration event */
+#define WPA_EVENT_LINK_RECONFIG "CTRL-EVENT-LINK-RECONFIG "
 
 /** IP subnet status change notification
  *
@@ -213,6 +226,9 @@ extern "C" {
 #define DPP_EVENT_CSR "DPP-CSR "
 #define DPP_EVENT_CHIRP_RX "DPP-CHIRP-RX "
 #define DPP_EVENT_CONF_NEEDED "DPP-CONF-NEEDED "
+#define DPP_EVENT_PB_STATUS "DPP-PB-STATUS "
+#define DPP_EVENT_PB_RESULT "DPP-PB-RESULT "
+#define DPP_EVENT_RELAY_NEEDS_CONTROLLER "DPP-RELAY-NEEDS-CONTROLLER "
 
 /* MESH events */
 #define MESH_GROUP_STARTED "MESH-GROUP-STARTED "
@@ -343,6 +359,7 @@ extern "C" {
 
 #define AP_EVENT_ENABLED "AP-ENABLED "
 #define AP_EVENT_DISABLED "AP-DISABLED "
+#define AP_EVENT_NO_IR "AP-NO_IR"
 
 #define INTERFACE_ENABLED "INTERFACE-ENABLED "
 #define INTERFACE_DISABLED "INTERFACE-DISABLED "
@@ -454,6 +471,8 @@ extern "C" {
 #define WPA_BSS_MASK_UPDATE_IDX		BIT(22)
 #define WPA_BSS_MASK_BEACON_IE		BIT(23)
 #define WPA_BSS_MASK_FILS_INDICATION	BIT(24)
+#define WPA_BSS_MASK_RNR		BIT(25)
+#define WPA_BSS_MASK_ML			BIT(26)
 
 
 /* VENDOR_ELEM_* frame id values */

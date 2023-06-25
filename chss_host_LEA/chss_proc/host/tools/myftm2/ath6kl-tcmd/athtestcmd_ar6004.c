@@ -24,7 +24,7 @@
 
 #include "athtestcmd.h"
 #include "testcmd.h"
-#include "libtcmd.h"
+#include <libtcmd.h>
 
 const char *progname;
 const char commands[] = "commands:\n"

@@ -294,6 +294,7 @@ TABLE tQca_CXMMciGPMAgentType                       //B5-MCI_GPM_COEX_AGENT Opco
     {0x51 "BT/MCI_AGENT_BT_CALIBRATION_INFO" "BT/MCI_AGENT_BT_CALIBRATION_INFO" 0 qQca_CXM_MciGpmAgent_BtCalibrationInfo}
     {0x52,"BT/MCI_AGENT_DEBUG_REG_INFO_RESP"}
     {0x53 "BT/MCI_AGENT_BT_ISO_SUBINT_PRIO_MASK" "BT/MCI_AGENT_BT_ISO_SUBINT_PRIORITY_MASK" 0 qQca_CXM_MciGpmAgent_BT_ISO_SUBINT_PRIO_MASK}
+    {0x56 "BT/MCI_AGENT_BT_DEBUG_IND_MASK" "BT/MCI_AGENT_BT_DEBUG_IND_MASK" 0 qQca_CXM_MciGpmAgent_BT_DebugIndicate}
     {Default "Invalid"}
 ENDTABLE
 
@@ -772,6 +773,10 @@ GROUP gQca_CXM_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT "WLAN CONNECTION STATUS
   FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_2g_mode     (Fixed 2 Bits)  (Hex) SUPPRESS_DETAIL
   FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlm_reserved0   (Fixed 2 Bits)  (Table tQca_CXM_WlanConnectionStatus_WLM_Mode)   "WLM 2G Mode"
   FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_wlan_ll_granted (Fixed 1 Byte)  (Hex)                                            "WLAN LL Granted"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain2_5g_status (Fixed 1 Byte)  (Hex)                                            "Chain2 5g"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_chain3_5g_status (Fixed 1 Byte)  (Hex)                                            "Chain3 5g"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_dbg_status       (Fixed 4 Bits)  (Hex)                                            "WAR361 Status"
+  FIELD fQca_MciGpmAgent_WLAN_CONNECTION_STATUS_REPORT_dbam_status      (Fixed 4 Bits)  (Hex)                                            "DBAM Status"
 }
 
 TABLE tQca_CXM_WlanConnectionStatus
@@ -1361,14 +1366,16 @@ GROUP qQca_CXM_MciGpmAgent_BT_CRASH_INFO "BT CRASH Info"
 GROUP qQca_CXM_MciGpmAgent_LE_ISO_QOS "LE ISO QoS"
 {
     FIELD qQca_CXM_MciGpmAgent_LeIsoQoSGroupId                (Fixed 1 Byte)   (Decimal)            "GroupId"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSCodecInfo              (Fixed 1 Byte)   (Decimal)            "CodecInfo"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSBitRate                (Fixed 1 Byte)   (Decimal)            "BitRate"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSPhyRate                (Fixed 1 Byte)   (Decimal)            "PhyRate"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSPacktInterval          (Fixed 1 Bytes)  (Decimal)            "PacketInterval"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSPacktLength            (Fixed 2 Bytes)  (Decimal)            "PacketLength"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSBandwidth              (Fixed 1 Bytes)  (Decimal)            "Bandwidth"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSFlushTimeout           (Fixed 1 Bytes)  (Decimal)            "FlushTimeout"
-    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSReserved               (Fixed 1 Bytes)  (Decimal)            SUPPRESS_DETAIL
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSCodecInfo              (Fixed 4 Bits)   (Decimal)            "CodecInfo"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQosReason                 (Fixed 4 Bits)   (Decimal)            "Update Reason"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSTxphyRate              (Fixed 4 Bits)   (Decimal)            "PhyRate Tx"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSRxphyRate              (Fixed 4 Bits)   (Decimal)            "PhyRate Rx"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSBW                     (Fixed 1 Byte)   (Decimal)            "BW"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSSDUSIZE_MS             (Fixed 2 Bytes)  (Decimal)            "SDU Size MS"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSSDUSIZE_SM             (Fixed 2 Bytes)  (Decimal)            "SDU Size SM"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSFTTX                   (Fixed 4 Bits)  (Decimal)              "FT Tx"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSFTRX                   (Fixed 4 Bits)  (Decimal)              "FT Rx"
+    FIELD qQca_CXM_MciGpmAgent_LeIsoQoSLatency                (Fixed 1 Bytes)  (Decimal)             "Latency"
 }
 
 /* 0x4C "BT/MCI_AGENT_UPDATE_LE_ISO_PRIO_MASK" */
@@ -1392,6 +1399,15 @@ TABLE tQca_CXM_StreamTransportType
    {0x01 "PFAL_COEX_BIG"}
 ENDTABLE
 
+TABLE tQca_isoUcaseCase
+    {0x00 "HQ_AUDIO"}
+    {0x01 "GAMING_NO_VBC"}
+    {0x02 "GAMING_VBC"}
+    {0x03 "VOICE"}
+    {0x04 "STEREO_REC"}
+    {0xFF "UNKNOWN"}
+ENDTABLE
+
 /* 0x4D "BT/MCI_AGENT_ADV_GROUP_CONN_UPDATE" */
 GROUP qQca_CXM_MciGpmAgent_ADV_GROUP_CONN_UPDATE "ADV GROUP CONN UPDATE"
 {
@@ -1401,8 +1417,9 @@ GROUP qQca_CXM_MciGpmAgent_ADV_GROUP_CONN_UPDATE "ADV GROUP CONN UPDATE"
     FIELD qQca_CXM_MciGpmAgent_AdvGroupConnStreamType         (Fixed 1 Bit)    (Table tQca_CXM_IsoStreamType)           "Stream Type"
     FIELD qQca_CXM_MciGpmAgent_AdvGroupConnDuration           (Fixed 2 Bytes)  (Decimal)            "Duration"
     FIELD qQca_CXM_MciGpmAgent_AdvGroupConnInterval           (Fixed 2 Bytes)  (Decimal)            "Interval"
-    FIELD qQca_CXM_MciGpmAgent_AdvGroupConnNumStream          (Fixed 1 Byte)   (Decimal)            "Num Streams"       
-    FIELD qQca_CXM_MciGpmAgent_AdvGroupConnResverd            (Fixed 3 Bytes)  (Decimal)            SUPPRESS_DETAIL
+    FIELD qQca_CXM_MciGpmAgent_AdvGroupConnNumStream          (Fixed 1 Byte)   (Decimal)            "Num Streams"    
+    FIELD qQca_CXM_MciGpmAgent_AdvGroupConnUsecase            (Fixed 1 Byte)   (Table tQca_isoUcaseCase)            "Use Case"        
+    FIELD qQca_CXM_MciGpmAgent_AdvGroupConnResverd            (Fixed 2 Bytes)  (Decimal)            SUPPRESS_DETAIL
 }
 
 /* 0x4D "BT/MCI_AGENT_ADV_STREAM_CONN_UPDATE" */
@@ -1419,7 +1436,7 @@ GROUP qQca_CXM_MciGpmAgent_ADV_STREAM_CONN_UPDATE "ADV STREAM CONN UPDATE"
     FIELD qQca_CXM_MciGpmAgent_AdvStreamConnLinkOps           (Fixed 1 Byte)   (Table tQca_CXM_ConnStatus)         "Conn Status"
     FIELD qQca_CXM_MciGpmAgent_AdvStreamConnBNRx              (Fixed 4 Bits)   (Decimal)            "BN Rx"
     FIELD qQca_CXM_MciGpmAgent_AdvStreamConnBNTx              (Fixed 4 Bits)   (Decimal)            "BN Tx"
-    FIELD qQca_CXM_MciGpmAgent_AdvStreamConnSEInterval        (Fixed 1 Byte)   (Decimal)            "Sub Event Interval"
+    FIELD qQca_CXM_MciGpmAgent_AdvStreamConnSEInterval        (Fixed 2 Byte)   (Decimal)            "Sub Event Interval(us)"
 }
 
 /* 0x51 "BT/MCI_AGENT_BT_CALIBRATION_INFO" */
@@ -1450,6 +1467,14 @@ GROUP qQca_CXM_MciGpmAgent_BT_ISO_SUBINT_PRIO_MASK "LE ISO Sub Interval Priority
     FIELD qQca_CXM_MciGpmAgent_LeIsoMaskLinkId                (Fixed 1 Byte)   (Decimal)               "LinkId"
     GROUP gQca_CXM_MciGpmAgent_LeIsoSubEventmask;
     FIELD qQca_CXM_MciGpmAgent_Reserved                        (Fixed 1 Byte)  (Hex)                    SUPPRESS_DETAIL
+}
+
+/* 0x56 "BT/MCI_AGENT_BT_DEBUG_IND_MASK" */
+GROUP qQca_CXM_MciGpmAgent_BT_DebugIndicate "LE ISO Sub Interval Priority Mask"
+{
+    FIELD qQca_CXM_MciGpmAgent_BT_DebugIndicate_Tag           (Fixed 1 Byte)   (Decimal)         "DbgTag"
+    FIELD qQca_CXM_MciGpmAgent_BT_DebugIndicate_Recipe        (Fixed 1 Byte)   (Decimal)         "RecipeApp"
+    FIELD qQca_CXM_MciGpmAgent_BT_DebugIndicate_Reason        (Fixed 1 Byte)   (Decimal)         "Reason"
 }
 
 GROUP gQca_CXM_MciGpmAgent_LeIsoSubEventmask "SubEventMask"

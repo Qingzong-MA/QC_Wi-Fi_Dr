@@ -589,6 +589,7 @@ void hif_latency_profile_start(struct hif_exec_context *hif_ext_group)
 #endif
 
 #ifdef FEATURE_NAPI
+
 #ifdef WLAN_ONE_MSI_VECTOR
 static bool hif_irq_disabled_time_limit_reached(struct hif_exec_context *hif_ext_group)
 {
@@ -602,12 +603,12 @@ static bool hif_irq_disabled_time_limit_reached(struct hif_exec_context *hif_ext
 		return time_limit_reached;
 
 	irq_disabled_duration_ns  = qdf_time_sched_clock() -
-			hif_ext_group->irq_disabled_start_time;
+					hif_ext_group->irq_disabled_start_time;
 	irq_disabled_duration_ms = qdf_do_div(irq_disabled_duration_ns, 1000 * 1000);
 	if (irq_disabled_duration_ms >= cfg->irq_disabled_max_duration_ms) {
 		time_limit_reached = true;
 		hif_record_event(hif_ext_group->hif, hif_ext_group->grp_id,
-				0, 0, 0, HIF_EVENT_IRQ_DISABLE_EXPIRED);
+				 0, 0, 0, HIF_EVENT_IRQ_DISABLE_EXPIRED);
 	}
 
 	return time_limit_reached;
@@ -656,7 +657,7 @@ static int hif_exec_poll(struct napi_struct *napi, int budget)
 	actual_dones = work_done;
 
 	if ((!hif_ext_group->force_break && work_done < normalized_budget) ||
-		hif_irq_disabled_time_limit_reached(hif_ext_group)) {
+	    hif_irq_disabled_time_limit_reached(hif_ext_group)) {
 		napi_complete(napi);
 		qdf_atomic_dec(&scn->active_grp_tasklet_cnt);
 		/* semaphore release must before irq_enable */

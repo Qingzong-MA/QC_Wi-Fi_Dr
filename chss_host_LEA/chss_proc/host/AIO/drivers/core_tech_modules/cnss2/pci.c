@@ -195,8 +195,8 @@ static int cnss_set_pci_config_space(struct cnss_pci_data *pci_priv, bool save)
 	if (save) {
 		if (link_down_or_recovery) {
 			pci_priv->saved_state = NULL;
-		} else if (test_bit(CNSS_DRIVER_UNLOADING, &plat_priv->driver_state)) {
-			pci_load_and_free_saved_state(pci_dev, &pci_priv->saved_state);
+                } else if (test_bit(CNSS_DRIVER_UNLOADING, &plat_priv->driver_state)) {
+                        pci_load_and_free_saved_state(pci_dev, &pci_priv->saved_state);
 		} else {
 			pci_save_state(pci_dev);
 			pci_priv->saved_state = pci_store_saved_state(pci_dev);
@@ -318,11 +318,11 @@ int cnss_suspend_pci_link(struct cnss_pci_data *pci_priv)
 		goto out;
 
 	pci_disable_device(pci_priv->pci_dev);
-#if 0
+
 	ret = pci_set_power_state(pci_priv->pci_dev, PCI_D3hot);
 	if (ret)
 		cnss_pr_err("Failed to set D3Hot, err =  %d\n", ret);
-#endif
+
 	ret = cnss_set_pci_link(pci_priv, PCI_LINK_DOWN);
 	if (ret)
 		goto out;
@@ -1587,7 +1587,7 @@ int cnss_pci_alloc_fw_mem(struct cnss_pci_data *pci_priv)
 	struct cnss_fw_mem *fw_mem = plat_priv->fw_mem;
 	int i;
 	size_t alloc_size;
-	const uint32_t align = FW_MEM_DEFAULT_ALIGNMENT - 1;
+	const uint64_t align = FW_MEM_DEFAULT_ALIGNMENT - 1;
 
 	for (i = 0; i < plat_priv->fw_mem_seg_len; i++) {
 		if (!fw_mem[i].va && fw_mem[i].size) {
@@ -1632,7 +1632,7 @@ static void cnss_pci_free_fw_mem(struct cnss_pci_data *pci_priv)
 	struct cnss_fw_mem *fw_mem = plat_priv->fw_mem;
 	int i;
 	size_t alloc_size;
-	const uint32_t align = FW_MEM_DEFAULT_ALIGNMENT - 1;
+	const uint64_t align = FW_MEM_DEFAULT_ALIGNMENT - 1;
 
 	for (i = 0; i < plat_priv->fw_mem_seg_len; i++) {
 		if (fw_mem[i].pre_aligned && fw_mem[i].size) {
@@ -1892,13 +1892,30 @@ static int cnss_pci_get_msi_assignment(struct cnss_pci_data *pci_priv)
 	return 0;
 }
 
+static int cnss_pci_config_msi_data(struct cnss_pci_data *pci_priv)
+{
+	struct msi_desc *msi_desc;
+	struct pci_dev *pci_dev = pci_priv->pci_dev;
+
+	msi_desc = irq_get_msi_desc(pci_dev->irq);
+	if (!msi_desc) {
+		cnss_pr_err("msi_desc is NULL!\n");
+		return -EINVAL;
+	}
+
+	pci_priv->msi_ep_base_data = msi_desc->msg.data;
+
+	cnss_pr_err("MSI base data is %d\n", pci_priv->msi_ep_base_data);
+
+	return 0;
+}
+
 static int cnss_pci_enable_msi(struct cnss_pci_data *pci_priv)
 {
 	int ret = 0;
 	struct pci_dev *pci_dev = pci_priv->pci_dev;
 	int num_vectors;
 	struct cnss_msi_config *msi_config;
-	struct msi_desc *msi_desc;
 
 	ret = cnss_pci_get_msi_assignment(pci_priv);
 	if (ret) {
@@ -1924,22 +1941,8 @@ static int cnss_pci_enable_msi(struct cnss_pci_data *pci_priv)
 		goto reset_msi_config;
 	}
 
-	msi_desc = irq_get_msi_desc(pci_dev->irq);
-	if (!msi_desc) {
-		cnss_pr_err("msi_desc is NULL!\n");
-		ret = -EINVAL;
+	if (cnss_pci_config_msi_data(pci_priv))
 		goto disable_msi;
-	}
-
-	pci_priv->msi_ep_base_data = msi_desc->msg.data;
-#ifndef CONFIG_NAPIER_X86
-	if (!pci_priv->msi_ep_base_data) {
-		cnss_pr_err("Got 0 MSI base data!\n");
-		CNSS_ASSERT(0);
-	}
-#endif
-
-	cnss_pr_dbg("MSI base data is %d\n", pci_priv->msi_ep_base_data);
 
 	return 0;
 
@@ -2788,7 +2791,7 @@ static int cnss_pci_probe(struct pci_dev *pci_dev,
 			pci_read_config_byte(pci_dev, 0x1F4, &aspm_state);
 			cnss_pr_err("L1SS status changed to: 0x%x", aspm_state);
 		}
-		/* fall-thru */
+		fallthrough;
 	case QCA6290_EMULATION_DEVICE_ID:
 	case QCA6290_DEVICE_ID:
 		/*
@@ -2804,7 +2807,7 @@ static int cnss_pci_probe(struct pci_dev *pci_dev,
 			pci_read_config_byte(pci_dev, 0x80, &aspm_state);
 			cnss_pr_err("ASPM status changed to: %x", aspm_state);
 		}
-		/* fall-thru */
+		fallthrough;
 	case QCN7605_DEVICE_ID:
 		ret = cnss_pci_enable_msi(pci_priv);
 		if (ret)
@@ -2812,6 +2815,9 @@ static int cnss_pci_probe(struct pci_dev *pci_dev,
 		ret = cnss_pci_register_mhi(pci_priv);
 		if (ret) {
 			cnss_pci_disable_msi(pci_priv);
+			goto disable_bus;
+		}
+		if (cnss_pci_config_msi_data(pci_priv)) {
 			goto disable_bus;
 		}
 #ifndef CONFIG_PCIE_EMULATION
@@ -2871,9 +2877,9 @@ static void cnss_pci_remove(struct pci_dev *pci_dev)
 		break;
 	}
 
-	if (pci_priv->default_state) {
-		pci_load_and_free_saved_state(pci_dev, &pci_priv->default_state);
-	}
+        if (pci_priv->default_state) {
+                pci_load_and_free_saved_state(pci_dev, &pci_priv->default_state);
+        }
 
 	cnss_pci_disable_bus(pci_priv);
 #ifndef CONFIG_NAPIER_X86

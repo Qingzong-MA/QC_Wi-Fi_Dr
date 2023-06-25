@@ -23,6 +23,7 @@ void* initRSTOpParms(A_UINT8 *pParmsCommon, PARM_OFFSET_TBL *pParmsOffset, PARM_
     pRSTParms->rstDir = pParmDict[PARM_RSTDIR].v.valU8;
     pRSTParms->phyId = pParmDict[PARM_PHYID].v.valU8;
     pRSTParms->freq = pParmDict[PARM_FREQ].v.valU16;
+    pRSTParms->txPwr = pParmDict[PARM_TXPOWER].v.valU16;
 
     // Make up ParmOffsetTbl
     resetParmOffsetFields();
@@ -32,6 +33,7 @@ void* initRSTOpParms(A_UINT8 *pParmsCommon, PARM_OFFSET_TBL *pParmsOffset, PARM_
     fillParmOffsetTbl((A_UINT32)PARM_RSTDIR, (A_UINT32)(((A_UINT32)&(pRSTParms->rstDir)) - (A_UINT32)pRSTParms), pParmsOffset);
     fillParmOffsetTbl((A_UINT32)PARM_PHYID, (A_UINT32)(((A_UINT32)&(pRSTParms->phyId)) - (A_UINT32)pRSTParms), pParmsOffset);
     fillParmOffsetTbl((A_UINT32)PARM_FREQ, (A_UINT32)(((A_UINT32)&(pRSTParms->freq)) - (A_UINT32)pRSTParms), pParmsOffset);
+    fillParmOffsetTbl((A_UINT32)PARM_TXPOWER, (A_UINT32)(((A_UINT32)&(pRSTParms->txPwr)) - (A_UINT32)pRSTParms), pParmsOffset);
     return((void*) pRSTParms);
 }
 
@@ -57,6 +59,7 @@ A_BOOL RSTOp(void *pParms)
     A_PRINTF("RSTOp: rstDir %d\n", pRSTParms->rstDir);
     A_PRINTF("RSTOp: phyId %u\n", pRSTParms->phyId);
     A_PRINTF("RSTOp: freq %u\n", pRSTParms->freq);
+    A_PRINTF("RSTOp: txPwr %u\n", pRSTParms->txPwr);
 #endif //_DEBUG
 
     if (NULL != RSTOpFunc) {
