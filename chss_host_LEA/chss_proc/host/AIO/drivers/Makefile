@@ -395,8 +395,6 @@ else
 	@mkdir -p ${INSTALL_ROOT}/lib/firmware/wlan/
 	@mkdir -p ${INSTALL_ROOT}/lib/firmware/WLAN-firmware
 	@mkdir -p ${INSTALL_ROOT}/lib/firmware/BT-firmware
-	@cp -rf $(ATH_DRIVER_TOPDIR)/firmware/WLAN-firmware  ${INSTALL_ROOT}/lib/firmware/
-	@cp -rf $(ATH_DRIVER_TOPDIR)/firmware/BT-firmware  ${INSTALL_ROOT}/lib/firmware/
 ifneq ("$(wildcard $(ATH_DRIVER_TOPDIR)/qcacld-3.0/firmware_bin/*.dat)", "")
 	@cp -f $(ATH_DRIVER_TOPDIR)/qcacld-3.0/firmware_bin/WCNSS_cfg.dat ${INSTALL_ROOT}/lib/firmware/wlan/cfg.dat;
 endif
