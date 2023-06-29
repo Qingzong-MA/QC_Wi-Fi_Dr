@@ -319,10 +319,11 @@ int cnss_suspend_pci_link(struct cnss_pci_data *pci_priv)
 
 	pci_disable_device(pci_priv->pci_dev);
 
+#if 0
 	ret = pci_set_power_state(pci_priv->pci_dev, PCI_D3hot);
 	if (ret)
 		cnss_pr_err("Failed to set D3Hot, err =  %d\n", ret);
-
+#endif
 	ret = cnss_set_pci_link(pci_priv, PCI_LINK_DOWN);
 	if (ret)
 		goto out;
