@@ -81,7 +81,7 @@
  * gMaxConcurrentActiveSessions - Maximum number of concurrent connections.
  * @Min: 1
  * @Max: 4
- * @Default: 3
+ * @Default: 4
  *
  * This ini is used to configure the maximum number of concurrent connections.
  *
@@ -95,7 +95,7 @@
  */
 #define CFG_MAX_CONC_CXNS CFG_INI_UINT(\
 					"gMaxConcurrentActiveSessions", \
-					1, 4, 3, \
+					1, 4, 4, \
 					CFG_VALUE_OR_DEFAULT, \
 					"Config max num allowed connections")
 
