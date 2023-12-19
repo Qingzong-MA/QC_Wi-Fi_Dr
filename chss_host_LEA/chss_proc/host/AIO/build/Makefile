@@ -50,6 +50,10 @@ export FW_WLAN_NAME=qcacld-new
 # CFG80211 PATH
 #################################################################################################################################
 export CFG80211_NAME=backports
+#################################################################################################################################
+# Driver version info
+#################################################################################################################################
+export ATH_TOOLS_TOPDIR=$(shell pwd)/tools
 
 ################################################################################
 #################################################
@@ -84,6 +88,8 @@ rootfs_clean:
 # include WLAN & BT 
 #
 drivers: rootfs_prep
+	@echo collect version info
+	cd ${ATH_TOOLS_TOPDIR} && ./add_timestamp_and_commit.sh FC64EABMD
 	@echo Build drivers
 	cd ${WLAN_DRIVER_TOPDIR} && ${MAKEARCH}
 	find ${WLAN_DRIVER_TOPDIR} -name 'cfg80211.ko' -exec cp '{}' $(INSTALL_ROOT)/lib/modules ';'

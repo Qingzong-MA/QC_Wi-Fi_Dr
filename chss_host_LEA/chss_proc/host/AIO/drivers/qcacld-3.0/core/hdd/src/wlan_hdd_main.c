@@ -205,6 +205,7 @@
 #include <linux/bitfield.h>
 #include <wlan_hdd_son.h>
 #include <son_ucfg_api.h>
+#include <wlan_hdd_ver.h>
 
 #ifdef MODULE
 #define WLAN_MODULE_NAME  module_name(THIS_MODULE)
@@ -17254,6 +17255,61 @@ static int con_mode_handler(const char *kmessage, const struct kernel_param *kp)
 	return hdd_set_con_mode_cb(mode);
 }
 
+#define WIFI_VERINFO_BUF_SIZE    512
+static ssize_t wifi_verinfo_read(struct file *fp, char __user *ubuf,
+		size_t count, loff_t *ppos)
+{
+	char *buf = NULL;
+	int ret = 0;
+
+	buf = kzalloc(sizeof(char) * WIFI_VERINFO_BUF_SIZE, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+	if (strlen(wifi_verinfo.commit_id) > 0) {
+		ret = scnprintf(buf, WIFI_VERINFO_BUF_SIZE,
+				"time stamp: %s\n"
+				"commit id: %s\n"
+				"driver version: v%s\n"
+				"FW version: %s\n"
+				"module type: %s\n",
+				wifi_verinfo.timestamp, wifi_verinfo.commit_id,
+				wifi_verinfo.driver_version, wifi_verinfo.fw_version,
+				wifi_verinfo.module_type);
+	} else {
+		ret = scnprintf(buf, WIFI_VERINFO_BUF_SIZE,
+				"This driver is compiled from local code which does not contain version control information.\n"
+				"The compilation time is: %s\n",
+				wifi_verinfo.timestamp);
+	}
+
+	ret = simple_read_from_buffer(ubuf, count, ppos, buf, ret);
+	kfree(buf);
+	return ret;
+}
+
+static const struct file_operations wifi_verinfo_fops = {
+	.read = wifi_verinfo_read,
+	.write = NULL,
+};
+
+static int wlan_hdd_create_verinfo(void)
+{
+	int ret = 0;
+	struct dentry * verinfo_den;
+
+	verinfo_den = debugfs_lookup(WLAN_MODULE_NAME, NULL);
+	if (IS_ERR(verinfo_den)) {
+		ret = PTR_ERR(verinfo_den);
+		hdd_err_rl("No space to create debugfs %d\n", ret);
+		return ret;
+	} else {
+		debugfs_create_file("wifi_verinfo", 0644, verinfo_den, 0, &wifi_verinfo_fops);
+	}
+
+	return ret;
+}
+
 int hdd_driver_load(void)
 {
 	struct osif_driver_sync *driver_sync;
@@ -17337,6 +17393,7 @@ int hdd_driver_load(void)
 		goto pld_deinit;
 	}
 
+	wlan_hdd_create_verinfo();
 	hdd_debug("%s: driver loaded", WLAN_MODULE_NAME);
 	hdd_place_marker(NULL, "DRIVER LOADED", NULL);
 
