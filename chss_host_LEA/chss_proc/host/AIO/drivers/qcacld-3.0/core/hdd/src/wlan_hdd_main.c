@@ -286,6 +286,7 @@ static struct kparam_string fwpath = {
 };
 
 char *country_code;
+extern int quec_sub_version;
 #ifdef FEATURE_WLAN_RESIDENT_DRIVER
 EXPORT_SYMBOL(country_code);
 #endif
@@ -19161,6 +19162,16 @@ static const struct kernel_param_ops pcie_gen_speed_ops = {
 	.get = param_get_int,
 };
 
+static int quec_sub_version_get_hex(char *buffer, const struct kernel_param *kp)
+{
+	scnprintf(buffer, 16, "0x%x\n", quec_sub_version);
+	return strlen(buffer);
+}
+
+static const struct kernel_param_ops quec_sub_version_ops = {
+	.get = quec_sub_version_get_hex,
+};
+
 module_param_cb(con_mode, &con_mode_ops, &con_mode,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
@@ -19168,6 +19179,9 @@ module_param_cb(con_mode_ftm, &con_mode_ftm_ops, &con_mode_ftm,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 module_param_cb(pcie_gen_speed, &pcie_gen_speed_ops, &pcie_gen_speed,
+		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+module_param_cb(quec_sub_version, &quec_sub_version_ops, &quec_sub_version,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 #ifdef WLAN_FEATURE_EPPING

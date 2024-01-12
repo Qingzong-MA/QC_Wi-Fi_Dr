@@ -24,6 +24,9 @@
 #include "mhi_bhi.h"
 #include "cnss_module.h"
 
+int quec_sub_version;
+EXPORT_SYMBOL(quec_sub_version);
+
 static struct mhi_device_ctxt *s_mhi_dev_ctxt;
 
 static int bhi_open(struct inode *mhi_inode, struct file *file_handle)
@@ -682,6 +685,7 @@ int bhi_probe(struct mhi_device_ctxt *mhi_dev_ctxt)
 	id = mhi_reg_read_remap(mhi_dev_ctxt,
 				mhi_dev_ctxt->mmio_info.mmio_addr,
 				JTAGID);
+	quec_sub_version = id;
 	mhi_log(mhi_dev_ctxt, MHI_MSG_ERROR, "jtagid:0x%x\n", id);
 
 	/* Make sure minimum  buffer we allocate for BHI/E is >= sbl image */
