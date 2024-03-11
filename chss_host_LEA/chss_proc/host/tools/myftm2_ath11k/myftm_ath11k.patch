@@ -1,0 +1,184 @@
+diff --git a/chss_host_LEA/chss_proc/host/tools/myftm2/libathtestcmd/athtestcmdlib.c b/chss_host_LEA/chss_proc/host/tools/myftm2/libathtestcmd/athtestcmdlib.c
+index 12e0fc7..9462064 100755
+--- a/chss_host_LEA/chss_proc/host/tools/myftm2/libathtestcmd/athtestcmdlib.c
++++ b/chss_host_LEA/chss_proc/host/tools/myftm2/libathtestcmd/athtestcmdlib.c
+@@ -902,7 +902,7 @@ static int doCommand(uint8_t *rCmdStream, uint32_t cmdStreamLen)
+ 
+ 	gCmd.errCode = 0;
+ 	gCmd.errString[0] = '\0';
+-	ALOGE("%s() ifname %s cmdStreamLen %d\n", __func__, ifname,
++	printf("%s() ifname %s cmdStreamLen %d\n", __func__, ifname,
+ 		cmdStreamLen);
+ 
+ 	if (g_tx_init == false) {
+@@ -924,9 +924,17 @@ static int doCommand(uint8_t *rCmdStream, uint32_t cmdStreamLen)
+ 		}
+ 		g_tx_init = true;
+ 	}
++	
++	// send ATH11K_TM_CMD_TESTMODE_START
++	if (tcmd_tx(rCmdStream, cmdStreamLen, 0))
++	{
++		testcmd_error(-1, "fail to tcmd_tx");
++		return -1;
++	}
+ 
++	// send ATH11K_TM_CMD_WMI_FTM
++	qtcmd_set_ep(TCMD_EP_TCMD);
+ 	resp = isResponseNeeded( (void*)rCmdStream);
+-
+ 	if (tcmd_tx(rCmdStream, cmdStreamLen, resp))
+ 	{
+ 		testcmd_error(-1, "fail to tcmd_tx");
+@@ -2497,6 +2505,7 @@ void qca6174RssiSelfTest()
+ #ifdef NOT_USE_CLITLVCMD_IF_MODULE
+ int qca6174TxCommand(const char *txtype)
+ {
++	
+ 	uint8_t *rCmdStream = NULL;
+ 	uint32_t cmdStreamLen = 0;
+ 	uint32_t miscFlags = PROCESS_RATE_IN_ORDER_MASK | TX_STATUS_PER_RATE_MASK;
+@@ -3375,7 +3384,6 @@ int qca6174TxCommand(const char *txtype)
+ 	Params->paConfig = gCmd.paConfig;
+ 	Params->gainIdx = gCmd.gainIdx;
+ 	Params->dacGain = gCmd.dacGain;
+-
+ #ifdef USE_TLV2
+ 	TESTFLOW_CMD_STREAM_V2 *pCmdStream;
+ 
+@@ -3401,12 +3409,15 @@ int qca6174TxCommand(const char *txtype)
+ 
+ 		registerBASICRSPHandler(handleBASICRSP);
+ 		tlv2CreateCmdHeader(CMD_TX);
+-		if (gCmd.phyid)
++		if (gCmd.phyid){
+ 			tlv2AddParms(4, PARM_PHYID, gCmd.phyid,
++					//PARM_TXMODE, 4);
+ 					PARM_TXMODE, Params->mode);
+-		else
++		}
++		else{
+ 			tlv2AddParms(4, PARM_PHYID, 0,
+ 					PARM_TXMODE, Params->mode);
++		}
+ 
+ 		if (gCmd.freq)
+ 			tlv2AddParms(2, PARM_FREQ, gCmd.freq);
+@@ -3582,6 +3593,7 @@ int qca6174TxSineStart(void)
+ 
+ int qca6174Tx99Start(void)
+ {
++	printf("enter qca6174Tx99Start!\n");
+ 	return qca6174TxCommand("tx99");
+ }
+ 
+diff --git a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.c b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.c
+index 99521ce..20811a7 100755
+--- a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.c
++++ b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.c
+@@ -84,6 +84,16 @@ static int tcmd_set_ep(uint32_t *driv_ep, enum tcmd_ep ep)
+ #endif
+ }
+ 
++
++int qtcmd_set_ep(enum tcmd_ep ep)
++{
++	int err;
++	err = tcmd_set_ep(&tcmd_cfg.ep, ep);
++	printf("qtcmd_set_ep=%d\n", tcmd_cfg.ep);
++	if (err)
++		return err;
++}
++
+ void tcmd_response_cb(void *buf, int len)
+ {
+ 	tcmd_cfg.timeout = true;
+@@ -103,7 +113,9 @@ int tcmd_init(char *iface, void (*rx_cb)(void *buf, int len), ...)
+ 	strlcpy(tcmd_cfg.iface, iface, sizeof(tcmd_cfg.iface));
+ 	tcmd_cfg.docommand_rx_cb = rx_cb;
+ 	tcmd_cfg.rx_cb = tcmd_response_cb;
++	
+ 	err = tcmd_set_ep(&tcmd_cfg.ep, ep);
++	printf("tcmd_set_ep=%d\n", tcmd_cfg.ep);
+ 	if (err)
+ 		return err;
+ 
+@@ -124,6 +136,7 @@ int tcmd_init(char *iface, void (*rx_cb)(void *buf, int len), ...)
+ 
+ int tcmd_tx_init(char *iface, void (*rx_cb)(void *buf, int len))
+ {
+-	return tcmd_init(iface, rx_cb, TCMD_EP_TCMD);
++	return tcmd_init(iface, rx_cb, ATH11K_TM_CMD_TESTMODE_START);
++	//return tcmd_init(iface, rx_cb, TCMD_EP_TCMD);
+ }
+ #endif
+diff --git a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.h b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.h
+index e20e0ad..c6dfd00 100755
+--- a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.h
++++ b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/libtcmd.h
+@@ -35,8 +35,13 @@
+ 
+ #ifndef CONFIG_AR6002_REV6
+ enum tcmd_ep {
+-	TCMD_EP_TCMD,
+-	TCMD_EP_WMI,
++        ATH11K_TM_CMD_GET_VERSION = 0,
++	TCMD_EP_WMI = 1,
++        //ATH11K_TM_CMD_WMI = 1,
++        ATH11K_TM_CMD_TESTMODE_START = 2,
++        ATH11K_TM_CMD_TESTMODE_STOP = 3,
++	TCMD_EP_TCMD = 4,
++       // ATH11K_TM_CMD_WMI_FTM = 4,
+ };
+ #endif
+ 
+@@ -69,6 +74,7 @@ struct tcmd_cfg {
+  * is required.  Returns: 0 on success, -ETIMEOUT on timeout
+  */
+ int tcmd_tx(void *buf, int len, bool resp);
++int qtcmd_set_ep(enum tcmd_ep ep);
+ 
+ /* Initialize tcmd transport layer on given iface. Call given rx_cb on tcmd
+  * response */
+diff --git a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/nl80211.c b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/nl80211.c
+index 5809aa6..e216d8a 100755
+--- a/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/nl80211.c
++++ b/chss_host_LEA/chss_proc/host/tools/myftm2/libtcmd/nl80211.c
+@@ -51,10 +51,15 @@ enum ar6k_testmode_attr {
+ };
+ 
+ enum ar6k_testmode_cmd {
+-	AR6K_TM_CMD_TCMD		= 0,
+-#ifndef CONFIG_AR6002_REV6
+-	AR6K_TM_CMD_WMI_CMD		= 0xF000,
+-#endif
++        AR6K_TM_CMD_GET_VERSION = 0,
++	#ifndef CONFIG_AR6002_REV6
++		AR6K_TM_CMD_WMI_CMD		= 0xF000,
++        	//ATH11K_TM_CMD_WMI = 1,
++	#endif
++	AR6K_TM_CMD_TESTMODE_START= 2,
++        AR6K_TM_CMD_TESTMODE_STOP = 3,
++	AR6K_TM_CMD_TCMD	    = 4,
++        //ATH11K_TM_CMD_WMI_FTM = 4,
+ };
+ 
+ static int error_handler(struct sockaddr_nl *nla, struct nlmsgerr *err,
+@@ -258,6 +263,9 @@ int nl_get_multicast_id(struct nl_handle *sock, const char *family,
+ int nl80211_set_ep(uint32_t *driv_ep, enum tcmd_ep ep)
+ {
+ 	switch (ep) {
++	case ATH11K_TM_CMD_TESTMODE_START: 
++		*driv_ep = AR6K_TM_CMD_TESTMODE_START;
++	break;
+ 	case TCMD_EP_TCMD:
+ 		*driv_ep = AR6K_TM_CMD_TCMD;
+ 	break;
+@@ -415,6 +423,7 @@ int nl80211_tcmd_tx(struct tcmd_cfg *cfg, void *buf, int len)
+ #ifdef CONFIG_AR6002_REV6
+ 	NLA_PUT_U32(msg, AR6K_TM_ATTR_CMD, AR6K_TM_CMD_TCMD);
+ #else
++	printf("NLA_PUT_U32 cfg->ep=%d\n",  cfg->ep);
+ 	NLA_PUT_U32(msg, AR6K_TM_ATTR_CMD, cfg->ep);
+ #endif
+ 	NLA_PUT(msg, AR6K_TM_ATTR_DATA, len, buf);
