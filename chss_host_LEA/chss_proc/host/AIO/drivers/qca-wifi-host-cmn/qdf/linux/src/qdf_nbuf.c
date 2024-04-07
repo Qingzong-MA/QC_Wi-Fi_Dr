@@ -621,7 +621,7 @@ realloc:
 	}
 
 skb_alloc:
-	/* Qualcomm's hardware does not support accessing the origin 8k space of memory,
+	/* Qualcomm's hardware cannot handle memory address below 0x2000,
 	 * so while SKB allocs memory in that area, it should realloc.
 	 */
 	if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
@@ -632,6 +632,9 @@ skb_alloc:
 			qdf_nofl_err("Quectel: NBUF alloc failed, MAX Trying");
 			return NULL;
 		} else {
+			/* Not freeing to make sure it
+			 * will not get allocated again
+			 */
 			goto realloc;
 		}
 	}
