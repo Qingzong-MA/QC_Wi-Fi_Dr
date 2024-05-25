@@ -111,7 +111,9 @@ static int cnss_stats_show_state(struct seq_file *s,
 		seq_printf(s, "UNKNOWN-%d", i);
 	}
 	seq_puts(s, ")\n");
-
+		
+        seq_printf(s, "<---------------------FW Capability---------------->\n");
+        seq_printf(s, "Board ID: 0x%04x\n", plat_priv->board_info.board_id);
 	return 0;
 }
 
