@@ -872,8 +872,13 @@ static int wlan_hdd_vendor_scan_random_attr(struct wiphy *wiphy,
 	if (!(request->flags & NL80211_SCAN_FLAG_RANDOM_ADDR))
 		return 0;
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+	if (!(wiphy->features & NL80211_FEATURE_SCAN_RANDOM_MAC_ADDR) ||
+	    (wdev->links[0].client.current_bss)) {
+#else
 	if (!(wiphy->features & NL80211_FEATURE_SCAN_RANDOM_MAC_ADDR) ||
 	    (wdev->current_bss)) {
+#endif
 		hdd_err("SCAN RANDOMIZATION not supported");
 		return -EOPNOTSUPP;
 	}

@@ -944,7 +944,11 @@ QDF_STATUS hdd_chan_change_notify(struct hdd_adapter *adapter,
 	hdd_debug("notify: chan:%d width:%d freq1:%d freq2:%d",
 		  chandef.chan->center_freq, chandef.width,
 		  chandef.center_freq1, chandef.center_freq2);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+	cfg80211_ch_switch_notify(dev, &chandef, 0);
+#else
 	cfg80211_ch_switch_notify(dev, &chandef);
+#endif
 
 	return QDF_STATUS_SUCCESS;
 }
@@ -6300,8 +6304,13 @@ static enum hw_mode_bandwidth wlan_hdd_get_channel_bw(
  *
  * Return: zero for success non-zero for failure
  */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+int wlan_hdd_cfg80211_stop_ap(struct wiphy *wiphy,
+				struct net_device *dev, unsigned int link_id)
+#else
 int wlan_hdd_cfg80211_stop_ap(struct wiphy *wiphy,
 				struct net_device *dev)
+#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -6901,9 +6910,15 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 			goto err_start_bss;
 		}
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+		if (wdev->links[0].ap.chandef.chan->center_freq !=
+				params->chandef.chan->center_freq)
+			params->chandef = wdev->links[0].ap.chandef;
+#else
 		if (wdev->chandef.chan->center_freq !=
 				params->chandef.chan->center_freq)
 			params->chandef = wdev->chandef;
+#endif
 		/*
 		 * If Do_Not_Break_Stream enabled send avoid channel list
 		 * to application.
