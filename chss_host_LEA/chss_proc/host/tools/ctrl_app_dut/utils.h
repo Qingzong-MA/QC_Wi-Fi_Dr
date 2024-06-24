@@ -28,6 +28,17 @@
 #define WPAS_UPLOAD_API "/upload-platform-wpas-log"
 
 #define RD_WR_EN 0666
+#define ARTIFACTS_UPLOAD_API "/upload-test-artifacts"
+#ifdef _DUT_
+#if defined(ANDROID)
+#define APP_LOG_FILE "/data/vendor/wifi/controlappc_DUT.log"
+#else
+#define APP_LOG_FILE "controlappc_DUT.log"
+#endif
+#else
+#define APP_LOG_FILE "controlappc_tool_platform.log"
+#endif
+#define UPLOAD_TC_APP_LOG 1
 
 /* Log */
 enum {
@@ -128,19 +139,23 @@ int pipe_command(char *buffer, int buffer_size, char *cmd, char *parameter[]);
 char* read_file(char *fn);
 int write_file(char *fn, char *buffer, int len);
 int append_file(char *fn, char *buffer, int len);
+void open_tc_app_log();
+void close_tc_app_log();
 
 /* network interface and loopback API */
 int get_mac_address(char *buffer, int size, char *interface);
 int set_mac_address(char *ifname, char *mac);
 int find_interface_ip(char *ipaddr, int ipaddr_len, char *name);
 int loopback_server_start(char *local_ip, char *local_port, int timeout);
-int loopback_server_stop();
-int loopback_server_status();
+int loopback_server_stop(void);
+int loopback_server_status(void);
 int send_udp_data(char *target_ip, int target_port, int packet_count, int packet_size, double rate);
 int stop_loopback_data(int *pkt_sent);
 int send_broadcast_arp(char *target_ip, int *send_count, int rate);
 int send_icmp_data(char *target_ip, int packet_count, int packet_size, double rate);
-int is_bridge_created();
+char* get_wlans_bridge();
+int set_wlans_bridge(char* br);
+int is_bridge_created(void);
 int create_bridge(char *br);
 int add_interface_to_bridge(char *br, char *interface);
 int reset_bridge(char *br);
@@ -159,51 +174,60 @@ extern int ap_interface_5gh;
 int get_debug_level(int value);
 
 /* hostapd API */
-char* get_hapd_exec_file();
+char* get_hapd_exec_file(void);
 int set_hapd_exec_file(char* path);
-char* get_hapd_full_exec_path();
+char* get_hapd_full_exec_path(void);
 int set_hapd_full_exec_path(char* path);
 char* get_hapd_ctrl_path_by_id(struct interface_info* wlan);
-char* get_hapd_ctrl_path();
+char* get_hapd_ctrl_path(void);
+char* get_hapd_ctrl_path_no_iface(void);
 int set_hapd_ctrl_path(char* path);
-char* get_hapd_global_ctrl_path();
+char* get_hapd_global_ctrl_path(void);
 int set_hapd_global_ctrl_path(char* path);
-char* get_hapd_conf_file();
+char* get_hapd_conf_file(void);
 char* get_hapd_conf_file_dir();
 int set_hapd_conf_file(char* path);
 int set_hapd_conf_file_dir(char* path);
+char* get_hapd_log_file_arguments(void);
+int set_hapd_log_file_arguments(char* path);
 void set_hostapd_debug_level(int level);
-char* get_hostapd_debug_arguments();
+char* get_hostapd_debug_arguments(void);
 
 /* wpa_supplicant API */
-char* get_wpas_exec_file();
+char* get_wpas_exec_file(void);
 int set_wpas_exec_file(char* path);
-char* get_wpas_full_exec_path();
+char* get_wpas_full_exec_path(void);
 int set_wpas_full_exec_path(char* path);
-char* get_wpas_ctrl_path();
+char* get_wpas_ctrl_path(void);
+char* get_wpas_if_ctrl_path(char* if_name);
+char* get_wpas_ctrl_path_no_iface(void);
 int set_wpas_ctrl_path(char* path);
-char* get_wpas_global_ctrl_path();
+char* get_wpas_global_ctrl_path(void);
 int set_wpas_global_ctrl_path(char* path);
-char* get_wpas_conf_file();
+char* get_wpas_conf_file(void);
 int set_wpas_conf_file(char* path);
+char* get_wpas_log_file_arguments(void);
+int set_wpas_log_file_arguments(char* path);
 void set_wpas_debug_level(int level);
-char* get_wpas_debug_arguments();
+char* get_wpas_debug_arguments(void);
 
 /* service and environment API */
-char* get_wireless_interface();
+char* get_wireless_interface(void);
 int set_wireless_interface(char *name);
-int get_service_port();
+int get_service_port(void);
 int set_service_port(int port);
-char* get_default_wireless_interface_info();
-int clear_interfaces_resource();
+char* get_default_wireless_interface_info(void);
+int clear_interfaces_resource(void);
 char* get_all_hapd_conf_files(int *swap_hostapd);
 
 void parse_bss_identifier(int bss_identifier, struct bss_identifier_info* bss);
 struct interface_info* assign_wireless_interface_info(struct bss_identifier_info *bss);
+struct interface_info* assign_pref_wireless_interface_info(struct bss_identifier_info *bss, const char* pref_ifname);
 struct interface_info* get_wireless_interface_info(int band, int identifier);
+struct interface_info* get_first_configured_wireless_interface_info();
 int add_all_wireless_interface_to_bridge(char *br);
 void set_default_wireless_interface_info(int channel);
-int show_wireless_interface_info();
+int show_wireless_interface_info(void);
 void iterate_all_wlan_interfaces(void (*callback_fn)(void *));
 void get_server_cert_hash(char *pem_file, char *buffer, int size);
 int insert_wpa_network_config(char *config);
@@ -222,6 +246,7 @@ int is_ht40minus_chan(int chan);
 size_t strlcat(char *dst, const char *str, size_t size);
 #endif /* ANDROID */
 void http_file_post(char *host, int port, char *path, char *file_name);
+int file_exists(const char *fname);
 #endif
 #if defined(ANDROID) || defined(MDM)
 int cld_drivercmd(char *ifname, char *command);

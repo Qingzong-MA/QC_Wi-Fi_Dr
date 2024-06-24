@@ -1,0 +1,189 @@
+From d3fe8f65ba68fc1dd226f6e6dc6f6b8b96b62680 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Tue, 19 Mar 2024 10:25:49 +0800
+Subject: [PATCH] Btdiag: Add RAW mode support to communicate with QCRPG
+
+Add RAW mode support to communicate with QCRPG.
+---
+ Btdiag.c         | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ privateMembers.c | 38 ++++++++++++++++++++++++++++++++++++++
+ privateMembers.h |  2 ++
+ 3 files changed, 82 insertions(+), 6 deletions(-)
+
+diff --git a/Btdiag.c b/Btdiag.c
+index 156c7568a8cf..d5c02f1358d6 100755
+--- a/Btdiag.c
++++ b/Btdiag.c
+@@ -45,6 +45,7 @@ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ int sock;
+ int client_sock;
+ bool legacyMode = 1;
++bool raw_mode = 0;
+ ConnectionType connectionTypeOptions;
+ ConnectionType QDARTConnectionType;
+ extern struct uart_t uart_port;
+@@ -180,6 +181,7 @@ void *NotifyObserver(void * arguments)
+ #elif defined(FLUORIDE_STACK)
+ 				ret = fluoride_read_raw_data(args->desc, args->buf, args->size);
+ 				recv_byte_len = ret;
++				tempbuf = args->buf;
+ 				break;
+ #else
+ 				ret = read_raw_data(args->desc, args->buf, args->size);
+@@ -241,6 +243,18 @@ void *NotifyObserver(void * arguments)
+ 			}
+ 		}
+ 
++		{
++			int res;
++			if(raw_mode) {
++				if ((recv_byte_len > 0) && (client_sock != -1)) {
++					res = send(client_sock , args->buf , recv_byte_len, 0);
++					if (res != recv_byte_len)
++						fprintf(stderr, "RAWMODE ERROR DUT->QRCT: send %d, sent %d", recv_byte_len, res);
++				}
++				continue;
++			}
++		}
++
+ 		//if (packetData.type == PacketDataType.Data)
+ 		{
+ 
+@@ -312,7 +326,6 @@ int main(int argc , char *argv[])
+ {
+     struct sockaddr_in server, client;
+ 	int clientaddr_size, read_size;
+-    char message[1000] , server_reply[2000];
+     char ipAddress[255] = "localhost";
+     int portNumber = 2390;            //default: 2390
+     char IOTypeString[10] = "";      
+@@ -330,7 +343,7 @@ int main(int argc , char *argv[])
+ 
+     //these variables will be used by child thread and should never released
+     struct arg_struct args;
+-    unsigned char databuf[HCI_MAX_EVENT_SIZE];
++    unsigned char databuf[2048];
+ 
+ 	memset(&uart_port, 0, sizeof(uart_port));
+ 
+@@ -970,6 +983,13 @@ int main(int argc , char *argv[])
+                     #endif
+                     return 1;
+             	}
++		} else {
++			if (argc > 7)
++				if (strstr(argv[7], "RAWMODE")) {
++					pPosition = strchr(argv[7], '=');
++					if (0 == strcmp(pPosition+1, "yes"))
++						raw_mode = 1;
++				}
+ 		}
+ 	        //require to download patch and NVM files
+ 	        isPatchandNvmRequired = 1;
+@@ -1017,9 +1037,22 @@ int main(int argc , char *argv[])
+                     #endif
+                     return 1;
+             	}
++			} else {
++				if (argc > 6)
++					if (strstr(argv[6], "RAWMODE")) {
++						pPosition = strchr(argv[6], '=');
++						if (0 == strcmp(pPosition+1, "yes"))
++							raw_mode = 1;
++					}
+ 			}
+         }
+ 
++#ifdef PLATFORM_ANDROID
++		fprintf(stderr,"\nRAWMODE=%s\n", raw_mode ? "yes" : "no");
++#else
++		printf("\nRAWMODE=%s\n", raw_mode ? "yes" : "no");
++#endif
++
+         //starting and making connection to SoC DUT
+         switch (connectionTypeOptions)
+         {
+@@ -1069,7 +1102,7 @@ int main(int argc , char *argv[])
+                 args.desc = descriptor;
+ 
+             args.buf = databuf;
+-            args.size = HCI_MAX_EVENT_SIZE;
++            args.size = sizeof(databuf);
+ 
+             err = pthread_create(&thread, NULL, &NotifyObserver, (void *)&args);
+             if (err != 0)
+@@ -1182,9 +1215,12 @@ int main(int argc , char *argv[])
+ 	        int lengthOfStream;
+ 	        while ((lengthOfStream = recv(client_sock, incomingDataBytes, TCP_BUF_LENGTH, 0)) != 0)
+ 	        {
+-	            if (lengthOfStream > 0)
+-	            processDiagPacket(incomingDataBytes);
+-
++			if (lengthOfStream > 0) {
++				if (raw_mode)
++					host_to_controller(incomingDataBytes, lengthOfStream);
++				else
++					processDiagPacket(incomingDataBytes);
++			}
+ 	            //initiate incomingDataBytes buf
+ 	            memset(incomingDataBytes, 0, TCP_BUF_LENGTH);
+ 	        }
+diff --git a/privateMembers.c b/privateMembers.c
+index 12c716c490cf..281ce99e1914 100755
+--- a/privateMembers.c
++++ b/privateMembers.c
+@@ -445,3 +445,41 @@ int processDiagPacket(BYTE inputDIAGMsg[])
+             return 1;
+     }
+ }
++
++void host_to_controller(unsigned char *msgToDUT, int lengthOfPayload) {
++	int i = 0;
++	int ret = 0;
++
++	switch (connectionTypeOptions)
++	{
++	case SERIAL:
++#ifdef HCI_CMD_NEED_DELAY
++		ret = uart_send_hci_cmd(descriptor, msgToDUT, lengthOfPayload);
++#else
++		ret = write(descriptor, msgToDUT, lengthOfPayload);
++#endif
++		if (ret != lengthOfPayload) {
++			fprintf(stderr, "%s: Send failed with ret value: %d\n", __FUNCTION__, ret);
++			return ;
++		}
++		break;
++	case USB:
++#ifdef BLUEDROID_STACK
++		ret = bluedroid_usb_send_hci_cmd(msgToDUT, lengthOfPayload);
++#elif defined(FLUORIDE_STACK)
++		ret = fluoride_send_hci_cmd(descriptor, msgToDUT, lengthOfPayload);
++#else
++		ret = usb_send_hci_cmd(Device, msgToDUT, lengthOfPayload);
++#endif
++		if (ret != 0) {
++			fprintf(stderr, "%s: Send failed with ret value: %d\n", __FUNCTION__, ret);
++			return ;
++		}
++		break;
++	}
++
++	printf("HOST -> SOC %d bytes\n", lengthOfPayload);
++	for (i=0; i<lengthOfPayload; i++)
++		printf("%02x ", msgToDUT[i]);
++	printf("\n");
++}
+diff --git a/privateMembers.h b/privateMembers.h
+index 51d349695dc1..2c25b45cb41c 100755
+--- a/privateMembers.h
++++ b/privateMembers.h
+@@ -130,3 +130,5 @@ static BYTE extendedBuildIDRespMsg[] = {
+                         0x42,0x52,0x49,0x44,0x47,0x45, //BRIDGE
+                         0x0                // Model string (BT.DIAG.BRIDGE)
+                                        };
++
++void host_to_controller(unsigned char *msgToDUT, int lengthOfPayload);
+-- 
+2.7.4
+

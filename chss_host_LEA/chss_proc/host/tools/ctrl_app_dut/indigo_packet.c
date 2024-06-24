@@ -75,7 +75,8 @@ int parse_packet(struct packet_wrapper *req, char *packet, int packet_len) {
     for (i = 0; i < req->tlv_num; i++) {
         tlv = get_tlv_by_id(req->tlv[i]->id);
         if (tlv) {
-            indigo_logger(LOG_LEVEL_INFO, "    TLV: 0x%04x (%s)", tlv->id, tlv->name);
+            if (!debug_packet)
+                indigo_logger(LOG_LEVEL_INFO, "    TLV: 0x%04x (%s)", tlv->id, tlv->name);
         } else {
             indigo_logger(LOG_LEVEL_WARNING, "    TLV: 0x%04x Unknown", req->tlv[i]->id);
             return -1;
@@ -88,6 +89,7 @@ int parse_packet(struct packet_wrapper *req, char *packet, int packet_len) {
         char *buffer;
         int buffer_len = packet_len*6;
         api = get_api_by_id(req->hdr.type);
+        memset(fn, 0, S_BUFFER_LEN);
         if (api) {
             snprintf(fn, sizeof(fn), "%02d_%s", capture_count++, api->name);
         }
@@ -208,7 +210,7 @@ int add_tlv(struct tlv_hdr *tlv, int id, int len, char *value) {
         return 1;
     tlv->id = id;
     tlv->len = len;
-    tlv->value = (char*)malloc(sizeof(char)*len);
+    tlv->value = (unsigned char*)malloc(sizeof(char)*len);
     if (tlv->value) {
         memcpy(tlv->value, value, len);
     } else {
@@ -228,7 +230,7 @@ int parse_tlv(struct tlv_hdr *tlv, char *packet, int packet_len) {
 
     tlv->id = ((packet[0] & 0x00ff) << 8) | (packet[1] & 0x00ff);
     tlv->len = packet[2];
-    tlv->value = (char*)malloc(sizeof(char) * tlv->len);
+    tlv->value = (unsigned char*)malloc(sizeof(char) * tlv->len);
     if (tlv->value) {
         memcpy(tlv->value, &packet[3], tlv->len);
     } else {

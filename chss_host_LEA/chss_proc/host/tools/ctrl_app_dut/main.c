@@ -43,7 +43,7 @@ char *indigo_radio_ifname[MAX_RADIO] = {};
 /* Internal functions */
 static void control_receive_message(int sock, void *eloop_ctx, void *sock_ctx);
 static int parse_parameters(int argc, char *argv[]);
-static void usage();
+static void usage(void);
 
 /* External variables */
 extern int capture_packet; /* debug. Write the received packets to files */
@@ -92,7 +92,7 @@ struct sockaddr_storage from;  // source address of the message
 static void control_receive_message(int sock, void *eloop_ctx, void *sock_ctx) {
     int ret;                          // return code
     int fromlen, len;                 // structure size and received length
-    unsigned char buffer[BUFFER_LEN]; // buffer to receive the message
+    char buffer[BUFFER_LEN];          // buffer to receive the message
     struct packet_wrapper req, resp;  // packet wrapper for the received message and response
     struct indigo_api *api = NULL;    // used for API search, validation and handler call
 
@@ -167,7 +167,7 @@ done:
 }
 
 /* Show the usage */
-static void usage() {
+static void usage(void) {
     printf("usage:\n");
     printf("app [-h] [-p<port number>] [-i<wireless interface>|-i<band>:<interface>[,<band>:<interface>]] [-a<hostapd path>] [-s<wpa_supplicant path>]\n\n");
     printf("usage:\n");
@@ -176,18 +176,21 @@ static void usage() {
     printf("  -d = debug received and sent message\n");
     printf("  -e = specify hostapd control path\n");
     printf("  -f = wpa supplicant config file path\n");
+    printf("  -H = hostapd log file\n");
+    printf("  -k = specify bridge name for wireless interfaces\n");
     printf("  -i = specify the interface. E.g., -i wlan0. Or, <band>:<interface>.\n       band can be 2 for 2.4GHz, 5 for 5GHz and 6 for 6GHz. E.g., -i 2:wlan0,2:wlan1,5:wlan32,5:wlan33\n");
+    printf("  -J = wpa_supplicant log file\n");
     printf("  -p = port number of the application\n");
     printf("  -s = specify wpa_supplicant path\n");
     printf("  -w = wpas control interface path\n\n");
 }
 
 /* Show the welcome message with role and version */
-static void print_welcome() {
+static void print_welcome(void) {
 #ifdef _DUT_
     printf("Welcome to use QuickTrack Control App DUT version");
 #else
-    printf("Welcome to use QuickTrack Control App Platform version");
+    printf("Welcome to use Quicktrack Control App Platform version");
 #endif
 
 #ifdef _VERSION_
@@ -199,13 +202,13 @@ static void print_welcome() {
 
 /* Parse the commandline parameters */
 static int parse_parameters(int argc, char *argv[]) {
-    int c, ifs_configured = 0;
-    char buf[128];
+    int c, ifs_configured = 0, bridge_configured = 0;
+    char buf[256];
 
 #ifdef _VERSION_
-    while ((c = getopt(argc, argv, "a:s:i:f:R:w:b:e:hp:dcvD:")) != -1) {
+    while ((c = getopt(argc, argv, "a:s:i:f:R:w:b:e:k:hp:dcvD:H:J:")) != -1) {
 #else
-    while ((c = getopt(argc, argv, "a:s:i:f:R:w:b:e:hp:dcD:")) != -1) {
+    while ((c = getopt(argc, argv, "a:s:i:f:R:w:b:e:k:hp:dcD:H:J:")) != -1) {
 #endif
         switch (c) {
         case 'a':
@@ -214,8 +217,12 @@ static int parse_parameters(int argc, char *argv[]) {
         case 'b':
             set_hapd_conf_file(optarg);
             break;
-        case 'D':
-            set_hapd_conf_file_dir(optarg);
+	case 'D':
+		set_hapd_conf_file_dir(optarg);
+		break;
+        case 'k':
+            set_wlans_bridge(optarg);
+            bridge_configured = 1;
             break;
         case 'c':
             capture_packet = 1;
@@ -232,10 +239,16 @@ static int parse_parameters(int argc, char *argv[]) {
         case 'h':
             usage();
             return 1;
+        case 'H':
+            set_hapd_log_file_arguments(optarg);
+            break;
         case 'i':
             if (set_wireless_interface(optarg) == 0) {
                 ifs_configured = 1;
             }
+            break;
+        case 'J':
+            set_wpas_log_file_arguments(optarg);
             break;
         case 'p':
             set_service_port(atoi(optarg));
@@ -287,6 +300,10 @@ static int parse_parameters(int argc, char *argv[]) {
         printf("\nWe need to specify the interfaces with -i.\n");
         return 1;
 #endif
+    }
+
+    if (bridge_configured == 0) {
+        set_wlans_bridge(BRIDGE_WLANS);
     }
 
     return 0;

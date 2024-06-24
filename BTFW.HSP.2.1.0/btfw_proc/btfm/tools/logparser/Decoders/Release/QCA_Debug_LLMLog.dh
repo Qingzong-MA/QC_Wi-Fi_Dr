@@ -64,6 +64,8 @@ TABLE tQca_LLMLogID APPENDS_ONLY tQca_EnhLogID
     {0x023B "LOG_ID_LLM_POWER_CONTROL_INFO"   "LOG_ID_LLM_POWER_CONTROL_INFO" 0 gQca_LLM_PowerControlInfo }
     {0x0240 "LOG_ID_LLM_ESCO_NEGO"          "LOG_ID_LLM_ESCO_NEGO"          0   gQca_LLM_ESCO_Nego}
     {0x0242 "LOG_ID_LLM_LE_LPA"             "LOG_ID_LLM_LE_LPA"             0   gQca_LLM_LE_LPA}
+    {0x0243 "LOG_ID_LLM_ABORT_CONN_PENDING_LMP"   "LOG_ID_LLM_ABORT_CONN_PENDING_LMP"   0   gQca_LLM_AbortConnPendingLMP}
+    {0x02FC "LOG_ID_LLM_LE_POWER_CONTROL_INFO"   "LOG_ID_LLM_LE_POWER_CONTROL_INFO" 0 gQca_LE_LLM_PowerControlInfo }
     {0x02FD "LOG_ID_LLM_LE_RAW_RSSI"       "LOG_ID_LLM_LE_RAW_RSSI"       0   gQca_LLM_LE_Rssi}
     {0x02FF "LLM End"}
 ENDTABLE
@@ -1576,6 +1578,25 @@ GROUP gQca_LLM_PowerControlInfo "Power Control Info"
     FIELD fQca_LLM_PowerControlInfoAvgRSSIdBm       (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "Average RSSI dBm"
 }
 
+
+GROUP gQca_LE_LLM_PowerControlInfo "LE Power Control Info"
+{
+    FIELD fQca_LLM_LE_PowerControlInfoConnHandle       (Fixed 2 Bytes)     (Decimal) "Connection Handle"
+    FIELD fQca_LLM_LE_PowerControlInfoSource           (Fixed 1 Byte)      (TABLE tQca_LE_PLChangeSource) "Source of the LE Power change"
+    GROUP gQca_LLM_LE_PowerControlInfoFlags "Power Control Flags"
+    {
+        RESERVED    (Fixed 5 Bits)
+        FIELD fQca_LLM_LE_LimitMaxPLOnPhy       (Fixed 1 Bit) (TABLE tQca_Power_Status)     "Limit Max PL On Phy "
+        FIELD fQca_LLM_LE_powerControlSupport         (Fixed 1 Bit) (TABLE tQca_Power_Status)     "LE Power Control Support"
+        FIELD fQca_LLM_LE_ISOOnTXPHy                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "ISO On TX PHy "
+    }
+    FIELD fQca_LLM_LE_TxPHY            (Fixed 1 Byte)      (TABLE tQca_LE_TxPHY) "TxPHY"
+    FIELD fQca_LLM_LE_MaxPLOnTxPHY          (Fixed 1 Byte)      (Decimal) "Maximum PL On TxPHY"
+    FIELD fQca_LLM_LE_CurrPLOnTxPHY         (Fixed 1 Byte)      (Decimal) "Current PL TxPHY"
+	
+    RESERVED    (Fixed 3 Bits)
+}
+
 TABLE tQca_PLChangeSource
     {0x00 "Remote"}
     {0x80 "Local"}
@@ -1589,9 +1610,30 @@ TABLE tQca_PLChangeSource
     {Default "Invalid"}
 ENDTABLE
 
+TABLE  tQca_LE_TxPHY
+    {0x00 "1M"}
+    {0x01 "2M"}
+    {0x02 "S8(125K)"}
+    {0x03 "S2(500K)"}
+    {0x04 "LEHS(Q2Q)"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_LE_PLChangeSource
+    {0x00 "Remote"}
+    {0x01 "Phy Updata"}
+    {0x02 "Min Channels Limit"}
+    {0x03 "Coded PHY Sync"}
+    {0x80 "Local"}
+    {0x81 "Local Acl Conn Init"}
+    {0x82 "Local Iso Conn Init"}
+    {0x83 "Local LE LPA Eval"}
+    {Default "Invalid"}
+ENDTABLE
+
 TABLE tQca_Power_Status
-    {0x00, "Disabled" }
-    {0x01, "Enabled" }
+    {0x00, "False" }
+    {0x01, "True" }
 ENDTABLE
 
 GROUP gQca_LLM_ESCO_Nego "eSCO Param Negotiation"
@@ -1678,4 +1720,10 @@ GROUP gQca_LLM_VoiceAlloc "LLM eSCO Voice Allocation Status"
     FIELD fQca_Voice_OTABUF_Alloc                 (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "OTABuf Alloc"            //BIT0
     
     
+}
+
+GROUP gQca_LLM_AbortConnPendingLMP "LLM abort connection if pending many LMPs"
+{    
+  FIELD fgQca_LLM_AbortConnPendingLMPConnHandle       (Fixed 2 Bytes)     (Hex) "Connection Handle"    
+  FIELD fgQca_LLM_AbortConnPendingLMPCnt              (Fixed 2 Bytes)     (Decimal) "LMPs Pending"
 }

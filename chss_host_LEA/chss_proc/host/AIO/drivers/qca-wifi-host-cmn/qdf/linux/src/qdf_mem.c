@@ -2353,31 +2353,7 @@ static inline void *qdf_mem_dma_alloc(qdf_device_t osdev, void *dev,
 static inline void *qdf_mem_dma_alloc(qdf_device_t osdev, void *dev,
 				      qdf_size_t size, qdf_dma_addr_t *paddr)
 {
-	uint32_t lowmem_alloc_tries = 0;
-	void *dma_vaddr = NULL;
-
-realloc:
-	dma_vaddr = dma_alloc_coherent(dev, size, paddr, qdf_mem_malloc_flags());
-
-	if (!dma_vaddr) {
-		qdf_err("%s failed , size: %zu!", __func__, size);
-		return NULL;
-	}
-	if (*paddr < 0x2000) {
-		lowmem_alloc_tries++;
-		qdf_err("Quectel: invalid phy addr 0x%llx, trying again", (uint64_t)(*paddr));
-		if (lowmem_alloc_tries > 10) {
-			qdf_err("Quectel: invalid phy addr, MAX trying");
-			return NULL;
-		} else {
-			/* Not freeing to make sure it
-			 * will not get allocated again
-			 */
-			goto realloc;
-		}
-	}
-
-	return dma_vaddr;
+	return dma_alloc_coherent(dev, size, paddr, qdf_mem_malloc_flags());
 }
 #endif
 

@@ -1,0 +1,289 @@
+From e495bb18696117f3dd7f4d7c55a59e8474b0486a Mon Sep 17 00:00:00 2001
+From: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+Date: Fri, 3 Feb 2023 14:37:38 +0800
+Subject: [PATCH] qcacmn: Dump event desc history after FW down
+
+For debugging purpose, dump event desc history when
+PLD_FW_DOWN event is received, Set CONFIG_DUMP_TO_FILE=y
+to enable this feature.
+
+CONFIG_DUMP_EVENT_DESC_CNT is used to limit the number
+of logs. it's 128 by default.
+
+Signed-off-by: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+---
+ hif/src/ce/ce_main.c | 104 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hif/src/ce/ce_main.h |  12 ++++++
+ hif/src/hif_exec.c   |  99 ++++++++++++++++++++++++++++++++++++++++++++++++
+ hif/src/hif_exec.h   |  10 +++++
+ 4 files changed, 225 insertions(+)
+
+diff --git a/hif/src/ce/ce_main.c b/hif/src/ce/ce_main.c
+index d4ffe7e..7f4606a 100644
+--- a/hif/src/ce/ce_main.c
++++ b/hif/src/ce/ce_main.c
+@@ -1456,6 +1456,110 @@ void free_mem_ce_debug_hist_data(struct hif_softc *scn, uint32_t ce_id)
+ #if defined(HIF_CONFIG_SLUB_DEBUG_ON) || defined(HIF_CE_DEBUG_DATA_BUF)
+ struct hif_ce_desc_event hif_ce_desc_history[CE_COUNT_MAX][HIF_CE_HISTORY_MAX];
+ 
++#ifdef DUMP_EVENT_TO_FILE
++char ce_dump_path[] = "/var/crash/ce_event_history.log";
++void hif_ce_print_desc_event_history(uint32_t count)
++{
++	uint32_t evt_index, ce_id, evt_count;
++	struct hif_ce_desc_event *hist;
++	struct hif_opaque_softc *hif_ctx;
++	struct hif_softc *scn;
++	struct ce_desc_hist *ce_hist;
++	char dump_buf[128];
++	uint32_t write_len;
++	int status;
++
++	struct file *fp = NULL;
++	loff_t pos = 0;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++	mm_segment_t fs;
++#endif
++
++	hif_ctx = cds_get_context(QDF_MODULE_ID_HIF);
++	if (!hif_ctx) {
++		hif_err("hif_ce_print_desc_event_history get hif_ctx fail");
++		return;
++	}
++
++	scn = HIF_GET_SOFTC(hif_ctx);
++	if (!scn) {
++		hif_err("hif_ce_print_desc_event_history get scn fail");
++		return;
++	}
++
++	fp = filp_open(ce_dump_path, O_RDWR | O_CREAT, 0644);
++	if (IS_ERR(fp)) {
++		hif_err("Hif event desc history dump create file %s failed\n",
++			ce_dump_path);
++		return;
++	}
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++	fs = get_fs();
++	set_fs(KERNEL_DS);
++#endif
++
++	ce_hist = &scn->hif_ce_desc_hist;
++	write_len = scnprintf(dump_buf, sizeof(dump_buf),
++		"CE Event Desc history (count %u)\nevt_id  ce_id  event_type          event_ts\n",
++		count);
++	status = vfs_write(fp, dump_buf, write_len, &pos);
++	if (status < 0) {
++		hif_err("Hif event desc history dump write file %s failed: %d\n",
++			ce_dump_path, status);
++		goto out;
++	}
++
++	if (count > HIF_CE_HISTORY_MAX)
++		count = HIF_CE_HISTORY_MAX;
++	for (ce_id = 0; ce_id < CE_COUNT_MAX; ce_id++) {
++		if (!ce_hist->enable[ce_id])
++			continue;
++
++		evt_count = count;
++		hist = (struct hif_ce_desc_event *)ce_hist->hist_ev[ce_id];
++
++		/* subtract count from index, and wrap if necessary */
++		evt_index = qdf_atomic_read(&ce_hist->history_index[ce_id]);
++		evt_index = HIF_CE_HISTORY_MAX + evt_index - evt_count + 1;
++		evt_index %= HIF_CE_HISTORY_MAX;
++
++		while (evt_count) {
++			write_len = scnprintf(dump_buf, sizeof(dump_buf),
++					      "%6d  %6d  %10d  %15lld\n",
++					      evt_index,
++					      ce_id,
++					      hist[evt_index].type,
++					      hist[evt_index].time);
++
++			status = vfs_write(fp, dump_buf, write_len, &pos);
++			if (status < 0) {
++				hif_err("Hif event desc history dump write file %s failed: %d\n",
++					ce_dump_path, status);
++				goto out;
++			}
++
++			--evt_count;
++			++evt_index;
++			if (evt_index >= HIF_CE_HISTORY_MAX)
++				evt_index = 0;
++		}
++	}
++
++	vfs_fsync(fp, 0);
++
++out:
++	status = filp_close(fp, NULL);
++	if (status < 0) {
++		hif_err("Hif event desc dump history close file %s failed: %d\n",
++			ce_dump_path, status);
++	}
++
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++	set_fs(fs);
++#endif
++}
++#endif
++
+ /**
+  * alloc_mem_ce_debug_history() - Allocate CE descriptor history
+  * @scn: hif scn handle
+diff --git a/hif/src/ce/ce_main.h b/hif/src/ce/ce_main.h
+index 1b680e7..0df2692 100644
+--- a/hif/src/ce/ce_main.h
++++ b/hif/src/ce/ce_main.h
+@@ -363,4 +363,16 @@ void hif_select_epping_service_to_pipe_map(struct service_to_pipe
+ void ce_service_register_module(enum ce_target_type target_type,
+ 				struct ce_ops* (*ce_attach)(void));
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
++#define vfs_write kernel_write
++#endif
++#if !defined(HIF_CE_DEBUG_DATA_DYNAMIC_BUF) && \
++    defined(DUMP_EVENT_TO_FILE)
++void hif_ce_print_desc_event_history(uint32_t count);
++#else
++static inline
++void hif_ce_print_desc_event_history(uint32_t count)
++{
++}
++#endif
+ #endif /* __CE_H__ */
+diff --git a/hif/src/hif_exec.c b/hif/src/hif_exec.c
+index e94566a..a251349 100644
+--- a/hif/src/hif_exec.c
++++ b/hif/src/hif_exec.c
+@@ -34,6 +34,105 @@ static struct hif_exec_context *hif_exec_tasklet_create(void);
+ #ifdef WLAN_FEATURE_DP_EVENT_HISTORY
+ struct hif_event_history hif_event_desc_history[HIF_NUM_INT_CONTEXTS];
+ 
++#ifdef DUMP_EVENT_TO_FILE
++char hif_dump_path[] = "/var/crash/hif_event_history.log";
++void hif_print_event_desc_history(uint32_t count)
++{
++	uint32_t evt_index, grp_index, evt_count;
++	struct hif_event_history *hist;
++	char dump_buf[128];
++	uint32_t write_len;
++	int status;
++
++	struct file *fp = NULL;
++	loff_t pos = 0;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++	mm_segment_t fs;
++#endif
++
++	fp = filp_open(hif_dump_path, O_RDWR | O_CREAT, 0644);
++	if (IS_ERR(fp)) {
++		hif_err("Hif event desc history dump create file %s failed\n",
++			hif_dump_path);
++		return;
++	}
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++	fs = get_fs();
++	set_fs(KERNEL_DS);
++#endif
++
++	write_len = scnprintf(dump_buf, sizeof(dump_buf),
++		"HIF Event Desc history (count %u)\nevt_id  ring_id     hp         tp  event_type         event_ts\n",
++		count);
++	status = vfs_write(fp, dump_buf, write_len, &pos);
++	if (status < 0) {
++		hif_err("Hif event desc history dump write file %s failed: %d\n",
++			hif_dump_path, status);
++		goto out;
++	}
++
++	if (count > HIF_EVENT_HIST_MAX)
++		count = HIF_EVENT_HIST_MAX;
++
++	for (grp_index = 0; grp_index < HIF_NUM_INT_CONTEXTS; grp_index++) {
++		hist = &hif_event_desc_history[grp_index];
++		evt_count = count;
++
++		/* subtract count from index, and wrap if necessary */
++		evt_index = qdf_atomic_read(&hist->index);
++		evt_index = HIF_EVENT_HIST_MAX + evt_index - evt_count + 1;
++		evt_index %= HIF_EVENT_HIST_MAX;
++
++		write_len = scnprintf(dump_buf, sizeof(dump_buf),
++					      "grp_index=%d, irq=%d, irq_ts=%lld\n",
++					      grp_index,
++					      hist->misc.last_irq_index,
++					      hist->misc.last_irq_ts);
++		status = vfs_write(fp, dump_buf, write_len, &pos);
++		if (status < 0) {
++			hif_err("Hif event desc history dump write file %s failed: %d\n",
++				hif_dump_path, status);
++			goto out;
++		}
++
++		while (evt_count) {
++			write_len = scnprintf(dump_buf, sizeof(dump_buf),
++					      "%6d  %7d  %5d  %9d  %10d  %15lld\n",
++					      evt_index,
++					      hist->event[evt_index].hal_ring_id,
++					      hist->event[evt_index].hp,
++					      hist->event[evt_index].tp,
++					      hist->event[evt_index].type,
++					      hist->event[evt_index].timestamp);
++			status = vfs_write(fp, dump_buf, write_len, &pos);
++			if (status < 0) {
++				hif_err("Hif event desc history dump write file %s failed: %d\n",
++				hif_dump_path, status);
++				goto out;
++			}
++
++			--evt_count;
++			++evt_index;
++			if (evt_index >= HIF_EVENT_HIST_MAX)
++				evt_index = 0;
++			}
++	}
++
++	vfs_fsync(fp, 0);
++
++out:
++	status = filp_close(fp, NULL);
++	if (status < 0) {
++		hif_err("Hif event desc dump history close file %s failed: %d\n",
++			hif_dump_path, status);
++	}
++
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0)) || (defined(CONFIG_SET_FS))
++		set_fs(fs);
++#endif
++}
++#endif
++
+ static inline
+ int hif_get_next_record_index(qdf_atomic_t *table_index,
+ 			      int array_size)
+diff --git a/hif/src/hif_exec.h b/hif/src/hif_exec.h
+index 3de608b..0857152 100644
+--- a/hif/src/hif_exec.h
++++ b/hif/src/hif_exec.h
+@@ -212,5 +212,15 @@ static inline void hif_pci_ce_irq_remove_affinity_hint(int irq)
+ {
+ }
+ #endif /* ifdef HIF_CPU_PERF_AFFINE_MASK */
++
++#if defined(WLAN_FEATURE_DP_EVENT_HISTORY) && \
++    defined(DUMP_EVENT_TO_FILE)
++void hif_print_event_desc_history(uint32_t count);
++#else
++static inline
++void hif_print_event_desc_history(uint32_t count)
++{
++}
++#endif
+ #endif
+ 
+-- 
+2.7.4
+

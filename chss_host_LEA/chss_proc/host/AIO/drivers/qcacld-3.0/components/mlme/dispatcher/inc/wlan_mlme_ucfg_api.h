@@ -369,6 +369,20 @@ QDF_STATUS ucfg_mlme_get_sub_20_chan_width(struct wlan_objmgr_psoc *psoc,
 }
 
 /**
+ * ucfg_mlme_set_sub_20_chan_width() - Set the sub 20 chan width config
+ * @psoc: pointer to psoc object
+ * @sub_20_chan_width: sub 20 chan width to be set
+ *
+ * Return: QDF Status
+ */
+static inline
+QDF_STATUS ucfg_mlme_set_sub_20_chan_width(struct wlan_objmgr_psoc *psoc,
+					   uint8_t sub_20_chan_width)
+{
+	return wlan_mlme_set_sub_20_chan_width(psoc, sub_20_chan_width);
+}
+
+/**
  * ucfg_mlme_get_fw_timeout_crash() - Get the fw timeout crash config
  * @psoc: pointer to psoc object
  * @fw_timeout_crash: Pointer to the variable from caller
@@ -989,6 +1003,21 @@ ucfg_mlme_get_roaming_triggers(struct wlan_objmgr_psoc *psoc)
 {
 	return wlan_mlme_get_roaming_triggers(psoc);
 }
+
+/**
+ * ucfg_mlme_set_roaming_triggers() - Set roaming triggers bitmap
+ * value
+ * @psoc: pointer to psoc object
+ * @trigger_bitmap: Roaming triggers bitmap to set
+ *
+ * Return: void
+ */
+static inline void
+ucfg_mlme_set_roaming_triggers(struct wlan_objmgr_psoc *psoc,
+			       uint32_t trigger_bitmap)
+{
+	wlan_mlme_set_roaming_triggers(psoc, trigger_bitmap);
+}
 #else
 static inline QDF_STATUS
 ucfg_mlme_get_roam_disable_config(struct wlan_objmgr_psoc *psoc,
@@ -1017,6 +1046,12 @@ static inline uint32_t
 ucfg_mlme_get_roaming_triggers(struct wlan_objmgr_psoc *psoc)
 {
 	return 0xffff;
+}
+
+static inline void
+ucfg_mlme_set_roaming_triggers(struct wlan_objmgr_psoc *psoc,
+			       uint32_t trigger_bitmap)
+{
 }
 #endif
 
@@ -4182,6 +4217,19 @@ static inline uint32_t
 ucfg_mlme_get_wds_mode(struct wlan_objmgr_psoc *psoc)
 {
 	return wlan_mlme_get_wds_mode(psoc);
+}
+
+/**
+ * ucfg_mlme_set_wds_mode() - Set the configured WDS mode
+ * @psoc: pointer to psoc object
+ * @mode: wds mode to set
+ *
+ * Return: void
+ */
+static inline void
+ucfg_mlme_set_wds_mode(struct wlan_objmgr_psoc *psoc, uint32_t mode)
+{
+	wlan_mlme_set_wds_mode(psoc, mode);
 }
 
 #ifdef WLAN_FEATURE_SON

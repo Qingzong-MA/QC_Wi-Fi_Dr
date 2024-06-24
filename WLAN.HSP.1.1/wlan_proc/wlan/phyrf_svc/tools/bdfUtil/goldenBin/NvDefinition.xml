@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- NV Template File -->
-<!-- Derived from NvDefinition_QCA649X.xlsx on 04/06/2023 with version: 5.3.29 (DO NOT EDIT) -->
+<!-- Derived from NvDefinition_QCA649X.xlsx on 11/21/2023 with version: 5.3.32 (DO NOT EDIT) -->
 <NvDefinition>
 	<DataType name="uint8">
 		<Member type="uint8" sizeOf="1"/>
@@ -251,7 +251,9 @@
 		<Member type="uint8" sizeOf="1" name="rssiImbThr"/>
 		<Member type="Freq_Plim_values" sizeOf="8" name="freqPlimvalues"/>
 		<Member type="HALPHY_FWBDFCHECK_CONFIG" sizeOf="1" name="fwBdfMatchCheck"/>
-		<Member type="uint8" sizeOf="227" name="baseFuture"/>
+		<Member type="uint32" sizeOf="1" name="commonBoardFlags2"/>
+		<Member type="uint8" sizeOf="1" name="Btco_Bo_update"/>
+		<Member type="uint8" sizeOf="222" name="baseFuture"/>
 	</DataType>
 	<DataType name="HALPHY_BDF_FLAGS">
 		<Member type="uint32" sizeOf="1" name="opFlags"/>
@@ -1558,7 +1560,8 @@
 		<Member type="uint8" sizeOf="1" name="pa1p8Support"/>
 		<Member type="uint8" sizeOf="1" name="enableDisableBits2"/>
 		<Member type="uint32" sizeOf="1" name="autoFeatureCtrlBits"/>
-		<Member type="uint8" sizeOf="23" name="bdfEnableDisableFlagsFuture"/>
+		<Member type="uint32" sizeOf="1" name="autoMiscCtrlBits"/>
+		<Member type="uint8" sizeOf="19" name="bdfEnableDisableFlagsFuture"/>
 	</NvItem>
 	<NvItem id="25" name="RSSI_OFFSET">
 		<Member type="NV_HEADER" sizeOf="1" name="nvRssiOffset"/>

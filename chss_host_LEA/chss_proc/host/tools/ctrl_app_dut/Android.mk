@@ -1,7 +1,7 @@
 # Role is dut or platform
 ROLE = dut
 # Package Version
-VERSION = "1.1.0.61"
+VERSION = "2.1.0.42"
 
 OBJS=main.c
 OBJS += eloop.c

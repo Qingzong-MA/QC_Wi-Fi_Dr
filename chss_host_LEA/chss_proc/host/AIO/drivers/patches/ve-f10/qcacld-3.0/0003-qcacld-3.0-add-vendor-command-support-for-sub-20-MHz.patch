@@ -1,0 +1,146 @@
+From 7ea0b29bbfb0b3a0b97bc6c9b5d37cf735c490fa Mon Sep 17 00:00:00 2001
+From: Yu Wang <quic_yyuwang@quicinc.com>
+Date: Thu, 9 May 2024 12:11:17 +0800
+Subject: [PATCH] qcacld-3.0: add vendor command support for sub 20 MHz channel
+ width
+
+Add set/get handler for QCA_WLAN_VENDOR_ATTR_CONFIG_SUB20_CHAN_WIDTH.
+
+Change-Id: Ifed5fe579055170dd08670ee2524c4cd9ec8db36
+Signed-off-by: Yu Wang <quic_yyuwang@quicinc.com>
+---
+ core/hdd/src/wlan_hdd_cfg80211.c | 86 ++++++++++++++++++++++++++++++--
+ 1 file changed, 83 insertions(+), 3 deletions(-)
+
+diff --git a/core/hdd/src/wlan_hdd_cfg80211.c b/core/hdd/src/wlan_hdd_cfg80211.c
+index cf48047effd..28330518348 100644
+--- a/core/hdd/src/wlan_hdd_cfg80211.c
++++ b/core/hdd/src/wlan_hdd_cfg80211.c
+@@ -6968,7 +6968,8 @@ const struct nla_policy wlan_hdd_wifi_config_policy[
+ 	[QCA_WLAN_VENDOR_ATTR_CONFIG_ANI_LEVEL] = {.type = NLA_S32 },
+ 	[QCA_WLAN_VENDOR_ATTR_CONFIG_TX_NSS] = {.type = NLA_U8 },
+ 	[QCA_WLAN_VENDOR_ATTR_CONFIG_RX_NSS] = {.type = NLA_U8 },
+-
++	[QCA_WLAN_VENDOR_ATTR_CONFIG_SUB20_CHAN_WIDTH] = {
++		.type = NLA_U32},
+ };
+ 
+ static const struct nla_policy
+@@ -8822,6 +8823,42 @@ static int hdd_set_nss(struct hdd_adapter *adapter,
+ 	return ret;
+ }
+ 
++/**
++ * hdd_set_sub20_chan_width() - set 5 or 10 MHz channel width for device
++ *
++ * @adapter: The adapter being configured
++ * @attr: The nl80211 attribute being applied
++ *
++ * Return: 0 on success, else error number
++ */
++static int hdd_set_sub20_chan_width(struct hdd_adapter *adapter,
++				    const struct nlattr *attr)
++{
++	uint32_t chan_width;
++	QDF_STATUS status;
++	enum cfg_sub_20_channel_width sub20_chan_width;
++
++	chan_width = nla_get_u32(attr);
++	switch (chan_width) {
++		case NL80211_CHAN_WIDTH_5:
++			sub20_chan_width = WLAN_SUB_20_CH_WIDTH_5;
++			break;
++		case NL80211_CHAN_WIDTH_10:
++			sub20_chan_width = WLAN_SUB_20_CH_WIDTH_10;
++			break;
++		case NL80211_CHAN_WIDTH_20_NOHT:
++			sub20_chan_width = WLAN_SUB_20_CH_WIDTH_NONE;
++			break;
++		default:
++			hdd_err_rl("invalid chan width %u",
++				   chan_width);
++			return -EINVAL;
++	}
++
++	status = hdd_update_sub20_chan_width(adapter, sub20_chan_width);
++	return qdf_status_to_os_return(status);
++}
++
+ /**
+  * typedef independent_setter_fn - independent attribute handler
+  * @adapter: The adapter being configured
+@@ -8932,6 +8969,8 @@ static const struct independent_setters independent_setters[] = {
+ 	 hdd_config_power},
+ 	{QCA_WLAN_VENDOR_ATTR_CONFIG_UDP_QOS_UPGRADE,
+ 	 hdd_config_udp_qos_upgrade_threshold},
++	{QCA_WLAN_VENDOR_ATTR_CONFIG_SUB20_CHAN_WIDTH,
++	 hdd_set_sub20_chan_width},
+ };
+ 
+ #ifdef WLAN_FEATURE_ELNA
+@@ -9407,6 +9446,44 @@ static int hdd_get_optimized_power_config(struct hdd_adapter *adapter,
+ 	return 0;
+ }
+ 
++/**
++ * hdd_get_sub20_chan_width() - Get 5 or 10 MHz channel width for device
++ * @adapter: Pointer to HDD adapter
++ * @skb: sk buffer to hold nl80211 attributes
++ * @attr: Pointer to struct nlattr
++ *
++ * Return: 0 on success; error number otherwise
++ */
++static int hdd_get_sub20_chan_width(struct hdd_adapter *adapter,
++				    struct sk_buff *skb,
++				    const struct nlattr *attr)
++{
++	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(adapter);
++	uint32_t chan_width;
++	int errno;
++
++	errno = wlan_hdd_validate_context(hdd_ctx);
++	if (errno)
++		return errno;
++
++	if (cds_is_5_mhz_enabled())
++		chan_width = NL80211_CHAN_WIDTH_5;
++	else if (cds_is_10_mhz_enabled())
++		chan_width = NL80211_CHAN_WIDTH_10;
++	else
++		chan_width = NL80211_CHAN_WIDTH_20_NOHT;
++
++	hdd_debug("sub20MHz chan width: %d", chan_width);
++	if (nla_put_u32(skb,
++			QCA_WLAN_VENDOR_ATTR_CONFIG_SUB20_CHAN_WIDTH,
++			chan_width)) {
++		hdd_err("nla_put failure");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ /**
+  * typedef config_getter_fn - get configuration handler
+  * @adapter: The adapter being configured
+@@ -9475,12 +9552,15 @@ static const struct config_getters config_getters[] = {
+ 	{QCA_WLAN_VENDOR_ATTR_CONFIG_OPTIMIZED_POWER_MANAGEMENT,
+ 	 sizeof(uint8_t),
+ 	 hdd_get_optimized_power_config},
+-	 {QCA_WLAN_VENDOR_ATTR_CONFIG_TX_NSS,
++	{QCA_WLAN_VENDOR_ATTR_CONFIG_TX_NSS,
+ 	 sizeof(uint8_t),
+ 	 hdd_get_tx_nss_config},
+-	 {QCA_WLAN_VENDOR_ATTR_CONFIG_RX_NSS,
++	{QCA_WLAN_VENDOR_ATTR_CONFIG_RX_NSS,
+ 	 sizeof(uint8_t),
+ 	 hdd_get_rx_nss_config},
++	{QCA_WLAN_VENDOR_ATTR_CONFIG_SUB20_CHAN_WIDTH,
++	 sizeof(uint32_t),
++	 hdd_get_sub20_chan_width},
+ };
+ 
+ /**
+-- 
+2.40.1.windows.1
+

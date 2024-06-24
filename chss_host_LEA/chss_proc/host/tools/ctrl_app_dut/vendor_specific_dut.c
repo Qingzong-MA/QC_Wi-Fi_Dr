@@ -22,13 +22,14 @@
 
 #include "vendor_specific.h"
 #include "utils.h"
+#include "wpa_ctrl.h"
 
 #ifdef HOSTAPD_SUPPORT_MBSSID_WAR
 extern int use_openwrt_wpad;
 #endif
 
 #if defined(_OPENWRT_)
-int detect_third_radio() {
+int detect_third_radio(void) {
     FILE *fp;
     char buffer[BUFFER_LEN];
     int third_radio = 0;
@@ -46,7 +47,7 @@ int detect_third_radio() {
 }
 #endif
 
-void interfaces_init() {
+void interfaces_init(void) {
 #if defined(_OPENWRT_) && !defined(_WTS_OPENWRT_) && !defined(_OPENWRT_QTI_)
     char buffer[BUFFER_LEN];
     char mac_addr[S_BUFFER_LEN];
@@ -102,10 +103,13 @@ void interfaces_init() {
         set_mac_address("ath21", mac_addr);
     }
     sleep(1);
+#elif defined(ANDROID) || defined(MDM)
+    add_wireless_interface("wlan1");
+    sleep(1);
 #endif
 }
 /* Be invoked when start controlApp */
-void vendor_init() {
+void vendor_init(void) {
 #if defined(_OPENWRT_) && !defined(_WTS_OPENWRT_) && !defined(_OPENWRT_QTI_)
     char buffer[BUFFER_LEN];
     char mac_addr[S_BUFFER_LEN];
@@ -124,10 +128,13 @@ void vendor_init() {
 #endif
 #endif
 #endif
+#if defined(ANDROID) || defined(MDM)
+    interfaces_init();
+#endif
 }
 
 /* Be invoked when terminate controlApp */
-void vendor_deinit() {
+void vendor_deinit(void) {
 #ifndef _OPENWRT_QTI_
     char buffer[S_BUFFER_LEN];
     memset(buffer, 0, sizeof(buffer));
@@ -139,7 +146,7 @@ void vendor_deinit() {
 }
 
 /* Called by reset_device_hander() */
-void vendor_device_reset() {
+void vendor_device_reset(void) {
 #ifdef _WTS_OPENWRT_
     char buffer[S_BUFFER_LEN];
 
@@ -164,9 +171,9 @@ void vendor_device_reset() {
 
 #ifdef _OPENWRT_
 void openwrt_apply_radio_config(void) {
+#ifdef _WTS_OPENWRT_
     char buffer[S_BUFFER_LEN];
 
-#ifdef _WTS_OPENWRT_
     // Apply radio configurations
     memset(buffer, 0, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "%s -g /var/run/hostapd/global -B -P /var/run/hostapd-global.pid",
@@ -187,7 +194,7 @@ void openwrt_apply_radio_config(void) {
 #endif
 
 /* Called by configure_ap_handler() */
-void configure_ap_enable_mbssid() {
+void configure_ap_enable_mbssid(void) {
 #ifdef _WTS_OPENWRT_
     /*
      * the following uci commands need to reboot openwrt
@@ -247,11 +254,11 @@ char buffer[S_BUFFER_LEN], wifi_name[16];
  * Called by start_ap_handler() after invoking hostapd
  */
 void start_ap_set_wlan_params(void *if_info) {
+#ifdef _WTS_OPENWRT_
     char buffer[S_BUFFER_LEN];
     struct interface_info *wlan = (struct interface_info *) if_info;
 
     memset(buffer, 0, sizeof(buffer));
-#ifdef _WTS_OPENWRT_
     /* Workaround: openwrt has IOT issue with intel AX210 AX mode */
     snprintf(buffer, sizeof(buffer), "cfg80211tool %s he_ul_ofdma 0", wlan->ifname);
     system(buffer);
@@ -260,6 +267,320 @@ void start_ap_set_wlan_params(void *if_info) {
     system(buffer);
     snprintf(buffer, sizeof(buffer), "cfg80211tool %s twt_responder 0", wlan->ifname);
     system(buffer);
-#endif
     printf("set_wlan_params: %s\n", buffer);
+#endif
+}
+/* Return addr of P2P-device if there is no GO or client interface */
+int get_p2p_mac_addr(char *mac_addr, size_t size) {
+    FILE *fp;
+    char buffer[S_BUFFER_LEN], *ptr, addr[32];
+    int error = 1, match = 0;
+
+    fp = popen("iw dev", "r");
+    if (fp) {
+        while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+            ptr = strstr(buffer, "addr");
+            if (ptr != NULL) {
+                sscanf(ptr, "%*s %s", addr);
+                while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+                    ptr = strstr(buffer, "type");
+                    if (ptr != NULL) {
+                        ptr += 5;
+                        if (!strncmp(ptr, "P2P-GO", 6) ||
+                            !strncmp(ptr, "P2P-client", 10)) {
+                            snprintf(mac_addr, size, "%s", addr);
+                            error = 0;
+                            match = 1;
+                        } else if (!strncmp(ptr, "P2P-device", 10)) {
+                            snprintf(mac_addr, size, "%s", addr);
+                            error = 0;
+                        }
+                        break;
+                    }
+                }
+                if (match)
+                    break;
+            }
+        }
+        pclose(fp);
+    }
+
+    return error;
+}
+
+/* Get the name of P2P Group(GO or Client) interface */
+int get_p2p_group_if(char *if_name, size_t size) {
+    FILE *fp;
+    char buffer[S_BUFFER_LEN], *ptr, name[32];
+    int error = 1;
+
+    fp = popen("iw dev", "r");
+    if (fp) {
+        while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+            ptr = strstr(buffer, "Interface");
+            if (ptr != NULL) {
+                sscanf(ptr, "%*s %s", name);
+                while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+                    ptr = strstr(buffer, "type");
+                    if (ptr != NULL) {
+                        ptr += 5;
+                        if (!strncmp(ptr, "P2P-GO", 6) ||
+                            !strncmp(ptr, "P2P-client", 10)) {
+                            snprintf(if_name, size, "%s", name);
+                            error = 0;
+                        }
+                        break;
+                    }
+                }
+                if (!error)
+                    break;
+            }
+        }
+        pclose(fp);
+    }
+
+    return error;
+}
+
+/* "iw dev" doesn't show the name of P2P device. The naming rule is based on wpa_supplicant */
+int get_p2p_dev_if(char *if_name, size_t size) {
+    struct wpa_ctrl *w;
+    int ret;
+
+    ret = snprintf(if_name, size, "p2p-dev-%s", get_wireless_interface());
+    if (ret < 0 || ret >= size)
+        indigo_logger(LOG_LEVEL_INFO,"Failed to print the ifname");
+
+    w = wpa_ctrl_open(get_wpas_if_ctrl_path(if_name));
+    if (!w) {
+        ret = snprintf(if_name, size, "%s", get_wireless_interface());
+        if (ret < 0 || ret >= size)
+            indigo_logger(LOG_LEVEL_INFO,"Failed to print the ifname");
+        return 0;
+    }
+    wpa_ctrl_close(w);
+    return 0;
+}
+
+/* Append IP range config and start dhcpd */
+void start_dhcp_server(char *if_name, char *ip_addr)
+{
+    char buffer[S_BUFFER_LEN];
+    char ip_sub[32], *ptr;
+    FILE *fp;
+
+    /* Avoid using system dhcp server service
+       snprintf(buffer, sizeof(buffer), "sed -i -e 's/INTERFACESv4=\".*\"/INTERFACESv4=\"%s\"/g' /etc/default/isc-dhcp-server", if_name);
+       system(buffer);
+       snprintf(buffer, sizeof(buffer), "systemctl restart isc-dhcp-server.service");
+       system(buffer);
+     */
+    /* Sample command from isc-dhcp-server: dhcpd -user dhcpd -group dhcpd -f -4 -pf /run/dhcp-server/dhcpd.pid -cf /etc/dhcp/dhcpd.conf p2p-wlp2s0-0 */
+
+    /* Avoid apparmor check because we manually start dhcpd */
+    memset(ip_sub, 0, sizeof(ip_sub));
+    ptr = strrchr(ip_addr, '.');
+    memcpy(ip_sub, ip_addr, ptr - ip_addr);
+#if defined(ANDROID) || defined(MDM)
+    snprintf(buffer, sizeof(buffer),
+             "dnsmasq -x /data/dnsmasq.pid --no-resolv --no-poll --dhcp-range=%s.50,%s.200,1h",
+             ip_sub, ip_sub);
+#else
+    system("cp QT_dhcpd.conf /etc/dhcp/QT_dhcpd.conf");
+    fp = fopen("/etc/dhcp/QT_dhcpd.conf", "a");
+    if (fp) {
+        snprintf(buffer, sizeof(buffer), "\nsubnet %s.0 netmask 255.255.255.0 {\n", ip_sub);
+        fputs(buffer, fp);
+        snprintf(buffer, sizeof(buffer), "    range %s.50 %s.200;\n", ip_sub, ip_sub);
+        fputs(buffer, fp);
+        fputs("}\n", fp);
+        fclose(fp);
+    }
+    system("touch /var/lib/dhcp/dhcpd.leases_QT");
+    snprintf(buffer, sizeof(buffer), "dhcpd -4 -cf /etc/dhcp/QT_dhcpd.conf -lf /var/lib/dhcp/dhcpd.leases_QT %s", if_name);
+#endif
+    indigo_logger(LOG_LEVEL_DEBUG, "%s: SYSTEM_CMD: %s", __func__, buffer);
+    system(buffer);
+}
+
+void stop_dhcp_server()
+{
+    /* system("systemctl stop isc-dhcp-server.service"); */
+    system("killall dhcpd 1>/dev/null 2>/dev/null");
+}
+
+void start_dhcp_client(char *if_name)
+{
+    char buffer[S_BUFFER_LEN];
+#if defined(ANDROID)
+        if (access("/system/bin/dhcpcd", F_OK) != -1) {
+                snprintf(buffer, sizeof(buffer), "/system/bin/dhcpcd -KL %s",
+                         if_name);
+        } else if (access("/system/bin/dhcptool", F_OK) != -1) {
+                snprintf(buffer, sizeof(buffer), "/system/bin/dhcptool %s",
+                         if_name);
+        } else if (access("/vendor/bin/dhcpcd", F_OK) != -1) {
+                snprintf(buffer, sizeof(buffer), "/vendor/bin/dhcpcd %s",
+                         if_name);
+        } else if (access("/vendor/bin/dhcptool", F_OK) != -1) {
+                snprintf(buffer, sizeof(buffer), "/vendor/bin/dhcptool %s",
+                         if_name);
+        } else {
+                indigo_logger(LOG_LEVEL_DEBUG,
+                              "DHCP client program missing");
+        }
+#else /* ANDROID */
+    snprintf(buffer, sizeof(buffer), "dhclient -4 %s &", if_name);
+#endif
+    indigo_logger(LOG_LEVEL_DEBUG, "%s: SYSTEM_CMD: %s", __func__, buffer);
+    system(buffer);
+}
+
+void stop_dhcp_client()
+{
+    system("killall dhclient 1>/dev/null 2>/dev/null");
+}
+
+wps_setting *p_wps_setting = NULL;
+wps_setting customized_wps_settings_ap[AP_SETTING_NUM];
+wps_setting customized_wps_settings_sta[STA_SETTING_NUM];
+
+void save_wsc_setting(wps_setting *s, char *entry, int len)
+{
+    char *p = NULL;
+
+    p = strchr(entry, '\n');
+    if (p)
+        p++;
+    else
+        p = entry;
+
+    sscanf(p, "%[^:]:%[^:]:%s", s->wkey, s->value, s->attr);
+}
+
+wps_setting* __get_wps_setting(int len, char *buffer, enum wps_device_role role)
+{
+    char *save_ptr;
+    char *token = strtok_r(buffer , ",", &save_ptr);
+    wps_setting *s = NULL;
+    int i = 0;
+
+    if (role == WPS_AP) {
+        memset(customized_wps_settings_ap, 0, sizeof(customized_wps_settings_ap));
+        p_wps_setting = customized_wps_settings_ap;
+        while (token != NULL) {
+            s = &p_wps_setting[i++];
+            save_wsc_setting(s, token, strlen(token));
+            token = strtok_r(NULL, ",", &save_ptr);
+        }
+    } else {
+        memset(customized_wps_settings_sta, 0, sizeof(customized_wps_settings_sta));
+        p_wps_setting = customized_wps_settings_sta;
+        while (token != NULL) {
+            s = &p_wps_setting[i++];
+            save_wsc_setting(s, token, strlen(token));
+            token = strtok_r(NULL, ",", &save_ptr);
+        }
+    }
+    return p_wps_setting;
+}
+
+#if defined(ANDROID) || defined(MDM)
+void add_default_ap_wps_settings_file(char *file)
+{
+  char output[1024];
+  int output_size = sizeof(output);
+
+  memset(output, 0, sizeof(output));
+  if (file == NULL)
+      return;
+
+  if (0 == access(file, F_OK)) {
+      indigo_logger(LOG_LEVEL_DEBUG, "%s: %s already exists", __func__, file);
+      return;
+  }
+
+  strlcat(output, "ssid:wps-test:2,\n", output_size);
+  strlcat(output, "wpa_key_mgmt:WPA-PSK:2,\n", output_size);
+  strlcat(output, "wpa_pairwise:CCMP:2,\n", output_size);
+  strlcat(output, "wpa_passphrase:12345678:2,\n", output_size);
+  strlcat(output, "wpa:2:2,\n", output_size);
+  strlcat(output, "wps_state:2:2,\n", output_size);
+  strlcat(output, "config_methods:label keypad push_button display:2,\n", output_size);
+  strlcat(output, "device_name:APUT:2,\n", output_size);
+  strlcat(output, "device_type:6-0050F204-1:2,\n", output_size);
+  strlcat(output, "manufacturer:QCOM:2,\n", output_size);
+  strlcat(output, "model_name:MDM:2,\n", output_size);
+  strlcat(output, "model_number:1.0:2,\n", output_size);
+  strlcat(output, "serial_number:111:2\n", output_size);
+
+  write_file(file, output, strlen(output));
+  indigo_logger(LOG_LEVEL_DEBUG, "%s: %s created", __func__, file);
+}
+#endif
+
+wps_setting* get_vendor_wps_settings(enum wps_device_role role)
+{
+    /*
+     * Please implement the vendor proprietary function to get WPS OOB and required settings.
+     * */
+#if defined(ANDROID)
+// Use /data to replace /tmp, as this settings file needs to manually push to device.
+#define WSC_SETTINGS_FILE_AP "/data/wsc_settings_APUT"
+#define WSC_SETTINGS_FILE_STA "/data/wsc_settings_STAUT"
+#else
+#define WSC_SETTINGS_FILE_AP "/tmp/wsc_settings_APUT"
+#define WSC_SETTINGS_FILE_STA "/tmp/wsc_settings_STAUT"
+#endif
+    int len = 0;
+    char pipebuf[S_BUFFER_LEN];
+    char pipebuf_tmp[S_BUFFER_LEN];
+    char *parameter_ap[] = {"cat", WSC_SETTINGS_FILE_AP, NULL, NULL};
+    char *parameter_sta[] = {"cat", WSC_SETTINGS_FILE_STA, NULL, NULL};
+
+#if defined(ANDROID) || defined(MDM)
+    // Generate a default wsc_settings_APUT file to simplify testing steps
+    if (role == WPS_AP)
+        add_default_ap_wps_settings_file(WSC_SETTINGS_FILE_AP);
+#endif
+
+    memset(pipebuf, 0, sizeof(pipebuf));
+    if (role == WPS_AP) {
+        if (0 == access(WSC_SETTINGS_FILE_AP, F_OK)) {
+            // use customized ap wsc settings
+#if defined(_OPENWRT_) || defined(MDM)
+            len = pipe_command(pipebuf, sizeof(pipebuf), "/bin/cat", parameter_ap);
+#elif defined(ANDROID)
+            len = pipe_command(pipebuf, sizeof(pipebuf), "/system/bin/cat", parameter_ap);
+#else
+            len = pipe_command(pipebuf, sizeof(pipebuf), "/usr/bin/cat", parameter_ap);
+#endif
+            if (len) {
+                indigo_logger(LOG_LEVEL_INFO, "wsc settings APUT:\n %s", pipebuf);
+                strlcpy(pipebuf_tmp, pipebuf, sizeof(pipebuf_tmp));
+                return __get_wps_setting(len, pipebuf_tmp, WPS_AP);
+            } else {
+                indigo_logger(LOG_LEVEL_INFO, "wsc settings APUT: no data");
+            }
+        } else {
+            indigo_logger(LOG_LEVEL_ERROR, "APUT: WPS Erorr. Failed to get settings.");
+            return NULL;
+        }
+    } else {
+        if (0 == access(WSC_SETTINGS_FILE_STA, F_OK)) {
+            // use customized sta wsc settings
+            len = pipe_command(pipebuf, sizeof(pipebuf), "/usr/bin/cat", parameter_sta);
+            if (len) {
+                indigo_logger(LOG_LEVEL_INFO, "wsc settings STAUT:\n %s", pipebuf);
+                strlcpy(pipebuf_tmp, pipebuf, sizeof(pipebuf_tmp));
+                return __get_wps_setting(len, pipebuf_tmp, WPS_STA);
+            } else {
+                indigo_logger(LOG_LEVEL_INFO, "wsc settings STAUT: no data");
+            }
+        } else {
+            indigo_logger(LOG_LEVEL_ERROR, "STAUT: WPS Erorr. Failed to get settings.");
+            return NULL;
+        }
+    }
+    return NULL;
 }

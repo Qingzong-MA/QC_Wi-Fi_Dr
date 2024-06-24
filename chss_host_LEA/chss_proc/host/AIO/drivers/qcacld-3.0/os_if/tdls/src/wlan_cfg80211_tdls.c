@@ -275,15 +275,6 @@ wlan_cfg80211_tdls_extract_params(struct tdls_update_peer_params *req_info,
 		qdf_mem_copy(req_info->extn_capability, params->ext_capab,
 			     sizeof(req_info->extn_capability));
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-	if (params->link_sta_params.ht_capa) {
-		req_info->htcap_present = 1;
-		qdf_mem_copy(&req_info->ht_cap, params->link_sta_params.ht_capa,
-			     sizeof(struct htcap_cmn_ie));
-	}
-
-	req_info->supported_rates_len = params->link_sta_params.supported_rates_len;
-#else
 	if (params->ht_capa) {
 		req_info->htcap_present = 1;
 		qdf_mem_copy(&req_info->ht_cap, params->ht_capa,
@@ -291,7 +282,6 @@ wlan_cfg80211_tdls_extract_params(struct tdls_update_peer_params *req_info,
 	}
 
 	req_info->supported_rates_len = params->supported_rates_len;
-#endif
 
 	/* Note : The Maximum sizeof supported_rates sent by the Supplicant is
 	 * 32. The supported_rates array , for all the structures propogating
@@ -304,29 +294,6 @@ wlan_cfg80211_tdls_extract_params(struct tdls_update_peer_params *req_info,
 	if (req_info->supported_rates_len > WLAN_MAC_MAX_SUPP_RATES)
 		req_info->supported_rates_len = WLAN_MAC_MAX_SUPP_RATES;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-	if (req_info->supported_rates_len) {
-		qdf_mem_copy(req_info->supported_rates,
-			     params->link_sta_params.supported_rates,
-			     req_info->supported_rates_len);
-		osif_debug("Supported Rates with Length %d",
-			   req_info->supported_rates_len);
-
-		for (i = 0; i < req_info->supported_rates_len; i++)
-			osif_debug("[%d]: %0x", i,
-				   req_info->supported_rates[i]);
-	}
-
-	if (params->link_sta_params.vht_capa) {
-		req_info->vhtcap_present = 1;
-		qdf_mem_copy(&req_info->vht_cap, params->link_sta_params.vht_capa,
-			     sizeof(struct vhtcap));
-	}
-
-	if (params->link_sta_params.ht_capa || params->link_sta_params.vht_capa ||
-	    (params->sta_flags_set & BIT(NL80211_STA_FLAG_WME)))
-		req_info->is_qos_wmm_sta = true;
-#else
 	if (req_info->supported_rates_len) {
 		qdf_mem_copy(req_info->supported_rates,
 			     params->supported_rates,
@@ -348,7 +315,6 @@ wlan_cfg80211_tdls_extract_params(struct tdls_update_peer_params *req_info,
 	if (params->ht_capa || params->vht_capa ||
 	    (params->sta_flags_set & BIT(NL80211_STA_FLAG_WME)))
 		req_info->is_qos_wmm_sta = true;
-#endif
 	if (params->sta_flags_set & BIT(NL80211_STA_FLAG_MFP)) {
 		osif_debug("TDLS peer pmf capable");
 		req_info->is_pmf = 1;

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <TCF>
-  <COPYRIGHT>Copyright (c) 2019-2022 Qualcomm Technologies, Inc.
+  <COPYRIGHT>Copyright (c) 2019-2023 Qualcomm Technologies, Inc.
 	All Rights Reserved.
 	Confidential and Proprietary - Qualcomm Technologies, Inc.</COPYRIGHT>
   <FORMAT_VERSION>1.0</FORMAT_VERSION>
@@ -1995,7 +1995,7 @@
     <TAG Number="83" Name="LE Tx Power Configuration">
       <DESCRIPTION>These parameters control LE TX output power configuration.</DESCRIPTION>
       <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
-      <ELEMENTS Name="LE Power Configuration" Type="STRUCTURE" Size="9">
+      <ELEMENTS Name="LE Power Configuration" Type="STRUCTURE" Size="15">
         <ELEMENTS Name="Advertising Power Level Index" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x7" Signed="false" Description="Advertising power level index (Default=0x7, 7d). Host can control range by limiting Tx Output Power. This Tx Power is used for Advertising and Scan Response. Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
         <ELEMENTS Name="Scan Request Power Level Index" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x7" Signed="false" Description="Scan Request Tx Power Level Index (Default=0x7, 7d). Host can control range by limiting Tx Output Power. Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
         <ELEMENTS Name="Connection Power Level Index" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x7" Signed="false" Description="Connection power level index (Default=0x7, 7d). Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
@@ -2005,6 +2005,18 @@
         <ELEMENTS Name="MultiAdvTxPower_mid" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x3" Signed="false" Description="Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
         <ELEMENTS Name="MultiAdvTxPower_high" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x5" Signed="false" Description="Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
         <ELEMENTS Name="MultiAdvTxPower_max" Type="INTEGER" Size="1" Min="0x0" Max="0x9" Default="0x7" Signed="false" Description="Negative PL can be specified as 0x20(-1) ~ 0x23(-4)." />
+        <ELEMENTS Name="Max PL on individual PHY" Type="STRUCTURE" Size="6">
+          <ELEMENTS Name="feature control flag" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="feature_enable" Default="0x0" Start="0" End="0" Description="enable feature" />
+          </ELEMENTS>
+          <ELEMENTS Name="Max PL on PHY" Type="FIXED_ARRAY" ElementSize="1" Size="5" Min="0x0" Max="0xFF" Signed="false" Description="" VariableName="max power level ">
+            <ELEMENTS Name="1M PHY" Default="0xB" Description="Max PL on 1M PHY" />
+            <ELEMENTS Name="2M PHY" Default="0xB" Description="Max PL on 2M PHY" />
+            <ELEMENTS Name="125K coded PHY" Default="0xB" Description="Max PL on 125k(S8) coded PHY" />
+            <ELEMENTS Name="500K coded PHY" Default="0xB" Description="Max PL on 500k(S2) coded PHY" />
+            <ELEMENTS Name="LEHS Q2Q PHY" Default="0xB" Description="Max PL on LEHS Q2Q PHY" />
+          </ELEMENTS>
+        </ELEMENTS>
       </ELEMENTS>
     </TAG>
     <TAG Number="87" Name="Cal Channel">

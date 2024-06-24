@@ -22,7 +22,7 @@ endif
 
 AM_CFLAGS += -D_DUT_
 AM_CFLAGS += -DMDM
-AM_CFLAGS += -DCONFIG_CTRL_IFACE_CLIENT_DIR=\"/var/run/wpa_supplicant\"
+#AM_CFLAGS += -DCONFIG_CTRL_IFACE_CLIENT_DIR=\"/var/run/wpa_supplicant\"
 
 ctrl_app_dut_SOURCES = main.c eloop.c indigo_api.c indigo_packet.c utils.c wpa_ctrl.c indigo_api_callback_dut.c vendor_specific_dut.c
 

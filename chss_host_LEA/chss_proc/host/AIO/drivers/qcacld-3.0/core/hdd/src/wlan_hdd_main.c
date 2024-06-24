@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022,2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -205,7 +205,6 @@
 #include <linux/bitfield.h>
 #include <wlan_hdd_son.h>
 #include <son_ucfg_api.h>
-#include <wlan_hdd_ver.h>
 
 #ifdef MODULE
 #define WLAN_MODULE_NAME  module_name(THIS_MODULE)
@@ -286,7 +285,6 @@ static struct kparam_string fwpath = {
 };
 
 char *country_code;
-extern int quec_sub_version;
 #ifdef FEATURE_WLAN_RESIDENT_DRIVER
 EXPORT_SYMBOL(country_code);
 #endif
@@ -315,7 +313,7 @@ static qdf_wake_lock_t wlan_wake_lock;
 #define HDD_FW_VER_SIID(tgt_fw_ver)           ((tgt_fw_ver & 0xf00000) >> 20)
 #define HDD_FW_VER_CRM_ID(tgt_fw_ver)         (tgt_fw_ver & 0x7fff)
 #define HDD_FW_VER_SUB_ID(tgt_fw_ver_ext) \
-((tgt_fw_ver_ext & 0xf0000000) >> 28)
+(((tgt_fw_ver_ext & 0x1c00) >> 6) | ((tgt_fw_ver_ext & 0xf0000000) >> 28))
 #define HDD_FW_VER_REL_ID(tgt_fw_ver_ext) \
 ((tgt_fw_ver_ext &  0xf800000) >> 23)
 
@@ -2382,14 +2380,48 @@ void hdd_update_multi_client_thermal_support(struct hdd_context *hdd_ctx)
 }
 #endif
 
+/**
+ * hdd_update_sub_20_config() - Update sub 20 MHz channel width config
+ * @hdd_ctx: Pointer to the HDD context
+ * @sub_20_fw_support: fw support for sub 20 MHz channel width
+ *
+ * Update sub 20 MHz channel width config according to FW capability
+ *
+ * Return: QDF_STATUS
+ */
+static QDF_STATUS
+hdd_update_sub_20_config(struct hdd_context *hdd_ctx, bool sub_20_fw_support)
+{
+	QDF_STATUS status;
+	struct hdd_config *config = hdd_ctx->config;
+
+	status = cds_set_sub_20_support(sub_20_fw_support);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("Failed to set sub20MHz channel width support");
+		return status;
+	}
+
+	if (!sub_20_fw_support)
+		config->sub_20_ch_width = WLAN_SUB_20_CH_WIDTH_NONE;
+
+	hdd_debug("sub20MHz channel width %u (fw support %u)",
+		  config->sub_20_ch_width, sub_20_fw_support);
+	status = ucfg_mlme_set_sub_20_chan_width(hdd_ctx->psoc,
+						 config->sub_20_ch_width);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("Failed to set sub20MHz channel width config");
+		return status;
+	}
+
+	return status;
+}
+
 int hdd_update_tgt_cfg(hdd_handle_t hdd_handle, struct wma_tgt_cfg *cfg)
 {
 	int ret;
 	struct hdd_context *hdd_ctx = hdd_handle_to_context(hdd_handle);
 	uint32_t temp_band_cap, band_capability;
-	struct cds_config_info *cds_cfg = cds_get_ini_config();
 	uint8_t antenna_mode;
-	uint8_t sub_20_chan_width;
 	QDF_STATUS status;
 	mac_handle_t mac_handle;
 	bool bval = false;
@@ -2438,23 +2470,11 @@ int hdd_update_tgt_cfg(hdd_handle_t hdd_handle, struct wma_tgt_cfg *cfg)
 			       cds_get_context(QDF_MODULE_ID_SOC));
 	ucfg_ipa_set_pdev_id(hdd_ctx->psoc, OL_TXRX_PDEV_ID);
 
-	status = ucfg_mlme_get_sub_20_chan_width(hdd_ctx->psoc,
-						 &sub_20_chan_width);
+	status = hdd_update_sub_20_config(hdd_ctx, cfg->sub_20_support);
 	if (QDF_IS_STATUS_ERROR(status)) {
-		hdd_err("Failed to get sub_20_chan_width config");
+		hdd_err("Failed to update sub20MHz channel width config");
 		ret = qdf_status_to_os_return(status);
 		goto pdev_close;
-	}
-
-	if (cds_cfg) {
-		if (sub_20_chan_width !=
-		    WLAN_SUB_20_CH_WIDTH_NONE && !cfg->sub_20_support) {
-			hdd_err("User requested sub 20 MHz channel width but unsupported by FW.");
-			cds_cfg->sub_20_channel_width =
-				WLAN_SUB_20_CH_WIDTH_NONE;
-		} else {
-			cds_cfg->sub_20_channel_width = sub_20_chan_width;
-		}
 	}
 
 	status = ucfg_mlme_get_band_capability(hdd_ctx->psoc, &band_capability);
@@ -5228,10 +5248,15 @@ static const struct net_device_ops wlan_drv_ops = {
 	.ndo_set_features = hdd_set_features,
 	.ndo_tx_timeout = hdd_tx_timeout,
 	.ndo_get_stats = hdd_get_stats,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	.ndo_do_ioctl = hdd_ioctl,
+#endif
 	.ndo_set_mac_address = hdd_set_mac_address,
 	.ndo_select_queue = hdd_select_queue,
 	.ndo_set_rx_mode = hdd_set_multicast_list,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+	.ndo_siocdevprivate = hdd_dev_private_ioctl,
+#endif
 };
 
 #ifdef FEATURE_MONITOR_MODE_SUPPORT
@@ -8201,22 +8226,14 @@ static void hdd_connect_done(struct net_device *dev, const u8 *bssid,
 		fils_params.status = WLAN_STATUS_UNSPECIFIED_FAILURE;
 	} else {
 		fils_params.status = status;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-		fils_params.links[0].bssid = bssid;
-#else
 		fils_params.bssid = bssid;
-#endif
 		fils_params.timeout_reason =
 				hdd_convert_timeout_reason(timeout_reason);
 		fils_params.req_ie = req_ie;
 		fils_params.req_ie_len = req_ie_len;
 		fils_params.resp_ie = resp_ie;
 		fils_params.resp_ie_len = resp_ie_len;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-		fils_params.links[0].bss = bss;
-#else
 		fils_params.bss = bss;
-#endif
 		hdd_populate_fils_params(&fils_params, roam_fils_params->kek,
 					 roam_fils_params->kek_len,
 					 roam_fils_params->fils_pmk,
@@ -12617,6 +12634,7 @@ static void hdd_cfg_params_init(struct hdd_context *hdd_ctx)
 	hdd_sar_cfg_update(config, psoc);
 	hdd_init_qmi_stats(config, psoc);
 	hdd_club_ll_stats_in_get_sta_cfg_update(config, psoc);
+	config->sub_20_ch_width = cfg_get(psoc, CFG_SUB_20_CHANNEL_WIDTH);
 }
 
 struct hdd_context *hdd_context_create(struct device *dev)
@@ -12970,7 +12988,7 @@ static int hdd_update_cds_config(struct hdd_context *hdd_ctx)
 	cds_cfg->enable_rxthread = hdd_ctx->enable_rxthread;
 	ucfg_mlme_get_sap_max_peers(hdd_ctx->psoc, &value);
 	cds_cfg->max_station = value;
-	cds_cfg->sub_20_channel_width = WLAN_SUB_20_CH_WIDTH_NONE;
+	cds_cfg->sub_20_channel_width = hdd_ctx->config->sub_20_ch_width;
 	cds_cfg->max_msdus_per_rxinorderind =
 		cfg_get(hdd_ctx->psoc, CFG_DP_MAX_MSDUS_PER_RXIND);
 	cds_cfg->self_recovery_enabled = self_recovery;
@@ -17264,61 +17282,6 @@ static int con_mode_handler(const char *kmessage, const struct kernel_param *kp)
 	return hdd_set_con_mode_cb(mode);
 }
 
-#define WIFI_VERINFO_BUF_SIZE    512
-static ssize_t wifi_verinfo_read(struct file *fp, char __user *ubuf,
-		size_t count, loff_t *ppos)
-{
-	char *buf = NULL;
-	int ret = 0;
-
-	buf = kzalloc(sizeof(char) * WIFI_VERINFO_BUF_SIZE, GFP_KERNEL);
-	if (!buf)
-		return -ENOMEM;
-
-	if (strlen(wifi_verinfo.commit_id) > 0) {
-		ret = scnprintf(buf, WIFI_VERINFO_BUF_SIZE,
-				"time stamp: %s\n"
-				"commit id: %s\n"
-				"driver version: v%s\n"
-				"FW version: %s\n"
-				"module type: %s\n",
-				wifi_verinfo.timestamp, wifi_verinfo.commit_id,
-				wifi_verinfo.driver_version, wifi_verinfo.fw_version,
-				wifi_verinfo.module_type);
-	} else {
-		ret = scnprintf(buf, WIFI_VERINFO_BUF_SIZE,
-				"This driver is compiled from local code which does not contain version control information.\n"
-				"The compilation time is: %s\n",
-				wifi_verinfo.timestamp);
-	}
-
-	ret = simple_read_from_buffer(ubuf, count, ppos, buf, ret);
-	kfree(buf);
-	return ret;
-}
-
-static const struct file_operations wifi_verinfo_fops = {
-	.read = wifi_verinfo_read,
-	.write = NULL,
-};
-
-static int wlan_hdd_create_verinfo(void)
-{
-	int ret = 0;
-	struct dentry * verinfo_den;
-
-	verinfo_den = debugfs_lookup(WLAN_MODULE_NAME, NULL);
-	if (IS_ERR(verinfo_den)) {
-		ret = PTR_ERR(verinfo_den);
-		hdd_err_rl("No space to create debugfs %d\n", ret);
-		return ret;
-	} else {
-		debugfs_create_file("wifi_verinfo", 0644, verinfo_den, 0, &wifi_verinfo_fops);
-	}
-
-	return ret;
-}
-
 int hdd_driver_load(void)
 {
 	struct osif_driver_sync *driver_sync;
@@ -17402,7 +17365,6 @@ int hdd_driver_load(void)
 		goto pld_deinit;
 	}
 
-	wlan_hdd_create_verinfo();
 	hdd_debug("%s: driver loaded", WLAN_MODULE_NAME);
 	hdd_place_marker(NULL, "DRIVER LOADED", NULL);
 
@@ -19082,6 +19044,74 @@ int hdd_crash_inject(struct hdd_adapter *adapter, uint32_t v1, uint32_t v2)
 }
 #endif
 
+QDF_STATUS
+hdd_update_sub20_chan_width(struct hdd_adapter *adapter,
+			    enum cfg_sub_20_channel_width sub_20_ch_width)
+{
+	QDF_STATUS status;
+	enum hdd_dot11_mode dot11_mode;
+	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(adapter);
+
+	if (policy_mgr_get_connection_count(hdd_ctx->psoc)) {
+		hdd_info("sub20MHz chan width updating is not allowed when connection is present");
+		return QDF_STATUS_E_INVAL;
+	}
+
+	status = cds_set_sub_20_channel_width(sub_20_ch_width);
+	if (status == QDF_STATUS_E_ALREADY) {
+		hdd_debug("sub20MHz chan width is already %u", sub_20_ch_width);
+		status = QDF_STATUS_SUCCESS;
+		goto out;
+	} else if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to set sub20MHz chan width: %u", status);
+		goto out;
+	}
+
+	hdd_debug("sub20MHz chan width to set: %u", sub_20_ch_width);
+	status = ucfg_mlme_set_sub_20_chan_width(hdd_ctx->psoc,
+						 sub_20_ch_width);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to set mlme sub20MHz chan width: %u", status);
+		goto out;
+	}
+
+	hdd_update_vdev_nss(hdd_ctx);
+	status = hdd_update_score_config(hdd_ctx);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to update score config: %u", status);
+		goto out;
+	}
+
+	dot11_mode = hdd_ctx->config->dot11Mode;
+	status = sme_set_phy_mode(hdd_ctx->mac_handle,
+				  hdd_cfg_xlate_to_csr_phy_mode(dot11_mode));
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to set phy mode: %u", status);
+		goto out;
+	}
+
+	if (!hdd_update_config_cfg(hdd_ctx)) {
+		status = QDF_STATUS_E_FAILURE;
+		goto out;
+	}
+
+	status = hdd_set_policy_mgr_user_cfg(hdd_ctx);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to set policy mgr user config: %u", status);
+		goto out;
+	}
+
+	status = sme_update_channel_list(hdd_ctx->mac_handle);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		hdd_err("failed to update channel list: %u", status);
+		goto out;
+	}
+
+	hdd_ctx->config->sub_20_ch_width = sub_20_ch_width;
+out:
+	return status;
+}
+
 /* Register the module init/exit functions */
 module_init(hdd_module_init);
 module_exit(hdd_module_exit);
@@ -19170,16 +19200,6 @@ static const struct kernel_param_ops pcie_gen_speed_ops = {
 	.get = param_get_int,
 };
 
-static int quec_sub_version_get_hex(char *buffer, const struct kernel_param *kp)
-{
-	scnprintf(buffer, 16, "0x%x\n", quec_sub_version);
-	return strlen(buffer);
-}
-
-static const struct kernel_param_ops quec_sub_version_ops = {
-	.get = quec_sub_version_get_hex,
-};
-
 module_param_cb(con_mode, &con_mode_ops, &con_mode,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
@@ -19187,9 +19207,6 @@ module_param_cb(con_mode_ftm, &con_mode_ftm_ops, &con_mode_ftm,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 module_param_cb(pcie_gen_speed, &pcie_gen_speed_ops, &pcie_gen_speed,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-module_param_cb(quec_sub_version, &quec_sub_version_ops, &quec_sub_version,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 #ifdef WLAN_FEATURE_EPPING

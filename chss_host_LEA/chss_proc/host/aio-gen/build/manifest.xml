@@ -1,10 +1,10 @@
 <config>
   <image_tree>
     <name>CHSS.LEA_VER.1.0</name>
-    <build_id>CHSS.LEA_VER.1.0-00017-QCALEAHSPZ-3</build_id>
+    <build_id>CHSS.LEA_VER.1.0-00022-QCALEAHSPZ-1</build_id>
     <branch_point_revision/>
-    <revision>00017</revision>
-    <spin>3</spin>
+    <revision>00022</revision>
+    <spin>1</spin>
     <client>QCALEAHSPZ</client>
   </image_tree>
 </config>

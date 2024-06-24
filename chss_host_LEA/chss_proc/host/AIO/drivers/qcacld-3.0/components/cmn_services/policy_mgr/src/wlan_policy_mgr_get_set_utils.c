@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -751,67 +751,6 @@ void policy_mgr_init_dbs_hw_mode(struct wlan_objmgr_psoc *psoc,
 		pm_ctx->num_dbs_hw_modes));
 }
 
-#ifdef FEATURE_FOURTH_CONNECTION
-/**
- * policy_mgr_4_freq_always_on_same_mac() - Function to check if 4 freq can
- * lead to 4 home freq on same mac
- * @freq1: Frequency 1
- * @freq2: Frequency 2
- * @freq3: Frequency 3
- * @freq4: Frequency 4
- *
- * Return:true if any 4 freq cause 4 home frequency on same mac
- *
- */
-static bool
-policy_mgr_4_freq_always_on_same_mac(     qdf_freq_t freq1, qdf_freq_t freq2,
-									qdf_freq_t freq3, qdf_freq_t freq4)
-{
-	if(!((pm_conc_connection_list[0].mac ==
-		pm_conc_connection_list[1].mac) &&
-		(pm_conc_connection_list[1].mac ==
-		pm_conc_connection_list[2].mac)))
-		return false;
-
-	if (((WLAN_REG_IS_24GHZ_CH_FREQ(freq1)) &&
-		(WLAN_REG_IS_24GHZ_CH_FREQ(freq2)) &&
-		(WLAN_REG_IS_24GHZ_CH_FREQ(freq3)) &&
-		(WLAN_REG_IS_24GHZ_CH_FREQ(freq4))) ||
-		((WLAN_REG_IS_5GHZ_CH_FREQ(freq1)) &&
-		(WLAN_REG_IS_5GHZ_CH_FREQ(freq2)) &&
-		(WLAN_REG_IS_5GHZ_CH_FREQ(freq3)) &&
-		(WLAN_REG_IS_5GHZ_CH_FREQ(freq4)))  ||
-		((WLAN_REG_IS_6GHZ_CHAN_FREQ(freq1)) &&
-		(WLAN_REG_IS_6GHZ_CHAN_FREQ(freq2)) &&
-		(WLAN_REG_IS_6GHZ_CHAN_FREQ(freq3)) &&
-		(WLAN_REG_IS_6GHZ_CHAN_FREQ(freq4)))) {
-		policy_mgr_rl_debug("don't allow 4th home channel on same MAC");
-		return true;
-	}
-
-	return false;
-}
-
-bool
-policy_mgr_allow_4th_new_freq(struct wlan_objmgr_psoc *psoc,
-								qdf_freq_t freq1, qdf_freq_t freq2,
-								qdf_freq_t freq3, qdf_freq_t new_ch_freq)
-{
-	/* if HW is not DBS return false */
-	if (!policy_mgr_is_hw_dbs_capable(psoc))
-		return false;
-
-	if (!freq1 || !freq2 || !freq3 || !new_ch_freq) {
-		policy_mgr_info("one or more freq are 0: freq1 %d freq2 %d freq3 %d new_freq %d",
-					freq1, freq2, freq3, new_ch_freq);
-		return false;
-	}
-
-	return !policy_mgr_4_freq_always_on_same_mac(freq1, freq2, freq3,
-                                                    new_ch_freq);
-}
-#endif
-
 void policy_mgr_dump_dbs_hw_mode(struct wlan_objmgr_psoc *psoc)
 {
 	uint32_t i, param;
@@ -1469,6 +1408,36 @@ uint32_t policy_mgr_mode_specific_vdev_id(struct wlan_objmgr_psoc *psoc,
 	qdf_mutex_release(&pm_ctx->qdf_conc_list_lock);
 
 	return vdev_id;
+}
+
+uint32_t policy_mgr_mode_get_macid_by_vdev_id(struct wlan_objmgr_psoc *psoc,
+					      uint32_t vdev_id)
+{
+	uint32_t conn_index = 0;
+	uint32_t mac_id = 0xFF;
+	enum policy_mgr_con_mode mode;
+	struct policy_mgr_psoc_priv_obj *pm_ctx;
+
+	pm_ctx = policy_mgr_get_context(psoc);
+	if (!pm_ctx) {
+		policy_mgr_err("Invalid Context");
+		return vdev_id;
+	}
+	mode = policy_mgr_con_mode_by_vdev_id(psoc, vdev_id);
+	qdf_mutex_acquire(&pm_ctx->qdf_conc_list_lock);
+
+	for (conn_index = 0; conn_index < MAX_NUMBER_OF_CONC_CONNECTIONS;
+		conn_index++) {
+		if ((pm_conc_connection_list[conn_index].mode == mode) &&
+		    pm_conc_connection_list[conn_index].in_use &&
+		    vdev_id == pm_conc_connection_list[conn_index].vdev_id) {
+			mac_id = pm_conc_connection_list[conn_index].mac;
+			break;
+		}
+	}
+	qdf_mutex_release(&pm_ctx->qdf_conc_list_lock);
+
+	return mac_id;
 }
 
 uint32_t policy_mgr_mode_specific_connection_count(
@@ -2421,7 +2390,8 @@ static bool policy_mgr_allow_multiple_sta_connections(struct wlan_objmgr_psoc *p
 bool policy_mgr_is_6ghz_conc_mode_supported(
 	struct wlan_objmgr_psoc *psoc, enum policy_mgr_con_mode mode)
 {
-	if (mode == PM_STA_MODE || mode == PM_SAP_MODE)
+	if (mode == PM_STA_MODE || mode == PM_SAP_MODE ||
+	    mode == PM_P2P_CLIENT_MODE || mode == PM_P2P_GO_MODE)
 		return true;
 	else
 		return false;
@@ -2714,8 +2684,7 @@ policy_mgr_allow_concurrency_csa(struct wlan_objmgr_psoc *psoc,
 	qdf_mutex_acquire(&pm_ctx->qdf_conc_list_lock);
 
 	if (forced && (reason == CSA_REASON_UNSAFE_CHANNEL ||
-		       reason == CSA_REASON_DCS ||
-		       reason == CSA_REASON_CONCURRENT_STA_CHANGED_CHANNEL))
+		       reason == CSA_REASON_DCS))
 		policy_mgr_store_and_del_conn_info_by_chan_and_mode(
 			psoc, old_ch_freq, mode, info, &num_cxn_del);
 	else

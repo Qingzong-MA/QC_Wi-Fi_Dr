@@ -481,8 +481,10 @@ int cnss_wlfw_respond_mem_send_sync(struct cnss_plat_data *plat_priv)
 		return -ENOMEM;
 
 	resp = kzalloc(sizeof(*resp), GFP_KERNEL);
-	if (!resp)
+	if (!resp) {
+		kfree(req);
 		return -ENOMEM;
+	}
 
 	req->mem_seg_len = plat_priv->fw_mem_seg_len;
 	for (i = 0; i < req->mem_seg_len; i++) {
@@ -1381,6 +1383,11 @@ static void cnss_wlfw_clnt_ind(struct qmi_handle *handle,
 		cnss_qmi_initiate_cal_download_ind_hdlr(plat_priv,
 							msg, msg_len);
 		break;
+	case QMI_WLFW_CAL_DONE_IND_V01:
+		cnss_driver_event_post(plat_priv,
+                               	       CNSS_DRIVER_EVENT_COLD_BOOT_CAL_DONE,
+                                       0, NULL);
+	
 	default:
 		cnss_pr_err("Invalid QMI WLFW indication, msg_id: 0x%x\n",
 			    msg_id);

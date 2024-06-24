@@ -1,9 +1,9 @@
 # Type is laptop or openwrt
 TYPE = laptop
-# Role is dut or platform
+# Role is dut or platform or afc
 ROLE = dut
 # Package Version
-VERSION = "1.2.0.70"
+VERSION = "2.1.0.42"
 
 OBJS = main.o eloop.o indigo_api.o indigo_packet.o utils.o wpa_ctrl.o
 CFLAGS += -g
@@ -29,6 +29,9 @@ ifeq ($(ROLE),dut)
 OBJS += indigo_api_callback_dut.o vendor_specific_dut.o
 CFLAGS += -D_DUT_
 CFLAGS += -DMDM
+else ifeq ($(ROLE), afc)
+OBJS += indigo_api_callback_afc.o vendor_specific_afc.o vendor_specific_openwrt.o
+CFLAGS += -D_AFC_
 else
 OBJS += indigo_api_callback_tp.o vendor_specific_tp.o
 CFLAGS += -DCONFIG_CTRL_IFACE_UDP

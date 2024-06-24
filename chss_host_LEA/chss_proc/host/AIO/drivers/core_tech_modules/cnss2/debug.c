@@ -79,8 +79,8 @@ static int cnss_stats_show_state(struct seq_file *s,
 		case CNSS_FW_READY:
 			seq_puts(s, "FW_READY");
 			continue;
-		case CNSS_COLD_BOOT_CAL:
-			seq_puts(s, "COLD_BOOT_CAL");
+		case CNSS_IN_COLD_BOOT_CAL:
+			seq_puts(s, "IN_COLD_BOOT_CAL");
 			continue;
 		case CNSS_DRIVER_LOADING:
 			seq_puts(s, "DRIVER_LOADING");
@@ -106,14 +106,18 @@ static int cnss_stats_show_state(struct seq_file *s,
 		case CNSS_DEV_REMOVED:
 			seq_puts(s, "DEV_REMOVED");
 			continue;
+		case CNSS_COLD_BOOT_CAL_DONE:
+			seq_puts(s, "COLD_BOOT_CAL_DONE");
+			continue;
+		case CNSS_PCI_PROBE_DONE:
+			seq_puts(s, "PCI PROBE DONE");
+			continue;
 		}
 
 		seq_printf(s, "UNKNOWN-%d", i);
 	}
 	seq_puts(s, ")\n");
-		
-        seq_printf(s, "<---------------------FW Capability---------------->\n");
-        seq_printf(s, "Board ID: 0x%04x\n", plat_priv->board_info.board_id);
+
 	return 0;
 }
 
@@ -189,8 +193,6 @@ static ssize_t cnss_dev_boot_debug_write(struct file *fp,
 		ret = cnss_force_fw_assert(&pci_priv->pci_dev->dev);
 	} else if (sysfs_streq(cmd, "dump_fw_sram")) {
 		ret = cnss_dump_fw_sram_to_file(plat_priv);
-		ret = cnss_pci_dump_fw_remote_mem_to_file(plat_priv->bus_priv);
-		ret = cnss_pci_dump_fw_paging_to_file(plat_priv->bus_priv);
 	} else {
 		cnss_pr_err("Device boot debugfs command is invalid\n");
 		ret = -EINVAL;

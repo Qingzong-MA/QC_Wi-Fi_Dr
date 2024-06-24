@@ -31,7 +31,7 @@
 
 #include "eloop.h"
 
-void vendor_deinit();
+void vendor_deinit(void);
 
 struct eloop_sock {
 	int sock;

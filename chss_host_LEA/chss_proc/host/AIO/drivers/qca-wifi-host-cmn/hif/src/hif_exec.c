@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017-2021 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -639,6 +640,7 @@ static int hif_exec_poll(struct napi_struct *napi, int budget)
 	int actual_dones;
 	int shift = hif_ext_group->scale_bin_shift;
 	int cpu = smp_processor_id();
+	bool irq_disable_time_reached;
 
 	hif_record_event(hif_ext_group->hif, hif_ext_group->grp_id,
 			 0, 0, 0, HIF_EVENT_BH_SCHED);
@@ -656,8 +658,15 @@ static int hif_exec_poll(struct napi_struct *napi, int budget)
 
 	actual_dones = work_done;
 
+	irq_disable_time_reached = hif_irq_disabled_time_limit_reached(hif_ext_group);
+
+	if (irq_disable_time_reached) {
+		if (work_done >= normalized_budget)
+			work_done = normalized_budget - 1;
+	}
+
 	if ((!hif_ext_group->force_break && work_done < normalized_budget) ||
-	    hif_irq_disabled_time_limit_reached(hif_ext_group)) {
+		irq_disable_time_reached) {
 		napi_complete(napi);
 		qdf_atomic_dec(&scn->active_grp_tasklet_cnt);
 		/* semaphore release must before irq_enable */

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -944,11 +944,7 @@ QDF_STATUS hdd_chan_change_notify(struct hdd_adapter *adapter,
 	hdd_debug("notify: chan:%d width:%d freq1:%d freq2:%d",
 		  chandef.chan->center_freq, chandef.width,
 		  chandef.center_freq1, chandef.center_freq2);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-	cfg80211_ch_switch_notify(dev, &chandef, 0);
-#else
 	cfg80211_ch_switch_notify(dev, &chandef);
-#endif
 
 	return QDF_STATUS_SUCCESS;
 }
@@ -3276,7 +3272,6 @@ QDF_STATUS wlan_hdd_get_channel_for_sap_restart(
 				struct wlan_objmgr_psoc *psoc,
 				uint8_t vdev_id, uint32_t *ch_freq)
 {
-	bool is_force_scc;
 	mac_handle_t mac_handle;
 	struct hdd_ap_ctx *hdd_ap_ctx;
 	struct hdd_context *hdd_ctx;
@@ -3407,10 +3402,9 @@ sap_restart:
 		  ch_params.ch_width);
 	hdd_ap_ctx->bss_stop_reason = BSS_STOP_DUE_TO_MCC_SCC_SWITCH;
 	*ch_freq = intf_ch_freq;
-	is_force_scc = policy_mgr_is_force_scc(psoc);
 	hdd_debug("SAP channel change with CSA/ECSA");
 	hdd_sap_restart_chan_switch_cb(psoc, vdev_id, *ch_freq,
-				       ch_params.ch_width, is_force_scc);
+				       ch_params.ch_width, false);
 	wlansap_context_put(sap_context);
 
 	return QDF_STATUS_SUCCESS;
@@ -3556,9 +3550,14 @@ const struct net_device_ops net_ops_struct = {
 	.ndo_tx_timeout = hdd_softap_tx_timeout,
 	.ndo_get_stats = hdd_get_stats,
 	.ndo_set_mac_address = hdd_hostapd_set_mac_address,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	.ndo_do_ioctl = hdd_ioctl,
+#endif
 	.ndo_change_mtu = hdd_hostapd_change_mtu,
 	.ndo_select_queue = hdd_select_queue,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+	.ndo_siocdevprivate = hdd_dev_private_ioctl,
+#endif
 };
 
 #ifdef WLAN_FEATURE_TSF_PTP
@@ -4836,7 +4835,6 @@ static int wlan_hdd_sap_p2p_11ac_overrides(struct hdd_adapter *ap_adapter)
 	struct sap_config *sap_cfg = &ap_adapter->session.ap.sap_config;
 	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(ap_adapter);
 	uint8_t ch_width;
-	uint8_t sub_20_chan_width;
 	QDF_STATUS status;
 	bool sap_force_11n_for_11ac = 0;
 	bool go_force_11n_for_11ac = 0;
@@ -4860,21 +4858,15 @@ static int wlan_hdd_sap_p2p_11ac_overrides(struct hdd_adapter *ap_adapter)
 	/*
 	 * sub_20 MHz channel width is incompatible with 11AC rates, hence do
 	 * not allow 11AC rates or more than 20 MHz channel width when
-	 * enable_sub_20_channel_width is non zero
+	 * sub_20_channel_width is enabled
 	 */
-	status = ucfg_mlme_get_sub_20_chan_width(hdd_ctx->psoc,
-						 &sub_20_chan_width);
-	if (QDF_IS_STATUS_ERROR(status)) {
-		hdd_err("Failed to get sub_20_chan_width config");
-		return -EIO;
-	}
 
 	ucfg_mlme_is_go_11ac_override(hdd_ctx->psoc,
 				      &go_11ac_override);
 	ucfg_mlme_is_sap_11ac_override(hdd_ctx->psoc,
 				       &sap_11ac_override);
 
-	if (!sub_20_chan_width &&
+	if (!cds_is_sub_20_mhz_enabled() &&
 	    (sap_cfg->SapHw_mode == eCSR_DOT11_MODE_11n ||
 	    sap_cfg->SapHw_mode == eCSR_DOT11_MODE_11ac ||
 	    sap_cfg->SapHw_mode == eCSR_DOT11_MODE_11ac_ONLY ||
@@ -6304,13 +6296,8 @@ static enum hw_mode_bandwidth wlan_hdd_get_channel_bw(
  *
  * Return: zero for success non-zero for failure
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-int wlan_hdd_cfg80211_stop_ap(struct wiphy *wiphy,
-				struct net_device *dev, unsigned int link_id)
-#else
 int wlan_hdd_cfg80211_stop_ap(struct wiphy *wiphy,
 				struct net_device *dev)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -6640,13 +6627,15 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 	if (0 != status)
 		return status;
 
-	hdd_nofl_info("%s(vdevid-%d): START AP: mode %s(%d) %d bw %d sub20 %d",
+	hdd_nofl_info("%s(vdevid-%d): START AP: mode %s(%d) %d bw %d (5MHz %d 10MHz %d)",
 		      dev->name, adapter->vdev_id,
 		      qdf_opmode_str(adapter->device_mode),
 		      adapter->device_mode,
 		      params->chandef.chan->center_freq,
 		      params->chandef.width,
-		      cds_is_sub_20_mhz_enabled());
+		      cds_is_5_mhz_enabled(),
+		      cds_is_10_mhz_enabled());
+
 	if (policy_mgr_is_hw_mode_change_in_progress(hdd_ctx->psoc)) {
 		status = policy_mgr_wait_for_connection_update(
 			hdd_ctx->psoc);
@@ -6910,15 +6899,9 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 			goto err_start_bss;
 		}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-		if (wdev->links[0].ap.chandef.chan->center_freq !=
-				params->chandef.chan->center_freq)
-			params->chandef = wdev->links[0].ap.chandef;
-#else
 		if (wdev->chandef.chan->center_freq !=
 				params->chandef.chan->center_freq)
 			params->chandef = wdev->chandef;
-#endif
 		/*
 		 * If Do_Not_Break_Stream enabled send avoid channel list
 		 * to application.

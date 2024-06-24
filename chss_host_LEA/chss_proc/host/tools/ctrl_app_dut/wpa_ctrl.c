@@ -164,20 +164,8 @@ static struct wpa_ctrl * wpa_ctrl_open2(const char *ctrl_path)
 
 struct wpa_ctrl * wpa_ctrl_open(const char *ctrl_path)
 {
-#if defined(ANDROID) || defined(MDM)
-    char full_ctrl_path[128];
-#ifdef MDM
-    snprintf(full_ctrl_path, sizeof(full_ctrl_path), "%s/%s",
-             ctrl_path, get_default_wireless_interface_info());
-#else
-    snprintf(full_ctrl_path, sizeof(full_ctrl_path), "%s%s",
-             ctrl_path, get_default_wireless_interface_info());
-#endif /* MDM */
-    indigo_logger(LOG_LEVEL_DEBUG, "%s: %s", __func__, full_ctrl_path);
-    return wpa_ctrl_open2(full_ctrl_path);
-#else
+    indigo_logger(LOG_LEVEL_DEBUG, "%s: %s", __func__, ctrl_path);
     return wpa_ctrl_open2(ctrl_path);
-#endif
 }
 
 
@@ -202,10 +190,10 @@ int wpa_ctrl_request(struct wpa_ctrl *ctrl, const char *cmd, size_t cmd_len,
 	int res;
 	fd_set rfds;
 	const char *_cmd;
-	char *cmd_buf = NULL;
 	size_t _cmd_len;
 
 #ifdef CONFIG_CTRL_IFACE_UDP
+	char *cmd_buf = NULL;
 	if (ctrl->cookie) {
 		char *pos;
 		_cmd_len = strlen(ctrl->cookie) + 1 + cmd_len;
@@ -311,13 +299,12 @@ int wpa_ctrl_recv(struct wpa_ctrl *ctrl, char *reply, size_t *reply_len)
 int wpa_ctrl_pending(struct wpa_ctrl *ctrl)
 {
 	struct timeval tv;
-	int res;
 	fd_set rfds;
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
 	FD_ZERO(&rfds);
 	FD_SET(ctrl->s, &rfds);
-	res = select(ctrl->s + 1, &rfds, NULL, NULL, &tv);
+	select(ctrl->s + 1, &rfds, NULL, NULL, &tv);
 	return FD_ISSET(ctrl->s, &rfds);
 }
 

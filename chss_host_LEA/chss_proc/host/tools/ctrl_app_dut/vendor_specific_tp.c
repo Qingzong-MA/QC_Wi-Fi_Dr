@@ -31,14 +31,14 @@ const struct sta_driver_ops *sta_drv_ops = NULL;
 const char *desc_platform1 = "Intel Corporation Device 2725";
 const char *desc_platform2 = "Qualcomm Device 1101";
 
-static void check_platform1_default_conf();
+static void check_platform1_default_conf(void);
 
 /**
  * Generic platform dependent API implementation
  */
 
 /* support multiple STA platforms detection */
-void detect_sta_vendor() {
+void detect_sta_vendor(void) {
     char cmd[S_BUFFER_LEN];
     char buf[S_BUFFER_LEN];
     char *strbuf = NULL, *temp = NULL;
@@ -87,7 +87,7 @@ void detect_sta_vendor() {
 }
 
 #if defined(_OPENWRT_)
-int detect_third_radio() {
+int detect_third_radio(void) {
     FILE *fp;
     char buffer[BUFFER_LEN];
     int third_radio = 0;
@@ -106,7 +106,7 @@ int detect_third_radio() {
 #endif
 
 /* Be invoked when start controlApp */
-void vendor_init() {
+void vendor_init(void) {
     /* Make sure native hostapd/wpa_supplicant is inactive */
     system("killall hostapd 1>/dev/null 2>/dev/null");
     sleep(1);
@@ -179,7 +179,7 @@ void vendor_init() {
 }
 
 /* Be invoked when terminate controlApp */
-void vendor_deinit() {
+void vendor_deinit(void) {
     char buffer[S_BUFFER_LEN];
     memset(buffer, 0, sizeof(buffer));
     system("killall hostapd >/dev/null 2>/dev/null");
@@ -190,7 +190,7 @@ void vendor_deinit() {
     system(buffer);
 }
 
-int set_channel_width() {
+int set_channel_width(void) {
     int ret = -1;
 
     if (!sta_hw_config.chwidth_isset) {
@@ -205,7 +205,7 @@ int set_channel_width() {
     return ret;
 }
 
-void set_phy_mode() {
+void set_phy_mode(void) {
     if (!sta_hw_config.phymode_isset) {
         return;
     } else {
@@ -236,7 +236,7 @@ struct he_chwidth_config he_chwidth_config_list[] = {
     { CHWIDTH_160, "0c3fc200fd09800ecffe00" }
 };
 
-static void check_platform1_default_conf() {
+static void check_platform1_default_conf(void) {
     char *fname = "/lib/firmware/iwl-dbg-cfg.ini";
     char buffer[S_BUFFER_LEN];
     FILE *f_ptr = NULL;
@@ -257,12 +257,12 @@ static void check_platform1_default_conf() {
     }
 }
 
-static void disable_11ax() {
+static void disable_11ax(void) {
     system("sudo modprobe -r iwlwifi;sudo modprobe iwlwifi disable_11ax=1");
     sleep(3);
 }
 
-static void reload_driver() {
+static void reload_driver(void) {
     system("sudo modprobe -r iwlwifi;sudo modprobe iwlwifi");
     sleep(3);
 }
@@ -329,7 +329,7 @@ static int set_he_channel_width(int chwidth) {
     return 0;
 }
 
-static int set_channel_width_platform1() {
+static int set_channel_width_platform1(void) {
     int ret = 0;
     if ((sta_hw_config.phymode == PHYMODE_11AXA ||
             sta_hw_config.phymode == PHYMODE_11AXG ||
@@ -343,7 +343,7 @@ static int set_channel_width_platform1() {
     return ret;
 }
 
-static void set_phy_mode_platform1() {
+static void set_phy_mode_platform1(void) {
     if (sta_hw_config.phymode == PHYMODE_11BGN || sta_hw_config.phymode == PHYMODE_11AC) {
         disable_11ax();
     } else if (sta_hw_config.phymode == PHYMODE_11BG || sta_hw_config.phymode == PHYMODE_11A) {
@@ -363,7 +363,7 @@ static void set_phy_mode_platform1() {
  * Platform-dependent implementation for STA platform 2
  */
 
-static int set_channel_width_platform2() {
+static int set_channel_width_platform2(void) {
     int ret = 0;
     if ((sta_hw_config.phymode == PHYMODE_11AXA ||
             sta_hw_config.phymode == PHYMODE_11AXG ||
@@ -377,7 +377,7 @@ static int set_channel_width_platform2() {
     return ret;
 }
 
-static void set_phy_mode_platform2() {
+static void set_phy_mode_platform2(void) {
     if (sta_hw_config.phymode == PHYMODE_11BGN || sta_hw_config.phymode == PHYMODE_11AC) {
         /* disable HE */
     } else if (sta_hw_config.phymode == PHYMODE_11BG || sta_hw_config.phymode == PHYMODE_11A) {

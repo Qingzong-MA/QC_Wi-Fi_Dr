@@ -36,7 +36,7 @@ int rrm = 0, he_mu_edca = 0;
 
 extern struct sockaddr_in *tool_addr;
 
-void register_apis() {
+void register_apis(void) {
     /* Basic */
     register_api(API_GET_MAC_ADDR, NULL, get_mac_addr_handler);
     register_api(API_GET_CONTROL_APP_VERSION, NULL, get_control_app_handler);

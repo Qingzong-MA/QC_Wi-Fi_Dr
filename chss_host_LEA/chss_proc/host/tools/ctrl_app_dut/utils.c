@@ -13,10 +13,6 @@
 /* CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT                       */
 /* OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS                          */
 /* SOFTWARE. */
-/* Copyright (c) 2005-2011, Jouni Malinen <j@w1.fi>
- * All Rights Reserved.
- * Licensed under the Clear BSD license.
-*/
 
 #include <stdio.h>
 #include <string.h>
@@ -33,7 +29,7 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
-#ifdef _OPENWRT_QTI_
+#if defined(_OPENWRT_QTI_) || defined(ANDROID) || defined(MDM)
 #include <net/if.h>
 #else
 #include <linux/if.h>
@@ -61,11 +57,19 @@ int syslog_level = LOG_LEVEL_INFO;
 /* multiple VAPs */
 int interface_count = 0;
 int configured_interface_count = 0;
-struct interface_info interfaces[8];
+struct interface_info interfaces[16];
 int band_mbssid_cnt[16];
 struct interface_info* default_interface;
 static struct loopback_info loopback = {};
 int ap_interface_5gh = 0;
+/* bridge used for wireless interfaces */
+char wlans_bridge[32];
+
+#if UPLOAD_TC_APP_LOG
+/* per test case control app log */
+FILE *app_log;
+extern struct sockaddr_in *tool_addr;
+#endif
 
 #ifdef HOSTAPD_SUPPORT_MBSSID_WAR
 int use_openwrt_wpad = 0;
@@ -76,7 +80,7 @@ void send_continuous_loopback_packet(void *eloop_ctx, void *sock_ctx);
 void debug_print_timestamp(void) {
     time_t rawtime;
     struct tm *info;
-    char buffer[32];
+    char buffer[32] = {0};
 
     time(&rawtime);
     info = localtime(&rawtime);
@@ -84,19 +88,17 @@ void debug_print_timestamp(void) {
         strftime(buffer, sizeof(buffer), "%b %d %H:%M:%S", info);
         printf("%s ", buffer);
     }
+#if UPLOAD_TC_APP_LOG
+    if (app_log) {
+        fprintf(app_log, "%s ", buffer);
+    }
+#endif
 }
 
 void indigo_logger(int level, const char *fmt, ...) {
-    char *format, *log_type;
-    int maxlen;
+    char format[4096], *log_type;
     int priority;
     va_list ap;
-
-    maxlen = strlen(fmt) + 100;
-    format = malloc(maxlen);
-    if (!format) {
-        return;
-    }
 
     switch (level) {
     case LOG_LEVEL_DEBUG_VERBOSE:
@@ -119,7 +121,7 @@ void indigo_logger(int level, const char *fmt, ...) {
         break;
     }
 
-    snprintf(format, maxlen, "controlappc.%8s  %s", log_type, fmt);
+    snprintf(format, sizeof(format), "controlappc.%8s  %s", log_type, fmt);
 
     if (level >= stdout_level) {
         debug_print_timestamp();
@@ -127,6 +129,14 @@ void indigo_logger(int level, const char *fmt, ...) {
         vprintf(format, ap);
         va_end(ap);
         printf("\n");
+#if UPLOAD_TC_APP_LOG
+        if (app_log) {
+            va_start(ap, fmt);
+            vfprintf(app_log, format, ap);
+            fprintf(app_log, "\n");
+            va_end(ap);
+        }
+#endif
     }
 
     if (level >= stdout_level) {
@@ -154,9 +164,37 @@ void indigo_logger(int level, const char *fmt, ...) {
     }
 }
 
+void open_tc_app_log() {
+#if UPLOAD_TC_APP_LOG
+    if (app_log) {
+        fclose(app_log);
+        app_log = NULL;
+    }
+    app_log = fopen(APP_LOG_FILE, "w");
+    if (app_log == NULL) {
+        indigo_logger(LOG_LEVEL_ERROR, "Failed to open the file %s",
+                      APP_LOG_FILE);
+    }
+#endif
+}
+
+/* Close file handle and upload test case control app log */
+void close_tc_app_log() {
+#if UPLOAD_TC_APP_LOG
+    if (app_log) {
+        fclose(app_log);
+        app_log = NULL;
+        if (tool_addr != NULL) {
+            http_file_post(inet_ntoa(tool_addr->sin_addr), TOOL_POST_PORT, HAPD_UPLOAD_API, APP_LOG_FILE);
+        }
+    }
+#endif
+}
+
 /* System */
 int pipe_command(char *buffer, int buffer_size, char *cmd, char *parameter[]) {
-    int pipefds[2], len = 0;
+    int pipefds[2] = {0};
+    int len = 0;
     pid_t pid;
 
     if (pipe(pipefds) == -1){
@@ -268,7 +306,7 @@ static void loopback_server_receive_message(int sock, void *eloop_ctx, void *soc
     int fromlen, len;
 
     fromlen = sizeof(from);
-    len = recvfrom(sock, buffer, BUFFER_LEN, 0, (struct sockaddr *) &from, &fromlen);
+    len = recvfrom(sock, buffer, BUFFER_LEN, 0, (struct sockaddr *) &from, (socklen_t*) &fromlen);
     if (len < 0) {
         indigo_logger(LOG_LEVEL_ERROR, "Loopback server recvfrom[server] error");
         return ;
@@ -335,7 +373,7 @@ int loopback_server_start(char *local_ip, char *local_port, int timeout) {
     return 0;
 }
 
-int loopback_server_stop() {
+int loopback_server_stop(void) {
     if (loopback_socket) {
         eloop_cancel_timeout(loopback_server_timeout, (void*)(intptr_t)loopback_socket, NULL);
         eloop_unregister_read_sock(loopback_socket);
@@ -345,7 +383,7 @@ int loopback_server_stop() {
     return 0;
 }
 
-int loopback_server_status() {
+int loopback_server_status(void) {
     return !!loopback_socket;
 }
 
@@ -501,7 +539,10 @@ int send_udp_data(char *target_ip, int target_port, int packet_count, int packet
         timeout.tv_sec = 1;
         timeout.tv_usec = 0;
     }
-    snprintf(ifname, sizeof(ifname), "%s", get_wireless_interface());
+    if (is_bridge_created()) {
+        snprintf(ifname, sizeof(ifname), "%s", get_wlans_bridge());
+    } else if (get_p2p_group_if(ifname, sizeof(ifname)) != 0)
+        snprintf(ifname, sizeof(ifname), "%s", get_wireless_interface());
     const int len = strnlen(ifname, IFNAMSIZ);
     if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, ifname, len) < 0) {
         indigo_logger(LOG_LEVEL_ERROR, "failed to bind the interface %s", ifname);
@@ -586,10 +627,10 @@ int send_icmp_data(char *target_ip, int packet_count, int packet_size, double ra
     struct timeval timeout;
     int pkt_sent = 0, pkt_rcv = 0;
 
-	sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-	if (sock < 0) {
+    sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    if (sock < 0) {
         return -1;
-	}
+    }
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -603,12 +644,16 @@ int send_icmp_data(char *target_ip, int packet_count, int packet_size, double ra
         timeout.tv_usec = 0;
     }
 
-    snprintf(ifname, sizeof(ifname), "%s", get_wireless_interface());
+    if (is_bridge_created()) {
+        snprintf(ifname, sizeof(ifname), "%s", get_wlans_bridge());
+    } else if (get_p2p_group_if(ifname, sizeof(ifname)) != 0)
+        snprintf(ifname, sizeof(ifname), "%s", get_wireless_interface());
     const int len = strnlen(ifname, IFNAMSIZ);
     if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, len) < 0) {
         indigo_logger(LOG_LEVEL_ERROR, "failed to bind the interface %s", ifname);
         return -1;
     }
+    indigo_logger(LOG_LEVEL_DEBUG, "Bind the interface %s", ifname);
 
     setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout));
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
@@ -662,7 +707,7 @@ int send_icmp_data(char *target_ip, int packet_count, int packet_size, double ra
                 indigo_logger(LOG_LEVEL_INFO, "icmp echo reply from %s, Receive echo %d bytes data", target_ip, n - 20);
                 pkt_rcv++;
             } else {
-                indigo_logger(LOG_LEVEL_INFO, "Received packet is not the ICMP reply from the DUT");
+                indigo_logger(LOG_LEVEL_INFO, "Received packet is not the ICMP reply from the Destination");
             }
         }
         usleep(rate * 1000000);
@@ -757,7 +802,18 @@ int bridge_created = 1;
 int bridge_created = 0;
 #endif
 
-int is_bridge_created() {
+char* get_wlans_bridge() {
+    return wlans_bridge;
+}
+int set_wlans_bridge(char* br) {
+    memset(wlans_bridge, 0, sizeof(wlans_bridge));
+    snprintf(wlans_bridge, sizeof(wlans_bridge), "%s", br);
+    printf("\nwlans_bridge = %s.\n", wlans_bridge);
+
+    return 0;
+}
+
+int is_bridge_created(void) {
     return bridge_created;
 }
 
@@ -772,9 +828,11 @@ void bridge_init(char *br) {
 int create_bridge(char *br) {
     char cmd[S_BUFFER_LEN];
 
+#if (!defined(ANDROID) && !defined(MDM))
     /* Create new bridge */
     snprintf(cmd, sizeof(cmd), "brctl addbr %s", br);
     system(cmd);
+#endif
 
     /* Bring up bridge */
     control_interface(br, "up");
@@ -791,9 +849,11 @@ int add_interface_to_bridge(char *br, char *ifname) {
     reset_interface_ip(ifname);
 
     /* Add interface to bridge */
+#if (!defined(ANDROID) && !defined(MDM))
     snprintf(cmd, sizeof(cmd), "brctl addif %s %s", br, ifname);
     system(cmd);
     printf("%s\n", cmd);
+#endif
 
     return 0;
 }
@@ -803,8 +863,10 @@ int reset_bridge(char *br) {
 
     /* Bring down bridge */
     control_interface(br, "down");
+#if (!defined(ANDROID) && !defined(MDM))
     snprintf(cmd, sizeof(cmd), "brctl delbr %s", br);
     system(cmd);
+#endif
 
     bridge_created = 0;
 
@@ -814,6 +876,10 @@ int reset_bridge(char *br) {
 int add_wireless_interface(char *ifname) {
     char cmd[S_BUFFER_LEN];
 
+    if (if_nametoindex(ifname) != 0) {
+        indigo_logger(LOG_LEVEL_DEBUG, "%s: %s exists - skip", __func__, ifname);
+        return 0;
+    }
     snprintf(cmd, sizeof(cmd), "iw dev %s interface add %s type managed", get_wireless_interface(), ifname);
     indigo_logger(LOG_LEVEL_DEBUG, "%s: SYSTEM_CMD: %s", __func__, cmd);
     system(cmd);
@@ -911,6 +977,7 @@ char hapd_full_ctrl_path[128];
 char hapd_global_ctrl_path[64] = HAPD_GLOBAL_CTRL_PATH_DEFAULT;
 char hapd_conf_file[64] = HAPD_CONF_FILE_DEFAULT;
 char hapd_conf_file_dir[64] = HAPD_CONF_FILE_DEFAULT_PATH;
+char hapd_log_file_arguments[64];
 int hostapd_debug_level = DEBUG_LEVEL_DISABLE;
 
 char wpas_exec_file[64];
@@ -919,6 +986,7 @@ char wpas_ctrl_path[64] = WPAS_CTRL_PATH_DEFAULT;
 char wpas_full_ctrl_path[128];
 char wpas_global_ctrl_path[64] = WPAS_GLOBAL_CTRL_PATH_DEFAULT;
 char wpas_conf_file[64] = WPAS_CONF_FILE_DEFAULT;
+char wpas_log_file_arguments[64];
 int wpas_debug_level = DEBUG_LEVEL_DISABLE;
 
 struct interface_info* assign_wireless_interface_info(struct bss_identifier_info *bss) {
@@ -931,10 +999,8 @@ struct interface_info* assign_wireless_interface_info(struct bss_identifier_info
             interfaces[i].identifier = bss->identifier;
             interfaces[i].mbssid_enable = bss->mbssid_enable;
             interfaces[i].transmitter = bss->transmitter;
-            if (bss->mbssid_enable) {
-                interfaces[i].hapd_bss_id = band_mbssid_cnt[bss->band];
-                band_mbssid_cnt[bss->band]++;
-            }
+            interfaces[i].hapd_bss_id = band_mbssid_cnt[bss->band];
+            band_mbssid_cnt[bss->band]++;
             memset(interfaces[i].hapd_conf_file, 0, sizeof(interfaces[i].hapd_conf_file));
             snprintf(interfaces[i].hapd_conf_file, sizeof(interfaces[i].hapd_conf_file),
                      "%s/hostapd_%s.conf", hapd_conf_file_dir, interfaces[i].ifname);
@@ -942,6 +1008,42 @@ struct interface_info* assign_wireless_interface_info(struct bss_identifier_info
         }
     }
 
+    return NULL;
+}
+
+/* if both ifname matches requested band, Pref_ifname wins */
+struct interface_info* assign_pref_wireless_interface_info(
+        struct bss_identifier_info *bss, const char *pref_ifname) {
+    int i;
+    struct interface_info *pref_info = NULL;
+
+    for (i = 0; i < interface_count; i++) {
+        if ((interfaces[i].band == bss->band) &&
+             (interfaces[i].identifier == UNUSED_IDENTIFIER)) {
+            // pick pref ifname
+            if (pref_ifname != NULL && !strcmp(interfaces[i].ifname, pref_ifname)) {
+                pref_info = &interfaces[i];
+                break;
+            }
+            // else pick 1st matching interface.
+            if (!pref_info)
+                pref_info = &interfaces[i];
+        }
+    }
+    if (pref_info) {
+        configured_interface_count++;
+        pref_info->identifier = bss->identifier;
+        pref_info->mbssid_enable = bss->mbssid_enable;
+        pref_info->transmitter = bss->transmitter;
+        if (bss->mbssid_enable) {
+            pref_info->hapd_bss_id = band_mbssid_cnt[bss->band];
+            band_mbssid_cnt[bss->band]++;
+        }
+        memset(pref_info->hapd_conf_file, 0, sizeof(pref_info->hapd_conf_file));
+        snprintf(pref_info->hapd_conf_file, sizeof(pref_info->hapd_conf_file),
+                 "%s/hostapd_%s.conf", HAPD_CONF_FILE_DEFAULT_PATH, pref_info->ifname);
+        return pref_info;
+    }
     return NULL;
 }
 
@@ -959,6 +1061,18 @@ struct interface_info* get_wireless_interface_info(int band, int identifier) {
     return NULL;
 }
 
+struct interface_info* get_first_configured_wireless_interface_info() {
+    int i;
+
+    for (i = 0; i < interface_count; i++) {
+        if (interfaces[i].identifier != UNUSED_IDENTIFIER) {
+            return &interfaces[i];
+        }
+    }
+
+    return NULL;
+}
+
 int get_debug_level(int value) {
     if (value == 0) {
         return DEBUG_LEVEL_DISABLE;
@@ -969,7 +1083,7 @@ int get_debug_level(int value) {
 }
 
 /* get hostapd's file name */
-char* get_hapd_exec_file() {
+char* get_hapd_exec_file(void) {
     return hapd_exec_file;
 }
 
@@ -986,7 +1100,7 @@ int set_hapd_exec_file(char* path) {
 }
 
 /* get hostapd's full path */
-char* get_hapd_full_exec_path() {
+char* get_hapd_full_exec_path(void) {
     return hapd_full_exec_path;
 }
 
@@ -999,6 +1113,7 @@ int set_hapd_full_exec_path(char* path) {
     return 0;
 }
 
+/* Control path with interface name */
 char* get_hapd_ctrl_path_by_id(struct interface_info* wlan) {
     memset(hapd_full_ctrl_path, 0, sizeof(hapd_full_ctrl_path));
     if (wlan) {
@@ -1011,24 +1126,28 @@ char* get_hapd_ctrl_path_by_id(struct interface_info* wlan) {
     return hapd_full_ctrl_path;
 }
 
-char* get_hapd_ctrl_path() {
+/* Control path with interface name */
+char* get_hapd_ctrl_path(void) {
     memset(hapd_full_ctrl_path, 0, sizeof(hapd_full_ctrl_path));
-#if defined(ANDROID) || defined(MDM)
-    snprintf(hapd_full_ctrl_path, sizeof(hapd_full_ctrl_path), "%s", hapd_ctrl_path);
-#else
     snprintf(hapd_full_ctrl_path, sizeof(hapd_full_ctrl_path), "%s/%s", hapd_ctrl_path, get_default_wireless_interface_info());
-#endif
     indigo_logger(LOG_LEVEL_DEBUG, "%s: CTRL_PATH: %s", __func__, hapd_full_ctrl_path);
     return hapd_full_ctrl_path;
 }
 
+/* Control path without interface name */
+char* get_hapd_ctrl_path_no_iface(void) {
+    indigo_logger(LOG_LEVEL_DEBUG, "%s: CTRL_PATH(no_iface): %s", __func__, hapd_ctrl_path);
+    return hapd_ctrl_path;
+}
+
+/* Control path without interface name */
 int set_hapd_ctrl_path(char* path) {
     memset(hapd_ctrl_path, 0, sizeof(hapd_ctrl_path));
     snprintf(hapd_ctrl_path, sizeof(hapd_ctrl_path), "%s", path);
     return 0;
 }
 
-char* get_hapd_global_ctrl_path() {
+char* get_hapd_global_ctrl_path(void) {
     return hapd_global_ctrl_path;
 }
 
@@ -1038,18 +1157,19 @@ int set_hapd_global_ctrl_path(char* path) {
     return 0;
 }
 
-char* get_hapd_conf_file() {
-    return hapd_conf_file;
-}
-
 char* get_hapd_conf_file_dir() {
     return hapd_conf_file_dir;
 }
 
-int set_hapd_conf_file(char* path) {
-    memset(hapd_conf_file, 0, sizeof(hapd_conf_file));
-    snprintf(hapd_conf_file, sizeof(hapd_conf_file), "%s", path);
-    return 0;
+char* get_hapd_conf_file(void) {
+    return hapd_conf_file;
+}
+
+char* get_hapd_log_file_arguments(void) {
+    if (hapd_log_file_arguments[0])
+        return hapd_log_file_arguments;
+
+    return "";
 }
 
 int set_hapd_conf_file_dir(char* path) {
@@ -1058,11 +1178,23 @@ int set_hapd_conf_file_dir(char* path) {
     return 0;
 }
 
+int set_hapd_conf_file(char* path) {
+    memset(hapd_conf_file, 0, sizeof(hapd_conf_file));
+    snprintf(hapd_conf_file, sizeof(hapd_conf_file), "%s", path);
+    return 0;
+}
+
+int set_hapd_log_file_arguments(char* path) {
+    memset(hapd_log_file_arguments, 0, sizeof(hapd_log_file_arguments));
+    snprintf(hapd_log_file_arguments, sizeof(hapd_log_file_arguments), " -f %s", path);
+    return 0;
+}
+
 void set_hostapd_debug_level(int level) {
     hostapd_debug_level = level;
 }
 
-char* get_hostapd_debug_arguments() {
+char* get_hostapd_debug_arguments(void) {
     if (hostapd_debug_level == DEBUG_LEVEL_ADVANCED) {
         return "-dddK";
     } else if (hostapd_debug_level == DEBUG_LEVEL_BASIC) {
@@ -1071,7 +1203,7 @@ char* get_hostapd_debug_arguments() {
     return "";
 }
 
-char* get_wpas_exec_file() {
+char* get_wpas_exec_file(void) {
     return wpas_exec_file;
 }
 
@@ -1085,7 +1217,7 @@ int set_wpas_exec_file(char* path) {
     return 0;
 }
 
-char* get_wpas_full_exec_path() {
+char* get_wpas_full_exec_path(void) {
     return wpas_full_exec_path;
 }
 
@@ -1097,23 +1229,35 @@ int set_wpas_full_exec_path(char* path) {
     return 0;
 }
 
-char* get_wpas_ctrl_path() {
+/* ctrl path with interface name */
+char* get_wpas_ctrl_path(void) {
     memset(wpas_full_ctrl_path, 0, sizeof(wpas_full_ctrl_path));
-#if defined(ANDROID) || defined(MDM)
-    snprintf(wpas_full_ctrl_path, sizeof(wpas_full_ctrl_path), "%s", wpas_ctrl_path);
-#else
     snprintf(wpas_full_ctrl_path, sizeof(wpas_full_ctrl_path), "%s/%s", wpas_ctrl_path, get_default_wireless_interface_info());
-#endif
+
     indigo_logger(LOG_LEVEL_DEBUG, "%s: CTRL_PATH: %s", __func__, wpas_full_ctrl_path);
     return wpas_full_ctrl_path;
 }
 
+char* get_wpas_if_ctrl_path(char* if_name) {
+    memset(wpas_full_ctrl_path, 0, sizeof(wpas_full_ctrl_path));
+    snprintf(wpas_full_ctrl_path, sizeof(wpas_full_ctrl_path), "%s/%s",
+             wpas_ctrl_path, if_name);
+    return wpas_full_ctrl_path;
+}
+
+/* ctrl path without interface name */
+char* get_wpas_ctrl_path_no_iface(void) {
+    indigo_logger(LOG_LEVEL_DEBUG, "%s: CTRL_PATH(no_iface): %s", __func__, wpas_ctrl_path);
+    return wpas_ctrl_path;
+}
+
+/* ctrl path without interface name */
 int set_wpas_ctrl_path(char* path) {
     snprintf(wpas_ctrl_path, sizeof(wpas_ctrl_path), "%s", path);
     return 0;
 }
 
-char* get_wpas_global_ctrl_path() {
+char* get_wpas_global_ctrl_path(void) {
     return wpas_global_ctrl_path;
 }
 
@@ -1122,8 +1266,15 @@ int set_wpas_global_ctrl_path(char* path) {
     return 0;
 }
 
-char* get_wpas_conf_file() {
+char* get_wpas_conf_file(void) {
     return wpas_conf_file;
+}
+
+char* get_wpas_log_file_arguments(void) {
+    if (wpas_log_file_arguments[0])
+        return wpas_log_file_arguments;
+
+    return "";
 }
 
 int set_wpas_conf_file(char* path) {
@@ -1132,11 +1283,17 @@ int set_wpas_conf_file(char* path) {
     return 0;
 }
 
+int set_wpas_log_file_arguments(char* path) {
+    memset(wpas_log_file_arguments, 0, sizeof(wpas_log_file_arguments));
+    snprintf(wpas_log_file_arguments, sizeof(wpas_log_file_arguments), " -f %s", path);
+    return 0;
+}
+
 void set_wpas_debug_level(int level) {
     wpas_debug_level = level;
 }
 
-char* get_wpas_debug_arguments() {
+char* get_wpas_debug_arguments(void) {
     if (wpas_debug_level == DEBUG_LEVEL_ADVANCED) {
         return "-ddd";
     } else if (wpas_debug_level == DEBUG_LEVEL_BASIC) {
@@ -1146,14 +1303,21 @@ char* get_wpas_debug_arguments() {
 }
 
 int add_wireless_interface_info(int band, int bssid, char *name) {
+    if (interface_count >= 8) {
+        indigo_logger(LOG_LEVEL_ERROR,
+                      "Interface count exceed max supported count.");
+        return -1;
+    }
+
     interfaces[interface_count].band = band;
     interfaces[interface_count].bssid = -1;
     interfaces[interface_count].identifier = UNUSED_IDENTIFIER;
-    strlcpy(interfaces[interface_count++].ifname, name, sizeof(interfaces[interface_count++].ifname));
+    strlcpy(interfaces[interface_count].ifname, name, sizeof(interfaces[interface_count].ifname));
+    interface_count++;
     return 0;
 }
 
-int show_wireless_interface_info() {
+int show_wireless_interface_info(void) {
     int i;
     char *band;
     indigo_logger(LOG_LEVEL_INFO, "interface_count=%d", interface_count);
@@ -1208,7 +1372,7 @@ int parse_wireless_interface_info(char *info) {
     return 0;
 }
 
-char* get_default_wireless_interface_info() {
+char* get_default_wireless_interface_info(void) {
     int i;
     for (i = 0; i < interface_count; i++) {
         if (interfaces[i].identifier != UNUSED_IDENTIFIER) {
@@ -1234,7 +1398,7 @@ void set_default_wireless_interface_info(int band) {
     }
 }
 
-void reset_default_wireless_interface_info() {
+void reset_default_wireless_interface_info(void) {
     default_interface = NULL;
 }
 
@@ -1247,7 +1411,7 @@ void parse_bss_identifier(int bss_identifier, struct bss_identifier_info* bss) {
     return;
 }
 
-int clear_interfaces_resource() {
+int clear_interfaces_resource(void) {
     int i, ret = 0;
     for (i = 0; i < interface_count; i++)
     {
@@ -1313,7 +1477,7 @@ char* get_all_hapd_conf_files(int *swap_hapd) {
         return hapd_conf_file;
 }
 
-char* get_wireless_interface() {
+char* get_wireless_interface(void) {
     return get_default_wireless_interface_info();
 }
 
@@ -1334,7 +1498,7 @@ int set_wireless_interface(char *name) {
     return 0;
 }
 
-int get_service_port() {
+int get_service_port(void) {
     return service_port;
 }
 
@@ -1420,7 +1584,7 @@ int get_6g_center_freq_index(int channel, int width) {
 
 int is_ht40plus_chan(int chan) {
     if (chan == 36 || chan == 44 || chan == 52 || chan == 60 ||
-        chan == 100 || chan == 108 || chan == 116 | chan == 124 ||
+        chan == 100 || chan == 108 || chan == 116 || chan == 124 ||
         chan == 132 || chan == 140 || chan == 149 || chan == 157)
         return 1;
     else
@@ -1429,7 +1593,7 @@ int is_ht40plus_chan(int chan) {
 
 int is_ht40minus_chan(int chan) {
     if (chan == 40 || chan == 48 || chan == 56 || chan == 64 ||
-        chan == 104 || chan == 112 || chan == 120 | chan == 128 ||
+        chan == 104 || chan == 112 || chan == 120 || chan == 128 ||
         chan == 136 || chan == 144 || chan == 153 || chan == 161)
         return 1;
     else
@@ -1438,26 +1602,26 @@ int is_ht40minus_chan(int chan) {
 
 /* String operation */
 size_t strlcpy(char *dest, const char *src, size_t siz) {
-	const char *s = src;
-	size_t left = siz;
+    const char *s = src;
+    size_t left = siz;
 
-	if (left) {
-		/* Copy string up to the maximum size of the dest buffer */
-		while (--left != 0) {
-			if ((*dest++ = *s++) == '\0')
-				break;
-		}
-	}
+    if (left) {
+        /* Copy string up to the maximum size of the dest buffer */
+        while (--left != 0) {
+            if ((*dest++ = *s++) == '\0')
+                break;
+        }
+    }
 
-	if (left == 0) {
-		/* Not enough room for the string; force NUL-termination */
-		if (siz != 0)
-			*dest = '\0';
-		while (*s++)
-			; /* determine total src string length */
-	}
+    if (left == 0) {
+        /* Not enough room for the string; force NUL-termination */
+        if (siz != 0)
+            *dest = '\0';
+        while (*s++)
+            ; /* determine total src string length */
+    }
 
-	return s - src - 1;
+    return s - src - 1;
 }
 
 int get_key_value(char *value, char *buffer, char *token) {
@@ -1529,10 +1693,14 @@ int insert_wpa_network_config(char *config) {
     char buffer[S_BUFFER_LEN];
 
     f_ptr = fopen(path, "r");
+    if (f_ptr == NULL) {
+        indigo_logger(LOG_LEVEL_ERROR, "Failed to open the file: %s", path);
+        return -1;
+    }
     f_tmp_ptr = fopen(tmp_path, "w");
-
-    if (f_ptr == NULL || f_tmp_ptr == NULL) {
-        indigo_logger(LOG_LEVEL_ERROR, "Failed to open the files");
+    if (f_tmp_ptr == NULL) {
+        indigo_logger(LOG_LEVEL_ERROR, "Failed to open the file: %s", tmp_path);
+        fclose(f_ptr);
         return -1;
     }
 
@@ -1689,7 +1857,7 @@ static int http_socket(char *host, int port) {
 
 /*  Upload log by specifying the host, port, path, and the local file name */
 void http_file_post(char *host, int port, char *path, char *file_name) {
-    int socketfd = 0, retval = 0, numbytes = 0;
+    int socketfd = 0, numbytes = 0;
     char *header = NULL, *body = NULL;
     char boundary[64];
     char response[10240];
@@ -1744,26 +1912,33 @@ done:
     }
 }
 
+int file_exists(const char *fname)
+{
+    struct stat s;
+    return stat(fname, &s) == 0;
+}
+
 #if (!defined(ANDROID) && !defined(_OPENWRT_QTI_)) || (defined(MDM))
 
 size_t strlcat(char *dst, const char *str, size_t size)
 {
-	char *pos;
-	size_t dstlen, srclen, copy;
+    char *pos;
+    size_t dstlen, srclen, copy;
 
-	srclen = strlen(str);
-	for (pos = dst; pos - dst < size && *pos != '\0'; pos++)
-		;
-	dstlen = pos - dst;
-	if (*pos != '\0')
-		return dstlen + srclen;
-	if (dstlen + srclen + 1 > size)
-		copy = size - dstlen - 1;
-	else
-		copy = srclen;
-	memcpy(pos, str, copy);
-	pos[copy] = '\0';
-	return dstlen + srclen;
+    srclen = strlen(str);
+    for (pos = dst; pos - dst < size && *pos != '\0'; pos++)
+        ;
+    dstlen = pos - dst;
+    if (*pos != '\0')
+        return dstlen + srclen;
+    if (dstlen + srclen + 1 > size)
+        copy = size - dstlen - 1;
+    else
+        copy = srclen;
+    memcpy(pos, str, copy);
+    pos[copy] = '\0';
+
+    return dstlen + srclen;
 }
 
 #endif /* ANDROID */

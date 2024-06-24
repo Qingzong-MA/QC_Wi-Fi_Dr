@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021,2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -539,6 +539,7 @@ static const struct ieee80211_txrx_stypes
 	[NL80211_IFTYPE_P2P_CLIENT] = {
 		.tx = 0xffff,
 		.rx = BIT(SIR_MAC_MGMT_ACTION) |
+		      BIT(SIR_MAC_MGMT_AUTH) |
 		      BIT(SIR_MAC_MGMT_PROBE_REQ),
 	},
 	[NL80211_IFTYPE_P2P_GO] = {
@@ -2162,16 +2163,9 @@ hdd_update_reg_chan_info(struct hdd_adapter *adapter,
 	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(adapter);
 	struct sap_config *sap_config = &adapter->session.ap.sap_config;
 	mac_handle_t mac_handle;
-	uint8_t sub_20_chan_width = 0;
-	QDF_STATUS status;
 
 	mac_handle = hdd_ctx->mac_handle;
 	sap_config->channel_info_count = channel_count;
-
-	status = ucfg_mlme_get_sub_20_chan_width(hdd_ctx->psoc,
-						 &sub_20_chan_width);
-	if (QDF_IS_STATUS_ERROR(status))
-		hdd_err("Failed to get sub_20_chan_width config");
 
 	for (i = 0; i < channel_count; i++) {
 		icv = &sap_config->channel_info[i];
@@ -2208,8 +2202,7 @@ hdd_update_reg_chan_info(struct hdd_adapter *adapter,
 				icv->freq,
 				sap_config->acs_cfg.ch_width,
 				sap_config->acs_cfg.is_ht_enabled,
-				sap_config->acs_cfg.is_vht_enabled,
-				sub_20_chan_width);
+				sap_config->acs_cfg.is_vht_enabled);
 		if (icv->flags & IEEE80211_CHAN_PASSIVE)
 			icv->flagext |= IEEE80211_CHAN_DFS;
 
@@ -7758,7 +7751,7 @@ static int hdd_process_generic_set_cmd(struct hdd_adapter *adapter,
 static int hdd_process_generic_set_cmd(struct hdd_adapter *adapter,
 				       struct nlattr *tb[])
 {
-	return -EINVAL;
+	return 0;
 }
 #endif
 
@@ -17871,20 +17864,11 @@ static int __wlan_hdd_cfg80211_add_key(struct wiphy *wiphy,
 	return errno;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_cfg80211_add_key(struct wiphy *wiphy,
-				     struct net_device *ndev,
-				     int link_id,
-				     u8 key_index, bool pairwise,
-				     const u8 *mac_addr,
-				     struct key_params *params)
-#else
 static int wlan_hdd_cfg80211_add_key(struct wiphy *wiphy,
 				     struct net_device *ndev,
 				     u8 key_index, bool pairwise,
 				     const u8 *mac_addr,
 				     struct key_params *params)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -18000,16 +17984,6 @@ static int __wlan_hdd_cfg80211_get_key(struct wiphy *wiphy,
 	return 0;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_cfg80211_get_key(struct wiphy *wiphy,
-				     struct net_device *ndev,
-				     int link_id,
-				     u8 key_index, bool pairwise,
-				     const u8 *mac_addr, void *cookie,
-				     void (*callback)(void *cookie,
-						      struct key_params *)
-				     )
-#else
 static int wlan_hdd_cfg80211_get_key(struct wiphy *wiphy,
 				     struct net_device *ndev,
 				     u8 key_index, bool pairwise,
@@ -18017,7 +17991,6 @@ static int wlan_hdd_cfg80211_get_key(struct wiphy *wiphy,
 				     void (*callback)(void *cookie,
 						      struct key_params *)
 				     )
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -18077,17 +18050,10 @@ static int __wlan_hdd_cfg80211_del_key(struct wiphy *wiphy,
  *
  * Return: 0 for success, error number on failure.
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_cfg80211_del_key(struct wiphy *wiphy,
-					struct net_device *dev,
-					int link_id, u8 key_index,
-					bool pairwise, const u8 *mac_addr)
-#else
 static int wlan_hdd_cfg80211_del_key(struct wiphy *wiphy,
 					struct net_device *dev,
 					u8 key_index,
 					bool pairwise, const u8 *mac_addr)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -18191,17 +18157,10 @@ out:
 	return ret;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_cfg80211_set_default_key(struct wiphy *wiphy,
-					     struct net_device *ndev,
-					     int link_id, u8 key_index,
-					     bool unicast, bool multicast)
-#else
 static int wlan_hdd_cfg80211_set_default_key(struct wiphy *wiphy,
 					     struct net_device *ndev,
 					     u8 key_index,
 					     bool unicast, bool multicast)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -18228,15 +18187,9 @@ static int _wlan_hdd_cfg80211_set_default_beacon_key(struct wiphy *wiphy,
 	return 0;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_cfg80211_set_default_beacon_key(struct wiphy *wiphy,
-						    struct net_device *ndev,
-						    int link_id, u8 key_index)
-#else
 static int wlan_hdd_cfg80211_set_default_beacon_key(struct wiphy *wiphy,
 						    struct net_device *ndev,
 						    u8 key_index)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -19974,7 +19927,7 @@ static int wlan_hdd_cfg80211_set_ie(struct hdd_adapter *adapter,
 					      HS20_OUI_TYPE_SIZE))) {
 				uint16_t curAddIELen =
 					assoc_add_ie->length;
-				struct cm_roam_values_copy src_cfg;
+				struct cm_roam_values_copy src_cfg = {};
 
 				hdd_debug("HS20 IE(len %d)", eLen + 2);
 
@@ -21386,15 +21339,9 @@ static int __wlan_hdd_set_default_mgmt_key(struct wiphy *wiphy,
  *
  * Return: 0 on success, error number on failure
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
-static int wlan_hdd_set_default_mgmt_key(struct wiphy *wiphy,
-					   struct net_device *netdev,
-					   int link_id, u8 key_index)
-#else
 static int wlan_hdd_set_default_mgmt_key(struct wiphy *wiphy,
 					   struct net_device *netdev,
 					   u8 key_index)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -23122,17 +23069,10 @@ __wlan_hdd_cfg80211_set_ap_channel_width(struct wiphy *wiphy,
  *
  * Return: 0 for success, non-zero for failure
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-static int
-wlan_hdd_cfg80211_set_ap_channel_width(struct wiphy *wiphy,
-				       struct net_device *dev, unsigned int link_id,
-				       struct cfg80211_chan_def *chandef)
-#else
 static int
 wlan_hdd_cfg80211_set_ap_channel_width(struct wiphy *wiphy,
 				       struct net_device *dev,
 				       struct cfg80211_chan_def *chandef)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -24485,15 +24425,9 @@ static int __wlan_hdd_cfg80211_get_channel(struct wiphy *wiphy,
  *
  * Return: 0 for success, non zero for failure
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-static int wlan_hdd_cfg80211_get_channel(struct wiphy *wiphy,
-					 struct wireless_dev *wdev, unsigned int link_id,
-					 struct cfg80211_chan_def *chandef)
-#else
 static int wlan_hdd_cfg80211_get_channel(struct wiphy *wiphy,
 					 struct wireless_dev *wdev,
 					 struct cfg80211_chan_def *chandef)
-#endif
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;
@@ -24633,17 +24567,10 @@ configure_fw:
 	return errno;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
-static int wlan_hdd_cfg80211_set_bitrate_mask(struct wiphy *wiphy,
-					      struct net_device *netdev,
-					      unsigned int link_id, const u8 *peer,
-					      const struct cfg80211_bitrate_mask *mask)
-#else
 static int wlan_hdd_cfg80211_set_bitrate_mask(struct wiphy *wiphy,
 					      struct net_device *netdev,
 					      const u8 *peer,
-					      const struct cfg80211_bitrate_mask *mask)
-#endif
+				       const struct cfg80211_bitrate_mask *mask)
 {
 	int errno;
 	struct osif_vdev_sync *vdev_sync;

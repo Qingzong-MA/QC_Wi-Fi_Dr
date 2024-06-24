@@ -56,8 +56,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof((x)) / (sizeof(((x)[0]))))
 #endif
@@ -884,12 +882,16 @@ void owrt_ap_add_vap(int id, const char *key,
 void start_ap_set_ath_params(void *if_info);
 void owrt_ap_set_vap(int id, const char *key,const char *val);
 void owrt_ap_set_radio( int id,const char *key, const char *val);
+void owrt_ap_set_iniwifi(const char *key, const char *val);
 int owrt_ap_config_radio(struct indigo_dut *dut);
 int owrt_ap_config_vap(struct indigo_dut *dut);
 void owrt_ap_set_list_vap(int id,const char *key, const char *val);
 int bring_up_ap_interface(void);
 void set_ap_params(struct packet_wrapper *req);
 void send_ap_btm_req(char *bssid);
+int send_afc_spectrum_req(int id);
+int send_afc_test_frame(int id, int bw);
+
 
 int get_value(const char *str);
 

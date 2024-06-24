@@ -1,0 +1,271 @@
+From 08ac8e3251c7feaa1955dc7d8a7c1f6c83afd7c6 Mon Sep 17 00:00:00 2001
+From: Tim Jiang <tjiang@qti.qualcomm.com>
+Date: Mon, 20 Mar 2023 16:41:28 +0800
+Subject: [PATCH] Btdiag: fix CMW stress test failure issue
+
+we should do the 7d and 7e translation after CRC for the socket diag packet
+
+Signed-off-by: Tim Jiang <tjiang@qti.qualcomm.com>
+---
+ Btdiag.c         | 123 +++++++++++++++++++++++++----------------------
+ connection.c     |   6 +++
+ privateMembers.c |  28 +++++++----
+ 3 files changed, 89 insertions(+), 68 deletions(-)
+
+diff --git a/Btdiag.c b/Btdiag.c
+index f22fba0..156c756 100755
+--- a/Btdiag.c
++++ b/Btdiag.c
+@@ -704,22 +704,19 @@ int main(int argc , char *argv[])
+ 	        BYTE rxbuf[TCP_BUF_LENGTH];
+ 	        memset(rxbuf, 0, TCP_BUF_LENGTH);
+ 
+-	        //Listening loop
+-	        while(1)
+-	        {
+-	            #ifdef PLATFORM_ANDROID
+-                   fprintf(stderr,"Waiting for QPST connection... \n");
+-                   #else
++#ifdef PLATFORM_ANDROID
++           fprintf(stderr,"Waiting for QPST connection... \n");
++#else
+ 	            printf("Waiting for QPST connection... \n");
+-	            #endif
++#endif
+ 
+-	            //starting and making connection to SoC DUT
+-	            switch (connectionTypeOptions)
+-	            {
+-	                case SERIAL:
++         //starting and making connection to SoC DUT
++            switch (connectionTypeOptions)
++            {
++                case SERIAL:
+ 		    	    descriptor = SerialConnection(Device, baudrate);
+ 	                break;
+-	                case USB:
++                case USB:
+ 	                #ifdef BLUEDROID_STACK
+ 	                descriptor = bluedroid_usb_connection();
+ 	                fprintf(stderr,"%d descriptor",descriptor);
+@@ -727,55 +724,61 @@ int main(int argc , char *argv[])
+ 	                descriptor = USBConnection(Device);
+ 	                #endif
+ 	                break;
+-	            }
++            }
+ 
+-	            if (descriptor <= 0)
+-	            {
+-	                #ifdef PLATFORM_ANDROID
+-	                fprintf(stderr,"\nFailed to connect to external device on\n");
+-	                #else
+-	                printf("\nFailed to connect to external device on\n");
+-	                #endif
+-	                return 1;
+-	            }
+-	            else
+-	            {
+-	                #ifdef PLATFORM_ANDROID
+-	                fprintf(stderr,"Connected to SoC DUT!\n");
+-	                #else
+-	                printf("Connected to SoC DUT!\n");
+-	                #endif
+-                    }
+-	            /* Create thread to recive HCI event */
+-	            {
+-	                //Check: move it to subfunction.
+-	                //Create a thread for receiving HCI event from DUT.
+-	                int err;
+-	                pthread_t thread;
++            if (descriptor <= 0)
++            {
++#ifdef PLATFORM_ANDROID
++                fprintf(stderr,"\nFailed to connect to external device on\n");
++#else
++                printf("\nFailed to connect to external device on\n");
++#endif
++                close(sock);
++                return 1;
++            }
++            else
++            {
++                #ifdef PLATFORM_ANDROID
++                    fprintf(stderr,"Connected to SoC DUT!\n");
++                #else
++                    printf("Connected to SoC DUT!\n");
++                #endif
++            }
++             /* Create thread to recive HCI event */
++            {
++                //Check: move it to subfunction.
++                //Create a thread for receiving HCI event from DUT.
++                int err;
++                pthread_t thread;
+ 
+-	                if (connectionTypeOptions == SERIAL)
+-	                    args.desc = descriptor;
+-	                else if (connectionTypeOptions == USB)
+-	                    args.desc = descriptor;
++                if (connectionTypeOptions == SERIAL)
++                    args.desc = descriptor;
++                else if (connectionTypeOptions == USB)
++                    args.desc = descriptor;
+ 
+-	                args.buf = databuf;
+-	                args.size = HCI_MAX_EVENT_SIZE;
++                args.buf = databuf;
++                args.size = HCI_MAX_EVENT_SIZE;
+ 
+-	                err = pthread_create(&thread, NULL, &NotifyObserver, (void *)&args);
+-	                if (err != 0)
+-	                {
+-	                    printf("\nCan't create thread :[%s]", strerror(err));
+-	                    break;
+-	                }
+-	                else
+-	                {
+-	                    #ifdef PLATFORM_ANDROID
+-	                    fprintf(stderr,"\nThread created successfully\n");
+-	                    #else
+-	                    printf("\nThread created successfully\n");
+-	                    #endif
+-	                 }
+-	            }
++                err = pthread_create(&thread, NULL, &NotifyObserver, (void *)&args);
++                if (err != 0)
++                {
++                    close(sock);
++                    printf("\nCan't create thread :[%s]", strerror(err));
++                    goto exit;
++                }
++                else
++                {
++                    #ifdef PLATFORM_ANDROID
++                        fprintf(stderr,"\nThread created successfully\n");
++                    #else
++                        printf("\nThread created successfully\n");
++                    #endif
++                 }
++            }
++
++	        //Listening loop
++	        while(1)
++	        {
+ 
+ 	            // Loop to receive all the data sent by the QMSL/QRCT(via QPST), as long as it is greater than 0
+ 	            int lengthOfStream;
+@@ -796,7 +799,7 @@ int main(int argc , char *argv[])
+ 	                printf("\n>>>QPST/Server is closed, closing application\n");
+ 	                #endif
+ 	                close(sock);
+-	                return 0;
++	                goto exit;
+ 	            }
+ 	        }
+ 		}
+@@ -1201,11 +1204,15 @@ int main(int argc , char *argv[])
+ 	        }
+ 		}
+     }
++exit:
+     #ifdef BLUEDROID_STACK
+     bluedroid_clean( );
+     #endif
+     #ifdef BLUETOPIA_STACK
+     CloseStack();
+     #endif
++#ifdef BLUEZ_STACK
++    closebluezdev(descriptor);
++#endif
+     return 0;
+ }
+diff --git a/connection.c b/connection.c
+index a592cde..6d55652 100755
+--- a/connection.c
++++ b/connection.c
+@@ -929,10 +929,16 @@ extern "C" int USBConnection(char *dev_name)
+ 		perror("Device open failed");
+ 	 	exit(-1);
+ 	}
++	fprintf(stderr, "%s: dd is  %d.\n",__func__,dd);
+ 	
+ 	return dd;
+ }
+ 
++extern "C" int closebluezdev(int dd)
++{
++
++	hci_close_dev(dd);
++}
+ /*
+  * Send an HCI command to (USB) device.
+  *
+diff --git a/privateMembers.c b/privateMembers.c
+index 7bb9afa..12c716c 100755
+--- a/privateMembers.c
++++ b/privateMembers.c
+@@ -201,7 +201,7 @@ void DiagPrintToStream(BYTE response[], int Length, bool check)
+ 
+ 	
+ 	int responseCounter = 0;
+-    for (responseCounter = 0; responseCounter < modifiedResponseMsg_Length; responseCounter++)
++    for (responseCounter = 0, i = 0; responseCounter < modifiedResponseMsg_Length; responseCounter++,i++)
+     {
+         //If the information to be sent contains either the ending flag (0x7E) or the escape character
+         //(0x7D), the escape character is inserted into the data stream and the byte is XORed with the
+@@ -210,34 +210,42 @@ void DiagPrintToStream(BYTE response[], int Length, bool check)
+         {
+             if (check)
+             {			    
+-	            tempCheckList[responseCounter] = 0x7D;				
++	            tempCheckList[i] = 0x7D;				
+                 BYTE p = (BYTE)(modifiedResponseMsg[responseCounter] ^ 0x20);
+-                tempCheckList[responseCounter] = p;
++                i++;
++                tempCheckList[i] = p;
++                messageToSend_Length++;
+             }
+             else
+             {			    
+-                tempCheckList[responseCounter] = modifiedResponseMsg[responseCounter];
++                tempCheckList[i] = modifiedResponseMsg[responseCounter];
+             }                   
+         }
+         else
+         {            
+-	        tempCheckList[responseCounter] = modifiedResponseMsg[responseCounter];
++	        tempCheckList[i] = modifiedResponseMsg[responseCounter];
+         }
+     }
++	modifiedResponseMsg_Length = i;
+ 
+ 	responseLength = responseCounter;
+ 
+-	memcpy(modifiedResponseMsg, tempCheckList, sizeof(modifiedResponseMsg));
++//	memcpy(modifiedResponseMsg, tempCheckList, sizeof(modifiedResponseMsg));
+ 
+     //add termination character	
+-    BYTE messageToSend[modifiedResponseMsg_Length + 1];   //modifiedResponseMsg.Length = responseLength +2;
+-	memset( messageToSend, 0, modifiedResponseMsg_Length + 1);
++	printf("%s:\n",__func__);
++    BYTE messageToSend[1024];   //modifiedResponseMsg.Length = responseLength +2;
++	memset( messageToSend, 0, 1024);
+     for (i = 0; i < (modifiedResponseMsg_Length); i++)
+-	{
+-        messageToSend[i] = modifiedResponseMsg[i];
++    {
++        messageToSend[i] = tempCheckList[i];
++        printf("%02x ", messageToSend[i]);
+     }
+ 
+     messageToSend[modifiedResponseMsg_Length] = DIAG_TERM_CHAR;
++    printf("\n");
++    printf("legacyMode = %d, sock = %d, messageToSend_Length = %d \n",
++			legacyMode, sock, messageToSend_Length);
+ 	
+ 	if (legacyMode == 1)
+ 	{
+-- 
+2.17.1
+

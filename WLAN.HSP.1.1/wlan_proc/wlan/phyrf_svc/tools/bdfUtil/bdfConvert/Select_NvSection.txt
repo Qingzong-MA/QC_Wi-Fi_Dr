@@ -1,4 +1,4 @@
-####### BDF template version: 5.3.29 #######
+####### BDF template version: 5.3.32 #######
 0:COMMON_BDF_HEADER
 0:PER_PHY_SETTING
 0:FREQMODAL

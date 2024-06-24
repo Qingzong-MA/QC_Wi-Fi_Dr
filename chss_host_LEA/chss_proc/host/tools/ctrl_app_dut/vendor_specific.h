@@ -52,18 +52,12 @@
 #define HAPD_CONF_FILE_DEFAULT_PATH                 "/data/vendor/wifi"
 #define WPAS_CONF_FILE_DEFAULT                      "/data/vendor/wifi/wpa_supplicant.conf"
 #else
-#ifdef MDM
-#define HAPD_CONF_FILE_DEFAULT                      "/etc/misc/wifi/hostapd.conf"
-#define HAPD_CONF_FILE_DEFAULT_PATH                 "/etc/misc/wifi"
-#define WPAS_CONF_FILE_DEFAULT                      "/etc/misc/wifi/wpa_supplicant.conf"
-#else
 #define HAPD_CONF_FILE_DEFAULT                      "/etc/hostapd/hostapd.conf"
 #define HAPD_CONF_FILE_DEFAULT_PATH                 "/etc/hostapd"
 #define WPAS_CONF_FILE_DEFAULT                      "/etc/wpa_supplicant/wpa_supplicant.conf"
-#endif /* MDM */
 // d(2.4G or 5G):Single band can work on 2G or 5G: first interface wlan0, second interface wlan1
 #endif /* ANDROID */
-#define DEFAULT_APP_INTERFACES_PARAMS               "2:wlan0,2:wlan1,5:wlan0,5:wlan1"
+#define DEFAULT_APP_INTERFACES_PARAMS               "2:wlan0,2:wlan1,5:wlan0,5:wlan1,6:wlan0,6:wlan1"
 
 #endif /* _OPENWRT_ */
 
@@ -82,9 +76,16 @@
 #define WPAS_GLOBAL_CTRL_PATH_DEFAULT               "/var/run/wpa_supplicant/global" // not use wpas global before
 #define WPAS_LOG_FILE                               "/var/log/supplicant.log"
 
+#if defined(ANDROID) || defined(MDM)
+#define HS20_OSU_CLIENT "/vendor/bin/hs20-osu-client"
+#else
+#define HS20_OSU_CLIENT "/usr/local/bin/WFA-Hostapd-Supplicant/hs20-osu-client"
+#endif
+
 #define WIRELESS_INTERFACE_DEFAULT                  "wlan0"
 #define SERVICE_PORT_DEFAULT                        9004
 
+/* Default bridge for wireless interfaces */
 #ifdef _OPENWRT_QTI_
 #define BRIDGE_WLANS                                "br-lan"
 #else
@@ -102,10 +103,57 @@
 #define HOSTAPD_SUPPORT_MBSSID_WAR
 #endif
 
+/* Default DUT GO intent value */
+#define P2P_GO_INTENT 7
+
+#define DHCP_SERVER_IP "192.168.65.1"
 struct indigo_dut;
-void vendor_init();
-void vendor_deinit();
-void vendor_device_reset();
+void vendor_init(void);
+void vendor_deinit(void);
+void vendor_device_reset(void);
+/**
+ * wps settings retrieved with vendor-specific operations.
+ */
+
+#define WPS_OOB_SSID          "ssid"
+#define WPS_OOB_AUTH_TYPE     "wpa_key_mgmt"
+#define WPS_OOB_ENC_TYPE      "wpa_pairwise"
+#define WPS_OOB_PSK           "wpa_passphrase"
+#define WPS_OOB_WPA_VER       "wpa"
+#define WPS_OOB_AP_PIN        "ap_pin"
+#define WPS_OOB_STATE         "wps_state"
+#define WPS_CONFIG            "config_methods"
+#define WPS_DEV_NAME          "device_name"
+#define WPS_DEV_TYPE          "device_type"
+#define WPS_MANUFACTURER      "manufacturer"
+#define WPS_MODEL_NAME        "model_name"
+#define WPS_MODEL_NUMBER      "model_number"
+#define WPS_SERIAL_NUMBER     "serial_number"
+
+#define WPS_OOB_NOT_CONFIGURED  "1"
+#define WPS_OOB_CONFIGURED      "2"
+
+#define SUPPORTED_CONF_METHOD_AP "label keypad push_button virtual_push_button display virtual_display"
+#define SUPPORTED_CONF_METHOD_STA "keypad push_button virtual_push_button display virtual_display"
+
+#define WPS_OOB_ONLY "1"
+#define WPS_COMMON "2"
+
+enum wps_device_role {
+    WPS_AP,
+    WPS_STA
+};
+
+#define GROUP_NUM (3)
+#define AP_SETTING_NUM (14)
+#define STA_SETTING_NUM (6)
+
+typedef struct _wps_setting {
+    /* key-value for each setting pair */
+    char wkey[64];
+    char value[512];
+    char attr[64];
+} wps_setting;
 
 #ifdef _TEST_PLATFORM_
 
@@ -125,8 +173,8 @@ extern const struct sta_driver_ops sta_driver_platform1_ops;
 extern const struct sta_driver_ops sta_driver_platform2_ops;
 
 /* Generic platform dependent APIs */
-int set_channel_width();
-void set_phy_mode();
+int set_channel_width(void);
+void set_phy_mode(void);
 #endif
 
 #ifdef _OPENWRT_
@@ -134,8 +182,20 @@ void openwrt_apply_radio_config(void);
 int detect_third_radio(void);
 #endif
 
-void configure_ap_enable_mbssid();
+void create_sta_interface();
+void delete_sta_interface();
+
+void configure_ap_enable_mbssid(void);
 void configure_ap_radio_params(char *band, char *country, int channel, int chwidth);
 void start_ap_set_wlan_params(void *if_info);
 
+int get_p2p_mac_addr(char *mac_addr, size_t size);
+int get_p2p_group_if(char *if_name, size_t size);
+int get_p2p_dev_if(char *if_name, size_t size);
+
+void start_dhcp_server(char *if_name, char *ip_addr);
+void stop_dhcp_server();
+void start_dhcp_client(char *if_name);
+void stop_dhcp_client();
+wps_setting* get_vendor_wps_settings(enum wps_device_role);
 #endif

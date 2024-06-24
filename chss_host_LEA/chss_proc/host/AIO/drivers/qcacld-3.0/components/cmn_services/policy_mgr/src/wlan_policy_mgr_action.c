@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021, 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -37,6 +37,7 @@
 #include "wlan_mlme_api.h"
 #include "sap_api.h"
 #include "wlan_mlme_api.h"
+#include "wlan_mlme_main.h"
 
 enum policy_mgr_conc_next_action (*policy_mgr_get_current_pref_hw_mode_ptr)
 	(struct wlan_objmgr_psoc *psoc);
@@ -810,10 +811,8 @@ policy_mgr_get_next_action(struct wlan_objmgr_psoc *psoc,
 	uint32_t num_connections = 0;
 	enum policy_mgr_one_connection_mode second_index = 0;
 	enum policy_mgr_two_connection_mode third_index = 0;
-	enum policy_mgr_three_connection_mode fourth_index = 0;
 	policy_mgr_next_action_two_connection_table_type *second_conn_table;
 	policy_mgr_next_action_three_connection_table_type *third_conn_table;
-	policy_mgr_next_action_four_connection_table_type *fourth_conn_table;
 	enum policy_mgr_band band;
 	struct policy_mgr_psoc_priv_obj *pm_ctx;
 	enum QDF_OPMODE new_conn_mode = QDF_MAX_NO_OF_MODE;
@@ -874,17 +873,6 @@ policy_mgr_get_next_action(struct wlan_objmgr_psoc *psoc,
 			psoc, session_id, ch_freq, reason);
 		*next_action = (*third_conn_table)[third_index][band];
 		break;
-       	case 3:
-               	fourth_index =
-                       	policy_mgr_get_fourth_connection_pcl_table_index(psoc);
-               	if (PM_MAX_THREE_CONNECTION_MODE == fourth_index) {
-                       	policy_mgr_err(
-                       	"couldn't find index for 4th connection next action table");
-                       	return QDF_STATUS_E_FAILURE;
-               	}
-               	fourth_conn_table = next_action_four_connection_table;
-               	*next_action = (*fourth_conn_table)[fourth_index][band];
-               	break;
 	default:
 		policy_mgr_err("unexpected num_connections value %d",
 			num_connections);
@@ -1435,6 +1423,24 @@ policy_mgr_handle_conc_multiport(struct wlan_objmgr_psoc *psoc,
 	}
 
 	return status;
+}
+
+enum policy_mgr_con_mode
+policy_mgr_con_mode_by_vdev_id(struct wlan_objmgr_psoc *psoc,
+			       uint8_t vdev_id)
+{
+	struct policy_mgr_psoc_priv_obj *pm_ctx;
+	enum policy_mgr_con_mode mode = PM_MAX_NUM_OF_MODE;
+	enum QDF_OPMODE op_mode;
+
+	pm_ctx = policy_mgr_get_context(psoc);
+	if (!pm_ctx) {
+		policy_mgr_err("Invalid Context");
+		return mode;
+	}
+
+	op_mode = wlan_get_opmode_from_vdev_id(pm_ctx->pdev, vdev_id);
+	return policy_mgr_convert_device_mode_to_qdf_type(op_mode);
 }
 
 #ifdef FEATURE_WLAN_MCC_TO_SCC_SWITCH

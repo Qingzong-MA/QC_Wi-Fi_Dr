@@ -60,11 +60,12 @@
 
 #include <athdefs.h>
 #include <a_types.h>
+#include <limits.h>
 
 #include "apb_athr_wlan_map.h"
 #include "rtc_soc_reg.h"
 #include "efuse_reg.h"
-#include <limits.h>
+
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -135,6 +136,30 @@
 #define AR6320V3_IRAM_LEN        0x38000  // iram length
 #define AR6320V3_AXI_START_ADDR  0xa0000  // axi start
 #define AR6320V3_AXI_LEN         0x18000  // axi length
+
+/*
+ * Set op_type, mem_type and offset fields into pos of procfs
+ * It will reuse pos, which is long long type
+ *
+ * op_type:     4 bits
+ * memtype:     8 bits
+ * reserve1:    20 bits
+ * offset:      32 bits
+ */
+#define OP_TYPE_LEGACY                  0
+#define OP_TYPE_EXT_QMI                 1
+#define OP_TYPE_EXT_DIRECT              2
+
+#define ATH_DIAG_EXT_OP_TYPE_LSB         60
+#define ATH_DIAG_EXT_MEM_TYPE_LSB        52
+#define ATH_DIAG_EXT_OFFSET_LSB          0
+
+#define INVALID_ARENA_ID                 0xff
+
+#define MAKE_ADDR64(op_type, mem_type, addr) \
+	((A_UINT64)(op_type) << ATH_DIAG_EXT_OP_TYPE_LSB) |\
+	((A_UINT64)(mem_type) << ATH_DIAG_EXT_MEM_TYPE_LSB) |\
+	((A_UINT64)(addr) << ATH_DIAG_EXT_OFFSET_LSB)
 
 struct ath_target_reg_info {
 	A_UINT32 reg_start;
@@ -482,12 +507,15 @@ unsigned int flag;
 const char *progname;
 const char commands[] =
 "commands and options:\n\
---get --address=<target word address>\n\
---set --address=<target word address> --[value|param]=<value>\n\
+--get --address=<target word address> --arena=<arena id> [--live]\n\
+--set --address=<target word address> --arena=<arena id> [--live] \n\
+                                      --[value|param]=<value>\n\
                                       --or=<OR-ing value>\n\
                                       --and=<AND-ing value>\n\
---read --address=<target address> --length=<bytes> --file=<filename>\n\
---write --address=<target address> --file=<filename>\n\
+--read --address=<target address> --arena=<arena id> [--live]\n\
+                                   --length=<bytes> --file=<filename>\n\
+--write --address=<target address> --arena=<arena id> [--live]\n\
+                                   --file=<filename>\n\
                                    --[value|param]=<value>\n\
 --otp --read --address=<otp offset> --length=<bytes> --file=<filename>\n\
 --otp --write --address=<otp offset> --file=<filename>\n\
@@ -503,12 +531,12 @@ The options can be given in any order.";
 #define nqprintf(args...) if (!quiet()) {printf(args);}
 #define min(x,y) ((x) < (y) ? (x) : (y))
 
-void ReadTargetRange(int dev, A_UINT32 address, A_UINT8 *buffer,
+void ReadTargetRange(int dev, A_UINT64 address, A_UINT8 *buffer,
 					 A_UINT32 length);
-void ReadTargetWord(int dev, A_UINT32 address, A_UINT32 *buffer);
-void WriteTargetRange(int dev, A_UINT32 address, A_UINT8 *buffer,
+void ReadTargetWord(int dev, A_UINT64 address, A_UINT32 *buffer);
+void WriteTargetRange(int dev, A_UINT64 address, A_UINT8 *buffer,
 					  A_UINT32 length);
-void WriteTargetWord(int dev, A_UINT32 address, A_UINT32 value);
+void WriteTargetWord(int dev, A_UINT64 address, A_UINT32 value);
 int ValidWriteOTP(int dev, A_UINT32 address, A_UINT8 *buffer,
 				  A_UINT32 length);
 
@@ -539,19 +567,20 @@ void list_supported_target_names()
 	}
 }
 
-void ReadTargetRange(int dev, A_UINT32 address,
+void ReadTargetRange(int dev, A_UINT64 address,
 		     A_UINT8 *buffer, A_UINT32 length)
 {
 	int nbyte;
 	unsigned int remaining;
 
-	(void)lseek(dev, address, SEEK_SET);
+	nqprintf("New address:0x%llx\n", address);
+	(void)lseek64(dev, address, SEEK_SET);
 
 	remaining = length;
 	while (remaining) {
 		nbyte = read(dev, buffer, (size_t)remaining);
 		if (nbyte <= 0) {
-			fprintf(stderr, "err %s failed (nbyte=%d, address=0x%x"
+			fprintf(stderr, "err %s failed (nbyte=%d, address=0x%llx"
 					" remaining=%d).\n",
 					__FUNCTION__, nbyte, address, remaining);
 			exit(1);
@@ -563,7 +592,7 @@ void ReadTargetRange(int dev, A_UINT32 address,
 	}
 }
 
-void ReadTargetWord(int dev, A_UINT32 address, A_UINT32 *buffer)
+void ReadTargetWord(int dev, A_UINT64 address, A_UINT32 *buffer)
 {
 	ReadTargetRange(dev, address, (A_UINT8 *)buffer, sizeof(*buffer));
 }
@@ -600,19 +629,20 @@ void ReadTargetOTP(int dev, A_UINT32 offset,
 	WriteTargetWord(dev, RTC_SOC_BASE_ADDRESS+OTP_OFFSET, 0);
 }
 
-void WriteTargetRange(int dev, A_UINT32 address,
+void WriteTargetRange(int dev, A_UINT64 address,
 		      A_UINT8 *buffer, A_UINT32 length)
 {
 	int nbyte;
 	unsigned int remaining;
 
-	(void)lseek(dev, address, SEEK_SET);
+	nqprintf("New address:0x%llx\n", address);
+	(void)lseek64(dev, address, SEEK_SET);
 
 	remaining = length;
 	while (remaining) {
 		nbyte = write(dev, buffer, (size_t)remaining);
 		if (nbyte <= 0) {
-			fprintf(stderr, "err %s failed (nbyte=%d, address=0x%x"
+			fprintf(stderr, "err %s failed (nbyte=%d, address=0x%llx"
 				" remaining=%d).\n",
 				__FUNCTION__, nbyte, address, remaining);
 			exit(1);
@@ -624,7 +654,7 @@ void WriteTargetRange(int dev, A_UINT32 address,
 	}
 }
 
-void WriteTargetWord(int dev, A_UINT32 address, A_UINT32 value)
+void WriteTargetWord(int dev, A_UINT64 address, A_UINT32 value)
 {
 	A_UINT32 param = value;
 
@@ -734,13 +764,26 @@ WriteTargetOTP(int dev, A_UINT32 offset, A_UINT8 *buffer, A_UINT32 length)
 	WriteTargetWord(dev, RTC_SOC_BASE_ADDRESS+OTP_OFFSET, 0);
 }
 
-void DumpTargetMem(int dev, unsigned int target_idx, char *pathname)
+static inline unsigned char GetOpType(unsigned char arena,
+				unsigned char live)
+{
+	if (arena == INVALID_ARENA_ID && !live)
+		return OP_TYPE_LEGACY;
+
+	return live ? OP_TYPE_EXT_DIRECT : OP_TYPE_EXT_QMI;
+}
+
+void DumpTargetMem(int dev, unsigned int target_idx, char *pathname,
+			unsigned char arena,
+			unsigned char live)
 {
 	const struct ath_target_reg_info *reg_info;
 	FILE * dump_fd;
 	char filename[PATH_MAX], tempfn[PATH_MAX];
 	A_UINT8 *buffer;
 	unsigned int i, address, length, remaining;
+	A_UINT64 addr64;
+	unsigned char op_type = GetOpType(arena, live);
 
 	if (target_idx >= MAX_TARGET_INDEX)
 		return;
@@ -783,7 +826,14 @@ void DumpTargetMem(int dev, unsigned int target_idx, char *pathname)
 
 		while (remaining) {
 			length = (remaining > MAX_BUF) ? MAX_BUF : remaining;
-			ReadTargetRange(dev, address, buffer, length);
+
+			nqprintf("DIAG Read target (address: 0x%x, arena: %u,"
+				 " live: %u, length: %u, remaining: %u)\n",
+				 address, arena, live, length, remaining);
+
+			addr64 = MAKE_ADDR64(op_type, arena, address);
+
+			ReadTargetRange(dev, addr64, buffer, length);
 			if(flag & HEX_FLAG) {
 				for(i=0; i<length; i+=4) {
 					if(i%16 == 0)
@@ -803,7 +853,6 @@ void DumpTargetMem(int dev, unsigned int target_idx, char *pathname)
 	}
 	free(buffer);
 }
-
 
 unsigned int
 parse_address(char *optarg)
@@ -843,6 +892,7 @@ int main (int argc, char **argv)
 	int i;
 	FILE * dump_fd;
 	unsigned int address = 0, target_idx = 0, length = 0;
+	A_UINT64 addr64;
 	A_UINT32 param = 0;
 	char filename[PATH_MAX], tempfn[PATH_MAX];
 	char pathname[PATH_MAX];
@@ -850,6 +900,9 @@ int main (int argc, char **argv)
 	unsigned int cmd = 0;
 	A_UINT8 *buffer;
 	unsigned int bitwise_mask = 0;
+	unsigned char arena = INVALID_ARENA_ID;
+	unsigned char live = 0;
+	unsigned char op_type;
 
 	progname = argv[0];
 
@@ -882,6 +935,8 @@ int main (int argc, char **argv)
 			{"target", 1, NULL, 't'},
 			{"value", 1, NULL, 'p'},
 			{"write", 0, NULL, 'w'},
+			{"arena", 1, NULL, 'A'},
+			{"live", 0, NULL, 'L'},
 			{0, 0, 0, 0}
 		};
 
@@ -891,6 +946,14 @@ int main (int argc, char **argv)
 			break;
 
 		switch (c) {
+		case 'A':
+			arena = parse_address(optarg);
+			break;
+
+		case 'L':
+			live = 1;
+			break;
+
 		case 'r':
 			cmd = DIAG_READ_TARGET;
 			break;
@@ -987,6 +1050,8 @@ int main (int argc, char **argv)
 		}
 	}
 
+	op_type = GetOpType(arena, live);
+
 	for (;;) {
 		/* DIAG uses a sysfs special file which may be auto-detected */
 		if (!(flag & DEVICE_FLAG)) {
@@ -997,7 +1062,7 @@ int main (int argc, char **argv)
 			 * command line, try to figure it out.  Typically
 			 * there's only a single device anyway.
 			 */
-			find_dev = popen("echo /proc/cld/athdiagpfs",
+			find_dev = popen("echo /proc/cldqca6490/athdiagpfs",
 					 "r");
 			if (find_dev) {
 				nbytes=fread(devicename, 1,
@@ -1048,7 +1113,9 @@ int main (int argc, char **argv)
 			}
 			nqprintf(
 			    "DIAG Read Target (address: 0x%x, length: %d,"
-			    " filename: %s)\n", address, length, filename);
+			    " filename: %s, arena: %u, live: %u)\n",
+			    address, length, filename,
+			    arena, live);
 			{
 				unsigned int remaining = length;
 
@@ -1068,11 +1135,23 @@ int main (int argc, char **argv)
 				while (remaining) {
 					length = (remaining > MAX_BUF)?
 						  MAX_BUF : remaining;
+
+					nqprintf("DIAG Read target (address: "
+						 "0x%x, arena: %u, live: %u,"
+						 " length: %u, "
+						 "remaining: %u)\n",
+						 address, arena, live,
+						 length, remaining);
+
+					addr64 = MAKE_ADDR64(op_type,
+							     arena,
+							     address);
+
 					if (flag & OTP_FLAG) {
 						ReadTargetOTP(dev, address,
 						    buffer, length);
 					} else {
-						ReadTargetRange(dev, address,
+						ReadTargetRange(dev, addr64,
 						    buffer, length);
 					}
 					if(flag & HEX_FLAG) {
@@ -1223,11 +1302,19 @@ int main (int argc, char **argv)
 					}
 				}
 
+				nqprintf("DIAG Write target (address: 0x%x, "
+					 "arena: %u, live: %u, length: %u, "
+					 "remaining: %u)\n",
+					 address, arena, live, length,
+					 remaining);
+
+				addr64 = MAKE_ADDR64(op_type, arena, address);
+
 				if (flag & OTP_FLAG) {
 					WriteTargetOTP(dev, address,
 					    buffer, length);
 				} else {
-					WriteTargetRange(dev, address,
+					WriteTargetRange(dev, addr64,
 					    buffer, length);
 				}
 
@@ -1245,9 +1332,12 @@ int main (int argc, char **argv)
 
 	case DIAG_READ_WORD:
 		if ((flag & (ADDRESS_FLAG)) == (ADDRESS_FLAG)) {
-			nqprintf("DIAG Read Word (address: 0x%x)\n",
-			         address);
-			ReadTargetWord(dev, address, &param);
+			nqprintf("DIAG Read Word (address: 0x%x, arena: %u, "
+				 "live: %u)\n",
+			         address, arena, live);
+
+			addr64 = MAKE_ADDR64(op_type, arena, address);
+			ReadTargetWord(dev, addr64, &param);
 
 			if (quiet()) {
 				printf("0x%x\n", param);
@@ -1296,11 +1386,14 @@ int main (int argc, char **argv)
 				}
 			} else {
 				nqprintf("DIAG Write Word (address: 0x%x,"
-					 " param: 0x%x)\n",
-					 address, param);
+					 " param: 0x%x, arena: %u, "
+					 "live: %u)\n",
+					 address, param, arena, live);
 			}
 
-			WriteTargetWord(dev, address, param);
+			addr64 = MAKE_ADDR64(op_type, arena, address);
+
+			WriteTargetWord(dev, addr64, param);
 		}
 		else
 			usage();
@@ -1320,7 +1413,7 @@ int main (int argc, char **argv)
 			snprintf(pathname, sizeof(pathname), "%s/", tempfn);
 		}
 
-		DumpTargetMem(dev, target_idx, pathname);
+		DumpTargetMem(dev, target_idx, pathname, arena, live);
 		break;
 
 	default:

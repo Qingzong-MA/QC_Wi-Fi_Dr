@@ -36,6 +36,8 @@ struct indigo_api indigo_api_list[] = {
     { API_AP_SET_PARAM, "API_AP_SET_PARAM", NULL, NULL },
     { API_AP_SEND_BTM_REQ, "API_AP_SEND_BTM_REQ", NULL, NULL },
     { API_AP_SEND_ARP_MSGS, "API_AP_SEND_ARP_MSGS", NULL, NULL },
+    { API_AP_START_WPS, "AP_START_WPS", NULL, NULL },
+    { API_AP_CONFIGURE_WSC, "AP_CONFIGURE_WSC", NULL, NULL },
     /* Station specific */
     { API_STA_START_UP, "STA_START_UP", NULL, NULL },
     { API_STA_ASSOCIATE, "STA_ASSOCIATE", NULL, NULL },
@@ -49,6 +51,24 @@ struct indigo_api indigo_api_list[] = {
     { API_STA_SET_PHY_MODE, "STA_SET_PHY_MODE", NULL, NULL },
     { API_STA_SET_CHANNEL_WIDTH, "STA_SET_CHANNEL_WIDTH", NULL, NULL },
     { API_STA_POWER_SAVE, "STA_POWER_SAVE", NULL, NULL },
+    { API_STA_SCAN, "STA_SCAN", NULL, NULL },
+    { API_STA_HS2_ASSOCIATE, "API_STA_HS2_ASSOCIATE", NULL, NULL },
+    { API_STA_INSTALL_PPSMO, "API_STA_INSTALL_PPSMO", NULL, NULL },
+    { API_P2P_START_UP, "P2P_START_UP", NULL, NULL },
+    { API_P2P_FIND, "P2P_FIND", NULL, NULL },
+    { API_P2P_LISTEN, "P2P_LISTEN", NULL, NULL },
+    { API_P2P_ADD_GROUP, "P2P_ADD_GROUP", NULL, NULL },
+    { API_P2P_START_WPS, "P2P_START_WPS", NULL, NULL },
+    { API_P2P_CONNECT, "P2P_CONNECT", NULL, NULL },
+    { API_STA_ADD_CREDENTIAL, "API_STA_ADD_CREDENTIAL", NULL, NULL },
+    { API_P2P_GET_INTENT_VALUE, "P2P_GET_INTENT_VALUE", NULL, NULL },
+    { API_STA_START_WPS, "STA_START_WPS", NULL, NULL },
+    { API_P2P_INVITE, "P2P_INVITE", NULL, NULL },
+    { API_P2P_STOP_GROUP, "P2P_STOP_GROUP", NULL, NULL },
+    { API_P2P_SET_SERV_DISC, "P2P_SET_SERV_DISC", NULL, NULL },
+    { API_STA_SEND_ICON_REQ, "STA_SEND_ICON_REQ", NULL, NULL },
+    { API_P2P_SET_EXT_LISTEN, "P2P_SET_EXT_LISTEN", NULL, NULL },
+    { API_STA_ENABLE_WSC, "STA_ENABLE_WSC", NULL, NULL },
     /* Network operation. E.g., get/set IP address, get MAC address, send the UDP data and reset */
     { API_GET_IP_ADDR, "GET_IP_ADDR", NULL, NULL },
     { API_GET_MAC_ADDR, "GET_MAC_ADDR", NULL, NULL },
@@ -60,6 +80,14 @@ struct indigo_api indigo_api_list[] = {
     { API_DEVICE_RESET, "DEVICE_RESET", NULL, NULL },
     { API_SEND_LOOP_BACK_DATA, "SEND_LOOP_BACK_DATA", NULL, NULL },
     { API_STOP_LOOP_BACK_DATA, "STOP_LOOP_BACK_DATA", NULL, NULL },
+    { API_START_DHCP, "START_DHCP", NULL, NULL },
+    { API_STOP_DHCP, "STOP_DHCP", NULL, NULL },
+    { API_GET_WSC_PIN, "GET_WSC_PIN", NULL, NULL },
+    { API_GET_WSC_CRED, "GET_WSC_CRED", NULL, NULL },
+    /* AFC */
+    { API_AFCD_CONFIGURE, "AFCD_CONFIGURE", NULL, NULL },
+    { API_AFCD_OPERATION, "AFCD_OPERATION", NULL, NULL },
+    { API_AFCD_GET_INFO, "AFCD_GET_INFO", NULL, NULL },
 };
 
 /* Structure to declare the TLV list */
@@ -98,6 +126,10 @@ struct indigo_tlv indigo_tlv_list[] = {
     { TLV_RESET_TYPE, "RESET_TYPE" },
     { APP_TYPE, "APP_TYPE" },
     { TLV_IE_OVERRIDE, "IE_OVERRIDE" },
+    { TLV_HOME_FQDN, "HOME_FQDN"},
+    { TLV_USERNAME, "USERNAME"},
+    { TLV_PREFER, "PREFER"},
+    { TLV_CREDENTIAL_TYPE, "CREDENTIAL_TYPE"},
     { TLV_ADDRESS, "ADDRESS" },
     { TLV_DISABLE_PMKSA_CACHING, "DISABLE_PMKSA_CACHING" },
     { TLV_SAE_ANTI_CLOGGING_THRESHOLD, "SAE_ANTI_CLOGGING_THRESHOLD" },
@@ -187,6 +219,98 @@ struct indigo_tlv indigo_tlv_list[] = {
     { TLV_RAND_MAC_ADDR, "RAND_MAC_ADDR" },
     { TLV_PREASSOC_RAND_MAC_ADDR, "PREASSOC_RAND_MAC_ADDR" },
     { TLV_RAND_ADDR_LIFETIME, "RAND_ADDR_LIFETIME" },
+    { TLV_HS20, "HS20" },
+    { TLV_ACCESS_NETWORK_TYPE, "ACCESS_NETWORK_TYPE" },
+    { TLV_INTERNET, "INTERNET" },
+    { TLV_VENUE_GROUP, "VENUE_GROUP" },
+    { TLV_VENUE_TYPE, "VENUE_TYPE" },
+    { TLV_HESSID, "HESSID" },
+    { TLV_ANQP_3GPP_CELL_NETWORK_INFO, "ANQP_3GPP_CELL_NETWORK_INFO" },
+    { TLV_OSU_SSID, "OSU_SSID" },
+    { TLV_PROXY_ARP, "PROXY_ARP" },
+    { TLV_BSSLOAD_ENABLE, "BSSLOAD_ENABLE" },
+    { TLV_ROAMING_CONSORTIUM, "ROAMING_CONSORTIUM" },
+    { TLV_NETWORK_AUTH_TYPE, "NETWORK_AUTH_TYPE" },
+    { TLV_DOMAIN_LIST, "DOMAIN_LIST" },
+    { TLV_HS20_OPERATOR_FRIENDLY_NAME, "HS20_OPERATOR_FRIENDLY_NAME" },
+    { TLV_NAI_REALM, "NAI_REALM" },
+    { TLV_VENUE_NAME, "VENUE_NAME" },
+    { TLV_IPADDR_TYPE_AVAILABILITY, "IPADDR_TYPE_AVAILABILITY" },
+    { TLV_HS20_WAN_METRICS, "HS20_WAN_METRICS" },
+    { TLV_HS20_CONN_CAPABILITY, "HS20_CONN_CAPABILITY"},
+    { TLV_VENUE_URL, "VENUE_URL" },
+    { TLV_OPERATOR_ICON_METADATA, "OPERATOR_ICON_METADATA" },
+    { TLV_OSU_PROVIDERS_LIST, "OSU_PROVIDERS_LIST" },
+    { TLV_OSU_PROVIDERS_NAI_LIST, "OSU_PROVIDERS_NAI_LIST" },
+    { TLV_REALM, "REALM" },
+    { TLV_IMSI, "IMSI" },
+    { TLV_MILENAGE, "MILENAGE" },
+    { TLV_BSSID_FILTER_LIST, "BSSID_FILTER_LIST" },
+    { TLV_PPSMO_FILE, "PPSMO_FILE" },
+    { TLV_OSU_SERVER_URI, "OSU_SERVER_URI" },
+    { TLV_OSU_METHOD, "OSU_METHOD" },
+    { TLV_GO_INTENT, "GO_INTENT" },
+    { TLV_WSC_METHOD, "WSC_METHOD" },
+    { TLV_PIN_METHOD, "PIN_METHOD" },
+    { TLV_PIN_CODE, "PIN_CODE" },
+    { TLV_P2P_CONN_TYPE, "P2P_CONN_TYPE" },
+    { TLV_HS20_OPERATING_CLASS_INDICATION, "HS20_OPERATING_CLASS_INDICATION"},
+    { TLV_WPS_ENABLE, "WPS_ENABLE" },
+    { TLV_UPDATE_CONFIG, "UPDATE_CONFIG" },
+    { TLV_EAP_FRAG_SIZE, "EAP_FRAG_SIZE" },
+    { TLV_PERFORM_WPS_IE_FRAG, "PERFORM_WPS_IE_FRAG" },
+    { TLV_ADVICE_OF_CHARGE, "ADVICE_OF_CHARGE"},
+    { TLV_IGNORE_BROADCAST_SSID, "IGNORE_BROADCAST_SSID"},
+    { TLV_PERSISTENT, "PERSISTENT_GROUP" },
+    { TLV_WSC_CONFIG_ONLY, "WSC_CONFIG_ONLY" },
+    { TLV_ICON_FILE, "ICON_FILE" },
+    { TLV_P2P_DISABLED, "P2P_DISABLED" },
+    { TLV_MANAGE_P2P, "MANAGE_P2P" },
+    { TLV_AP_STA_COEXIST, "AP_STA_COEXIST" },
+    { TLV_WPS_INDEPENDENT, "WPS_INDEPENDENT" },
+    { TLV_LOCAL_PWR_CONST, "LOCAL_PWR_CONST" },
+    { TLV_SPECTRUM_MGMT_REQ, "SPECTRUM_MGMT_REQ" },
+    { TLV_CAPTURE_FILE, "CAPTURE_FILE" },
+    { TLV_CAPTURE_FILTER, "CAPTURE_FILTER" },
+    { TLV_CAPTURE_INFILE, "CAPTURE_INFILE" },
+    { TLV_CAPTURE_OUTFILE, "CAPTURE_OUTFILE" },
+    { TLV_TP_IP_ADDRESS, "TP_IP_ADDRESS" },
+    { TLV_WPS_ER_SUPPORT, "WPS_ER_SUPPORT" },
+    { TLV_ADDITIONAL_TEST_PLATFORM_ID, "ADDITIONAL_TEST_PLATFORM_ID" },
+    /* AFC */
+    { TLV_AFC_VERSION_NUMBER, "AFC_VERSION_NUMBER"},
+    { TLV_AFC_REQUEST_ID, "AFC_REQUEST_ID"},
+    { TLV_AFC_SERIAL_NUMBER, "AFC_SERIAL_NUMBER"},
+    { TLV_AFC_NRA, "AFC_NRA"},
+    { TLV_AFC_CERT_ID, "AFC_CERT_ID"},
+    { TLV_AFC_RULE_SET_ID, "AFC_RULE_SET_ID"},
+    { TLV_AFC_LOCATION_GEO_AREA, "AFC_LOCATION_GEO_AREA"},
+    { TLV_AFC_ELLIPSE_CENTER, "AFC_ELLIPSE_CENTER"},
+    { TLV_AFC_ELLIPSE_MAJOR_AXIS, "AFC_ELLIPSE_MAJOR_AXIS"},
+    { TLV_AFC_ELLIPSE_MINOR_AXIS, "AFC_ELLIPSE_MINOR_AXIS"},
+    { TLV_AFC_ELLIPSE_ORIENTATION, "AFC_ELLIPSE_ORIENTATION"},
+    { TLV_AFC_LINEARPOLY_BOUNDARY, "AFC_LINEARPOLY_BOUNDARY"},
+    { TLV_AFC_RADIALPOLY_CENTER, "AFC_RADIALPOLY_CENTER"},
+    { TLV_AFC_RADIALPOLY_BOUNDARY, "AFC_RADIALPOLY_BOUNDARY"},
+    { TLV_AFC_HEIGHT, "AFC_HEIGHT"},
+    { TLV_AFC_HEIGHT_TYPE, "AFC_HEIGHT_TYPE"},
+    { TLV_AFC_VERTICAL_UNCERT, "AFC_VERTICAL_UNCERT"},
+    { TLV_AFC_DEPLOYMENT, "AFC_DEPLOYMENT"},
+    { TLV_AFC_FREQ_RANGE, "AFC_FREQ_RANGE"},
+    { TLV_AFC_GLOBAL_OPCL, "AFC_GLOBAL_OPCL"},
+    { TLV_AFC_CHANNEL_CFI, "AFC_CHANNEL_CFI"},
+    { TLV_AFC_MIN_DESIRED_PWR, "AFC_MIN_DESIRED_PWR"},
+    { TLV_AFC_VENDOR_EXT, "AFC_VENDOR_EXT"},
+    { TLV_AFC_SERVER_URL, "AFC_SERVER_URL" },
+    { TLV_AFC_TEST_SSID, "AFC_TEST_SSID" },
+    { TLV_AFC_DEVICE_RESET, "AFC_DEVICE_RESET" },
+    { TLV_AFC_SEND_SPECTRUM_REQ, "AFC_SEND_SPECTRUM_REQ" },
+    { TLV_AFC_POWER_CYCLE, "AFC_POWER_CYCLE" },
+    { TLV_AFC_SECURITY_TYPE, "AFC_SECURITY_TYPE" },
+    { TLV_AFC_WPA_PASSPHRASE, "AFC_WPA_PASSPHRASE" },
+    { TLV_AFC_SEND_TEST_FRAME, "AFC_SEND_TEST_FRAME" },
+    { TLV_AFC_BANDWIDTH, "AFC_BANDWIDTH" },
+    { TLV_AFC_CA_CERT, "AFC_CA_CERT" },
 };
 
 /* Find the type of the API stucture by the ID from the list */
@@ -238,13 +362,13 @@ void fill_wrapper_ack(struct packet_wrapper *wrapper, int seq, int status, char 
     wrapper->tlv[0] = malloc(sizeof(struct tlv_hdr));
     wrapper->tlv[0]->id = TLV_STATUS;
     wrapper->tlv[0]->len = 1;
-    wrapper->tlv[0]->value = (char*)malloc(wrapper->tlv[0]->len);
+    wrapper->tlv[0]->value = (unsigned char*)malloc(wrapper->tlv[0]->len);
     wrapper->tlv[0]->value[0] = status;
 
     wrapper->tlv[1] = malloc(sizeof(struct tlv_hdr));
     wrapper->tlv[1]->id = TLV_MESSAGE;
     wrapper->tlv[1]->len = strlen(reason);
-    wrapper->tlv[1]->value = (char*)malloc(wrapper->tlv[1]->len);
+    wrapper->tlv[1]->value = (unsigned char*)malloc(wrapper->tlv[1]->len);
     memcpy(wrapper->tlv[1]->value, reason, wrapper->tlv[1]->len);
 }
 
@@ -275,7 +399,7 @@ void fill_wrapper_tlv_byte(struct packet_wrapper *wrapper, int id, char value) {
     wrapper->tlv[wrapper->tlv_num] = malloc(sizeof(struct tlv_hdr));
     wrapper->tlv[wrapper->tlv_num]->id = id;
     wrapper->tlv[wrapper->tlv_num]->len = 1;
-    wrapper->tlv[wrapper->tlv_num]->value = (char*)malloc(1);
+    wrapper->tlv[wrapper->tlv_num]->value = (unsigned char*)malloc(1);
     wrapper->tlv[wrapper->tlv_num]->value[0] = value;
     wrapper->tlv_num++;
 }
@@ -285,7 +409,7 @@ void fill_wrapper_tlv_bytes(struct packet_wrapper *wrapper, int id, int len, cha
     wrapper->tlv[wrapper->tlv_num] = malloc(sizeof(struct tlv_hdr));
     wrapper->tlv[wrapper->tlv_num]->id = id;
     wrapper->tlv[wrapper->tlv_num]->len = len;
-    wrapper->tlv[wrapper->tlv_num]->value = (char*)malloc(len);
+    wrapper->tlv[wrapper->tlv_num]->value = (unsigned char*)malloc(len);
     memcpy(wrapper->tlv[wrapper->tlv_num]->value, value, len);
     wrapper->tlv_num++;
 }

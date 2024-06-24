@@ -1,9 +1,9 @@
-####### BDF template version: 5.3.27 ####### 
+####### BDF template version: 5.3.32 ####### 
 uint16	COMMON_BDF_HEADER.nvBase.nvId	 1 
 uint16	COMMON_BDF_HEADER.nvBase.nvLen	 1028 
 uint32	COMMON_BDF_HEADER.nvBase.nvFlag	 0 
 uint16	COMMON_BDF_HEADER.baseBdfHeader.length	 28216 
-uint16	COMMON_BDF_HEADER.baseBdfHeader.checksum	 29157 
+uint16	COMMON_BDF_HEADER.baseBdfHeader.checksum	 28894 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.templateVerMinor	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.templateVerMajor	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.macAddr[0]	 0 
@@ -211,7 +211,7 @@ uint8	COMMON_BDF_HEADER.baseBdfHeader.cck_fir_wb_sel	 15
 uint8	COMMON_BDF_HEADER.baseBdfHeader.minTpcTxPwr	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.bdfTemplateVer1	 5 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.bdfTemplateVer2	 3 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.bdfTemplateVer3	 27 
+uint8	COMMON_BDF_HEADER.baseBdfHeader.bdfTemplateVer3	 32 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.gtx_config.greentxConfig	 7 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.gtx_config.gtxRTMask_basic_TpcPkts	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.gtx_config.gtxPER_VSupport	 56 
@@ -382,6 +382,8 @@ uint8	COMMON_BDF_HEADER.baseBdfHeader.freqPlimvalues[7].Plim	 0
 uint32	COMMON_BDF_HEADER.baseBdfHeader.fwBdfMatchCheck.fwBdfCheckConfig	 0 
 uint32	COMMON_BDF_HEADER.baseBdfHeader.fwBdfMatchCheck.fwVerMinor	 0 
 uint32	COMMON_BDF_HEADER.baseBdfHeader.fwBdfMatchCheck.fwVerMajor	 0 
+uint32	COMMON_BDF_HEADER.baseBdfHeader.commonBoardFlags2	 0 
+uint8	COMMON_BDF_HEADER.baseBdfHeader.Btco_Bo_update	 1 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[0]	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[1]	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[2]	 0 
@@ -604,11 +606,6 @@ uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[218]	 0
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[219]	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[220]	 0 
 uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[221]	 0 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[222]	 0 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[223]	 0 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[224]	 0 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[225]	 0 
-uint8	COMMON_BDF_HEADER.baseBdfHeader.baseFuture[226]	 0 
 uint16	PER_PHY_SETTING.nvPerPhy.nvId	 2 
 uint16	PER_PHY_SETTING.nvPerPhy.nvLen	 292 
 uint32	PER_PHY_SETTING.nvPerPhy.nvFlag	 0 
@@ -47085,6 +47082,9 @@ uint8	BDF_ENABLE_DISABLE_FLAGS.RegulatoryHeavyClipEnable	 0
 uint8	BDF_ENABLE_DISABLE_FLAGS.wlanBtCalSyncEn	 1 
 uint8	BDF_ENABLE_DISABLE_FLAGS.fdmtEnableDisableBits	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.pa1p8Support	 0 
+uint8	BDF_ENABLE_DISABLE_FLAGS.enableDisableBits2	 0 
+uint32	BDF_ENABLE_DISABLE_FLAGS.autoFeatureCtrlBits	 0 
+uint32	BDF_ENABLE_DISABLE_FLAGS.autoMiscCtrlBits	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[0]	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[1]	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[2]	 0 
@@ -47104,15 +47104,6 @@ uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[15]	 0
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[16]	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[17]	 0 
 uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[18]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[19]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[20]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[21]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[22]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[23]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[24]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[25]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[26]	 0 
-uint8	BDF_ENABLE_DISABLE_FLAGS.bdfEnableDisableFlagsFuture[27]	 0 
 uint16	RSSI_OFFSET.nvRssiOffset.nvId	 25 
 uint16	RSSI_OFFSET.nvRssiOffset.nvLen	 92 
 uint32	RSSI_OFFSET.nvRssiOffset.nvFlag	 0 

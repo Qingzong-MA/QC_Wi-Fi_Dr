@@ -1,0 +1,107 @@
+From 405d756921ddff60f19a56f28352ebacde04a793 Mon Sep 17 00:00:00 2001
+From: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+Date: Fri, 3 Feb 2023 14:12:07 +0800
+Subject: [PATCH] qcacld-3.0: Dump event desc history after FW down
+
+For debugging purpose, dump event desc history when
+PLD_FW_DOWN event is received, Set CONFIG_DUMP_TO_FILE=y
+to enable this feature.
+
+CONFIG_DUMP_EVENT_DESC_CNT is used to limit the number
+of logs. it's 128 by default.
+
+Signed-off-by: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+---
+ Kbuild                             |  3 +++
+ core/cds/inc/cds_api.h             | 18 ++++++++++++++++++
+ core/cds/src/cds_api.c             | 11 +++++++++++
+ core/hdd/src/wlan_hdd_driver_ops.c |  1 +
+ 4 files changed, 33 insertions(+)
+
+diff --git a/Kbuild b/Kbuild
+index 0087b72..f4d0c30 100755
+--- a/Kbuild
++++ b/Kbuild
+@@ -3593,6 +3593,9 @@ ifeq ($(CONFIG_NON_QC_PLATFORM), y)
+ ccflags-y += -DWLAN_DUMP_LOG_BUF_CNT=$(CONFIG_DUMP_LOG_BUF_CNT)
+ endif
+ 
++cppflags-$(CONFIG_DUMP_TO_FILE) += -DDUMP_EVENT_TO_FILE
++cppflags-$(CONFIG_DUMP_TO_FILE) += -DWLAN_DUMP_EVENT_DESC_CNT=128
++
+ ifdef CONFIG_SCHED_HISTORY_SIZE
+ ccflags-y += -DWLAN_SCHED_HISTORY_SIZE=$(CONFIG_SCHED_HISTORY_SIZE)
+ endif
+diff --git a/core/cds/inc/cds_api.h b/core/cds/inc/cds_api.h
+index 421e38a..1f3d775 100644
+--- a/core/cds/inc/cds_api.h
++++ b/core/cds/inc/cds_api.h
+@@ -526,6 +526,24 @@ void cds_print_htc_credit_history(uint32_t count,
+ {
+ }
+ #endif
++
++#ifdef DUMP_EVENT_TO_FILE
++/**
++ * cds_print_desc_event_history() - Helper function to copy desc event
++ *				    history via hif_print_event_desc_history()
++ *				    and hif_ce_print_desc_event_history()
++ *
++ * Return:	none
++ */
++void
++cds_print_desc_event_history(void);
++#else
++static inline void
++cds_print_desc_event_history(void)
++{
++}
++#endif
++
+ /**
+  * cds_is_group_addr() - checks whether addr is multi cast
+  * @mac_addr: address to be checked for multicast
+diff --git a/core/cds/src/cds_api.c b/core/cds/src/cds_api.c
+index d4294c5..3c39776 100644
+--- a/core/cds/src/cds_api.c
++++ b/core/cds/src/cds_api.c
+@@ -81,6 +81,8 @@
+ #include <qdf_notifier.h>
+ #include <qwlan_version.h>
+ #include <qdf_trace.h>
++#include "hif_exec.h"
++#include "ce_main.h"
+ 
+ /* Preprocessor Definitions and Constants */
+ 
+@@ -2866,6 +2868,15 @@ uint32_t cds_get_connectivity_stats_pkt_bitmap(void *context)
+ 	return adapter->pkt_type_bitmap;
+ }
+ 
++#ifdef DUMP_EVENT_TO_FILE
++void
++cds_print_desc_event_history(void)
++{
++	hif_print_event_desc_history(WLAN_DUMP_EVENT_DESC_CNT);
++	hif_ce_print_desc_event_history(WLAN_DUMP_EVENT_DESC_CNT);
++}
++#endif
++
+ #ifdef FEATURE_ALIGN_STATS_FROM_DP
+ /**
+  * cds_get_cdp_vdev_stats() - Function which retrieves cdp vdev stats
+diff --git a/core/hdd/src/wlan_hdd_driver_ops.c b/core/hdd/src/wlan_hdd_driver_ops.c
+index 4286b08..b0a0b3b 100644
+--- a/core/hdd/src/wlan_hdd_driver_ops.c
++++ b/core/hdd/src/wlan_hdd_driver_ops.c
+@@ -1948,6 +1948,7 @@ wlan_hdd_pld_uevent(struct device *dev, struct pld_uevent_data *event_data)
+ 	case PLD_FW_DOWN:
+ 		hdd_debug("Received firmware down indication");
+ 		hdd_dump_log_buffer();
++		cds_print_desc_event_history();
+ 		cds_set_target_ready(false);
+ 		cds_set_recovery_in_progress(true);
+ 
+-- 
+2.7.4
+

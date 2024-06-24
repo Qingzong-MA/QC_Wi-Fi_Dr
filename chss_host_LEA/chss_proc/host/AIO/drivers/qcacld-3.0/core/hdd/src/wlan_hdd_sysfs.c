@@ -76,6 +76,8 @@
 #include <wlan_hdd_sysfs_dp_aggregation.h>
 #include <wlan_hdd_sysfs_dl_modes.h>
 #include <wlan_hdd_sysfs_swlm.h>
+#include <wlan_hdd_sysfs_wds_mode.h>
+#include <wlan_hdd_sysfs_roam_trigger_bitmap.h>
 
 #define MAX_PSOC_ID_SIZE 10
 
@@ -782,12 +784,16 @@ void hdd_create_sysfs_files(struct hdd_context *hdd_ctx)
 		hdd_sysfs_pm_dbs_create(driver_kobject);
 		hdd_sysfs_dp_aggregation_create(driver_kobject);
 		hdd_sysfs_dp_swlm_create(driver_kobject);
+		hdd_sysfs_wds_mode_create(driver_kobject);
+		hdd_sysfs_roam_trigger_bitmap_create(driver_kobject);
 	}
 }
 
 void hdd_destroy_sysfs_files(void)
 {
 	if  (QDF_GLOBAL_MISSION_MODE == hdd_get_conparam()) {
+		hdd_sysfs_roam_trigger_bitmap_destroy(driver_kobject);
+		hdd_sysfs_wds_mode_destroy(driver_kobject);
 		hdd_sysfs_dp_swlm_destroy(driver_kobject);
 		hdd_sysfs_dp_aggregation_destroy(driver_kobject);
 		hdd_sysfs_pm_dbs_destroy(driver_kobject);
@@ -819,6 +825,7 @@ void hdd_create_adapter_sysfs_files(struct hdd_adapter *adapter)
 		hdd_sysfs_create_sta_adapter_root_obj(adapter);
 		break;
 	case QDF_SAP_MODE:
+	case QDF_P2P_GO_MODE:
 		hdd_sysfs_create_sap_adapter_root_obj(adapter);
 		break;
 	case QDF_MONITOR_MODE:
@@ -840,6 +847,7 @@ void hdd_destroy_adapter_sysfs_files(struct hdd_adapter *adapter)
 		hdd_sysfs_destroy_sta_adapter_root_obj(adapter);
 		break;
 	case QDF_SAP_MODE:
+	case QDF_P2P_GO_MODE:
 		hdd_sysfs_destroy_sap_adapter_root_obj(adapter);
 		break;
 	case QDF_MONITOR_MODE:

@@ -643,34 +643,41 @@ GROUP gQca_PFAL_MemPoolAllocFail "FMB Pool Alloc Fail"
 	FIELD fQca_PFAL_POOL_ID  			(Fixed 4 Bytes)      (Hex)            					"current pool"
 	FIELD fQca_PFAL_POOL_returnAddress  (Fixed 4 Bytes)      (Hex)            					"return address"
 	FIELD fQca_PFAL_POOL_SECTION  		(Fixed 2 Bytes)      (TABLE tQca_Pool_Section)        	"pool section"
-    FIELD fQca_PFAL_POOL_COUNT  		(Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Hex)       "pool count"
+    FIELD fQca_PFAL_POOL_genericCount   (Fixed 1 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "generic pool count"
+    FIELD fQca_PFAL_POOL_staticCount  	(Fixed 1 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "static pool count"
+    /* ISO and ADV memories are allocated during initialization. Just show constant value here. */
+    FIELD fQca_PFAL_POOL_isoMemSize     (Fixed 0 Bytes)  IF (FieldIs EqualTo 1 fQca_PFAL_POOL_SECTION) RETRIEVE (StoreInteger 1920) (Decimal)    "ISO memory size"
+    FIELD fQca_PFAL_POOL_advMemSize     (Fixed 0 Bytes)  IF (FieldIs EqualTo 1 fQca_PFAL_POOL_SECTION) RETRIEVE (StoreInteger 8064) (Decimal)    "ADV memory size"
+    FIELD fQca_PFAL_POOL_aciMemSize     (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "ACI memory size"
+    FIELD fQca_PFAL_POOL_irkMemSize     (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "IRK memory size"
+    FIELD fQca_PFAL_POOL_bcaMemSize     (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "BCA memory size"
+    FIELD fQca_PFAL_POOL_voiceMemSize   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)       "voice memory size"
 	
-	GROUP gQCA_FmbPoolDbgINFO IF (FieldIs NotEqualTo 0 fQca_PFAL_POOL_COUNT)
+	GROUP gQca_PFAl_GmenPoolInfo IF (FieldIs NotEqualTo 0 fQca_PFAL_POOL_genericCount)
 	{
+        /* Init the Counter to 0 */
+        FIELD fQca_PFAL_GmenPoolCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE GmenPoolCntr
+        
+        GROUP gQca_PFAL_GenericPoolInfo REPEAT COUNT (FromField Times fQca_PFAL_POOL_genericCount)
+        {
+            GROUP gQCA_PFAL_GMENPool LABEL(LabelCount "Genric Pool #" GmenPoolCntr ) 
+            {
+                FIELD fQca_PFAL_GMENPOOL_nFree  		(Fixed 1 Byte)      (Hex)            "nFree"
+                FIELD fQca_PFAL_GMENPOOL_nReserved  	(Fixed 1 Byte)      (Hex)            "nReserved"
+                FIELD fQca_PFAL_GMENPOOL_nFailed  		(Fixed 1 Byte)      (Hex)            "nFailed"
+                FIELD fQca_PFAL_GMENPOOL_nWatermark  	(Fixed 1 Byte)    	(Hex)            "nWatermark"
+            }
+            /* Increment the Counter */
+            FIELD fQca_PFAL_GmenPoolCntrIncr (Fixed 0) RETRIEVE (StoreField GmenPoolCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE GmenPoolCntr
+        }
+    }
+
+	GROUP gQca_PFAl_SmenPoolInfo IF (FieldIs NotEqualTo 0 fQca_PFAL_POOL_staticCount)
+    {
 		/* Init the Counter to 0 */
 		FIELD fQca_PFAL_PoolCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE PoolCntr
 		
-		/* Loop through the end of the frame to capture all the generic pool info Packets in the Frame */
-		GROUP gQCA_GMENPoolInfos IF (FieldIs EqualTo 1 fQca_PFAL_POOL_SECTION)
-		{
-			/* Init the Counter to 0 */
-			FIELD fQca_PFAL_GmenPoolCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE GmenPoolCntr
-			
-			GROUP gQCA_PFAL_GmenPoolInfo REPEAT COUNT (Fixed 16 times)
-			{
-				GROUP gQCA_PFAL_GMENPool LABEL(LabelCount "Genric Pool #" GmenPoolCntr ) 
-				{
-					FIELD fQca_PFAL_GMENPOOL_nFree  		(Fixed 1 Byte)      (Hex)            "nFree"
-					FIELD fQca_PFAL_GMENPOOL_nReserved  	(Fixed 1 Byte)      (Hex)            "nReserved"
-					FIELD fQca_PFAL_GMENPOOL_nFailed  		(Fixed 1 Byte)      (Hex)            "nFailed"
-					FIELD fQca_PFAL_GMENPOOL_nWatermark  	(Fixed 1 Byte)    	(Hex)            "nWatermark"
-				}
-				/* Increment the Counter */
-				FIELD fQca_PFAL_GmenPoolCntrIncr (Fixed 0) RETRIEVE (StoreField GmenPoolCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE GmenPoolCntr
-			}
-		}
-		
-		GROUP gQCA_PFAL_PoolInfos REPEAT SIZE (ToEndOfLayer)
+		GROUP gQCA_PFAL_staticPoolInfos REPEAT SIZE (ToEndOfLayer)
 		{
 			GROUP gQCA_PoolInfo LABEL(LabelCount "Static Pool #" poolCntr ) 
 			{

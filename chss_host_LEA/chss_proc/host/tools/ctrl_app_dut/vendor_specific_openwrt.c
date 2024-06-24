@@ -659,23 +659,6 @@ int owrt_ap_config_vap(struct indigo_dut *dut)
                 snprintf(buf, sizeof(buf), "%d", dut->ap_pmf);
                 owrt_ap_set_vap(id,
                                 "ieee80211w", buf);
-            } else if (dut->ap_tag_key_mgmt[j] == AP_WPA_PSK) {
-                owrt_ap_set_vap(id,
-                                "encryption", "psk+ccmp");
-                if (dut->ap_mbssid == VALUE_ENABLED) {
-                    snprintf(buf, sizeof(buf), "\"%s\"",
-                             dut->ap_tag_passphrase[j]);
-                } else {
-                    snprintf(buf, sizeof(buf), "\"%s\"",
-                             dut->ap_passphrase);
-                }
-                owrt_ap_set_vap(id,
-                                "key", buf);
-                snprintf(buf, sizeof(buf), "%d", dut->ap_pmf);
-                owrt_ap_set_vap(id,
-                                "ieee80211w", buf);
-                snprintf(buf, sizeof(buf), "%s", dut->ap_passphrase);
-                owrt_ap_set_vap(id, "wpa_passphrase", buf);
             } else if (dut->ap_tag_key_mgmt[j] == AP2_WPA2_EAP) {
                 owrt_ap_set_vap(id,
                                 "encryption", "wpa2+ccmp");
@@ -1826,9 +1809,7 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
         struct interface_info* wlanp, struct indigo_dut *dut)
 {
     int has_sae = 0, has_wpa = 0, has_pmf = 0, has_owe = 0, has_transition = 0,
-    has_transition_disable = 0, is_6g_only = 0, chwidthset = 0,
-    vht_chwidthset = 0, enable_muedca = 0, has_sae_groups = 0,
-    unsol_pr_resp_interval = 0;
+    has_transition_disable = 0;
     int chan = 0, chwidth = 1;
     int i, enable_11h = 0;
     char buffer[S_BUFFER_LEN], cfg_item[2*S_BUFFER_LEN];
@@ -1842,12 +1823,12 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
     struct interface_info *wlan;
 
     memset(country, 0, sizeof(country));
+    memset(band, 0, sizeof(band));
 
     for (i = 0; i < wrapper->tlv_num; i++) {
         tlv = wrapper->tlv[i];
 
         if (tlv->id == TLV_HE_6G_ONLY) {
-            is_6g_only = 1;
             continue;
         }
 
@@ -1940,28 +1921,28 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
         }
 
         if (tlv->id == TLV_WPA_KEY_MGMT) {
-            if (tlv->value) {
+            if (tlv_value) {
                 if (dut->ap_bss_info.identifier > 1 && !dut->ap_has_owe_identifier) {
-                    if (strncasecmp(tlv->value, "NONE", tlv->len) == 0) {
+                    if (strncasecmp(tlv_value, "NONE", tlv->len) == 0) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_OPEN;
-                    } else if (strncasecmp(tlv->value, "OSEN", tlv->len) == 0 &&
+                    } else if (strncasecmp(tlv_value, "OSEN", tlv->len) == 0 &&
                         dut->ap_bss_info.identifier == 2) {
                         /*
                         * OSEN only supported on WLAN_TAG = 2 for now
                         */
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_OSEN;
-                    } else if (strncasecmp(tlv->value, "WPA2-PSK", tlv->len) == 0) {
+                    } else if (strncasecmp(tlv_value, "WPA2-PSK", tlv->len) == 0) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_WPA2_PSK;
-                    } else if (strncasecmp(tlv->value, "WPA-PSK", tlv->len) == 0) {
+                    } else if (strncasecmp(tlv_value, "WPA-PSK", tlv->len) == 0) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP_WPA_PSK;
                         dut->ap_cipher = AP_TKIP;
-                    } else if (strncasecmp(tlv->value, "WPA2-Ent", tlv->len) == 0 &&
+                    } else if (strncasecmp(tlv_value, "WPA2-Ent", tlv->len) == 0 &&
                                dut->ap_bss_info.identifier == 2) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_WPA2_EAP;
-                    } else if (strncasecmp(tlv->value, "OWE", tlv->len) == 0 &&
+                    } else if (strncasecmp(tlv_value, "OWE", tlv->len) == 0 &&
                                dut->ap_bss_info.identifier == 2) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_WPA2_OWE;
-                    } else if (strncasecmp(tlv->value, "SAE", tlv->len) == 0) {
+                    } else if (strncasecmp(tlv_value, "SAE", tlv->len) == 0) {
                         dut->ap_tag_key_mgmt[dut->ap_bss_info.identifier - 2] = AP2_WPA2_SAE;
                     }
                 } else {
@@ -2088,7 +2069,6 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
         }
 
         if (tlv->id == TLV_HW_MODE) {
-            memset(band, 0, sizeof(band));
             memcpy(band, tlv->value, tlv->len);
             if (!strncmp(band, "a", 1)) {
                 dut->ap_mode = AP_11a;
@@ -2212,14 +2192,12 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
             memset(value, 0, sizeof(value));
             memcpy(value, tlv->value, tlv->len);
             chwidth = atoi(value);
-            chwidthset = 1;
         }
 
         if (tlv->id == TLV_VHT_OPER_CHWIDTH) {
             memset(value, 0, sizeof(value));
             memcpy(value, tlv->value, tlv->len);
             chwidth = atoi(value);
-            vht_chwidthset = 1;
         }
 
         if (!strncmp(band, "a", 1)) {
@@ -2243,12 +2221,6 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
            dut->enable_11ax = 1;
         }
 
-        if (tlv->id == TLV_HE_MU_EDCA)
-            enable_muedca = 1;
-
-        if (tlv->id == TLV_SAE_GROUPS)
-            has_sae_groups = 1;
-
         if (tlv->id == TLV_COUNTRY_CODE)
             memcpy(dut->ap_countrycode, tlv->value, tlv->len);
 
@@ -2258,17 +2230,11 @@ int generate_wireless_config(char *output, int output_size, struct packet_wrappe
         if (tlv->id == TLV_IEEE80211_D || tlv->id == TLV_HE_OPER_CENTR_FREQ)
             continue;
 
-
-        if (tlv->id == TLV_HE_UNSOL_PR_RESP_CADENCE) {
-            memset(value, 0, sizeof(value));
-            memcpy(value, tlv->value, tlv->len);
-            unsol_pr_resp_interval = atoi(value);
-        }
    }
 
         memset(buffer, 0, sizeof(buffer));
         memset(cfg_item, 0, sizeof(cfg_item));
-        if (tlv->id == TLV_OWE_TRANSITION_BSS_IDENTIFIER) {
+        if ( tlv != NULL && tlv->id == TLV_OWE_TRANSITION_BSS_IDENTIFIER) {
             int bss_identifier;
             char bss_identifier_str[8];
             memset(&bss_info, 0, sizeof(bss_info));
@@ -2408,4 +2374,28 @@ void send_ap_btm_req(char *bssid)
                 ifname,  bssid);
         run_system(request);
     }
+}
+
+int send_afc_spectrum_req(int id) {
+    char request[4096];
+    int len;
+
+    memset(request, 0, sizeof(request));
+    snprintf(request, sizeof(request),
+             "wifitool ath%d set_wfa_test_param 6ghz 2 1", id);
+    len = run_system(request);
+
+    return len;
+}
+
+int send_afc_test_frame(int id, int bw) {
+    char request[4096];
+    int len;
+
+    memset(request, 0, sizeof(request));
+    snprintf(request, sizeof(request),
+             "wifitool ath%d frame_injector_en 0 1 100 ff:ff:ff:ff:ff:ff %d 5", id, bw);
+    len = run_system(request);
+
+    return len;
 }

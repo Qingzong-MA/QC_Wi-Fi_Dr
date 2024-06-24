@@ -585,7 +585,6 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
 	struct sk_buff *skb;
 	unsigned long offset;
 	int flags = GFP_KERNEL;
-	uint32_t lowmem_alloc_tries = 0;
 
 	if (align)
 		size += (align - 1);
@@ -603,7 +602,6 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
 #endif
 	}
 
-realloc:
 	skb = __netdev_alloc_skb(NULL, size, flags);
 
 	if (skb)
@@ -621,23 +619,6 @@ realloc:
 	}
 
 skb_alloc:
-	/* Qualcomm's hardware cannot handle memory address below 0x2000,
-	 * so while SKB allocs memory in that area, it should realloc.
-	 */
-	if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
-		lowmem_alloc_tries++;
-		qdf_nofl_err("Quectel: NBUF alloc failed %zuB @ %s:%d",
-					size, func, line);
-		if (lowmem_alloc_tries > 100) {
-			qdf_nofl_err("Quectel: NBUF alloc failed, MAX Trying");
-			return NULL;
-		} else {
-			/* Not freeing to make sure it
-			 * will not get allocated again
-			 */
-			goto realloc;
-		}
-	}
 	memset(skb->cb, 0x0, sizeof(skb->cb));
 
 	/*

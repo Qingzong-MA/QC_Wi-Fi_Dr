@@ -1,0 +1,38 @@
+From d3d3eeb7f123f3157a375e881a89b0918b1e96c3 Mon Sep 17 00:00:00 2001
+From: Shi Hong <quic_hongsh@quicinc.com>
+Date: Thu, 11 Apr 2024 15:02:06 +0800
+Subject: [PATCH] qcacld-3.0: add small address check
+
+HW doesn't not allow dma address<0x2000. Add physical address check for
+skb and dma memory.
+
+Signed-off-by: Hong Shi <quic_hongsh@quicinc.com>
+---
+ core/hdd/src/wlan_hdd_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/core/hdd/src/wlan_hdd_main.c b/core/hdd/src/wlan_hdd_main.c
+index e021ab5..92147e7 100644
+--- a/core/hdd/src/wlan_hdd_main.c
++++ b/core/hdd/src/wlan_hdd_main.c
+@@ -9428,6 +9428,8 @@ void hdd_wlan_exit(struct hdd_context *hdd_ctx)
+ 
+ 	qdf_nbuf_deinit_replenish_timer();
+ 
++	qdf_nbuf_invalid_nbuf_queue_deinit();
++
+ 	if (QDF_GLOBAL_MONITOR_MODE ==  hdd_get_conparam()) {
+ 		hdd_info("Release wakelock for monitor mode!");
+ 		qdf_wake_lock_release(&hdd_ctx->monitor_mode_wakelock,
+@@ -15145,6 +15147,8 @@ int hdd_wlan_startup(struct hdd_context *hdd_ctx)
+ 
+ 	hdd_action_oui_config(hdd_ctx);
+ 
++	qdf_nbuf_invalid_nbuf_queue_init();
++
+ 	qdf_nbuf_init_replenish_timer();
+ 
+ 	status = wlan_hdd_cache_chann_mutex_create(hdd_ctx);
+-- 
+2.7.4
+
