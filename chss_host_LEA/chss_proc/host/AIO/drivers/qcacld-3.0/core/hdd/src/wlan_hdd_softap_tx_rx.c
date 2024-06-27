@@ -1436,6 +1436,7 @@ QDF_STATUS hdd_softap_stop_bss(struct hdd_adapter *adapter)
 	uint8_t indoor_chnl_marking = 0;
 	struct hdd_context *hdd_ctx;
 	struct hdd_station_info *sta_info, *tmp = NULL;
+	uint8_t mac_addr[QDF_MAC_ADDR_SIZE];
 
 	hdd_ctx = WLAN_HDD_GET_CTX(adapter);
 
@@ -1466,12 +1467,13 @@ QDF_STATUS hdd_softap_stop_bss(struct hdd_adapter *adapter)
 	}
 
 	if (ucfg_ipa_is_enabled()) {
+		memcpy(mac_addr, adapter->dev->dev_addr, QDF_MAC_ADDR_SIZE);
 		if (ucfg_ipa_wlan_evt(hdd_ctx->pdev,
 				      adapter->dev,
 				      adapter->device_mode,
 				      adapter->vdev_id,
 				      WLAN_IPA_AP_DISCONNECT,
-				      adapter->dev->dev_addr) !=
+				      mac_addr) !=
 		    QDF_STATUS_SUCCESS)
 			hdd_err("WLAN_AP_DISCONNECT event failed");
 	}

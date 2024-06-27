@@ -452,6 +452,7 @@ static void hdd_nud_filter_netevent(struct neighbour *neigh)
 	struct hdd_adapter *adapter;
 	struct hdd_context *hdd_ctx;
 	const struct net_device *netdev = neigh->dev;
+	uint8_t mac_addr[QDF_MAC_ADDR_SIZE];
 
 	hdd_enter();
 
@@ -460,7 +461,8 @@ static void hdd_nud_filter_netevent(struct neighbour *neigh)
 	if (0 != status)
 		return;
 
-	adapter = hdd_get_adapter_by_macaddr(hdd_ctx, netdev->dev_addr);
+	memcpy(mac_addr, netdev->dev_addr, QDF_MAC_ADDR_SIZE);
+	adapter = hdd_get_adapter_by_macaddr(hdd_ctx, mac_addr);
 
 	if (!adapter)
 		return;

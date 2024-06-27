@@ -699,7 +699,7 @@ static void diag_mhi_dev_exit(int dev)
                 pr_err("diag_mhi_dev_exit: failed to deregister channel\n");
 }
 
-int diag_mhi_init()
+int diag_mhi_init(void)
 {
 	int i;
 	int err = 0;
@@ -748,7 +748,7 @@ fail:
 	return -ENOMEM;
 }
 
-void diag_mhi_exit()
+void diag_mhi_exit(void)
 {
 	int i;
 

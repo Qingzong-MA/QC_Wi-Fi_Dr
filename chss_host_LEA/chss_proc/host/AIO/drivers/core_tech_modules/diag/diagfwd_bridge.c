@@ -79,7 +79,7 @@ int diagfwd_bridge_register(int id, int ctxt, struct diag_remote_dev_ops *ops)
 }
 
 
-int diagfwd_bridge_init()
+int diagfwd_bridge_init(void)
 {
 	int err = 0;
 
@@ -118,7 +118,7 @@ int diagfwd_bridge_write(int id, unsigned char *buf, int len)
 }
 
 
-void diagfwd_bridge_exit()
+void diagfwd_bridge_exit(void)
 {
 #ifdef CONFIG_DIAG_MHI
 	diag_mhi_exit();

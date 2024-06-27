@@ -67,6 +67,7 @@
 #include "qdf_str.h"
 #include "qdf_types.h"
 #include "qdf_trace.h"
+#include "qdf_net_if.h"
 #include "wlan_hdd_cfg.h"
 #include "wlan_policy_mgr_api.h"
 #include "wlan_hdd_tsf.h"
@@ -731,6 +732,7 @@ static int __hdd_hostapd_set_mac_address(struct net_device *dev, void *addr)
 	struct hdd_context *hdd_ctx;
 	int ret = 0;
 	struct qdf_mac_addr mac_addr;
+	uint8_t t_mac_addr[QDF_MAC_ADDR_SIZE];
 
 	hdd_enter_dev(dev);
 
@@ -771,7 +773,8 @@ static int __hdd_hostapd_set_mac_address(struct net_device *dev, void *addr)
 		  dev->name);
 	hdd_update_dynamic_mac(hdd_ctx, &adapter->mac_addr, &mac_addr);
 	memcpy(&adapter->mac_addr, psta_mac_addr->sa_data, ETH_ALEN);
-	memcpy(dev->dev_addr, psta_mac_addr->sa_data, ETH_ALEN);
+	memcpy(t_mac_addr, psta_mac_addr->sa_data, ETH_ALEN);
+	qdf_net_update_net_device_dev_addr(dev, t_mac_addr, QDF_MAC_ADDR_SIZE);
 	hdd_exit();
 	return 0;
 }
@@ -1883,6 +1886,7 @@ QDF_STATUS hdd_hostapd_sap_event_cb(struct sap_event *sap_event,
 	struct sap_context *sap_ctx = NULL;
 	struct wlan_objmgr_vdev *vdev;
 	qdf_freq_t dfs_freq;
+	uint8_t mac_addr[QDF_MAC_ADDR_SIZE];
 
 	dev = context;
 	if (!dev) {
@@ -2030,12 +2034,13 @@ QDF_STATUS hdd_hostapd_sap_event_cb(struct sap_event *sap_event,
 		}
 
 		if (ucfg_ipa_is_enabled()) {
+			memcpy(mac_addr, adapter->dev->dev_addr, QDF_MAC_ADDR_SIZE);
 			status = ucfg_ipa_wlan_evt(hdd_ctx->pdev,
 						   adapter->dev,
 						   adapter->device_mode,
 						   adapter->vdev_id,
 						   WLAN_IPA_AP_CONNECT,
-						   adapter->dev->dev_addr);
+						   mac_addr);
 			if (status)
 				hdd_err("WLAN_AP_CONNECT event failed");
 		}
@@ -3864,7 +3869,7 @@ struct hdd_adapter *hdd_wlan_create_ap_dev(struct hdd_context *hdd_ctx,
 	dev->mtu = HDD_DEFAULT_MTU;
 	dev->tx_queue_len = HDD_NETDEV_TX_QUEUE_LEN;
 
-	qdf_mem_copy(dev->dev_addr, mac_addr, sizeof(tSirMacAddr));
+	qdf_net_update_net_device_dev_addr(dev, mac_addr, sizeof(tSirMacAddr));
 	qdf_mem_copy(adapter->mac_addr.bytes, mac_addr, sizeof(tSirMacAddr));
 
 	adapter->offloads_configured = false;

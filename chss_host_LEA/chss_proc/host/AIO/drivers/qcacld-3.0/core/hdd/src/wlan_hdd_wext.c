@@ -8545,6 +8545,7 @@ static int __iw_set_pno(struct net_device *dev,
 	uint8_t i, j, params;
 	QDF_STATUS status;
 	size_t len;
+	uint8_t mac_addr[QDF_MAC_ADDR_SIZE];
 
 	/* request is a large struct, so we make it static to avoid
 	 * stack overflow.  This API is only invoked via ioctl, so it
@@ -8564,8 +8565,9 @@ static int __iw_set_pno(struct net_device *dev,
 	if (0 != ret)
 		return ret;
 
+	memcpy(mac_addr, dev->dev_addr, QDF_MAC_ADDR_SIZE);
 	vdev = wlan_objmgr_get_vdev_by_macaddr_from_pdev(hdd_ctx->pdev,
-							 dev->dev_addr,
+							 mac_addr,
 							 WLAN_OSIF_SCAN_ID);
 	if (!vdev) {
 		hdd_err("vdev object is NULL");
