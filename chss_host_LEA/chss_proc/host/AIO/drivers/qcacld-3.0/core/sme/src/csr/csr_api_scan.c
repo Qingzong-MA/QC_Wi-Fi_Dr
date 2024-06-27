@@ -1150,6 +1150,7 @@ static void csr_handle_nxt_cmd(struct mac_context *mac_ctx,
 		 */
 		if (QDF_IS_STATUS_SUCCESS(ret))
 			return;
+		break;
 	default:
 		break;
 	}

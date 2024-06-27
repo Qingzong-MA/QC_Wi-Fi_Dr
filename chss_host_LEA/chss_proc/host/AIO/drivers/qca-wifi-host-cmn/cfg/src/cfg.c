@@ -101,15 +101,15 @@ cfg_int_item_handler(struct cfg_value_store *store,
 	}
 
 	switch (meta->fallback) {
-	default:
-		QDF_DEBUG_PANIC("Unknown fallback method %d for cfg item '%s'",
-				meta->fallback, meta->name);
-		/* fall through */
 	case CFG_VALUE_OR_DEFAULT:
 		/* store already contains default */
 		break;
 	case CFG_VALUE_OR_CLAMP:
 		*store_value = __cfg_clamp(value, meta->min, meta->max);
+		break;
+	default:
+		QDF_DEBUG_PANIC("Unknown fallback method %d for cfg item '%s'",
+				meta->fallback, meta->name);
 		break;
 	}
 
@@ -155,15 +155,15 @@ cfg_uint_item_handler(struct cfg_value_store *store,
 	}
 
 	switch (meta->fallback) {
-	default:
-		QDF_DEBUG_PANIC("Unknown fallback method %d for cfg item '%s'",
-				meta->fallback, meta->name);
-		/* fall through */
 	case CFG_VALUE_OR_DEFAULT:
 		/* store already contains default */
 		break;
 	case CFG_VALUE_OR_CLAMP:
 		*store_value = __cfg_clamp(value, min, max);
+		break;
+	default:
+		QDF_DEBUG_PANIC("Unknown fallback method %d for cfg item '%s'",
+				meta->fallback, meta->name);
 		break;
 	}
 

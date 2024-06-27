@@ -772,10 +772,6 @@ pmo_core_enable_wow_in_fw(struct wlan_objmgr_psoc *psoc,
 	}
 
 	switch (wow_params->resume_trigger) {
-	default:
-		pmo_err("Invalid resume trigger setting: %d",
-			 wow_params->resume_trigger);
-		/* intentional fall-through to default */
 	case PMO_WOW_RESUME_TRIGGER_DEFAULT:
 	case PMO_WOW_RESUME_TRIGGER_GPIO:
 		/*
@@ -785,6 +781,10 @@ pmo_core_enable_wow_in_fw(struct wlan_objmgr_psoc *psoc,
 		break;
 	case PMO_WOW_RESUME_TRIGGER_HTC_WAKEUP:
 		param.flags |= WMI_WOW_FLAG_DO_HTC_WAKEUP;
+		break;
+	default:
+		pmo_err("Invalid resume trigger setting: %d",
+			 wow_params->resume_trigger);
 		break;
 	}
 

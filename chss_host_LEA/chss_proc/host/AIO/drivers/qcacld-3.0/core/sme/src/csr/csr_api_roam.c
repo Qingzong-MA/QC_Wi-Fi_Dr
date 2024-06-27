@@ -7669,6 +7669,7 @@ QDF_STATUS csr_roam_issue_disassociate_cmd(struct mac_context *mac,
 			pCommand->u.roamCmd.roamReason = eCsrStopBss;
 			pCommand->u.roamCmd.roamProfile.BSSType =
 				eCSR_BSS_TYPE_NDI;
+			break;
 		default:
 			break;
 		}
@@ -16270,6 +16271,7 @@ static void csr_free_cmd_memory(struct mac_context *mac, tSmeCmd *pCommand)
 #ifndef FEATURE_CM_ENABLE
 	case e_sme_command_set_hw_mode:
 		csr_release_command_set_hw_mode(mac, pCommand);
+		break;
 #endif
 	default:
 		break;

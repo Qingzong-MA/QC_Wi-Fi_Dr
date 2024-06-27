@@ -1458,9 +1458,9 @@ static QDF_STATUS dp_rx_defrag(struct dp_peer *peer, unsigned tid,
 
 	switch (peer->security[index].sec_type) {
 	case cdp_sec_type_tkip:
-		tkip_demic = 1;
-
 	case cdp_sec_type_tkip_nomic:
+		if (cdp_sec_type_tkip == peer->security[index].sec_type)
+			tkip_demic = 1;
 		while (cur) {
 			tmp_next = qdf_nbuf_next(cur);
 			if (dp_rx_defrag_tkip_decap(cur, hdr_space)) {

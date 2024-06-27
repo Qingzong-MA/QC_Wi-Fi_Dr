@@ -3025,15 +3025,14 @@ cm_roam_switch_to_deinit(struct wlan_objmgr_pdev *pdev,
 				 vdev_id);
 			cm_roam_switch_to_rso_stop(pdev, vdev_id, reason);
 		}
-
-	case WLAN_ROAM_INIT:
 		break;
-
+	case WLAN_ROAM_INIT:
 	case WLAN_ROAM_DEINIT:
-	/*
-	 * Already the roaming module is de-initialized at fw,
-	 * do nothing here
-	 */
+		/*
+		* Already the roaming module is de-initialized at fw,
+		* do nothing here
+		*/
+		break;
 	default:
 		return QDF_STATUS_SUCCESS;
 	}

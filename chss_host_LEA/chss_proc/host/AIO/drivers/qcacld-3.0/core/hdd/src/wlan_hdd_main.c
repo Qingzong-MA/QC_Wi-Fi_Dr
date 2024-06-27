@@ -1064,7 +1064,7 @@ static int __hdd_netdev_notifier_call(struct net_device *net_dev,
 	case NETDEV_FEAT_CHANGE:
 		hdd_debug("vdev %d netdev Feature 0x%llx\n",
 			  adapter->vdev_id, net_dev->features);
-
+		break;
 	default:
 		break;
 	}
@@ -8684,6 +8684,7 @@ QDF_STATUS hdd_start_all_adapters(struct hdd_context *hdd_ctx)
 			break;
 		case QDF_NDI_MODE:
 			hdd_ndi_start(adapter->dev->name, 0);
+			break;
 		default:
 			break;
 		}
