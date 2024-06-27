@@ -8226,14 +8226,22 @@ static void hdd_connect_done(struct net_device *dev, const u8 *bssid,
 		fils_params.status = WLAN_STATUS_UNSPECIFIED_FAILURE;
 	} else {
 		fils_params.status = status;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+		fils_params.links[0].bssid = bssid;
+#else
 		fils_params.bssid = bssid;
+#endif
 		fils_params.timeout_reason =
 				hdd_convert_timeout_reason(timeout_reason);
 		fils_params.req_ie = req_ie;
 		fils_params.req_ie_len = req_ie_len;
 		fils_params.resp_ie = resp_ie;
 		fils_params.resp_ie_len = resp_ie_len;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+		fils_params.links[0].bss = bss;
+#else
 		fils_params.bss = bss;
+#endif
 		hdd_populate_fils_params(&fils_params, roam_fils_params->kek,
 					 roam_fils_params->kek_len,
 					 roam_fils_params->fils_pmk,
