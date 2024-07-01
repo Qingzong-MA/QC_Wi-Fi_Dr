@@ -46,6 +46,14 @@
 #define PKTLOG_PROC_DIR         "ath_pktlog"
 #endif
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
+/*
+ * Commit 359745d78351 ("proc: remove PDE_DATA() completely")
+ * Replaced PDE_DATA() with pde_data()
+ */
+#define pde_data(inode) PDE_DATA(inode)
+#endif
+
 /* Permissions for creating proc entries */
 #define PKTLOG_PROC_PERM        0444
 #define PKTLOG_PROCSYS_DIR_PERM 0555
@@ -871,7 +879,7 @@ __pktlog_read(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	struct ath_pktlog_info *pl_info;
 	struct ath_pktlog_buf *log_buf;
 
-	pl_info = PDE_DATA(file->f_path.dentry->d_inode);
+	pl_info = pde_data(file->f_path.dentry->d_inode);
 	if (!pl_info)
 		return 0;
 
@@ -1014,7 +1022,7 @@ rd_done:
 static ssize_t
 pktlog_read(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 {
-	struct ath_pktlog_info *info = PDE_DATA(file->f_path.dentry->d_inode);
+	struct ath_pktlog_info *info = pde_data(file->f_path.dentry->d_inode);
 	struct qdf_op_sync *op_sync;
 	ssize_t err_size;
 
