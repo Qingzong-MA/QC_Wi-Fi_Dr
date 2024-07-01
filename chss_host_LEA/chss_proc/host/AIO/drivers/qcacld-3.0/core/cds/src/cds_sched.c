@@ -859,7 +859,11 @@ static int cds_ol_rx_thread(void *arg)
 	}
 
 	cds_debug("Exiting CDS OL rx thread");
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
 	complete_and_exit(&pSchedContext->ol_rx_shutdown, 0);
+#else
+	kthread_complete_and_exit(&pSchedContext->ol_rx_shutdown, 0);
+#endif
 
 	return 0;
 }

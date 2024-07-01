@@ -380,10 +380,12 @@ qdf_export_symbol(qdf_event_list_destroy);
 
 QDF_STATUS qdf_exit_thread(QDF_STATUS status)
 {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
 	if (status == QDF_STATUS_SUCCESS)
 		do_exit(0);
 	else
 		do_exit(SIGKILL);
+#endif
 
 	return QDF_STATUS_SUCCESS;
 }

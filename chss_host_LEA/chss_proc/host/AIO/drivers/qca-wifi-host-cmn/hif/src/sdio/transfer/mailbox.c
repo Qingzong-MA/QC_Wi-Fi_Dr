@@ -1887,7 +1887,11 @@ static int async_task(void *param)
 		}
 	}
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
 	complete_and_exit(&device->async_completion, 0);
+#else
+	kthread_complete_and_exit(&device->async_completion, 0);
+#endif
 
 	return 0;
 }

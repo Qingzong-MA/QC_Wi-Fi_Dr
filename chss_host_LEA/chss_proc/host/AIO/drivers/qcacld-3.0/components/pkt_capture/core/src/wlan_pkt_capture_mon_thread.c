@@ -357,7 +357,11 @@ static int pkt_capture_mon_thread(void *arg)
 		}
 	}
 	pkt_capture_debug("Exiting packet capture mon thread");
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
 	complete_and_exit(&mon_ctx->mon_shutdown, 0);
+#else
+	kthread_complete_and_exit(&mon_ctx->mon_shutdown, 0);
+#endif
 
 	return 0;
 }
