@@ -222,7 +222,7 @@ static void qmi_log(struct qmi_handle *handle,
 		QMI_REQ_RESP_LOG("%s %s CF:%x TI:%x MI:%x ML:%x SvcId: %x",
 		(handle->handle_type == QMI_CLIENT_HANDLE ? "QCCI" : "QCSI"),
 		ops_type, cntl_flag, txn_id, msg_id, msg_len, service_id);
-	} else if ((cntl_flag == QMI_INDICATION_CONTROL_FLAG)) {
+	} else if (cntl_flag == QMI_INDICATION_CONTROL_FLAG) {
 		QMI_IND_LOG("%s %s CF:%x TI:%x MI:%x ML:%x SvcId: %x",
 		(handle->handle_type == QMI_CLIENT_HANDLE ? "QCCI" : "QCSI"),
 		ops_type, cntl_flag, txn_id, msg_id, msg_len, service_id);
