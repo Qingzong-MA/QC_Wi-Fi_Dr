@@ -82,8 +82,23 @@ static void hif_init_rx_thread_napi(struct qca_napi_info *napii)
 	struct qdf_net_if *nd = (struct qdf_net_if *)&napii->rx_thread_netdev;
 
 	qdf_net_if_create_dummy_if(nd);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+/*
+ * Upstream commit b48b89f9c189 ("net: drop the weight argument from
+ * netif_napi_add") was introduced in Linux 6.1.  As described by the
+ * subject, this removes the weight argument from netif_napi_add().
+ *
+ * This was preceded by commit 58caed3dacb4 ("netdev: reshuffle
+ * netif_napi_add() APIs to allow dropping weight") in Linux 5.19
+ * which added new APIs to call when a non-default weight wishes to be
+ * sent.
+ */
 	netif_napi_add(&napii->rx_thread_netdev, &napii->rx_thread_napi,
-		       hif_rxthread_napi_poll, 64);
+				hif_rxthread_napi_poll);
+#else
+	netif_napi_add(&napii->rx_thread_netdev, &napii->rx_thread_napi,
+				hif_rxthread_napi_poll, 64);
+#endif
 	napi_enable(&napii->rx_thread_napi);
 }
 
@@ -206,7 +221,11 @@ int hif_napi_create(struct hif_opaque_softc   *hif_ctx,
 
 		NAPI_DEBUG("adding napi=%pK to netdev=%pK (poll=%pK, bdgt=%d)",
 			   &(napii->napi), &(napii->netdev), poll, budget);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 0))
+		netif_napi_add_weight(&(napii->netdev), &(napii->napi), poll, budget);
+#else
 		netif_napi_add(&(napii->netdev), &(napii->napi), poll, budget);
+#endif
 
 		NAPI_DEBUG("after napi_add");
 		NAPI_DEBUG("napi=0x%pK, netdev=0x%pK",
