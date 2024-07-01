@@ -375,7 +375,11 @@ static int hdd_ipa_send_to_nw_stack(qdf_nbuf_t skb)
 	if (qdf_ipa_get_lan_rx_napi())
 		result = netif_receive_skb(skb);
 	else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+		result = netif_rx(skb);
+#else
 		result = netif_rx_ni(skb);
+#endif
 	return result;
 }
 

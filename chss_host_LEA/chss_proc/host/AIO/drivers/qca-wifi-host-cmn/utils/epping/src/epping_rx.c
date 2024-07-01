@@ -138,7 +138,11 @@ void epping_rx(void *ctx, HTC_PACKET *pPacket)
 			if (hdd_napi_enabled(HDD_NAPI_ANY))
 				netif_receive_skb(pktSkb);
 			else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+				netif_rx(pktSkb);
+#else
 				netif_rx_ni(pktSkb);
+#endif
 			if ((adapter->stats.rx_packets %
 				 EPPING_STATS_LOG_COUNT) == 0) {
 				EPPING_LOG(QDF_TRACE_LEVEL_FATAL,

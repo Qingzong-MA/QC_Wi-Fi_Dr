@@ -75,7 +75,11 @@ void hdd_rx_monitor_callback(ol_osif_vdev_handle context,
 			 * This is the last packet on the chain
 			 * Scheduling rx sirq
 			 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+			rxstat = netif_rx(skb);
+#else
 			rxstat = netif_rx_ni(skb);
+#endif
 		}
 
 		if (NET_RX_SUCCESS == rxstat)

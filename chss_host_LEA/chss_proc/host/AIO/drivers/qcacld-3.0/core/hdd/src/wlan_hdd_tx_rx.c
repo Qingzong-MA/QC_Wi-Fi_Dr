@@ -1536,7 +1536,11 @@ QDF_STATUS hdd_mon_rx_packet_cbk(void *context, qdf_nbuf_t rxbuf)
 			 * This is the last packet on the chain
 			 * Scheduling rx sirq
 			 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+			rxstat = netif_rx(skb);
+#else
 			rxstat = netif_rx_ni(skb);
+#endif
 		}
 
 		if (NET_RX_SUCCESS == rxstat)
@@ -2166,7 +2170,11 @@ QDF_STATUS hdd_rx_deliver_to_stack(struct hdd_adapter *adapter,
 
 	adapter->hdd_stats.tx_rx_stats.rx_non_aggregated++;
 	hdd_ctx->no_rx_offload_pkt_cnt++;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+	netif_status = netif_rx(skb);
+#else
 	netif_status = netif_rx_ni(skb);
+#endif
 
 	if (netif_status == NET_RX_SUCCESS)
 		status = QDF_STATUS_SUCCESS;
@@ -2332,7 +2340,11 @@ QDF_STATUS hdd_rx_deliver_to_stack(struct hdd_adapter *adapter,
 		 * qcacld-3.0: Do netif_rx_ni() for frames received before
 		 * peer assoc
 		 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0))
+		netif_status = netif_rx(skb);
+#else
 		netif_status = netif_rx_ni(skb);
+#endif
 	} else { /* NAPI Context */
 		netif_status = netif_receive_skb(skb);
 	}
