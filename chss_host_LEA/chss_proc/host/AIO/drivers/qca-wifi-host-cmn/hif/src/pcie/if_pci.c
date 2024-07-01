@@ -1783,6 +1783,9 @@ static int hif_enable_pci_nopld(struct hif_pci_softc *sc,
 	int ret = 0;
 	uint16_t device_id = 0;
 	struct hif_softc *ol_sc = HIF_GET_SOFTC(sc);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	struct device *dev = &pdev->dev;
+#endif
 
 	pci_read_config_word(pdev, PCI_DEVICE_ID, &device_id);
 	if (device_id != id->device)  {
@@ -1819,6 +1822,13 @@ static int hif_enable_pci_nopld(struct hif_pci_softc *sc,
 	/* if CONFIG_ARM_LPAE is enabled, we have to set 64 bits mask
 	 * for 32 bits device also.
 	 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+	if (ret) {
+		hif_err("Cannot enable 64-bit pci DMA");
+		goto err_dma;
+	}
+#else
 	ret =  pci_set_dma_mask(pdev, DMA_BIT_MASK(64));
 	if (ret) {
 		hif_err("Cannot enable 64-bit pci DMA");
@@ -1827,6 +1837,14 @@ static int hif_enable_pci_nopld(struct hif_pci_softc *sc,
 	ret = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
 	if (ret) {
 		hif_err("Cannot enable 64-bit DMA");
+		goto err_dma;
+	}
+#endif
+#else
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
+	if (ret) {
+		hif_err("Cannot enable 32-bit pci DMA");
 		goto err_dma;
 	}
 #else
@@ -1840,6 +1858,7 @@ static int hif_enable_pci_nopld(struct hif_pci_softc *sc,
 		hif_err("Cannot enable 32-bit consistent DMA!");
 		goto err_dma;
 	}
+#endif
 #endif
 
 	PCI_CFG_TO_DISABLE_L1SS_STATES(pdev, 0x188);
