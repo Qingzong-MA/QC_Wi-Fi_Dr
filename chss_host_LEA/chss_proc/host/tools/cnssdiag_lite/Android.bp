@@ -1,0 +1,41 @@
+cc_binary {
+    name: "cnss_diag_lite",
+    srcs: [
+        "cld-fwlog-netlink.c",
+        "parser.c",
+        "nan-parser.c",
+        "cld-diag-parser.c",
+        "cld80211_lib.c",
+    ],
+    cflags: [
+        "-Wno-unused-parameter",
+        "-Wno-pointer-arith",
+        "-Wno-sign-compare",
+        "-Wno-format",
+        "-Wno-absolute-value",
+        "-Wno-enum-conversion",
+        "-g3",
+        "-DCONFIG_CLD80211_LIB",
+        "-D_GNU_SOURCE",
+        "-DCONFIG_LIBNL30",
+    ],
+    include_dirs: [
+        "external/libnl/include",
+    ],
+    shared_libs: [
+        "libnl",
+        "libc",
+    ],
+    target: {
+        android_arm64: {
+            cflags: [
+                "-DANDROID_ARM64",
+            ],
+        },
+        android_x86_64: {
+            cflags: [
+                "-DANDROID_X86_64",
+            ],
+        },
+    },
+}
