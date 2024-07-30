@@ -1,0 +1,55 @@
+diff --git a/sources/wpa_supplicant_8/hostapd/config_file.c b/sources/wpa_supplicant_8/hostapd/config_file.c
+index cc1855d..d6dd7da 100755
+--- a/sources/wpa_supplicant_8/hostapd/config_file.c
++++ b/sources/wpa_supplicant_8/hostapd/config_file.c
+@@ -4602,6 +4602,8 @@ static int hostapd_config_fill(struct hostapd_config *conf,
+ 		}
+ 		bss->mka_psk_set |= MKA_PSK_SET_CKN;
+ #endif /* CONFIG_MACSEC */
++	} else if (os_strcmp(buf, "force_40mhz") == 0) {
++		conf->force_40mhz = atoi(pos);
+ 	} else {
+ 		wpa_printf(MSG_ERROR,
+ 			   "Line %d: unknown configuration item '%s'",
+diff --git a/sources/wpa_supplicant_8/src/ap/ap_config.c b/sources/wpa_supplicant_8/src/ap/ap_config.c
+index 35a32a1..d2e5d7e 100755
+--- a/sources/wpa_supplicant_8/src/ap/ap_config.c
++++ b/sources/wpa_supplicant_8/src/ap/ap_config.c
+@@ -278,6 +278,8 @@ struct hostapd_config * hostapd_config_defaults(void)
+ 	conf->airtime_update_interval = AIRTIME_DEFAULT_UPDATE_INTERVAL;
+ #endif /* CONFIG_AIRTIME_POLICY */
+ 
++	conf->force_40mhz = 0;
++
+ 	return conf;
+ }
+ 
+diff --git a/sources/wpa_supplicant_8/src/ap/ap_config.h b/sources/wpa_supplicant_8/src/ap/ap_config.h
+index 3af231f..c00eb23 100755
+--- a/sources/wpa_supplicant_8/src/ap/ap_config.h
++++ b/sources/wpa_supplicant_8/src/ap/ap_config.h
+@@ -989,6 +989,8 @@ struct hostapd_config {
+ 	/* Use driver-generated interface addresses when adding multiple BSSs */
+ 	u8 use_driver_iface_addr;
+ 
++	int force_40mhz;
++
+ #ifdef CONFIG_FST
+ 	struct fst_iface_cfg fst_cfg;
+ #endif /* CONFIG_FST */
+diff --git a/sources/wpa_supplicant_8/src/ap/hw_features.c b/sources/wpa_supplicant_8/src/ap/hw_features.c
+index f34b8a0..06757db 100755
+--- a/sources/wpa_supplicant_8/src/ap/hw_features.c
++++ b/sources/wpa_supplicant_8/src/ap/hw_features.c
+@@ -332,6 +332,11 @@ static void ieee80211n_check_scan(struct hostapd_iface *iface)
+ 		oper40 = ieee80211n_check_40mhz_2g4(iface, scan_res);
+ 	wpa_scan_results_free(scan_res);
+ 
++	if (!oper40 && iface->conf->force_40mhz) {
++		wpa_printf(MSG_INFO, "Will force to 40MHz in the 2.4G.");
++		oper40 = 1;
++	}
++
+ 	iface->secondary_ch = iface->conf->secondary_channel;
+ 	if (!oper40) {
+ 		wpa_printf(MSG_INFO, "20/40 MHz operation not permitted on "

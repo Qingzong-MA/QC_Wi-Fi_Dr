@@ -1,0 +1,15 @@
+diff --git a/chss_host_LEA/chss_proc/host/AIO/apps/hostap/src/ap/hw_features.c b/chss_host_LEA/chss_proc/host/AIO/apps/hostap/src/ap/hw_features.c
+index bb5404f..3436ed7 100644
+--- a/chss_host_LEA/chss_proc/host/AIO/apps/hostap/src/ap/hw_features.c
++++ b/chss_host_LEA/chss_proc/host/AIO/apps/hostap/src/ap/hw_features.c
+@@ -288,7 +288,10 @@ static int ieee80211n_check_40mhz_5g(struct hostapd_iface *iface,
+ 			wpa_printf(MSG_DEBUG,
+ 				   "Cannot switch PRI/SEC channels due to local constraint");
+ 		} else {
++#if 0
+ 			ieee80211n_switch_pri_sec(iface);
++#endif
++			// not TO DO
+ 		}
+ 	}
+ 

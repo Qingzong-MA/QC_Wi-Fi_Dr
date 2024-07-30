@@ -1,0 +1,32 @@
+Index: misdk/linuxkernel/4.19/drivers/pci/controller/pcie-mstar.c
+=================================================================
+--- a/misdk/linuxkernel/4.19/drivers/pci/controller/pcie-mstar.c
++++ b/misdk/linuxkernel/4.19/drivers/pci/controller/pcie-mstar.c
+@ -836,6 +836,9 @@
+	return ret;
+ }
+
++//debug
++int write_count = 0;
++
+ static int mstar_pcie_config_write(struct pci_bus *bus, unsigned int devfn,
+				 int where, int size, u32 val)
+ {
+@@ -861,6 +864,17 @@
+		}
+ #endif
+
++//debug
++	if (where == 0x5c) {
++		return 0;
++		write_count++;
++
++		if ((write_count % 100) == 0) {
++			printk("PCIE debug dump...\n");
++			dump_stack();
++		}
++	}
++
+	//printk("[PCIE] Wr %x %x %x %x\n", bn, where, size, val);
+        
+	return mstar_pcie_hw_wr_cfg(port, bn, devfn, where, size, val);
