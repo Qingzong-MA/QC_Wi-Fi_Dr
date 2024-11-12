@@ -5110,6 +5110,7 @@ typedef enum {
 	wmi_service_lower_6g_edge_ch_supp,
 	wmi_service_disable_upper_6g_edge_ch_supp,
 #endif
+	wmi_service_sae_eapol_offload_support,
 	wmi_services_max,
 } wmi_conv_service_ids;
 #define WMI_SERVICE_UNAVAILABLE 0xFFFF
@@ -5362,6 +5363,7 @@ typedef struct {
 	uint32_t max_ndp_sessions;
 	uint32_t max_ndi;
 	bool carrier_vow_optimization;
+	bool sae_eapol_offload;
 } target_resource_config;
 
 /**
