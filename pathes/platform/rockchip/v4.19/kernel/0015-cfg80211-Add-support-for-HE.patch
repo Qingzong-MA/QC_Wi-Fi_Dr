@@ -1,0 +1,27 @@
+From 0dc662a303dd9af535042f78e2768d026abbb862 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:42:28 +0800
+Subject: [PATCH 15/33] cfg80211: Add support for HE
+
+Change-Id: Ibbdd7f8c509cb03ebd67320204d9ed702c4ef033
+---
+ kernel/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 4763c16b29..a4eb980bf9 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -83,6 +83,9 @@ struct wiphy;
+ /* Indicate backport support for external authentication*/
+ #define CFG80211_EXTERNAL_AUTH_SUPPORT 1
+ 
++/* Indicate backport support for HE */
++#define CFG80211_HE_SUPPORT_BACKPORT 1
++
+ /**
+  * enum ieee80211_channel_flags - channel flags
+  *
+-- 
+2.17.1
+

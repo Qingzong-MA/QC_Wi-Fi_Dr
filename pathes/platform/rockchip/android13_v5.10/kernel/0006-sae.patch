@@ -1,0 +1,27 @@
+From 09d0577f3d42fc15dbf9473b065eb19f1c62fa46 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 14:54:41 +0800
+Subject: [PATCH 6/7] sae
+
+Change-Id: Icd8922b3a5b709018dc97f4e6476e4f940a1cac0
+---
+ kernel-5.10/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel-5.10/include/net/cfg80211.h b/kernel-5.10/include/net/cfg80211.h
+index bbcb4e44ec..8c5f825d0c 100644
+--- a/kernel-5.10/include/net/cfg80211.h
++++ b/kernel-5.10/include/net/cfg80211.h
+@@ -73,6 +73,9 @@ struct wiphy;
+  * wireless hardware capability structures
+  */
+ 
++/* Indicate backport support for external authentication*/
++#define CFG80211_EXTERNAL_AUTH_SUPPORT 1
++
+ /**
+  * enum ieee80211_channel_flags - channel flags
+  *
+-- 
+2.17.1
+

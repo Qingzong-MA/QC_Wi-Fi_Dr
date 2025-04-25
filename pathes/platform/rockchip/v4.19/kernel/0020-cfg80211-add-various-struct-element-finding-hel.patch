@@ -1,0 +1,299 @@
+From 8dfdca7465d8a68fc529b60b9faf3e76a8066d88 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:51:11 +0800
+Subject: [PATCH 20/33] cfg80211: add various struct element finding helpers
+
+Change-Id: If813c7d7beb6555fd39ab8aace2b388eed6e1d4d
+---
+ kernel/include/net/cfg80211.h | 135 ++++++++++++++++++++++++++++++++--
+ kernel/net/wireless/scan.c    |  39 +++++-----
+ kernel/net/wireless/util.c    |   6 +-
+ 3 files changed, 148 insertions(+), 32 deletions(-)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 1a2453813c..254df19d82 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -2142,16 +2142,30 @@ struct cfg80211_bss {
+ 	u8 priv[0] __aligned(sizeof(void *));
+ };
+ 
++/**
++ * ieee80211_bss_get_elem - find element with given ID
++ * @bss: the bss to search
++ * @id: the element ID
++ *
++ * Note that the return value is an RCU-protected pointer, so
++ * rcu_read_lock() must be held when calling this function.
++ * Return: %NULL if not found.
++ */
++const struct element *ieee80211_bss_get_elem(struct cfg80211_bss *bss, u8 id);
++
+ /**
+  * ieee80211_bss_get_ie - find IE with given ID
+  * @bss: the bss to search
+- * @ie: the IE ID
++ * @id: the element ID
+  *
+  * Note that the return value is an RCU-protected pointer, so
+  * rcu_read_lock() must be held when calling this function.
+  * Return: %NULL if not found.
+  */
+-const u8 *ieee80211_bss_get_ie(struct cfg80211_bss *bss, u8 ie);
++static inline const u8 *ieee80211_bss_get_ie(struct cfg80211_bss *bss, u8 id)
++{
++	return (void *)ieee80211_bss_get_elem(bss, id);
++}
+ 
+ 
+ /**
+@@ -4864,6 +4878,33 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
+ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
+ 				    struct cfg80211_qos_map *qos_map);
+ 
++/**
++ * cfg80211_find_elem_match - match information element and byte array in data
++ *
++ * @eid: element ID
++ * @ies: data consisting of IEs
++ * @len: length of data
++ * @match: byte array to match
++ * @match_len: number of bytes in the match array
++ * @match_offset: offset in the IE data where the byte array should match.
++ *	Note the difference to cfg80211_find_ie_match() which considers
++ *	the offset to start from the element ID byte, but here we take
++ *	the data portion instead.
++ *
++ * Return: %NULL if the element ID could not be found or if
++ * the element is invalid (claims to be longer than the given
++ * data) or if the byte array doesn't match; otherwise return the
++ * requested element struct.
++ *
++ * Note: There are no checks on the element length other than
++ * having to fit into the given data and being large enough for the
++ * byte array to match.
++ */
++const struct element *
++cfg80211_find_elem_match(u8 eid, const u8 *ies, unsigned int len,
++			 const u8 *match, unsigned int match_len,
++			 unsigned int match_offset);
++
+ /**
+  * cfg80211_find_ie_match - match information element and byte array in data
+  *
+@@ -4888,9 +4929,44 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
+  * having to fit into the given data and being large enough for the
+  * byte array to match.
+  */
+-const u8 *cfg80211_find_ie_match(u8 eid, const u8 *ies, int len,
+-				 const u8 *match, int match_len,
+-				 int match_offset);
++static inline const u8 *
++cfg80211_find_ie_match(u8 eid, const u8 *ies, unsigned int len,
++		       const u8 *match, unsigned int match_len,
++		       unsigned int match_offset)
++{
++	/* match_offset can't be smaller than 2, unless match_len is
++	 * zero, in which case match_offset must be zero as well.
++	 */
++	if (WARN_ON((match_len && match_offset < 2) ||
++		    (!match_len && match_offset)))
++		return NULL;
++
++	return (void *)cfg80211_find_elem_match(eid, ies, len,
++						match, match_len,
++						match_offset ?
++							match_offset - 2 : 0);
++}
++
++/**
++ * cfg80211_find_elem - find information element in data
++ *
++ * @eid: element ID
++ * @ies: data consisting of IEs
++ * @len: length of data
++ *
++ * Return: %NULL if the element ID could not be found or if
++ * the element is invalid (claims to be longer than the given
++ * data) or if the byte array doesn't match; otherwise return the
++ * requested element struct.
++ *
++ * Note: There are no checks on the element length other than
++ * having to fit into the given data.
++ */
++static inline const struct element *
++cfg80211_find_elem(u8 eid, const u8 *ies, int len)
++{
++	return cfg80211_find_elem_match(eid, ies, len, NULL, 0, 0);
++}
+ 
+ /**
+  * cfg80211_find_ie - find information element in data
+@@ -4912,6 +4988,28 @@ static inline const u8 *cfg80211_find_ie(u8 eid, const u8 *ies, int len)
+ 	return cfg80211_find_ie_match(eid, ies, len, NULL, 0, 0);
+ }
+ 
++/**
++ * cfg80211_find_ext_elem - find information element with EID Extension in data
++ *
++ * @ext_eid: element ID Extension
++ * @ies: data consisting of IEs
++ * @len: length of data
++ *
++ * Return: %NULL if the etended element could not be found or if
++ * the element is invalid (claims to be longer than the given
++ * data) or if the byte array doesn't match; otherwise return the
++ * requested element struct.
++ *
++ * Note: There are no checks on the element length other than
++ * having to fit into the given data.
++ */
++static inline const struct element *
++cfg80211_find_ext_elem(u8 ext_eid, const u8 *ies, int len)
++{
++	return cfg80211_find_elem_match(WLAN_EID_EXTENSION, ies, len,
++					&ext_eid, 1, 0);
++}
++
+ /**
+  * cfg80211_find_ext_ie - find information element with EID Extension in data
+  *
+@@ -4933,6 +5031,25 @@ static inline const u8 *cfg80211_find_ext_ie(u8 ext_eid, const u8 *ies, int len)
+ 				      &ext_eid, 1, 2);
+ }
+ 
++/**
++ * cfg80211_find_vendor_elem - find vendor specific information element in data
++ *
++ * @oui: vendor OUI
++ * @oui_type: vendor-specific OUI type (must be < 0xff), negative means any
++ * @ies: data consisting of IEs
++ * @len: length of data
++ *
++ * Return: %NULL if the vendor specific element ID could not be found or if the
++ * element is invalid (claims to be longer than the given data); otherwise
++ * return the element structure for the requested element.
++ *
++ * Note: There are no checks on the element length other than having to fit into
++ * the given data.
++ */
++const struct element *cfg80211_find_vendor_elem(unsigned int oui, int oui_type,
++						const u8 *ies,
++						unsigned int len);
++
+ /**
+  * cfg80211_find_vendor_ie - find vendor specific information element in data
+  *
+@@ -4949,8 +5066,12 @@ static inline const u8 *cfg80211_find_ext_ie(u8 ext_eid, const u8 *ies, int len)
+  * Note: There are no checks on the element length other than having to fit into
+  * the given data.
+  */
+-const u8 *cfg80211_find_vendor_ie(unsigned int oui, int oui_type,
+-				  const u8 *ies, int len);
++static inline const u8 *
++cfg80211_find_vendor_ie(unsigned int oui, int oui_type,
++			const u8 *ies, unsigned int len)
++{
++	return (void *)cfg80211_find_vendor_elem(oui, oui_type, ies, len);
++}
+ 
+ /**
+  * cfg80211_send_layer2_update - send layer 2 update frame
+diff --git a/kernel/net/wireless/scan.c b/kernel/net/wireless/scan.c
+index fe4c054107..dbdf75ad05 100644
+--- a/kernel/net/wireless/scan.c
++++ b/kernel/net/wireless/scan.c
+@@ -650,48 +650,43 @@ void cfg80211_bss_expire(struct cfg80211_registered_device *rdev)
+ 	__cfg80211_bss_expire(rdev, jiffies - IEEE80211_SCAN_RESULT_EXPIRE);
+ }
+ 
+-const u8 *cfg80211_find_ie_match(u8 eid, const u8 *ies, int len,
+-				 const u8 *match, int match_len,
+-				 int match_offset)
++const struct element *
++cfg80211_find_elem_match(u8 eid, const u8 *ies, unsigned int len,
++			 const u8 *match, unsigned int match_len,
++			 unsigned int match_offset)
+ {
+ 	const struct element *elem;
+ 
+-	/* match_offset can't be smaller than 2, unless match_len is
+-	 * zero, in which case match_offset must be zero as well.
+-	 */
+-	if (WARN_ON((match_len && match_offset < 2) ||
+-		    (!match_len && match_offset)))
+-		return NULL;
+-
+ 	for_each_element_id(elem, eid, ies, len) {
+-		if (elem->datalen >= match_offset - 2 + match_len &&
+-		    !memcmp(elem->data + match_offset - 2, match, match_len))
+-			return (void *)elem;
++		if (elem->datalen >= match_offset + match_len &&
++		    !memcmp(elem->data + match_offset, match, match_len))
++			return elem;
+ 	}
+ 
+ 	return NULL;
+ }
+-EXPORT_SYMBOL(cfg80211_find_ie_match);
++EXPORT_SYMBOL(cfg80211_find_elem_match);
+ 
+-const u8 *cfg80211_find_vendor_ie(unsigned int oui, int oui_type,
+-				  const u8 *ies, int len)
++const struct element *cfg80211_find_vendor_elem(unsigned int oui, int oui_type,
++						const u8 *ies,
++						unsigned int len)
+ {
+-	const u8 *ie;
++	const struct element *elem;
+ 	u8 match[] = { oui >> 16, oui >> 8, oui, oui_type };
+ 	int match_len = (oui_type < 0) ? 3 : sizeof(match);
+ 
+ 	if (WARN_ON(oui_type > 0xff))
+ 		return NULL;
+ 
+-	ie = cfg80211_find_ie_match(WLAN_EID_VENDOR_SPECIFIC, ies, len,
+-				    match, match_len, 2);
++	elem = cfg80211_find_elem_match(WLAN_EID_VENDOR_SPECIFIC, ies, len,
++					match, match_len, 0);
+ 
+-	if (ie && (ie[1] < 4))
++	if (!elem || elem->datalen < 4)
+ 		return NULL;
+ 
+-	return ie;
++	return elem;
+ }
+-EXPORT_SYMBOL(cfg80211_find_vendor_ie);
++EXPORT_SYMBOL(cfg80211_find_vendor_elem);
+ 
+ /**
+  * enum bss_compare_mode - BSS compare mode
+diff --git a/kernel/net/wireless/util.c b/kernel/net/wireless/util.c
+index dc66f6f9c6..2650053ad2 100644
+--- a/kernel/net/wireless/util.c
++++ b/kernel/net/wireless/util.c
+@@ -829,7 +829,7 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
+ }
+ EXPORT_SYMBOL(cfg80211_classify8021d);
+ 
+-const u8 *ieee80211_bss_get_ie(struct cfg80211_bss *bss, u8 ie)
++const struct element *ieee80211_bss_get_elem(struct cfg80211_bss *bss, u8 id)
+ {
+ 	const struct cfg80211_bss_ies *ies;
+ 
+@@ -837,9 +837,9 @@ const u8 *ieee80211_bss_get_ie(struct cfg80211_bss *bss, u8 ie)
+ 	if (!ies)
+ 		return NULL;
+ 
+-	return cfg80211_find_ie(ie, ies->data, ies->len);
++	return cfg80211_find_elem(id, ies->data, ies->len);
+ }
+-EXPORT_SYMBOL(ieee80211_bss_get_ie);
++EXPORT_SYMBOL(ieee80211_bss_get_elem);
+ 
+ void cfg80211_upload_connect_keys(struct wireless_dev *wdev)
+ {
+-- 
+2.17.1
+

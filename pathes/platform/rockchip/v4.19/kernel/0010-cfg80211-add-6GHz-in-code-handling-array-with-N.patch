@@ -1,0 +1,31 @@
+From 2e1d1a996d1b693740200c3e3e0bebb8b9ae52fc Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:07:45 +0800
+Subject: [PATCH 10/33] cfg80211: add 6GHz in code handling array with
+ NUM_NL80211_BANDS entries
+
+Change-Id: I9b6a35c5ce773890c689931f1cf09357cac947d3
+---
+ kernel/net/wireless/trace.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/net/wireless/trace.h b/kernel/net/wireless/trace.h
+index 713c15d6c5..d039ec0f98 100644
+--- a/kernel/net/wireless/trace.h
++++ b/kernel/net/wireless/trace.h
+@@ -3222,10 +3222,11 @@ TRACE_EVENT(rdev_set_mcast_rate,
+ 		       sizeof(int) * NUM_NL80211_BANDS);
+ 	),
+ 	TP_printk(WIPHY_PR_FMT ", " NETDEV_PR_FMT ", "
+-		  "mcast_rates [2.4GHz=0x%x, 5.2GHz=0x%x, 60GHz=0x%x]",
++		  "mcast_rates [2.4GHz=0x%x, 5.2GHz=0x%x, 6GHz=0x%x, 60GHz=0x%x]",
+ 		  WIPHY_PR_ARG, NETDEV_PR_ARG,
+ 		  __entry->mcast_rate[NL80211_BAND_2GHZ],
+ 		  __entry->mcast_rate[NL80211_BAND_5GHZ],
++		  __entry->mcast_rate[NL80211_BAND_6GHZ],
+ 		  __entry->mcast_rate[NL80211_BAND_60GHZ])
+ );
+ 
+-- 
+2.17.1
+

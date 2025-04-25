@@ -1,0 +1,40 @@
+From 13996f9cf1c6993ba5e71bfb6e7fa8d2f16b0cff Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:54:19 +0800
+Subject: [PATCH 22/33] cfg80211: fix memory leak of new_ie
+
+Change-Id: Ice6de0def2770e89471c179e0d530cc2ce8627ad
+---
+ kernel/net/wireless/scan.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/kernel/net/wireless/scan.c b/kernel/net/wireless/scan.c
+index d958bdcbd5..af3a0af370 100644
+--- a/kernel/net/wireless/scan.c
++++ b/kernel/net/wireless/scan.c
+@@ -1581,10 +1581,8 @@ cfg80211_update_notlisted_nontrans(struct wiphy *wiphy,
+ 	if (!new_ie)
+ 		return;
+ 	new_ies = kzalloc(sizeof(*new_ies) + new_ie_len, gfp);
+-	if (!new_ies) {
+-		kfree(new_ie);
+-		return;
+-	}
++	if (!new_ies)
++		goto out_free;
+ 
+ 	pos = new_ie;
+ 
+@@ -1618,6 +1616,9 @@ cfg80211_update_notlisted_nontrans(struct wiphy *wiphy,
+ 		if (old)
+ 			kfree_rcu((struct cfg80211_bss_ies *)old, rcu_head);
+ 	}
++
++out_free:
++	kfree(new_ie);
+ }
+ 
+ /* cfg80211_inform_bss_width_frame helper */
+-- 
+2.17.1
+

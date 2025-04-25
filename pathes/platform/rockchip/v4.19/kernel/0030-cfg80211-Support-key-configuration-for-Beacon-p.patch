@@ -1,0 +1,31 @@
+From cc54eb6ad2fecee8f09534cf204082884ad5734f Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 16:54:13 +0800
+Subject: [PATCH 30/33] cfg80211: Support key configuration for Beacon protection
+ (BIGTK)
+
+Change-Id: I1d8139e84ef24a000a9c1841c3e2cdae4a9ff570
+---
+ kernel/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+ mode change 100644 => 100755 kernel/include/net/cfg80211.h
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+old mode 100644
+new mode 100755
+index 200c05ddbe..e917bb762f
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -26,6 +26,9 @@
+ #include <linux/net.h>
+ #include <net/regulatory.h>
+ 
++/* Indicate backport support for key configuration for Beacon protection*/
++#define CFG80211_BIGTK_CONFIGURATION_SUPPORT 1
++
+ /* Indicate support for including KEK length in rekey data */
+ #define CFG80211_REKEY_DATA_KEK_LEN 1
+ 
+-- 
+2.17.1
+

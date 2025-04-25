@@ -1,0 +1,27 @@
+From 739f746862ad267eaf1adc1aa1b40584fe712637 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:00:23 +0800
+Subject: [PATCH 05/33] x86-kernel: reserve CMA memory space under 4G
+
+Change-Id: Ife2fe605814d0bfaa22b546d6db126a6f7e6f903
+---
+ kernel/arch/x86/kernel/setup.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/arch/x86/kernel/setup.c b/kernel/arch/x86/kernel/setup.c
+index 652a10a321..fed7e6e011 100644
+--- a/kernel/arch/x86/kernel/setup.c
++++ b/kernel/arch/x86/kernel/setup.c
+@@ -1188,7 +1188,8 @@ void __init setup_arch(char **cmdline_p)
+ 	early_acpi_boot_init();
+ 
+ 	initmem_init();
+-	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
++//	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
++	dma_contiguous_reserve(max_low_pfn_mapped << PAGE_SHIFT);
+ 
+ 	/*
+ 	 * Reserve memory for crash kernel after SRAT is parsed so that it
+-- 
+2.17.1
+

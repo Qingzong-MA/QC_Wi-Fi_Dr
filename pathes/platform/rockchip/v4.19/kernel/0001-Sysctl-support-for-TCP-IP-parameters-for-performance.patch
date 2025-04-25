@@ -1,0 +1,191 @@
+From 5a29068596e1afd19b7009005217e9a56917cfa8 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Thu, 24 Apr 2025 17:04:25 +0800
+Subject: [PATCH 01/33] Sysctl support for TCP/IP parameters for performance
+
+Change-Id: I58f24332d2d01b7926e1646c917688e05ce0624c
+---
+ kernel/include/net/tcp.h          | 11 ++++++++++
+ kernel/net/ipv4/sysctl_net_ipv4.c | 23 +++++++++++++++++++++
+ kernel/net/ipv4/tcp.c             | 12 +++++++++--
+ kernel/net/ipv4/tcp_input.c       |  3 ++-
+ kernel/net/ipv4/tcp_timer.c       | 34 +++++++++++++++++++++++++++++++
+ 5 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/include/net/tcp.h b/kernel/include/net/tcp.h
+index 3f0d654984..9ceb584ba1 100644
+--- a/kernel/include/net/tcp.h
++++ b/kernel/include/net/tcp.h
+@@ -148,6 +148,8 @@ void tcp_time_wait(struct sock *sk, int state, int timeo);
+ 						 * most likely due to retrans in 3WHS.
+ 						 */
+ 
++#define TCP_DELACK_SEG  1  /*Number of full MSS to receive before Acking RFC2581*/
++
+ #define TCP_RESOURCE_PROBE_INTERVAL ((unsigned)(HZ/2U)) /* Maximal interval between probes
+ 					                 * for local resources.
+ 					                 */
+@@ -254,6 +256,10 @@ extern atomic_long_t tcp_memory_allocated;
+ extern struct percpu_counter tcp_sockets_allocated;
+ extern unsigned long tcp_memory_pressure;
+ 
++/* sysctl variables for controlling various tcp parameters */
++extern int sysctl_tcp_delack_seg;
++extern int sysctl_tcp_use_userconfig;
++
+ /* optimized version of sk_under_memory_pressure() for TCP sockets */
+ static inline bool tcp_under_memory_pressure(const struct sock *sk)
+ {
+@@ -345,6 +351,11 @@ ssize_t tcp_splice_read(struct socket *sk, loff_t *ppos,
+ 			struct pipe_inode_info *pipe, size_t len,
+ 			unsigned int flags);
+ 
++extern int tcp_use_userconfig_sysctl_handler(struct ctl_table *, int,
++		                                         void __user *, size_t *, loff_t *);
++extern int tcp_proc_delayed_ack_control(struct ctl_table *, int,
++		                void __user *, size_t *, loff_t *);
++
+ void tcp_enter_quickack_mode(struct sock *sk, unsigned int max_quickacks);
+ static inline void tcp_dec_quickack_mode(struct sock *sk,
+ 					 const unsigned int pkts)
+diff --git a/kernel/net/ipv4/sysctl_net_ipv4.c b/kernel/net/ipv4/sysctl_net_ipv4.c
+index ad132b6e8c..61994b92f2 100644
+--- a/kernel/net/ipv4/sysctl_net_ipv4.c
++++ b/kernel/net/ipv4/sysctl_net_ipv4.c
+@@ -49,10 +49,15 @@ static int tcp_syn_retries_min = 1;
+ static int tcp_syn_retries_max = MAX_TCP_SYNCNT;
+ static int ip_ping_group_range_min[] = { 0, 0 };
+ static int ip_ping_group_range_max[] = { GID_T_MAX, GID_T_MAX };
++static int tcp_delack_seg_min = TCP_DELACK_MIN;
++static int tcp_delack_seg_max = 60;
++static int tcp_use_userconfig_min;
++static int tcp_use_userconfig_max = 1;
+ static int comp_sack_nr_max = 255;
+ static u32 u32_max_div_HZ = UINT_MAX / HZ;
+ static int one_day_secs = 24 * 3600;
+ 
++
+ /* obsolete */
+ static int sysctl_tcp_low_latency __read_mostly;
+ 
+@@ -1238,6 +1243,24 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.proc_handler	= proc_dointvec_minmax,
+ 		.extra1		= &one
+ 	},
++	{
++		.procname	= "tcp_delack_seg",
++		.data		= &sysctl_tcp_delack_seg,
++		.maxlen		= sizeof(sysctl_tcp_delack_seg),
++		.mode		= 0644,
++		.proc_handler	= tcp_proc_delayed_ack_control,
++		.extra1		= &tcp_delack_seg_min,
++		.extra2		= &tcp_delack_seg_max,
++	},
++	{
++		.procname	= "tcp_use_userconfig",
++		.data		= &sysctl_tcp_use_userconfig,
++		.maxlen		= sizeof(sysctl_tcp_use_userconfig),
++		.mode		= 0644,
++		.proc_handler	= tcp_use_userconfig_sysctl_handler,
++		.extra1		= &tcp_use_userconfig_min,
++		.extra2		= &tcp_use_userconfig_max,
++	},
+ 	{ }
+ };
+ 
+diff --git a/kernel/net/ipv4/tcp.c b/kernel/net/ipv4/tcp.c
+index 4dce1b418a..caa6670338 100644
+--- a/kernel/net/ipv4/tcp.c
++++ b/kernel/net/ipv4/tcp.c
+@@ -289,6 +289,11 @@ EXPORT_SYMBOL_GPL(tcp_orphan_count);
+ long sysctl_tcp_mem[3] __read_mostly;
+ EXPORT_SYMBOL(sysctl_tcp_mem);
+ 
++int sysctl_tcp_delack_seg __read_mostly = TCP_DELACK_SEG;
++EXPORT_SYMBOL(sysctl_tcp_delack_seg);
++int sysctl_tcp_use_userconfig __read_mostly;
++EXPORT_SYMBOL(sysctl_tcp_use_userconfig);
++
+ atomic_long_t tcp_memory_allocated;	/* Current allocated memory. */
+ EXPORT_SYMBOL(tcp_memory_allocated);
+ 
+@@ -1562,8 +1567,11 @@ static void tcp_cleanup_rbuf(struct sock *sk, int copied)
+ 		   /* Delayed ACKs frequently hit locked sockets during bulk
+ 		    * receive. */
+ 		if (icsk->icsk_ack.blocked ||
+-		    /* Once-per-two-segments ACK was not sent by tcp_input.c */
+-		    tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
++		    /* Once-per-sysctl_tcp_delack_seg segments
++	             * ACK was not sent by tcp_input.c
++	             */
++	            tp->rcv_nxt - tp->rcv_wup > (icsk->icsk_ack.rcv_mss) *
++                                          sysctl_tcp_delack_seg ||
+ 		    /*
+ 		     * If this read emptied read buffer, we send ACK, if
+ 		     * connection is not bidirectional, user drained
+diff --git a/kernel/net/ipv4/tcp_input.c b/kernel/net/ipv4/tcp_input.c
+index 757e1f60e0..3975ebaf84 100644
+--- a/kernel/net/ipv4/tcp_input.c
++++ b/kernel/net/ipv4/tcp_input.c
+@@ -5197,7 +5197,8 @@ static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
+ 	unsigned long rtt, delay;
+ 
+ 	    /* More than one full frame received... */
+-	if (((tp->rcv_nxt - tp->rcv_wup) > inet_csk(sk)->icsk_ack.rcv_mss &&
++	if (((tp->rcv_nxt - tp->rcv_wup) > (inet_csk(sk)->icsk_ack.rcv_mss) *
++                                        sysctl_tcp_delack_seg &&
+ 	     /* ... and right edge of window advances far enough.
+ 	      * (tcp_recvmsg() will send ACK otherwise).
+ 	      * If application uses SO_RCVLOWAT, we want send ack now if
+diff --git a/kernel/net/ipv4/tcp_timer.c b/kernel/net/ipv4/tcp_timer.c
+index d071ed6b8b..2d86b2e543 100644
+--- a/kernel/net/ipv4/tcp_timer.c
++++ b/kernel/net/ipv4/tcp_timer.c
+@@ -22,6 +22,38 @@
+ #include <linux/gfp.h>
+ #include <net/tcp.h>
+ 
++/*Function to reset tcp_ack related sysctl on resetting master control */
++void set_tcp_default(void)
++{
++       sysctl_tcp_delack_seg   = TCP_DELACK_SEG;
++}
++
++/*sysctl handler for tcp_ack realted master control */
++int tcp_proc_delayed_ack_control(struct ctl_table *table, int write,
++                       void __user *buffer, size_t *length, loff_t *ppos)
++{
++       int ret = proc_dointvec_minmax(table, write, buffer, length, ppos);
++
++       /* The ret value will be 0 if the input validation is successful
++        * and the values are written to sysctl table. If not, the stack
++        * will continue to work with currently configured values
++        */
++       return ret;
++}
++
++/*sysctl handler for tcp_ack realted master control */
++int tcp_use_userconfig_sysctl_handler(struct ctl_table *table, int write,
++                       void __user *buffer, size_t *length, loff_t *ppos)
++{
++       int ret = proc_dointvec_minmax(table, write, buffer, length, ppos);
++
++       if (write && ret == 0) {
++               if (!sysctl_tcp_use_userconfig)
++                       set_tcp_default();
++       }
++       return ret;
++}
++
+ static u32 tcp_clamp_rto_to_user_timeout(const struct sock *sk)
+ {
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
+@@ -761,3 +793,5 @@ void tcp_init_xmit_timers(struct sock *sk)
+ 		     HRTIMER_MODE_REL_PINNED_SOFT);
+ 	tcp_sk(sk)->compressed_ack_timer.function = tcp_compressed_ack_kick;
+ }
++
++EXPORT_SYMBOL(tcp_init_xmit_timers);
+-- 
+2.17.1
+

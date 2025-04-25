@@ -1,0 +1,52 @@
+From f10ad6bb2fd0f3ae96a04fb5913b980e70610ee5 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:31:31 +0800
+Subject: [PATCH 19/33] dsa: mv88e6xxx: Optimise atu_get
+
+Change-Id: I04fc7f8c76628a9cbac32db7fff30d406e146e3d
+---
+ kernel/include/linux/etherdevice.h | 15 +++++++++++++++
+ kernel/include/net/cfg80211.h      |  1 +
+ 2 files changed, 16 insertions(+)
+
+diff --git a/kernel/include/linux/etherdevice.h b/kernel/include/linux/etherdevice.h
+index 572e11bb86..ac79261929 100644
+--- a/kernel/include/linux/etherdevice.h
++++ b/kernel/include/linux/etherdevice.h
+@@ -446,6 +446,21 @@ static inline void eth_addr_dec(u8 *addr)
+ 	u64_to_ether_addr(u, addr);
+ }
+ 
++/**
++ * ether_addr_greater - Compare two Ethernet addresses
++ * @addr1: Pointer to a six-byte array containing the Ethernet address
++ * @addr2: Pointer other six-byte array containing the Ethernet address
++ *
++ * Compare two Ethernet addresses, returns true addr1 is greater than addr2
++ */
++static inline bool ether_addr_greater(const u8 *addr1, const u8 *addr2)
++{
++	u64 u1 = ether_addr_to_u64(addr1);
++	u64 u2 = ether_addr_to_u64(addr2);
++
++	return u1 > u2;
++}
++
+ /**
+  * is_etherdev_addr - Tell if given Ethernet address belongs to the device.
+  * @dev: Pointer to a device structure
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 9eff9d6463..1a2453813c 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -19,6 +19,7 @@
+ #include <linux/bug.h>
+ #include <linux/netlink.h>
+ #include <linux/skbuff.h>
++#include <linux/etherdevice.h>
+ #include <linux/nl80211.h>
+ #include <linux/if_ether.h>
+ #include <linux/ieee80211.h>
+-- 
+2.17.1
+

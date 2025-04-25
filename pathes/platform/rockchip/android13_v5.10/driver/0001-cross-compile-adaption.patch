@@ -1,0 +1,112 @@
+From 5ea6b941ebe6a8f70de19e976d33c59afd6658c3 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 15:05:07 +0800
+Subject: [PATCH] cross-compile adaption
+
+---
+ chss_host_LEA/chss_proc/host/AIO/build/Makefile            | 7 ++++++-
+ .../chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10  | 4 ++--
+ .../chss_proc/host/AIO/drivers/core_tech_modules/Kbuild    | 1 -
+ .../host/AIO/drivers/core_tech_modules/cnss2/main.c        | 3 +++
+ chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild | 3 ++-
+ 5 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/Makefile b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+index b6072d221..5edaf755c 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/Makefile
++++ b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+@@ -1,7 +1,11 @@
+ #
+ # Main Makefile
+ #
+-export ATH_TOPDIR=$(shell pwd)/..
++BUILD_TIME=$(shell date +%s)
++AIO_TOPDIR=$(shell pwd)/../../AIO
++$(shell ln -sf ${AIO_TOPDIR} /tmp/AIO_${BUILD_TIME})
++export ATH_TOPDIR=/tmp/AIO_${BUILD_TIME}
++
+ export BACKPORT_PWD=$(shell pwd)/backports
+ # different customer want to use different wpa_supplicant
+ # in board_type config file, we can override it
+@@ -111,6 +115,7 @@ drivers: rootfs_prep
+ 	cp -fr $(INSTALL_ROOT)/lib/modules $(INSTALL_ROOT)/lib/unstripped_modules
+ 	@echo Strip modules
+ 	@cd ${INSTALL_ROOT}/lib/modules && ${TOOLPREFIX}strip --strip-unneeded *.ko
++	@rm -rf $(ATH_TOPDIR)
+ 
+ 
+ drivers_firmware: rootfs_prep
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10 b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+index 4d4412c15..b15cd65f1 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
++++ b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+@@ -1,10 +1,10 @@
+ #
+ # Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+ #
+-export KERNELPATH=/lib/modules/${shell uname -r}/build
++#export KERNELPATH=/lib/modules/${shell uname -r}/build
+ #export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+ 
+-export KERNELARCH=x86_64
++#export KERNELARCH=x86_64
+ #export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+ #export TOOLPREFIX=${CROSS_COMPILE}
+ #export BTPATH=<set the bt path>
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+index 591824bd2..7298636e8 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+@@ -204,7 +204,6 @@ ifneq ($(CONFIG_MULTI_CARD),)
+ endif
+ 
+ CDEFINES :=	-Wall\
+-		-Werror
+ KBUILD_CPPFLAGS += $(CDEFINES)
+ 
+ ifneq ($(CONFIG_WLAN_CNSS_CORE), y)
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/cnss2/main.c b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/cnss2/main.c
+index 3d04ee2ac..79735ec10 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/cnss2/main.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/cnss2/main.c
+@@ -42,6 +42,9 @@
+ #include <linux/panic_notifier.h>
+ #endif
+ 
++// FOR kernel_write and filp_open
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
++
+ #define CNSS_DUMP_FORMAT_VER		0x11
+ #define CNSS_DUMP_FORMAT_VER_V2		0x22
+ #define CNSS_DUMP_MAGIC_VER_V2		0x42445953
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+index 0087b724f..90cd89ef1 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+@@ -23,6 +23,7 @@ WLAN_FW_API ?= $(WLAN_ROOT)/../fw-api/
+ WLAN_PROFILE ?= default
+ CONFIG_QCA_CLD_WLAN_PROFILE ?= $(WLAN_PROFILE)
+ 
++ifeq ($(RK3568_ANDROID13),y)
+ ifeq ($(KERNEL_BUILD), n)
+ ifneq ($(ANDROID_BUILD_TOP),)
+       ANDROID_BUILD_TOP_REL := $(shell python -c "import os.path; print(os.path.relpath('$(ANDROID_BUILD_TOP)'))")
+@@ -31,6 +32,7 @@ ifneq ($(ANDROID_BUILD_TOP),)
+       override WLAN_FW_API := $(ANDROID_BUILD_TOP_REL)/$(WLAN_FW_API)
+ endif
+ endif
++endif
+ 
+ include $(WLAN_ROOT)/configs/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig
+ 
+@@ -2665,7 +2667,6 @@ ccflags-y += $(INCS)
+ 
+ cppflags-y +=	-DANI_OS_TYPE_ANDROID=6 \
+ 		-Wall\
+-		-Werror\
+ 		-D__linux__
+ 
+ cppflags-$(CONFIG_PTT_SOCK_SVC_ENABLE) += -DPTT_SOCK_SVC_ENABLE
+-- 
+2.17.1
+

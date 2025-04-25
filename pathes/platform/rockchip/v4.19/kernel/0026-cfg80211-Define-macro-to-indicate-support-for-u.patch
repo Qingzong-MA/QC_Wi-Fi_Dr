@@ -1,0 +1,27 @@
+From 6f78910bbd1816f80cdd2894d3cdb0ea17b282c0 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 14:04:11 +0800
+Subject: [PATCH 26/33] cfg80211: Define macro to indicate support for update connect
+ params
+
+Change-Id: Ic1bd1dea6d2c9d08bf5547942a2ba6bee7077df7
+---
+ kernel/include/net/cfg80211.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 0463152632..887f64590d 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -34,6 +34,8 @@
+ 
+ /* Indicate backport support for processing user cell base hint */
+ #define CFG80211_USER_HINT_CELL_BASE_SELF_MANAGED 1
++/* backport support for new cfg80211 ops "update_connect_params" */
++#define CFG80211_UPDATE_CONNECT_PARAMS 1
+ 
+ /**
+  * DOC: Introduction
+-- 
+2.17.1
+

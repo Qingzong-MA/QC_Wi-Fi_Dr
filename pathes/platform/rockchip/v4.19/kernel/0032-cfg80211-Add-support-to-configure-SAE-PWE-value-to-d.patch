@@ -1,0 +1,229 @@
+From 7cd135b2eeecbf55458b6855db07eb455254be68 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Thu, 24 Apr 2025 17:18:55 +0800
+Subject: [PATCH 32/33] cfg80211: Add support to configure SAE PWE value to
+ drivers
+
+Change-Id: I70d27afcf2d7d5b9f4c2d47124ec17ec49518de4
+---
+ kernel/include/net/cfg80211.h       |  4 ++
+ kernel/include/net/netlink.h        | 66 ++++++++++++++++++++++++++---
+ kernel/include/uapi/linux/nl80211.h | 42 ++++++++++++++++++
+ kernel/net/wireless/nl80211.c       |  9 ++++
+ 4 files changed, 115 insertions(+), 6 deletions(-)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index e917bb762f..199f6cb41c 100755
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -64,6 +64,9 @@
+  */
+ 
+ 
++/* Indicate backport support to configure SAE PWE value */
++#define CFG80211_SAE_PWE_CONFIG_SUPPORT 1
++
+ /**
+  * DOC: Device registration
+  *
+@@ -884,6 +887,7 @@ struct cfg80211_crypto_settings {
+ 	struct key_params *wep_keys;
+ 	int wep_tx_key;
+ 	const u8 *psk;
++        enum nl80211_sae_pwe_mechanism sae_pwe;
+ };
+ 
+ /**
+diff --git a/kernel/include/net/netlink.h b/kernel/include/net/netlink.h
+index 39e1d875d5..a3ca340c0b 100644
+--- a/kernel/include/net/netlink.h
++++ b/kernel/include/net/netlink.h
+@@ -188,6 +188,9 @@ enum {
+ /**
+  * struct nla_policy - attribute validation policy
+  * @type: Type of attribute or NLA_UNSPEC
++ * @validation_type: type of attribute validation done in addition to
++ *	type-specific validation (e.g. range, function call), see
++ *	&enum nla_policy_validation
+  * @len: Type specific length of payload
+  *
+  * Policies are defined as arrays of this struct, the array must be
+@@ -198,9 +201,12 @@ enum {
+  *    NLA_NUL_STRING       Maximum length of string (excluding NUL)
+  *    NLA_FLAG             Unused
+  *    NLA_BINARY           Maximum length of attribute payload
+- *    NLA_NESTED           Don't use `len' field -- length verification is
+- *                         done by checking len of nested header (or empty)
+- *    NLA_NESTED_COMPAT    Minimum length of structure payload
++ *    NLA_MIN_LEN          Minimum length of attribute payload
++ *    NLA_NESTED,
++ *    NLA_NESTED_ARRAY     Length verification is done by checking len of
++ *                         nested header (or empty); len field is used if
++ *                         validation_data is also used, for the max attr
++ *                         number in the nested policy.
+  *    NLA_U8, NLA_U16,
+  *    NLA_U32, NLA_U64,
+  *    NLA_S8, NLA_S16,
+@@ -220,9 +226,35 @@ enum {
+  * };
+  */
+ struct nla_policy {
+-	u16		type;
+-	u16		len;
+-	void            *validation_data;
++	u8              type;
++        u8              validation_type;
++        u16             len;
++        union {
++                void *validation_data;
++                struct {
++                        s16 min, max;
++                };
++                int (*validate)(const struct nlattr *attr,
++                                struct netlink_ext_ack *extack);
++                 /*This entry is special, and used for the attribute at index 0
++                 * only, and specifies special data about the policy, namely it
++                 * specifies the "boundary type" where strict length validation
++                 * starts for any attribute types >= this value, also, strict
++                 * nesting validation starts here.
++                 *
++                 * Additionally, it means that NLA_UNSPEC is actually NLA_REJECT
++                 * for any types >= this, so need to use NLA_MIN_LEN to get the
++                 * previous pure { .len = xyz } behaviour. The advantage of this
++                 * is that types not specified in the policy will be rejected.
++                 *
++                 * For completely new families it should be set to 1 so that the
++                 * validation is enforced for all attributes. For existing ones
++                 * it should be set at least when new attributes are added to
++                 * the enum used by the policy, and be set to the new value that
++                 * was added to enforce strict validation from thereon.
++                 */
++                u16 strict_start_type;
++       };
+ };
+ 
+ /**
+@@ -237,6 +269,28 @@ struct nl_info {
+ 	bool			skip_notify;
+ };
+ 
++enum nla_policy_validation {
++    NLA_VALIDATE_NONE,
++    NLA_VALIDATE_RANGE,
++    NLA_VALIDATE_MIN,
++    NLA_VALIDATE_MAX,
++    NLA_VALIDATE_FUNCTION,
++};
++
++#define __NLA_ENSURE(condition) BUILD_BUG_ON_ZERO(!(condition))
++#define NLA_ENSURE_INT_TYPE(tp)             \
++    (__NLA_ENSURE(tp == NLA_S8 || tp == NLA_U8 ||   \
++              tp == NLA_S16 || tp == NLA_U16 || \
++              tp == NLA_S32 || tp == NLA_U32 || \
++              tp == NLA_S64 || tp == NLA_U64) + tp)
++
++#define NLA_POLICY_RANGE(tp, _min, _max) {      \
++    .type = NLA_ENSURE_INT_TYPE(tp),        \
++    .validation_type = NLA_VALIDATE_RANGE,      \
++    .min = _min,                    \
++    .max = _max                 \
++}
++
+ int netlink_rcv_skb(struct sk_buff *skb,
+ 		    int (*cb)(struct sk_buff *, struct nlmsghdr *,
+ 			      struct netlink_ext_ack *));
+diff --git a/kernel/include/uapi/linux/nl80211.h b/kernel/include/uapi/linux/nl80211.h
+index 6c23665a00..03ba09d10c 100644
+--- a/kernel/include/uapi/linux/nl80211.h
++++ b/kernel/include/uapi/linux/nl80211.h
+@@ -2351,6 +2351,11 @@ enum nl80211_commands {
+  *	%NL80211_ATTR_AKM_SUITES are default capabilities if AKM suites not
+  *	advertised for a specific interface type.
+  *
++ * @NL80211_ATTR_SAE_PWE: Indicates the mechanism(s) allowed for SAE PWE
++ *	derivation in WPA3-Personal networks which are using SAE authentication.
++ *	This is a u8 attribute that encapsulates one of the values from
++ *	&enum nl80211_sae_pwe_mechanism.
++ *
+  * @NUM_NL80211_ATTR: total number of nl80211_attrs available
+  * @NL80211_ATTR_MAX: highest attribute number currently defined
+  * @__NL80211_ATTR_AFTER_LAST: internal use
+@@ -2818,6 +2823,25 @@ enum nl80211_attrs {
+ 	NL80211_ATTR_HE_BSS_COLOR,
+ 
+ 	NL80211_ATTR_IFTYPE_AKM_SUITES,
++	NL80211_ATTR_TID_CONFIG,
++	NL80211_ATTR_CONTROL_PORT_NO_PREAUTH,
++	NL80211_ATTR_PMK_LIFETIME,
++	NL80211_ATTR_PMK_REAUTH_THRESHOLD,
++	NL80211_ATTR_RECEIVE_MULTICAST,
++	NL80211_ATTR_WIPHY_FREQ_OFFSET,
++	NL80211_ATTR_CENTER_FREQ1_OFFSET,
++	NL80211_ATTR_SCAN_FREQ_KHZ,
++
++	NL80211_ATTR_HE_6GHZ_CAPABILITY,
++
++	NL80211_ATTR_FILS_DISCOVERY,
++
++	NL80211_ATTR_UNSOL_BCAST_PROBE_RESP,
++
++	NL80211_ATTR_S1G_CAPABILITY,
++	NL80211_ATTR_S1G_CAPABILITY_MASK,
++
++	NL80211_ATTR_SAE_PWE,
+ 
+ 	/* add attributes here, update the policy in nl80211.c */
+ 
+@@ -6037,4 +6061,22 @@ enum nl80211_iftype_akm_attributes {
+ 	NL80211_IFTYPE_AKM_ATTR_MAX = __NL80211_IFTYPE_AKM_ATTR_LAST - 1,
+ };
+ 
++/**
++ * enum nl80211_sae_pwe_mechanism - The mechanism(s) allowed for SAE PWE
++ *	derivation. Applicable only when WPA3-Personal SAE authentication is
++ *	used.
++ *
++ * @NL80211_SAE_PWE_UNSPECIFIED: not specified, used internally to indicate that
++ *	attribute is not present from userspace.
++ * @NL80211_SAE_PWE_HUNT_AND_PECK: hunting-and-pecking loop only
++ * @NL80211_SAE_PWE_HASH_TO_ELEMENT: hash-to-element only
++ * @NL80211_SAE_PWE_BOTH: both hunting-and-pecking loop and hash-to-element
++ *	can be used.
++ */
++enum nl80211_sae_pwe_mechanism {
++	NL80211_SAE_PWE_UNSPECIFIED,
++	NL80211_SAE_PWE_HUNT_AND_PECK,
++	NL80211_SAE_PWE_HASH_TO_ELEMENT,
++	NL80211_SAE_PWE_BOTH,
++};
+ #endif /* __LINUX_NL80211_H */
+diff --git a/kernel/net/wireless/nl80211.c b/kernel/net/wireless/nl80211.c
+index 72bed35252..fb5a8e150a 100644
+--- a/kernel/net/wireless/nl80211.c
++++ b/kernel/net/wireless/nl80211.c
+@@ -471,6 +471,9 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 	[NL80211_ATTR_TXQ_QUANTUM] = { .type = NLA_U32 },
+ 	[NL80211_ATTR_HE_CAPABILITY] = { .type = NLA_BINARY,
+ 					 .len = NL80211_HE_MAX_CAPABILITY_LEN },
++       [NL80211_ATTR_SAE_PWE] =
++           NLA_POLICY_RANGE(NLA_U8, NL80211_SAE_PWE_HUNT_AND_PECK,
++                    NL80211_SAE_PWE_BOTH),
+ };
+ 
+ /* policy for the key attributes */
+@@ -8771,6 +8774,12 @@ static int nl80211_crypto_settings(struct cfg80211_registered_device *rdev,
+ 		settings->psk = nla_data(info->attrs[NL80211_ATTR_PMK]);
+ 	}
+ 
++       if (info->attrs[NL80211_ATTR_SAE_PWE])
++          settings->sae_pwe =
++              nla_get_u8(info->attrs[NL80211_ATTR_SAE_PWE]);
++       else
++          settings->sae_pwe = NL80211_SAE_PWE_UNSPECIFIED;
++
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

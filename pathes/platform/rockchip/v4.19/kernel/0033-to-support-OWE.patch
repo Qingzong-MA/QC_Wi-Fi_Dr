@@ -1,0 +1,27 @@
+From eb8234241a0d312068b4823f5ac6a42a2260ed11 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Thu, 24 Apr 2025 17:24:17 +0800
+Subject: [PATCH 33/33] to support OWE
+
+Change-Id: I23bc7450c4d64c00b60f5f7a7e6d647f3192b132
+---
+ kernel/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 199f6cb41c..fb161838da 100755
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -106,6 +106,9 @@ struct wiphy;
+ /* Indicate backport support for external authentication*/
+ #define CFG80211_EXTERNAL_AUTH_SUPPORT 1
+ 
++/* Indicate backport support for DH IE creation/update*/
++#define CFG80211_EXTERNAL_DH_UPDATE_SUPPORT 1
++
+ /* Indicate backport support for HE */
+ #define CFG80211_HE_SUPPORT_BACKPORT 1
+ 
+-- 
+2.17.1
+

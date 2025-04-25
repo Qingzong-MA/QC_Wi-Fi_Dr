@@ -1,0 +1,25 @@
+From 5b0a1a526252d8614e8bd8ad4c428845d0dae92e Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:11:06 +0800
+Subject: [PATCH 13/33] cfg80211: apply same mandatory rate flags for 5GHz and 6GHz
+
+Change-Id: I40be5cfe272f008e550bed0a31d8cc34f0de53b9
+---
+ kernel/net/wireless/util.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/kernel/net/wireless/util.c b/kernel/net/wireless/util.c
+index 72aadedc2e..1e1cb3ded4 100644
+--- a/kernel/net/wireless/util.c
++++ b/kernel/net/wireless/util.c
+@@ -152,6 +152,7 @@ static void set_mandatory_flags_band(struct ieee80211_supported_band *sband)
+ 
+ 	switch (sband->band) {
+ 	case NL80211_BAND_5GHZ:
++	case NL80211_BAND_6GHZ:
+ 		want = 3;
+ 		for (i = 0; i < sband->n_bitrates; i++) {
+ 			if (sband->bitrates[i].bitrate == 60 ||
+-- 
+2.17.1
+

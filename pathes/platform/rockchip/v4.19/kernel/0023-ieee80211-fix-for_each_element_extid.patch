@@ -1,0 +1,28 @@
+From 9676ffb74ec7a0e5a7607c5c8d10bca5c6fcdd74 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:55:29 +0800
+Subject: [PATCH 23/33] ieee80211: fix for_each_element_extid()
+
+Change-Id: I56fb16008ed8fb6f074cbd61c6036252afcbd54a
+---
+ kernel/include/linux/ieee80211.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/include/linux/ieee80211.h b/kernel/include/linux/ieee80211.h
+index 778d3ef939..b5ed032207 100644
+--- a/kernel/include/linux/ieee80211.h
++++ b/kernel/include/linux/ieee80211.h
+@@ -3213,8 +3213,8 @@ struct element {
+ 	for_each_element(element, data, datalen)			\
+ 		if (element->id == (_id))
+ 
+-#define for_each_element_extid(element, extid, data, datalen)		\
+-	for_each_element(element, data, datalen)			\
++#define for_each_element_extid(element, extid, _data, _datalen)		\
++	for_each_element(element, _data, _datalen)			\
+ 		if (element->id == WLAN_EID_EXTENSION &&		\
+ 		    element->datalen > 0 &&				\
+ 		    element->data[0] == (extid))
+-- 
+2.17.1
+

@@ -1,0 +1,26 @@
+From ae35239edc2a9ef0dba8954b6bc8d1af4aed8f08 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 14:55:21 +0800
+Subject: [PATCH 7/7] x86-kernel: reserve CMA memory space under 4G
+
+Change-Id: I6cbde8e9662bdd044f1c5624dcadd18399761fb6
+---
+ kernel-5.10/arch/x86/kernel/setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel-5.10/arch/x86/kernel/setup.c b/kernel-5.10/arch/x86/kernel/setup.c
+index 9257a8f0f9..14fe970f4b 100644
+--- a/kernel-5.10/arch/x86/kernel/setup.c
++++ b/kernel-5.10/arch/x86/kernel/setup.c
+@@ -1167,7 +1167,7 @@ void __init setup_arch(char **cmdline_p)
+ 	early_acpi_boot_init();
+ 
+ 	initmem_init();
+-	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
++	dma_contiguous_reserve(max_low_pfn_mapped << PAGE_SHIFT);
+ 
+ 	if (boot_cpu_has(X86_FEATURE_GBPAGES))
+ 		hugetlb_cma_reserve(PUD_SHIFT - PAGE_SHIFT);
+-- 
+2.17.1
+

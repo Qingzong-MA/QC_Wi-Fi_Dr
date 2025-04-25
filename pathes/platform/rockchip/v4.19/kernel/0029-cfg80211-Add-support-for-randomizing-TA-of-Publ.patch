@@ -1,0 +1,31 @@
+From d009f6959eead6eff306a79d182a6c57e9d4c74b Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 15:35:09 +0800
+Subject: [PATCH 29/33] cfg80211: Add support for randomizing TA of Public Action
+ frames
+
+Change-Id: I4985f6badfaeef3580538ddcd1a47fca3f447cd0
+---
+ kernel/include/net/cfg80211.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index eca945f553..200c05ddbe 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -40,6 +40,12 @@
+ /* backport support for new cfg80211 ops "update_connect_params" */
+ #define CFG80211_UPDATE_CONNECT_PARAMS 1
+ 
++/**
++ *  backport support for NL80211_EXT_FEATURE_MGMT_TX_RANDOM_TA
++ *  and NL80211_EXT_FEATURE_MGMT_TX_RANDOM_TA_CONNECTED.
++ */
++#define CFG80211_RAND_TA_FOR_PUBLIC_ACTION_FRAME 1
++
+ /**
+  * DOC: Introduction
+  *
+-- 
+2.17.1
+

@@ -1,0 +1,27 @@
+From 8a696df42716478ad4169551c0b2ef2f75f0973b Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:07:02 +0800
+Subject: [PATCH 09/33] cfg80211: extend ieee80211_operating_class_to_band() for 6GHz
+
+Change-Id: I6137aaff71d8f6feed74d16117d181cd84902bc1
+---
+ kernel/net/wireless/util.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel/net/wireless/util.c b/kernel/net/wireless/util.c
+index 7c42ac776e..72aadedc2e 100644
+--- a/kernel/net/wireless/util.c
++++ b/kernel/net/wireless/util.c
+@@ -1531,6 +1531,9 @@ bool ieee80211_operating_class_to_band(u8 operating_class,
+ 	case 128 ... 130:
+ 		*band = NL80211_BAND_5GHZ;
+ 		return true;
++	case 131 ... 135:
++		*band = NL80211_BAND_6GHZ;
++		return true;
+ 	case 81:
+ 	case 82:
+ 	case 83:
+-- 
+2.17.1
+

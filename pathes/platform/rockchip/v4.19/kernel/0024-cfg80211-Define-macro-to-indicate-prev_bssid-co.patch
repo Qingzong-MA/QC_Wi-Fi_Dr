@@ -1,0 +1,27 @@
+From 145809311762dc1f075e27c1a92403feace87bbb Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:56:42 +0800
+Subject: [PATCH 24/33] cfg80211: Define macro to indicate prev_bssid connect
+ support
+
+Change-Id: Ib9a1c947b42152423ba823d6a93945190fca94db
+---
+ kernel/include/net/cfg80211.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 254df19d82..5a195aac2c 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -77,6 +77,8 @@
+ 
+ struct wiphy;
+ 
++#define CFG80211_CONNECT_PREV_BSSID 1
++
+ /*
+  * wireless hardware capability structures
+  */
+-- 
+2.17.1
+

@@ -1,0 +1,27 @@
+From 158527f6f10836279c758e2caafba7d01c95ba9c Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:13:56 +0800
+Subject: [PATCH 14/33] cfg80211: Indicate support 6GHz band in kernel
+
+Change-Id: I339bb2f3aae3156819153705ccc78281eb604bc9
+---
+ kernel/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 4e4d3913a5..4763c16b29 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -28,6 +28,9 @@
+ /* Indicate support for including KEK length in rekey data */
+ #define CFG80211_REKEY_DATA_KEK_LEN 1
+ 
++/* Indicate backport support for 6GHz band */
++#define CFG80211_6GHZ_BAND_SUPPORTED 1
++
+ /**
+  * DOC: Introduction
+  *
+-- 
+2.17.1
+

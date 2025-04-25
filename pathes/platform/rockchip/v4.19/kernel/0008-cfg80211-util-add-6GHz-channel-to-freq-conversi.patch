@@ -1,0 +1,43 @@
+From e4ca2e5ad6fe01634317a922ad3fb906d8da5758 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:05:44 +0800
+Subject: [PATCH 08/33] cfg80211: util: add 6GHz channel to freq conversion and vice
+ versa
+
+Change-Id: Ic9c5324e9c17b67bd9963901db4acc7bb2df0ec0
+---
+ kernel/net/wireless/util.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/net/wireless/util.c b/kernel/net/wireless/util.c
+index 74b85aec54..7c42ac776e 100644
+--- a/kernel/net/wireless/util.c
++++ b/kernel/net/wireless/util.c
+@@ -91,6 +91,11 @@ int ieee80211_channel_to_frequency(int chan, enum nl80211_band band)
+ 		if (chan < 5)
+ 			return 56160 + chan * 2160;
+ 		break;
++	case NL80211_BAND_6GHZ:
++		/* see 802.11ax D4.1 27.3.22.2 */
++		if (chan <= 253)
++			return 5940 + chan * 5;
++		break;
+ 	default:
+ 		;
+ 	}
+@@ -107,8 +112,11 @@ int ieee80211_frequency_to_channel(int freq)
+ 		return (freq - 2407) / 5;
+ 	else if (freq >= 4910 && freq <= 4980)
+ 		return (freq - 4000) / 5;
+-	else if (freq <= 45000) /* DMG band lower limit */
++	else if (freq < 5940)
+ 		return (freq - 5000) / 5;
++	else if (freq <= 45000) /* DMG band lower limit */
++		/* see 802.11ax D4.1 27.3.22.2 */
++		return (freq - 5940) / 5;
+ 	else if (freq >= 58320 && freq <= 64800)
+ 		return (freq - 56160) / 2160;
+ 	else
+-- 
+2.17.1
+

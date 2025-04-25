@@ -1,0 +1,42 @@
+From 17fab4e2b7e03be94d44117a8db9e4014094a3a8 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:10:35 +0800
+Subject: [PATCH 12/33] cfg80211: ibss: use 11a mandatory rates for 6GHz band
+ operation
+
+Change-Id: I0efcc25f9f777bea3c5a33744cbf2771b455c181
+---
+ kernel/net/wireless/ibss.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/net/wireless/ibss.c b/kernel/net/wireless/ibss.c
+index d1743e6abc..fd579830be 100644
+--- a/kernel/net/wireless/ibss.c
++++ b/kernel/net/wireless/ibss.c
+@@ -104,13 +104,18 @@ int __cfg80211_join_ibss(struct cfg80211_registered_device *rdev,
+ 		* use the mandatory rate set for 11b or
+ 		* 11a for maximum compatibility.
+ 		*/
+-		struct ieee80211_supported_band *sband =
+-			rdev->wiphy.bands[params->chandef.chan->band];
++		struct ieee80211_supported_band *sband;
++		enum nl80211_band band;
++		u32 flag;
+ 		int j;
+-		u32 flag = params->chandef.chan->band == NL80211_BAND_5GHZ ?
+-			IEEE80211_RATE_MANDATORY_A :
+-			IEEE80211_RATE_MANDATORY_B;
+ 
++		band = params->chandef.chan->band;
++		if (band == NL80211_BAND_5GHZ ||
++		    band == NL80211_BAND_6GHZ)
++			flag = IEEE80211_RATE_MANDATORY_A;
++		else
++			flag = IEEE80211_RATE_MANDATORY_B;
++		sband = rdev->wiphy.bands[band];
+ 		for (j = 0; j < sband->n_bitrates; j++) {
+ 			if (sband->bitrates[j].flags & flag)
+ 				params->basic_rates |= BIT(j);
+-- 
+2.17.1
+

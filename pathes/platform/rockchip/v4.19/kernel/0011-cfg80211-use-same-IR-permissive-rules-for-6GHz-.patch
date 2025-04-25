@@ -1,0 +1,27 @@
+From 7d8f7a60a2031793adc2df8f16bda0aa1a39cfe5 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 16:09:17 +0800
+Subject: [PATCH 11/33] cfg80211: use same IR permissive rules for 6GHz band
+
+Change-Id: Iaa9e92b0f62cf5f1b178ccfbf2a639102774411c
+---
+ kernel/net/wireless/chan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/net/wireless/chan.c b/kernel/net/wireless/chan.c
+index 5e1edea6b9..7561322ee2 100644
+--- a/kernel/net/wireless/chan.c
++++ b/kernel/net/wireless/chan.c
+@@ -1051,7 +1051,8 @@ static bool cfg80211_ir_permissive_chan(struct wiphy *wiphy,
+ 		if (chan == other_chan)
+ 			return true;
+ 
+-		if (chan->band != NL80211_BAND_5GHZ)
++		if (chan->band != NL80211_BAND_5GHZ &&
++		    chan->band != NL80211_BAND_6GHZ)
+ 			continue;
+ 
+ 		r1 = cfg80211_get_unii(chan->center_freq);
+-- 
+2.17.1
+

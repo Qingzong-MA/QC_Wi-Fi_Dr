@@ -1,0 +1,26 @@
+From eba4b47b3a2210b4052f9ba7b5a836b0dc7bcd43 Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Fri, 21 Jul 2023 13:50:00 +0800
+Subject: [PATCH 03/33] cfg80211: Define macro to indicate support for new cfg80211
+ connect api
+
+Change-Id: I7846bbc35968d7296003c094e6aa38602e8bdb0e
+---
+ kernel/include/net/cfg80211.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 706b9859e7..8d68886b9b 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -69,6 +69,7 @@
+ #define CFG80211_CONNECT_DONE 1
+ /* Indicate backport support for FILS SK offload in cfg80211 */
+ #define CFG80211_FILS_SK_OFFLOAD_SUPPORT 1
++#define CFG80211_CONNECT_BSS 1
+ 
+ struct wiphy;
+ 
+-- 
+2.17.1
+

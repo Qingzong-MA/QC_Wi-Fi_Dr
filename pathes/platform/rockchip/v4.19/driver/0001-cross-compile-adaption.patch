@@ -1,0 +1,122 @@
+From 0a71c3fb53d4a8f90663999e08ff90bd248feeab Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Thu, 24 Apr 2025 21:11:29 +0800
+Subject: [PATCH] cross-compile adaption
+
+---
+ chss_host_LEA/chss_proc/host/AIO/build/Makefile            | 7 ++++++-
+ .../chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10  | 6 +++---
+ .../host/AIO/drivers/qcacld-3.0/core/pld/src/pld_pcie.h    | 3 +--
+ chss_host_LEA/chss_proc/host/tools/Qcmbr/Qcmbr.h           | 2 +-
+ chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/Makefile  | 2 +-
+ .../chss_proc/host/tools/cnssdiag_lite/cld-fwlog-netlink.c | 5 ++---
+ 6 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/Makefile b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+index b6072d221..688d7b9cf 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/Makefile
++++ b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+@@ -1,7 +1,11 @@
+ #
+ # Main Makefile
+ #
+-export ATH_TOPDIR=$(shell pwd)/..
++BUILD_TIME:=$(shell date +%s)
++AIO_TOPDIR:=$(shell pwd)/../../AIO
++$(shell ln -sf ${AIO_TOPDIR} /tmp/AIO_${BUILD_TIME})
++export ATH_TOPDIR=/tmp/AIO_${BUILD_TIME}
++
+ export BACKPORT_PWD=$(shell pwd)/backports
+ # different customer want to use different wpa_supplicant
+ # in board_type config file, we can override it
+@@ -111,6 +115,7 @@ drivers: rootfs_prep
+ 	cp -fr $(INSTALL_ROOT)/lib/modules $(INSTALL_ROOT)/lib/unstripped_modules
+ 	@echo Strip modules
+ 	@cd ${INSTALL_ROOT}/lib/modules && ${TOOLPREFIX}strip --strip-unneeded *.ko
++	rm ${ATH_TOPDIR} -rf
+ 
+ 
+ drivers_firmware: rootfs_prep
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10 b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+index 4d4412c15..08f5939a8 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
++++ b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+@@ -1,12 +1,12 @@
+ #
+ # Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+ #
+-export KERNELPATH=/lib/modules/${shell uname -r}/build
++#export KERNELPATH=/lib/modules/${shell uname -r}/build
+ #export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+ 
+-export KERNELARCH=x86_64
++#export KERNELARCH=x86_64
+ #export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+-#export TOOLPREFIX=${CROSS_COMPILE}
++export TOOLPREFIX=${CROSS_COMPILE}
+ #export BTPATH=<set the bt path>
+ 
+ # for backports
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/pld/src/pld_pcie.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/pld/src/pld_pcie.h
+index 3802d4cdf..c3d93d4b3 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/pld/src/pld_pcie.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/pld/src/pld_pcie.h
+@@ -659,8 +659,7 @@ static inline void pld_pcie_link_down(struct device *dev)
+ }
+ #endif
+ 
+-#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)) && \
+-		(LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0)))
++#if 0 //Add by Qingzong, 20221108
+ static inline int pld_pcie_get_reg_dump(struct device *dev, uint8_t *buf,
+ 					uint32_t len)
+ {
+diff --git a/chss_host_LEA/chss_proc/host/tools/Qcmbr/Qcmbr.h b/chss_host_LEA/chss_proc/host/tools/Qcmbr/Qcmbr.h
+index 708a3eedc..8ca403126 100755
+--- a/chss_host_LEA/chss_proc/host/tools/Qcmbr/Qcmbr.h
++++ b/chss_host_LEA/chss_proc/host/tools/Qcmbr/Qcmbr.h
+@@ -113,7 +113,7 @@ typedef int64_t                 s64;
+ 
+ #define DEVDRVIF_API 
+ 
+-void (*rx_cb)(void *buf);
++//void (*rx_cb)(void *buf);
+ 
+ #define Sleep     sleep
+ 
+diff --git a/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/Makefile b/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/Makefile
+index 7dcffffb3..470bf9ae1 100755
+--- a/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/Makefile
++++ b/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/Makefile
+@@ -1,4 +1,4 @@
+-CC := $(ATH_CROSS_COMPILE_TYPE)gcc
++CC := $(ATH_CROSS_COMPILE_TYPE)
+ TARGET_TYPE ?= AR9888
+ TARGET_VERS ?= v2
+ 
+diff --git a/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/cld-fwlog-netlink.c b/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/cld-fwlog-netlink.c
+index a7a0d1fce..114fdbc47 100755
+--- a/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/cld-fwlog-netlink.c
++++ b/chss_host_LEA/chss_proc/host/tools/cnssdiag_lite/cld-fwlog-netlink.c
+@@ -1255,8 +1255,7 @@ void create_genl_sock_thread()
+ 	pthread_create(&genl_thread, NULL, genl_thread_routine, NULL);
+ }
+ #endif
+-
+-int32_t fw_log_mask = MASK_LOW_LEVEL;
++int32_t fw_log_mask_q = MASK_LOW_LEVEL;
+ int terminated = 0;
+ void sig_handler(int signo)
+ {
+@@ -1309,7 +1308,7 @@ int32_t main(int32_t argc, char *argv[])
+ 			optionflag |= CONSOLE_FLAG;
+ 			fw_hdl.enable = TRUE;
+                         if (optarg != NULL) {
+-				fw_log_mask = atoi(optarg);
++				fw_log_mask_q = atoi(optarg);
+ 				diag_msg_mask_set = 1;
+ 			}
+ 			break;
+-- 
+2.17.1
+

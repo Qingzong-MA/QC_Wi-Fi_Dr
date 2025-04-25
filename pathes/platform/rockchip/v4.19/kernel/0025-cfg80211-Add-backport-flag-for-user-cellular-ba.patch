@@ -1,0 +1,27 @@
+From a3ee054ef03207c23ca49e0af0539db402e641eb Mon Sep 17 00:00:00 2001
+From: "neil.shi" <neil.shi@quectel.com>
+Date: Sat, 22 Jul 2023 13:59:37 +0800
+Subject: [PATCH 25/33] cfg80211: Add backport flag for user cellular base hint
+
+Change-Id: I1145ae37783927eecdb7b42d0018ef61ad7837a7
+---
+ kernel/include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/kernel/include/net/cfg80211.h b/kernel/include/net/cfg80211.h
+index 5a195aac2c..0463152632 100644
+--- a/kernel/include/net/cfg80211.h
++++ b/kernel/include/net/cfg80211.h
+@@ -32,6 +32,9 @@
+ /* Indicate backport support for 6GHz band */
+ #define CFG80211_6GHZ_BAND_SUPPORTED 1
+ 
++/* Indicate backport support for processing user cell base hint */
++#define CFG80211_USER_HINT_CELL_BASE_SELF_MANAGED 1
++
+ /**
+  * DOC: Introduction
+  *
+-- 
+2.17.1
+
