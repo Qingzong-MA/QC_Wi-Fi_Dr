@@ -1,0 +1,13 @@
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 7f52f6a1c7ea..b1e80bc41d4e 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -79,7 +79,7 @@ struct wiphy;
+ 
+ /* Indicate backport support for external authentication*/
+ #define CFG80211_EXTERNAL_AUTH_SUPPORT 1
+-
++#define CFG80211_EXTERNAL_DH_UPDATE_SUPPORT 1
+ /**
+  * enum ieee80211_channel_flags - channel flags
+  *

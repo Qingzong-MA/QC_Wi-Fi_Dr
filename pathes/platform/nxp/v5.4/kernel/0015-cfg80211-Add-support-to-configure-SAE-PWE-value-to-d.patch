@@ -1,0 +1,240 @@
+From 09c2c20de524e4625b8500887ce9a6860e1ae8ed Mon Sep 17 00:00:00 2001
+From: Li Feng <quic_lifeng@quicinc.com>
+Date: Thu, 14 Apr 2022 17:11:25 +0800
+Subject: [PATCH 2/3] cfg80211: Add support to configure SAE PWE value to
+ drivers
+
+Add support to configure SAE PWE preference from userspace to drivers in
+both AP and STA modes. This is needed for cases where the driver takes
+care of Authentication frame processing (SME in the driver) so that
+correct enforcement of the acceptable PWE derivation mechanism can be
+performed.
+
+The userspace applications can pass the sae_pwe value using the
+NL80211_ATTR_SAE_PWE attribute in the NL80211_CMD_CONNECT and
+NL80211_CMD_START_AP commands to the driver. This allows selection
+between the hunting-and-pecking loop and hash-to-element options for PWE
+derivation. For backwards compatibility, this new attribute is optional
+and if not included, the driver is notified of the value being
+unspecified.
+
+Signed-off-by: Rohan Dutta <drohan@codeaurora.org>
+Signed-off-by: Jouni Malinen <jouni@codeaurora.org>
+Link: https://lore.kernel.org/r/20201027100910.22283-1-jouni@codeaurora.org
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Veerendranath Jakkam <vjakkam@codeaurora.org>
+---
+ include/net/cfg80211.h       |  16 ++++++
+ include/uapi/linux/nl80211.h | 121 +++++++++++++++++++++++++++++++++++++++++++
+ net/wireless/nl80211.c       |   9 ++++
+ 3 files changed, 146 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 5dbbd05..a51df47 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -859,6 +859,21 @@ struct survey_info {
+  * @sae_pwd: password for SAE authentication (for devices supporting SAE
+  *	offload)
+  * @sae_pwd_len: length of SAE password (for devices supporting SAE offload)
++ * @sae_pwe: The mechanisms allowed for SAE PWE derivation:
++ *
++ *      NL80211_SAE_PWE_UNSPECIFIED
++ *        Not-specified, used to indicate userspace did not specify any
++ *        preference. The driver should follow its internal policy in
++ *        such a scenario.
++ *
++ *      NL80211_SAE_PWE_HUNT_AND_PECK
++ *        Allow hunting-and-pecking loop only
++ *
++ *      NL80211_SAE_PWE_HASH_TO_ELEMENT
++ *        Allow hash-to-element only
++ *
++ *      NL80211_SAE_PWE_BOTH
++ *        Allow either hunting-and-pecking loop or hash-to-element
+  */
+ struct cfg80211_crypto_settings {
+ 	u32 wpa_versions;
+@@ -876,6 +891,7 @@ struct cfg80211_crypto_settings {
+ 	const u8 *psk;
+ 	const u8 *sae_pwd;
+ 	u8 sae_pwd_len;
++	enum nl80211_sae_pwe_mechanism sae_pwe;
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index 1c048e9..9460273 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -2373,6 +2373,80 @@ enum nl80211_commands {
+  *	the allowed channel bandwidth configurations. (u8 attribute)
+  *	Defined by IEEE P802.11ay/D4.0 section 9.4.2.251, Table 13.
+  *
++ * @NL80211_ATTR_VLAN_ID: VLAN ID (1..4094) for the station and VLAN group key
++ *      (u16).
++ *
++ * @NL80211_ATTR_HE_BSS_COLOR: nested attribute for BSS Color Settings.
++ *
++ * @NL80211_ATTR_IFTYPE_AKM_SUITES: nested array attribute, with each entry
++ *      using attributes from &enum nl80211_iftype_akm_attributes. This
++ *      attribute is sent in a response to %NL80211_CMD_GET_WIPHY indicating
++ *      supported AKM suites capability per interface. AKMs advertised in
++ *      %NL80211_ATTR_AKM_SUITES are default capabilities if AKM suites not
++ *      advertised for a specific interface type.
++ *
++ * @NL80211_ATTR_TID_CONFIG: TID specific configuration in a
++ *      nested attribute with &enum nl80211_tid_config_attr sub-attributes;
++ *      on output (in wiphy attributes) it contains only the feature sub-
++ *      attributes.
++ *
++ * @NL80211_ATTR_CONTROL_PORT_NO_PREAUTH: disable preauth frame rx on control
++ *      port in order to forward/receive them as ordinary data frames.
++ *
++ * @NL80211_ATTR_PMK_LIFETIME: Maximum lifetime for PMKSA in seconds (u32,
++ *      dot11RSNAConfigPMKReauthThreshold; 0 is not a valid value).
++ *      An optional parameter configured through %NL80211_CMD_SET_PMKSA.
++ *      Drivers that trigger roaming need to know the lifetime of the
++ *      configured PMKSA for triggering the full vs. PMKSA caching based
++ *      authentication. This timeout helps authentication methods like SAE,
++ *      where PMK gets updated only by going through a full (new SAE)
++ *      authentication instead of getting updated during an association for EAP
++ *      authentication. No new full authentication within the PMK expiry shall
++ *      result in a disassociation at the end of the lifetime.
++ *
++ * @NL80211_ATTR_PMK_REAUTH_THRESHOLD: Reauthentication threshold time, in
++ *      terms of percentage of %NL80211_ATTR_PMK_LIFETIME
++ *      (u8, dot11RSNAConfigPMKReauthThreshold, 1..100). This is an optional
++ *      parameter configured through %NL80211_CMD_SET_PMKSA. Requests the
++ *      driver to trigger a full authentication roam (without PMKSA caching)
++ *      after the reauthentication threshold time, but before the PMK lifetime
++ *      has expired.
++ *
++ *      Authentication methods like SAE need to be able to generate a new PMKSA
++ *      entry without having to force a disconnection after the PMK timeout. If
++ *      no roaming occurs between the reauth threshold and PMK expiration,
++ *      disassociation is still forced.
++ * @NL80211_ATTR_RECEIVE_MULTICAST: multicast flag for the
++ *      %NL80211_CMD_REGISTER_FRAME command, see the description there.
++ * @NL80211_ATTR_WIPHY_FREQ_OFFSET: offset of the associated
++ *      %NL80211_ATTR_WIPHY_FREQ in positive KHz. Only valid when supplied with
++ *      an %NL80211_ATTR_WIPHY_FREQ_OFFSET.
++ * @NL80211_ATTR_CENTER_FREQ1_OFFSET: Center frequency offset in KHz for the
++ *      first channel segment specified in %NL80211_ATTR_CENTER_FREQ1.
++ * @NL80211_ATTR_SCAN_FREQ_KHZ: nested attribute with KHz frequencies
++ *
++ * @NL80211_ATTR_HE_6GHZ_CAPABILITY: HE 6 GHz Band Capability element (from
++ *      association request when used with NL80211_CMD_NEW_STATION).
++ *
++ * @NL80211_ATTR_FILS_DISCOVERY: Optional parameter to configure FILS
++ *      discovery. It is a nested attribute, see
++ *      &enum nl80211_fils_discovery_attributes.
++ *
++ * @NL80211_ATTR_UNSOL_BCAST_PROBE_RESP: Optional parameter to configure
++ *      unsolicited broadcast probe response. It is a nested attribute, see
++ *      &enum nl80211_unsol_bcast_probe_resp_attributes.
++ *
++ * @NL80211_ATTR_S1G_CAPABILITY: S1G Capability information element (from
++ *      association request when used with NL80211_CMD_NEW_STATION)
++ * @NL80211_ATTR_S1G_CAPABILITY_MASK: S1G Capability Information element
++ *      override mask. Used with NL80211_ATTR_S1G_CAPABILITY in
++ *      NL80211_CMD_ASSOCIATE or NL80211_CMD_CONNECT.
++ *
++ * @NL80211_ATTR_SAE_PWE: Indicates the mechanism(s) allowed for SAE PWE
++ *      derivation in WPA3-Personal networks which are using SAE authentication.
++ *      This is a u8 attribute that encapsulates one of the values from
++ *      &enum nl80211_sae_pwe_mechanism.
++ *
+  * @NUM_NL80211_ATTR: total number of nl80211_attrs available
+  * @NL80211_ATTR_MAX: highest attribute number currently defined
+  * @__NL80211_ATTR_AFTER_LAST: internal use
+@@ -2835,6 +2909,35 @@ enum nl80211_attrs {
+ 	NL80211_ATTR_WIPHY_EDMG_CHANNELS,
+ 	NL80211_ATTR_WIPHY_EDMG_BW_CONFIG,
+ 
++	NL80211_ATTR_VLAN_ID,
++
++	NL80211_ATTR_HE_BSS_COLOR,
++
++	NL80211_ATTR_IFTYPE_AKM_SUITES,
++
++	NL80211_ATTR_TID_CONFIG,
++
++	NL80211_ATTR_CONTROL_PORT_NO_PREAUTH,
++
++	NL80211_ATTR_PMK_LIFETIME,
++	NL80211_ATTR_PMK_REAUTH_THRESHOLD,
++
++	NL80211_ATTR_RECEIVE_MULTICAST,
++	NL80211_ATTR_WIPHY_FREQ_OFFSET,
++	NL80211_ATTR_CENTER_FREQ1_OFFSET,
++	NL80211_ATTR_SCAN_FREQ_KHZ,
++
++	NL80211_ATTR_HE_6GHZ_CAPABILITY,
++
++	NL80211_ATTR_FILS_DISCOVERY,
++
++	NL80211_ATTR_UNSOL_BCAST_PROBE_RESP,
++
++	NL80211_ATTR_S1G_CAPABILITY,
++	NL80211_ATTR_S1G_CAPABILITY_MASK,
++
++	NL80211_ATTR_SAE_PWE,
++
+ 	/* add attributes here, update the policy in nl80211.c */
+ 
+ 	__NL80211_ATTR_AFTER_LAST,
+@@ -6595,5 +6698,23 @@ enum nl80211_obss_pd_attributes {
+ 	NL80211_HE_OBSS_PD_ATTR_MAX = __NL80211_HE_OBSS_PD_ATTR_LAST - 1,
+ };
+ 
++/**
++ * enum nl80211_sae_pwe_mechanism - The mechanism(s) allowed for SAE PWE
++ *      derivation. Applicable only when WPA3-Personal SAE authentication is
++ *      used.
++ *
++ * @NL80211_SAE_PWE_UNSPECIFIED: not specified, used internally to indicate that
++ *      attribute is not present from userspace.
++ * @NL80211_SAE_PWE_HUNT_AND_PECK: hunting-and-pecking loop only
++ * @NL80211_SAE_PWE_HASH_TO_ELEMENT: hash-to-element only
++ * @NL80211_SAE_PWE_BOTH: both hunting-and-pecking loop and hash-to-element
++ *      can be used.
++ */
++enum nl80211_sae_pwe_mechanism {
++	NL80211_SAE_PWE_UNSPECIFIED,
++	NL80211_SAE_PWE_HUNT_AND_PECK,
++	NL80211_SAE_PWE_HASH_TO_ELEMENT,
++	NL80211_SAE_PWE_BOTH,
++};
+ 
+ #endif /* __LINUX_NL80211_H */
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 3f30276..9d8fbb6 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -624,6 +624,9 @@ const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 					.len = SAE_PASSWORD_MAX_LEN },
+ 	[NL80211_ATTR_TWT_RESPONDER] = { .type = NLA_FLAG },
+ 	[NL80211_ATTR_HE_OBSS_PD] = NLA_POLICY_NESTED(he_obss_pd_policy),
++	[NL80211_ATTR_SAE_PWE] =
++		NLA_POLICY_RANGE(NLA_U8, NL80211_SAE_PWE_HUNT_AND_PECK,
++				 NL80211_SAE_PWE_BOTH),
+ };
+ 
+ /* policy for the key attributes */
+@@ -9175,6 +9178,12 @@ static int nl80211_crypto_settings(struct cfg80211_registered_device *rdev,
+ 			nla_len(info->attrs[NL80211_ATTR_SAE_PASSWORD]);
+ 	}
+ 
++	if (info->attrs[NL80211_ATTR_SAE_PWE])
++		settings->sae_pwe =
++			nla_get_u8(info->attrs[NL80211_ATTR_SAE_PWE]);
++	else
++		settings->sae_pwe = NL80211_SAE_PWE_UNSPECIFIED;
++
+ 	return 0;
+ }
+ 
+-- 
+2.7.4
+

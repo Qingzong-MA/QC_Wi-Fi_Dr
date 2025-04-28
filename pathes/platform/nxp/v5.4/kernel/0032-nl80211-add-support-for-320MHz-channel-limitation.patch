@@ -1,0 +1,127 @@
+From 8e92ca52791f9a2ed885d0233a04e13eca8cbbda Mon Sep 17 00:00:00 2001
+From: Sriram R <quic_srirrama@quicinc.com>
+Date: Mon, 14 Feb 2022 17:29:56 +0100
+Subject: [PATCH 13/17] nl80211: add support for 320MHz channel limitation
+
+Add support to advertise drivers or regulatory limitations on 320 MHz
+channels to userspace.
+
+Signed-off-by: Sriram R <quic_srirrama@quicinc.com>
+Co-authored-by: Karthikeyan Periyasamy <quic_periyasia@quicinc.com>
+Signed-off-by: Karthikeyan Periyasamy <quic_periyasia@quicinc.com>
+Co-authored-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Signed-off-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Link: https://lore.kernel.org/r/1640163883-12696-6-git-send-email-quic_vjakkam@quicinc.com
+Link: https://lore.kernel.org/r/20220214163009.175289-3-johannes@sipsolutions.net
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/uapi/linux/nl80211.h | 25 +++++++++++++++++++++++++
+ net/wireless/nl80211.c       |  3 +++
+ net/wireless/reg.c           |  6 ++++++
+ 3 files changed, 34 insertions(+)
+
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index c618534..6386263 100755
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -3737,6 +3737,21 @@ enum nl80211_wmm_rule {
+  * @NL80211_FREQUENCY_ATTR_WMM: this channel has wmm limitations.
+  *	This is a nested attribute that contains the wmm limitation per AC.
+  *	(see &enum nl80211_wmm_rule)
++ * @NL80211_FREQUENCY_ATTR_NO_HE: HE operation is not allowed on this channel
++ *	in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_OFFSET: frequency offset in KHz
++ * @NL80211_FREQUENCY_ATTR_1MHZ: 1 MHz operation is allowed
++ *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_2MHZ: 2 MHz operation is allowed
++ *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_4MHZ: 4 MHz operation is allowed
++ *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_8MHZ: 8 MHz operation is allowed
++ *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_16MHZ: 16 MHz operation is allowed
++ *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_NO_320MHZ: any 320 MHz channel using this channel
++ *	as the primary or any of the secondary channels isn't possible
+  * @NL80211_FREQUENCY_ATTR_MAX: highest frequency attribute number
+  *	currently defined
+  * @__NL80211_FREQUENCY_ATTR_AFTER_LAST: internal use
+@@ -3766,6 +3781,14 @@ enum nl80211_frequency_attr {
+ 	NL80211_FREQUENCY_ATTR_NO_20MHZ,
+ 	NL80211_FREQUENCY_ATTR_NO_10MHZ,
+ 	NL80211_FREQUENCY_ATTR_WMM,
++	NL80211_FREQUENCY_ATTR_NO_HE,
++	NL80211_FREQUENCY_ATTR_OFFSET,
++	NL80211_FREQUENCY_ATTR_1MHZ,
++	NL80211_FREQUENCY_ATTR_2MHZ,
++	NL80211_FREQUENCY_ATTR_4MHZ,
++	NL80211_FREQUENCY_ATTR_8MHZ,
++	NL80211_FREQUENCY_ATTR_16MHZ,
++	NL80211_FREQUENCY_ATTR_NO_320MHZ,
+ 
+ 	/* keep last */
+ 	__NL80211_FREQUENCY_ATTR_AFTER_LAST,
+@@ -3963,6 +3986,7 @@ enum nl80211_sched_scan_match_attr {
+  * @NL80211_RRF_NO_HT40PLUS: channels can't be used in HT40+ operation
+  * @NL80211_RRF_NO_80MHZ: 80MHz operation not allowed
+  * @NL80211_RRF_NO_160MHZ: 160MHz operation not allowed
++ * @NL80211_RRF_NO_320MHZ: 320MHz operation not allowed
+  */
+ enum nl80211_reg_rule_flags {
+ 	NL80211_RRF_NO_OFDM		= 1<<0,
+@@ -3980,6 +4004,7 @@ enum nl80211_reg_rule_flags {
+ 	NL80211_RRF_NO_HT40PLUS		= 1<<14,
+ 	NL80211_RRF_NO_80MHZ		= 1<<15,
+ 	NL80211_RRF_NO_160MHZ		= 1<<16,
++	NL80211_RRF_NO_320MHZ		= 1<<18,
+ };
+ 
+ #define NL80211_RRF_PASSIVE_SCAN	NL80211_RRF_NO_IR
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 2f77f1c..7ea6bb5 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -980,6 +980,9 @@ static int nl80211_msg_put_channel(struct sk_buff *msg, struct wiphy *wiphy,
+ 		if ((chan->flags & IEEE80211_CHAN_NO_10MHZ) &&
+ 		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_NO_10MHZ))
+ 			goto nla_put_failure;
++		if ((chan->flags & IEEE80211_CHAN_NO_320MHZ) &&
++		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_NO_320MHZ))
++			goto nla_put_failure;
+ 	}
+ 
+ 	if (nla_put_u32(msg, NL80211_FREQUENCY_ATTR_MAX_TX_POWER,
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index a46e948..0c0cb74 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -1198,6 +1198,8 @@ unsigned int reg_get_max_bandwidth(const struct ieee80211_regdomain *rd,
+ {
+ 	unsigned int bw = reg_get_max_bandwidth_from_range(rd, rule);
+ 
++	if (rule->flags & NL80211_RRF_NO_320MHZ)
++		bw = min_t(unsigned int, bw, MHZ_TO_KHZ(160));
+ 	if (rule->flags & NL80211_RRF_NO_160MHZ)
+ 		bw = min_t(unsigned int, bw, MHZ_TO_KHZ(80));
+ 	if (rule->flags & NL80211_RRF_NO_80MHZ)
+@@ -1569,6 +1571,8 @@ static u32 map_regdom_flags(u32 rd_flags)
+ 		channel_flags |= IEEE80211_CHAN_NO_80MHZ;
+ 	if (rd_flags & NL80211_RRF_NO_160MHZ)
+ 		channel_flags |= IEEE80211_CHAN_NO_160MHZ;
++	if (rd_flags & NL80211_RRF_NO_320MHZ)
++		channel_flags |= IEEE80211_CHAN_NO_320MHZ;
+ 	return channel_flags;
+ }
+ 
+@@ -1685,6 +1689,8 @@ static uint32_t reg_rule_to_chan_bw_flags(const struct ieee80211_regdomain *regd
+ 		bw_flags |= IEEE80211_CHAN_NO_80MHZ;
+ 	if (max_bandwidth_khz < MHZ_TO_KHZ(160))
+ 		bw_flags |= IEEE80211_CHAN_NO_160MHZ;
++	if (max_bandwidth_khz < MHZ_TO_KHZ(320))
++		bw_flags |= IEEE80211_CHAN_NO_320MHZ;
+ 	return bw_flags;
+ }
+ 
+-- 
+2.7.4
+

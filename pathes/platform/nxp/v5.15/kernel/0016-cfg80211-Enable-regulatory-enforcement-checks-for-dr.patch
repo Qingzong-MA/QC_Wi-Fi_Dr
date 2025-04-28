@@ -1,0 +1,60 @@
+From 0c168406af2a9de8f56a33166c32affff2b1a12f Mon Sep 17 00:00:00 2001
+From: Sriram R <quic_srirrama@quicinc.com>
+Date: Thu, 2 Dec 2021 07:08:40 +0530
+Subject: [PATCH 016/100] cfg80211: Enable regulatory enforcement checks for
+ drivers supporting mesh iface
+
+Currently cfg80211 checks for invalid channels whenever there is a
+regulatory update and stops the active interfaces if it is operating on
+an unsupported channel in the new regulatory domain.
+
+This is done based on a regulatory flag REGULATORY_IGNORE_STALE_KICKOFF
+set during wiphy registration which disables this enforcement when
+unsupported interface modes are supported by driver.
+
+Add support to enable this enforcement when Mesh Point interface type
+is advertised by drivers.
+
+Signed-off-by: Sriram R <quic_srirrama@quicinc.com>
+Link: https://lore.kernel.org/r/1638409120-28997-1-git-send-email-quic_srirrama@quicinc.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ net/wireless/core.c | 1 +
+ net/wireless/reg.c  | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/net/wireless/core.c b/net/wireless/core.c
+index c3f256e04fa6..f08d4b3bb148 100644
+--- a/net/wireless/core.c
++++ b/net/wireless/core.c
+@@ -728,6 +728,7 @@ int wiphy_register(struct wiphy *wiphy)
+ 	if (wiphy->interface_modes & ~(BIT(NL80211_IFTYPE_STATION) |
+ 				       BIT(NL80211_IFTYPE_P2P_CLIENT) |
+ 				       BIT(NL80211_IFTYPE_AP) |
++				       BIT(NL80211_IFTYPE_MESH_POINT) |
+ 				       BIT(NL80211_IFTYPE_P2P_GO) |
+ 				       BIT(NL80211_IFTYPE_ADHOC) |
+ 				       BIT(NL80211_IFTYPE_P2P_DEVICE) |
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index 54c13ea7d977..379d7747669c 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -2354,6 +2354,7 @@ static bool reg_wdev_chan_valid(struct wiphy *wiphy, struct wireless_dev *wdev)
+ 	switch (iftype) {
+ 	case NL80211_IFTYPE_AP:
+ 	case NL80211_IFTYPE_P2P_GO:
++	case NL80211_IFTYPE_MESH_POINT:
+ 		if (!wdev->beacon_interval)
+ 			goto wdev_inactive_unlock;
+ 		chandef = wdev->chandef;
+@@ -2392,6 +2393,7 @@ static bool reg_wdev_chan_valid(struct wiphy *wiphy, struct wireless_dev *wdev)
+ 	case NL80211_IFTYPE_AP:
+ 	case NL80211_IFTYPE_P2P_GO:
+ 	case NL80211_IFTYPE_ADHOC:
++	case NL80211_IFTYPE_MESH_POINT:
+ 		wiphy_lock(wiphy);
+ 		ret = cfg80211_reg_can_beacon_relax(wiphy, &chandef, iftype);
+ 		wiphy_unlock(wiphy);
+-- 
+2.17.1
+

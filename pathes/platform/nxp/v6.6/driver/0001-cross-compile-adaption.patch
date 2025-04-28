@@ -1,0 +1,413 @@
+From 2e4b486122dc40cce83744bf141388d6d1666b18 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Sun, 27 Apr 2025 14:14:15 +0800
+Subject: [PATCH] cross-compile adaption
+
+---
+ .../chss_proc/host/AIO/build/Makefile         |  6 ++++-
+ .../AIO/build/scripts/ve-f10/config.ve-f10    |  6 ++---
+ .../chss_proc/host/AIO/drivers/Makefile       |  2 +-
+ .../host/AIO/drivers/core_tech_modules/Kbuild |  3 +--
+ .../ipc_router/ipc_router_socket.c            |  2 ++
+ .../core_tech_modules/ks_bridge/ks_bridge.c   |  4 +++
+ .../drivers/core_tech_modules/mhi/mhi_iface.c |  4 +++
+ .../qti_sdio_client/qti_sdio_client.c         |  4 +++
+ .../dp/wifi3.0/dp_internal.h                  |  4 +++
+ .../qca-wifi-host-cmn/qdf/inc/qdf_trace.h     |  4 +++
+ .../qca-wifi-host-cmn/qdf/inc/qdf_types.h     |  4 +++
+ .../qca-wifi-host-cmn/utils/pktlog/linux_ac.c | 13 ++++++++++
+ .../host/AIO/drivers/qcacld-3.0/Kbuild        |  1 -
+ .../core/dp/txrx/ol_txrx_internal.h           |  4 +++
+ .../qcacld-3.0/core/hdd/inc/wlan_hdd_tdls.h   |  9 ++++++-
+ .../qcacld-3.0/core/hdd/src/wlan_hdd_main.c   |  4 +++
+ .../qcacld-3.0/core/hdd/src/wlan_hdd_tdls.c   | 25 ++++++++++++++++---
+ .../core/mac/src/include/parser_api.h         |  4 +++
+ .../core/mac/src/include/utils_api.h          |  4 +++
+ .../sys/legacy/src/utils/inc/utils_parser.h   |  4 +++
+ 20 files changed, 99 insertions(+), 12 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/Makefile b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+index b6072d221..35f69f74c 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/Makefile
++++ b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+@@ -1,7 +1,10 @@
+ #
+ # Main Makefile
+ #
+-export ATH_TOPDIR=$(shell pwd)/..
++BUILD_TIME:=$(shell date +%s)
++AIO_TOPDIR=$(shell pwd)/../../AIO
++$(shell ln -sf ${AIO_TOPDIR} /tmp/AIO_${BUILD_TIME})
++export ATH_TOPDIR=/tmp/AIO_${BUILD_TIME}
+ export BACKPORT_PWD=$(shell pwd)/backports
+ # different customer want to use different wpa_supplicant
+ # in board_type config file, we can override it
+@@ -111,6 +114,7 @@ drivers: rootfs_prep
+ 	cp -fr $(INSTALL_ROOT)/lib/modules $(INSTALL_ROOT)/lib/unstripped_modules
+ 	@echo Strip modules
+ 	@cd ${INSTALL_ROOT}/lib/modules && ${TOOLPREFIX}strip --strip-unneeded *.ko
++	rm ${ATH_TOPDIR} -rf
+ 
+ 
+ drivers_firmware: rootfs_prep
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10 b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+index 4d4412c15..c66074cab 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
++++ b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+@@ -1,12 +1,12 @@
+ #
+ # Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+ #
+-export KERNELPATH=/lib/modules/${shell uname -r}/build
++export KERNELPATH=${KBUILD_OUTPUT}
+ #export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+ 
+-export KERNELARCH=x86_64
++export KERNELARCH=${ARCH}
+ #export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+-#export TOOLPREFIX=${CROSS_COMPILE}
++export TOOLPREFIX=${CROSS_COMPILE}
+ #export BTPATH=<set the bt path>
+ 
+ # for backports
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/Makefile b/chss_host_LEA/chss_proc/host/AIO/drivers/Makefile
+index c947f2903..f53f6c37f 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/Makefile
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/Makefile
+@@ -339,7 +339,7 @@ qcacld_3_2_clean:
+ 	${MAKEARCH} -C $(KERNELPATH) M=$(ATH_QCACLD_CLD_3_2_TOPDIR) $(KBUILD_OPTIONS_CLD_3_2) clean
+ 
+ core_tech_modules_build:
+-	${MAKEARCH} -C $(CORE_TECH_TOPDIR) $(KBUILD_OPTIONS_CORE_TECH) KBUILD_EXTRA_SYMBOLS=$(MODULE_SYMBOL_DIR)/Module.symvers
++	${MAKEARCH} -C $(CORE_TECH_TOPDIR) $(KBUILD_OPTIONS_CORE_TECH)
+ 
+ core_tech_modules_clean:
+ 	${MAKEARCH} -C $(KERNELPATH) M=$(CORE_TECH_TOPDIR) clean
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+index 591824bd2..de4334ba5 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+@@ -203,8 +203,7 @@ ifneq ($(CONFIG_MULTI_CARD),)
+ 	endif
+ endif
+ 
+-CDEFINES :=	-Wall\
+-		-Werror
++CDEFINES :=	-Wall
+ KBUILD_CPPFLAGS += $(CDEFINES)
+ 
+ ifneq ($(CONFIG_WLAN_CNSS_CORE), y)
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ipc_router/ipc_router_socket.c b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ipc_router/ipc_router_socket.c
+index 4f362dcec..8751ea6ac 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ipc_router/ipc_router_socket.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ipc_router/ipc_router_socket.c
+@@ -648,7 +648,9 @@ static const struct proto_ops msm_ipc_proto_ops = {
+ 	.sendmsg		= msm_ipc_router_sendmsg,
+ 	.recvmsg		= msm_ipc_router_recvmsg,
+ 	.mmap			= sock_no_mmap,
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 5, 0))
+ 	.sendpage		= sock_no_sendpage,
++#endif
+ };
+ 
+ static struct proto msm_ipc_proto = {
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ks_bridge/ks_bridge.c b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ks_bridge/ks_bridge.c
+index e1a24d8b8..9549660cf 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ks_bridge/ks_bridge.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/ks_bridge/ks_bridge.c
+@@ -859,7 +859,11 @@ ksb_usb_probe(struct usb_interface *ifc, const struct usb_device_id *id)
+ 		goto fail_chrdev_region;
+ 	}
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0))
++	ksb->class = class_create(mdev->name);
++#else
+ 	ksb->class = class_create(THIS_MODULE, mdev->name);
++#endif
+ 	if (IS_ERR(ksb->class)) {
+ 		dbg_log_event(ksb, "clscr failed", PTR_ERR(ksb->class), 0);
+ 		goto fail_class_create;
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/mhi/mhi_iface.c b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/mhi/mhi_iface.c
+index 9f9883510..2ae492398 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/mhi/mhi_iface.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/mhi/mhi_iface.c
+@@ -708,7 +708,11 @@ static int __init mhi_init(void)
+ 	mutex_lock(&mhi_dev_drv->lock);
+ 	INIT_LIST_HEAD(&mhi_dev_drv->head);
+ 	mutex_unlock(&mhi_dev_drv->lock);
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0))
++	mhi_dev_drv->mhi_bhi_class = class_create(MHI_BHI_CLASS_NAME);
++#else
+ 	mhi_dev_drv->mhi_bhi_class = class_create(THIS_MODULE, MHI_BHI_CLASS_NAME);
++#endif
+ 	if (IS_ERR(mhi_dev_drv->mhi_bhi_class)) {
+ 		pr_err("Error creating mhi_bhi_class\n");
+ 		goto class_error;
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/qti_sdio_client/qti_sdio_client.c b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/qti_sdio_client/qti_sdio_client.c
+index aa5bac7b2..811ad6f6e 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/qti_sdio_client/qti_sdio_client.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/qti_sdio_client/qti_sdio_client.c
+@@ -856,7 +856,11 @@ static int qti_client_probe(struct sdio_al_client_handle *client_handle)
+ 			goto tx_err;
+ 		}
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0))
++		tty_dev->qsb_class = class_create("qsahara");
++#else
+ 		tty_dev->qsb_class = class_create(THIS_MODULE, "qsahara");
++#endif
+ 		if (IS_ERR(tty_dev->qsb_class)) {
+ 			to_console = 1;
+ 			qlog(qsb, "client %s failed to create class\n",
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/dp/wifi3.0/dp_internal.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/dp/wifi3.0/dp_internal.h
+index 33eb4bec9..034e1c311 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/dp/wifi3.0/dp_internal.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/dp/wifi3.0/dp_internal.h
+@@ -173,7 +173,11 @@ enum timer_yield_status {
+ };
+ 
+ #if DP_PRINT_ENABLE
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linxu/stdarg.h>       /* va_list */
++#else
+ #include <stdarg.h>       /* va_list */
++#endif
+ #include <qdf_types.h> /* qdf_vprint */
+ #include <cdp_txrx_handle.h>
+ 
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_trace.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_trace.h
+index ab493c7ec..8119240ea 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_trace.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_trace.h
+@@ -27,7 +27,11 @@
+ 
+ /* Include Files */
+ #include  <qdf_types.h>         /* For QDF_MODULE_ID... */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include  <linux/stdarg.h>            /* For va_list... */
++#else
+ #include  <stdarg.h>            /* For va_list... */
++#endif
+ #include  <qdf_status.h>
+ #include  <qdf_nbuf.h>
+ #include  <i_qdf_types.h>
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_types.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_types.h
+index f272e49a5..03b2eb2ed 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_types.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/qdf/inc/qdf_types.h
+@@ -28,7 +28,11 @@
+ 
+ /* Include Files */
+ #include <i_qdf_types.h>
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linux/stdarg.h>
++#else
+ #include <stdarg.h>
++#endif
+ #ifdef TSOSEG_DEBUG
+ #include <qdf_atomic.h>
+ #endif
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/utils/pktlog/linux_ac.c b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/utils/pktlog/linux_ac.c
+index 1bb6a3cc5..f716b3d3f 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/utils/pktlog/linux_ac.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qca-wifi-host-cmn/utils/pktlog/linux_ac.c
+@@ -337,12 +337,20 @@ static int pktlog_sysctl_register(struct hif_opaque_softc *scn)
+ 	memset(pl_info_lnx->sysctls, 0, sizeof(pl_info_lnx->sysctls));
+ 	pl_info_lnx->sysctls[0].procname = PKTLOG_PROC_DIR;
+ 	pl_info_lnx->sysctls[0].mode = PKTLOG_PROCSYS_DIR_PERM;
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
++	pl_info_lnx->sysctls[0].type = SYSCTL_TABLE_TYPE_DEFAULT;
++#else
+ 	pl_info_lnx->sysctls[0].child = &pl_info_lnx->sysctls[2];
++#endif
+ 
+ 	/* [1] is NULL terminator */
+ 	pl_info_lnx->sysctls[2].procname = proc_name;
+ 	pl_info_lnx->sysctls[2].mode = PKTLOG_PROCSYS_DIR_PERM;
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
++	pl_info_lnx->sysctls[2].type = SYSCTL_TABLE_TYPE_DEFAULT;
++#else
+ 	pl_info_lnx->sysctls[2].child = &pl_info_lnx->sysctls[4];
++#endif
+ 
+ 	/* [3] is NULL terminator */
+ 	pl_info_lnx->sysctls[4].procname = "enable";
+@@ -403,8 +411,13 @@ static int pktlog_sysctl_register(struct hif_opaque_softc *scn)
+ 
+ 	/* and register everything */
+ 	/* register_sysctl_table changed from 2.6.21 onwards */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 5, 0))
++	pl_info_lnx->sysctl_header =
++		register_sysctl("system", pl_info_lnx->sysctls);
++#else
+ 	pl_info_lnx->sysctl_header =
+ 		register_sysctl_table(pl_info_lnx->sysctls);
++#endif
+ 
+ 	if (!pl_info_lnx->sysctl_header) {
+ 		qdf_nofl_info("%s: failed to register sysctls!", proc_name);
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+index 0087b724f..78512959b 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+@@ -2665,7 +2665,6 @@ ccflags-y += $(INCS)
+ 
+ cppflags-y +=	-DANI_OS_TYPE_ANDROID=6 \
+ 		-Wall\
+-		-Werror\
+ 		-D__linux__
+ 
+ cppflags-$(CONFIG_PTT_SOCK_SVC_ENABLE) += -DPTT_SOCK_SVC_ENABLE
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/dp/txrx/ol_txrx_internal.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/dp/txrx/ol_txrx_internal.h
+index 52b8ac59c..b8ff85655 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/dp/txrx/ol_txrx_internal.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/dp/txrx/ol_txrx_internal.h
+@@ -67,7 +67,11 @@
+ 
+ #ifdef TXRX_PRINT_ENABLE
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linux/stdarg.h>             /* va_list */
++#else
+ #include <stdarg.h>             /* va_list */
++#endif
+ #include <qdf_types.h>          /* qdf_vprint */
+ 
+ #define ol_txrx_alert(params...) \
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/wlan_hdd_tdls.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/wlan_hdd_tdls.h
+index 1f87d4d84..165caf672 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/wlan_hdd_tdls.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/wlan_hdd_tdls.h
+@@ -113,7 +113,14 @@ int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 				u16 status_code, u32 peer_capability,
+ 				const u8 *buf, size_t len);
+ #else
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
++int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
++				struct net_device *dev, const uint8_t *peer, int link_id,
++				uint8_t action_code, uint8_t dialog_token,
++				uint16_t status_code, uint32_t peer_capability,
++				bool initiator, const uint8_t *buf,
++				size_t len);
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
+ int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 				struct net_device *dev, const uint8_t *peer,
+ 				uint8_t action_code, uint8_t dialog_token,
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_main.c b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_main.c
+index 16b76a718..5412f0626 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_main.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_main.c
+@@ -16528,7 +16528,11 @@ static int  wlan_hdd_state_ctrl_param_create(void)
+ 	}
+ 	wlan_hdd_state_major = MAJOR(device);
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0))
++	class = class_create(WLAN_MODULE_NAME);
++#else
+ 	class = class_create(THIS_MODULE, WLAN_MODULE_NAME);
++#endif
+ 	if (IS_ERR(class)) {
+ 		pr_err("wlan_hdd_state class_create error");
+ 		goto class_err;
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_tdls.c b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_tdls.c
+index 72f0bab6e..66a5fc6d8 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_tdls.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/src/wlan_hdd_tdls.c
+@@ -447,7 +447,14 @@ static int __wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+  *
+  * Return: 0 if success; negative errno otherwise
+  */
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
++static int __wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
++				struct net_device *dev, const uint8_t *peer, int link_id,
++				uint8_t action_code, uint8_t dialog_token,
++				uint16_t status_code, uint32_t peer_capability,
++				bool initiator, const uint8_t *buf,
++				size_t len)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
+ static int __wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 				struct net_device *dev, const uint8_t *peer,
+ 				uint8_t action_code, uint8_t dialog_token,
+@@ -552,7 +559,14 @@ int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 					u16 status_code, u32 peer_capability,
+ 					const u8 *buf, size_t len)
+ #else /* TDLS_MGMT_VERSION2 */
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)) || defined(WITH_BACKPORTS)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
++int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
++					struct net_device *dev,
++					const u8 *peer, int link_id, u8 action_code,
++					u8 dialog_token, u16 status_code,
++					u32 peer_capability, bool initiator,
++					const u8 *buf, size_t len)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)) || defined(WITH_BACKPORTS)
+ int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 					struct net_device *dev,
+ 					const u8 *peer, u8 action_code,
+@@ -595,7 +609,12 @@ int wlan_hdd_cfg80211_tdls_mgmt(struct wiphy *wiphy,
+ 					      dialog_token, status_code,
+ 					      peer_capability, buf, len);
+ #else /* TDLS_MGMT_VERSION2 */
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)) || defined(WITH_BACKPORTS)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
++	errno = __wlan_hdd_cfg80211_tdls_mgmt(wiphy, dev, peer, link_id, action_code,
++					      dialog_token, status_code,
++					      peer_capability, initiator,
++					      buf, len);
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)) || defined(WITH_BACKPORTS)
+ 	errno = __wlan_hdd_cfg80211_tdls_mgmt(wiphy, dev, peer, action_code,
+ 					      dialog_token, status_code,
+ 					      peer_capability, initiator,
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/parser_api.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/parser_api.h
+index 12d2c9a8e..09efa53b3 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/parser_api.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/parser_api.h
+@@ -29,7 +29,11 @@
+ #ifndef __PARSE_H__
+ #define __PARSE_H__
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linux/stdarg.h>
++#else
+ #include <stdarg.h>
++#endif
+ #include "sir_mac_prop_exts.h"
+ #include "dot11f.h"
+ #include "lim_ft_defs.h"
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/utils_api.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/utils_api.h
+index e2f8ce261..6224d23d6 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/utils_api.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/include/utils_api.h
+@@ -19,7 +19,11 @@
+ #ifndef __UTILSAPI_H
+ #define __UTILSAPI_H
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linux/stdarg.h>
++#else
+ #include <stdarg.h>
++#endif
+ #include <sir_common.h>
+ #include "ani_global.h"
+ #include "sys_wrapper.h"
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/sys/legacy/src/utils/inc/utils_parser.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/sys/legacy/src/utils/inc/utils_parser.h
+index 4c4c8b8ec..57756038d 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/sys/legacy/src/utils/inc/utils_parser.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/src/sys/legacy/src/utils/inc/utils_parser.h
+@@ -30,7 +30,11 @@
+ #ifndef __UTILS_PARSE_H__
+ #define __UTILS_PARSE_H__
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
++#include <linux/stdarg.h>
++#else
+ #include <stdarg.h>
++#endif
+ #include "sir_api.h"
+ #include "dot11f.h"
+ #include "utils_api.h"
+-- 
+2.17.1
+

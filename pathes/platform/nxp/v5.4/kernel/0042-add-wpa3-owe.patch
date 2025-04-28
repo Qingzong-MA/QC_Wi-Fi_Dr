@@ -1,0 +1,25 @@
+From 3bd9cb3d88c09c972bd6172bebcdbdf457249db8 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 23:57:24 +0800
+Subject: [PATCH 3/4] add wpa3 owe
+
+---
+ include/net/cfg80211.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 2d71933bd7e3..80f966b26e05 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -82,7 +82,7 @@ struct wiphy;
+ 
+ /* Indicate backport support for external authentication*/
+ #define CFG80211_EXTERNAL_AUTH_SUPPORT 1
+-
++#define CFG80211_EXTERNAL_DH_UPDATE_SUPPORT 1
+ /**
+  * enum ieee80211_channel_flags - channel flags
+  *
+-- 
+2.17.1
+

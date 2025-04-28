@@ -1,0 +1,106 @@
+From 7fc82af856d6bc26910902f8f42659b162864955 Mon Sep 17 00:00:00 2001
+From: Veerendranath Jakkam <vjakkam@codeaurora.org>
+Date: Fri, 13 Mar 2020 01:59:03 +0200
+Subject: [PATCH] cfg80211: Configure PMK lifetime and reauth threshold for
+ PMKSA entries
+
+Drivers that trigger roaming need to know the lifetime of the configured
+PMKSA for deciding whether to trigger the full or PMKSA cache based
+authentication. The configured PMKSA is invalid after the PMK lifetime
+has expired and must not be used after that and the STA needs to
+disassociate if the PMK expires. Hence the STA is expected to refresh
+the PMK with a full authentication before this happens (e.g., when
+reassociating to a new BSS the next time or by performing EAPOL
+reauthentication depending on the AKM) to avoid unnecessary
+disconnection.
+
+The PMK reauthentication threshold is the percentage of the PMK lifetime
+value and indicates to the driver to trigger a full authentication roam
+(without PMKSA caching) after the reauthentication threshold time, but
+before the PMK timer has expired. Authentication methods like SAE need
+to be able to generate a new PMKSA entry without having to force a
+disconnection after this threshold timeout. If no roaming occurs between
+the reauthentication threshold time and PMK lifetime expiration,
+disassociation is still forced.
+
+The new attributes for providing these values correspond to the dot11
+MIB variables dot11RSNAConfigPMKLifetime and
+dot11RSNAConfigPMKReauthThreshold.
+
+This type of functionality is already available in cases where user
+space component is in control of roaming. This commit extends that same
+capability into cases where parts or all of this functionality is
+offloaded to the driver.
+
+Signed-off-by: Veerendranath Jakkam <vjakkam@codeaurora.org>
+Signed-off-by: Jouni Malinen <jouni@codeaurora.org>
+Link: https://lore.kernel.org/r/20200312235903.18462-1-jouni@codeaurora.org
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h | 13 +++++++++++++
+ net/wireless/nl80211.c | 11 +++++++++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index ddf4e88..52a5dec 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -2651,6 +2651,17 @@ enum wiphy_params_flags {
+  * @cache_id: 2-octet cache identifier advertized by a FILS AP identifying the
+  *	scope of PMKSA. This is valid only if @ssid_len is non-zero (may be
+  *	%NULL).
++ * @pmk_lifetime: Maximum lifetime for PMKSA in seconds
++ *	(dot11RSNAConfigPMKLifetime) or 0 if not specified.
++ *	The configured PMKSA must not be used for PMKSA caching after
++ *	expiration and any keys derived from this PMK become invalid on
++ *	expiration, i.e., the current association must be dropped if the PMK
++ *	used for it expires.
++ * @pmk_reauth_threshold: Threshold time for reauthentication (percentage of
++ *	PMK lifetime, dot11RSNAConfigPMKReauthThreshold) or 0 if not specified.
++ *	Drivers are expected to trigger a full authentication instead of using
++ *	this PMKSA for caching when reassociating to a new BSS after this
++ *	threshold to generate a new PMK before the current one expires.
+  */
+ struct cfg80211_pmksa {
+ 	const u8 *bssid;
+@@ -2660,6 +2671,8 @@ struct cfg80211_pmksa {
+ 	const u8 *ssid;
+ 	size_t ssid_len;
+ 	const u8 *cache_id;
++	u32 pmk_lifetime;
++	u8 pmk_reauth_threshold;
+ };
+ 
+ /**
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index a8fc464..d96f233 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -627,6 +627,8 @@ const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 	[NL80211_ATTR_SAE_PWE] =
+ 		NLA_POLICY_RANGE(NLA_U8, NL80211_SAE_PWE_HUNT_AND_PECK,
+ 				 NL80211_SAE_PWE_BOTH),
++	[NL80211_ATTR_PMK_LIFETIME] = NLA_POLICY_MIN(NLA_U32, 1),
++	[NL80211_ATTR_PMK_REAUTH_THRESHOLD] = NLA_POLICY_RANGE(NLA_U8, 1, 100),
+ };
+ 
+ /* policy for the key attributes */
+@@ -10328,6 +10330,15 @@ static int nl80211_setdel_pmksa(struct sk_buff *skb, struct genl_info *info)
+ 		pmksa.pmk_len = nla_len(info->attrs[NL80211_ATTR_PMK]);
+ 	}
+ 
++	if (info->attrs[NL80211_ATTR_PMK_LIFETIME])
++		pmksa.pmk_lifetime =
++			nla_get_u32(info->attrs[NL80211_ATTR_PMK_LIFETIME]);
++
++	if (info->attrs[NL80211_ATTR_PMK_REAUTH_THRESHOLD])
++		pmksa.pmk_reauth_threshold =
++			nla_get_u8(
++				info->attrs[NL80211_ATTR_PMK_REAUTH_THRESHOLD]);
++
+ 	if (dev->ieee80211_ptr->iftype != NL80211_IFTYPE_STATION &&
+ 	    dev->ieee80211_ptr->iftype != NL80211_IFTYPE_P2P_CLIENT &&
+ 	    !(dev->ieee80211_ptr->iftype == NL80211_IFTYPE_AP &&
+-- 
+2.7.4
+

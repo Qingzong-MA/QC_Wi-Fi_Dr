@@ -1,0 +1,268 @@
+From 8fdfae65e618d637410d9dcfcf0b73b9387ed814 Mon Sep 17 00:00:00 2001
+From: Jia Ding <quic_jiad@quicinc.com>
+Date: Thu, 14 Apr 2022 11:26:54 +0800
+Subject: [PATCH 11/17] cfg80211: Add support for EHT 320 MHz channel width
+
+Add 320 MHz support in the channel def and center frequency validation
+with compatible check.
+
+Signed-off-by: Jia Ding <quic_jiad@quicinc.com>
+Co-authored-by: Karthikeyan Periyasamy <quic_periyasa@quicinc.com>
+Signed-off-by: Karthikeyan Periyasamy <quic_periyasa@quicinc.com>
+Co-authored-by: Muna Sinada <quic_msinada@quicinc.com>
+Signed-off-by: Muna Sinada <quic_msinada@quicinc.com>
+Co-authored-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Signed-off-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Link: https://lore.kernel.org/r/1640163883-12696-5-git-send-email-quic_vjakkam@quicinc.com
+Link: https://lore.kernel.org/r/20220214163009.175289-1-johannes@sipsolutions.net
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+---
+ include/net/cfg80211.h       |  6 +++
+ include/uapi/linux/nl80211.h | 13 +++++++
+ net/wireless/chan.c          | 90 +++++++++++++++++++++++++++++++++++++++++---
+ net/wireless/nl80211.c       |  2 +
+ 4 files changed, 105 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index a7b01a3..70bbaeb 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -110,6 +110,11 @@ struct wiphy;
+  *	on this channel.
+  * @IEEE80211_CHAN_NO_10MHZ: 10 MHz bandwidth is not permitted
+  *	on this channel.
++ * @IEEE80211_CHAN_NO_320MHZ: If the driver supports 320 MHz on the band,
++ *	this flag indicates that a 320 MHz channel cannot use this
++ *	channel as the control or any of the secondary channels.
++ *	This may be due to the driver or due to regulatory bandwidth
++ *	restrictions.
+  *
+  */
+ enum ieee80211_channel_flags {
+@@ -126,6 +131,7 @@ enum ieee80211_channel_flags {
+ 	IEEE80211_CHAN_IR_CONCURRENT	= 1<<10,
+ 	IEEE80211_CHAN_NO_20MHZ		= 1<<11,
+ 	IEEE80211_CHAN_NO_10MHZ		= 1<<12,
++	IEEE80211_CHAN_NO_320MHZ	= 1<<19,
+ };
+ 
+ #define IEEE80211_CHAN_NO_HT40 \
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index e9ca186..aacd77a 100755
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -4396,6 +4396,13 @@ enum nl80211_key_mode {
+  *	attribute must be provided as well
+  * @NL80211_CHAN_WIDTH_5: 5 MHz OFDM channel
+  * @NL80211_CHAN_WIDTH_10: 10 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_1: 1 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_2: 2 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_4: 4 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_8: 8 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_16: 16 MHz OFDM channel
++ * @NL80211_CHAN_WIDTH_320: 320 MHz channel, the %NL80211_ATTR_CENTER_FREQ1
++ *	attribute must be provided as well
+  */
+ enum nl80211_chan_width {
+ 	NL80211_CHAN_WIDTH_20_NOHT,
+@@ -4406,6 +4413,12 @@ enum nl80211_chan_width {
+ 	NL80211_CHAN_WIDTH_160,
+ 	NL80211_CHAN_WIDTH_5,
+ 	NL80211_CHAN_WIDTH_10,
++	NL80211_CHAN_WIDTH_1,
++	NL80211_CHAN_WIDTH_2,
++	NL80211_CHAN_WIDTH_4,
++	NL80211_CHAN_WIDTH_8,
++	NL80211_CHAN_WIDTH_16,
++	NL80211_CHAN_WIDTH_320,
+ };
+ 
+ /**
+diff --git a/net/wireless/chan.c b/net/wireless/chan.c
+index 3c3c997..75cf8f0 100644
+--- a/net/wireless/chan.c
++++ b/net/wireless/chan.c
+@@ -187,6 +187,17 @@ bool cfg80211_chandef_valid(const struct cfg80211_chan_def *chandef)
+ 		if (chandef->center_freq2)
+ 			return false;
+ 		break;
++	case NL80211_CHAN_WIDTH_320:
++		if (chandef->center_freq1 == control_freq + 150 ||
++		    chandef->center_freq1 == control_freq + 130 ||
++		    chandef->center_freq1 == control_freq + 110 ||
++		    chandef->center_freq1 == control_freq + 90 ||
++		    chandef->center_freq1 == control_freq - 90 ||
++		    chandef->center_freq1 == control_freq - 110 ||
++		    chandef->center_freq1 == control_freq - 130 ||
++		    chandef->center_freq1 == control_freq - 150)
++			break;
++		fallthrough;
+ 	case NL80211_CHAN_WIDTH_160:
+ 		if (chandef->center_freq1 != control_freq + 70 &&
+ 		    chandef->center_freq1 != control_freq + 50 &&
+@@ -218,7 +229,7 @@ bool cfg80211_chandef_valid(const struct cfg80211_chan_def *chandef)
+ EXPORT_SYMBOL(cfg80211_chandef_valid);
+ 
+ static void chandef_primary_freqs(const struct cfg80211_chan_def *c,
+-				  u32 *pri40, u32 *pri80)
++				  u32 *pri40, u32 *pri80, u32 *pri160)
+ {
+ 	int tmp;
+ 
+@@ -226,9 +237,11 @@ static void chandef_primary_freqs(const struct cfg80211_chan_def *c,
+ 	case NL80211_CHAN_WIDTH_40:
+ 		*pri40 = c->center_freq1;
+ 		*pri80 = 0;
++		*pri160 = 0;
+ 		break;
+ 	case NL80211_CHAN_WIDTH_80:
+ 	case NL80211_CHAN_WIDTH_80P80:
++		*pri160 = 0;
+ 		*pri80 = c->center_freq1;
+ 		/* n_P20 */
+ 		tmp = (30 + c->chan->center_freq - c->center_freq1)/20;
+@@ -238,6 +251,7 @@ static void chandef_primary_freqs(const struct cfg80211_chan_def *c,
+ 		*pri40 = c->center_freq1 - 20 + 40 * tmp;
+ 		break;
+ 	case NL80211_CHAN_WIDTH_160:
++		*pri160 = c->center_freq1;
+ 		/* n_P20 */
+ 		tmp = (70 + c->chan->center_freq - c->center_freq1)/20;
+ 		/* n_P40 */
+@@ -248,6 +262,20 @@ static void chandef_primary_freqs(const struct cfg80211_chan_def *c,
+ 		tmp /= 2;
+ 		*pri80 = c->center_freq1 - 40 + 80 * tmp;
+ 		break;
++	case NL80211_CHAN_WIDTH_320:
++		/* n_P20 */
++		tmp = (150 + c->chan->center_freq - c->center_freq1) / 20;
++		/* n_P40 */
++		tmp /= 2;
++		/* freq_P40 */
++		*pri40 = c->center_freq1 - 140 + 40 * tmp;
++		/* n_P80 */
++		tmp /= 2;
++		*pri80 = c->center_freq1 - 120 + 80 * tmp;
++		/* n_P160 */
++		tmp /= 2;
++		*pri160 = c->center_freq1 - 80 + 160 * tmp;
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -278,6 +306,9 @@ static int cfg80211_chandef_get_width(const struct cfg80211_chan_def *c)
+ 	case NL80211_CHAN_WIDTH_160:
+ 		width = 160;
+ 		break;
++	case NL80211_CHAN_WIDTH_320:
++		width = 320;
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		return -1;
+@@ -289,7 +320,7 @@ const struct cfg80211_chan_def *
+ cfg80211_chandef_compatible(const struct cfg80211_chan_def *c1,
+ 			    const struct cfg80211_chan_def *c2)
+ {
+-	u32 c1_pri40, c1_pri80, c2_pri40, c2_pri80;
++	u32 c1_pri40, c1_pri80, c2_pri40, c2_pri80, c1_pri160, c2_pri160;
+ 
+ 	/* If they are identical, return */
+ 	if (cfg80211_chandef_identical(c1, c2))
+@@ -324,14 +355,31 @@ cfg80211_chandef_compatible(const struct cfg80211_chan_def *c1,
+ 	    c2->width == NL80211_CHAN_WIDTH_20)
+ 		return c1;
+ 
+-	chandef_primary_freqs(c1, &c1_pri40, &c1_pri80);
+-	chandef_primary_freqs(c2, &c2_pri40, &c2_pri80);
++	chandef_primary_freqs(c1, &c1_pri40, &c1_pri80, &c1_pri160);
++	chandef_primary_freqs(c2, &c2_pri40, &c2_pri80, &c2_pri160);
+ 
+ 	if (c1_pri40 != c2_pri40)
+ 		return NULL;
+ 
+-	WARN_ON(!c1_pri80 && !c2_pri80);
+-	if (c1_pri80 && c2_pri80 && c1_pri80 != c2_pri80)
++	if (c1->width == NL80211_CHAN_WIDTH_40)
++		return c2;
++
++	if (c2->width == NL80211_CHAN_WIDTH_40)
++		return c1;
++
++	if (c1_pri80 != c2_pri80)
++		return NULL;
++
++	if (c1->width == NL80211_CHAN_WIDTH_80 &&
++	    c2->width > NL80211_CHAN_WIDTH_80)
++		return c2;
++
++	if (c2->width == NL80211_CHAN_WIDTH_80 &&
++	    c1->width > NL80211_CHAN_WIDTH_80)
++		return c1;
++
++	WARN_ON(!c1_pri160 && !c2_pri160);
++	if (c1_pri160 && c2_pri160 && c1_pri160 != c2_pri160)
+ 		return NULL;
+ 
+ 	if (c1->width > c2->width)
+@@ -886,6 +934,10 @@ bool cfg80211_chandef_usable(struct wiphy *wiphy,
+ 	struct ieee80211_edmg *edmg_cap;
+ 	u32 width, control_freq, cap;
+ 	bool is_6ghz_chan;
++	bool support_320 = false;
++	const struct ieee80211_sband_iftype_data *iftd;
++	struct ieee80211_supported_band *sband;
++	int i;
+ 
+ 	if (WARN_ON(!cfg80211_chandef_valid(chandef)))
+ 		return false;
+@@ -981,6 +1033,32 @@ bool cfg80211_chandef_usable(struct wiphy *wiphy,
+ 		prohibited_flags |= IEEE80211_CHAN_NO_160MHZ;
+ 		width = 160;
+ 		break;
++	case NL80211_CHAN_WIDTH_320:
++		prohibited_flags |= IEEE80211_CHAN_NO_320MHZ;
++		width = 320;
++
++		if (chandef->chan->band != NL80211_BAND_6GHZ)
++			return false;
++
++		sband = wiphy->bands[NL80211_BAND_6GHZ];
++		if (!sband)
++			return false;
++
++		for (i = 0; i < sband->n_iftype_data; i++) {
++			iftd = &sband->iftype_data[i];
++			if (!iftd->eht_cap.has_eht)
++				continue;
++
++			if (iftd->eht_cap.eht_cap_elem.phy_cap_info[0] &
++			    IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ) {
++				support_320 = true;
++				break;
++			}
++		}
++
++		if (!support_320)
++			return false;
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		return false;
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 2e56cd1..a346c2a 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -9633,6 +9633,8 @@ static int nl80211_join_ibss(struct sk_buff *skb, struct genl_info *info)
+ 					     NL80211_EXT_FEATURE_VHT_IBSS))
+ 			return -EINVAL;
+ 		break;
++	case NL80211_CHAN_WIDTH_320:
++		return -EINVAL;
+ 	default:
+ 		return -EINVAL;
+ 	}
+-- 
+2.7.4
+

@@ -1,0 +1,29 @@
+From f64afbdadbe7968c39f740d38bfc7d55d86a8100 Mon Sep 17 00:00:00 2001
+From: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Date: Thu, 31 Mar 2022 01:54:29 +0530
+Subject: [PATCH 16/17] cfg80211: Add 11BE basic backport flag
+
+gerrit: 4057110/5
+Change-Id: Ia630b2457bf19090df8c768c8c8e93d1a2f258d6
+Signed-off-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+---
+ include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 9e8fb2b..8bb062d 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -36,6 +36,9 @@
+  * use restrictions.
+  */
+ 
++#ifndef __ANDROID_COMMON_KERNEL__
++#define CFG80211_11BE_BASIC 1
++#endif /* __ANDROID_COMMON_KERNEL__ */
+ /* Indicate backport support for key configuration for Beacon protection*/
+ #define CFG80211_BIGTK_CONFIGURATION_SUPPORT 1
+ 
+-- 
+2.7.4
+

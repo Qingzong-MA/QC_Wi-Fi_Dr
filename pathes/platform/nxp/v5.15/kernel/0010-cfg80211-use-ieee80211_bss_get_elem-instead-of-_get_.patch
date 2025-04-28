@@ -1,0 +1,190 @@
+From f133eaca7e04eb3061a11e7a3839fe71e718d798 Mon Sep 17 00:00:00 2001
+From: Johannes Berg <johannes.berg@intel.com>
+Date: Thu, 30 Sep 2021 13:11:32 +0200
+Subject: [PATCH 010/100] cfg80211: use ieee80211_bss_get_elem() instead of
+ _get_ie()
+
+Use the structured helper for finding an element instead of
+the unstructured ieee80211_bss_get_ie().
+
+Link: https://lore.kernel.org/r/20210930131130.e94709f341c3.I4ddb7fcb40efca27987deda7f9a144a5702ebfae@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ net/wireless/nl80211.c  | 12 +++++++-----
+ net/wireless/scan.c     | 21 ++++++++++-----------
+ net/wireless/sme.c      | 22 ++++++++++------------
+ net/wireless/wext-sme.c | 12 ++++++------
+ 4 files changed, 33 insertions(+), 34 deletions(-)
+
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 99532615d5a7..fe7932409cb3 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -3680,14 +3680,16 @@ static int nl80211_send_iface(struct sk_buff *msg, u32 portid, u32 seq, int flag
+ 	case NL80211_IFTYPE_STATION:
+ 	case NL80211_IFTYPE_P2P_CLIENT:
+ 	case NL80211_IFTYPE_ADHOC: {
+-		const u8 *ssid_ie;
++		const struct element *ssid_elem;
++
+ 		if (!wdev->current_bss)
+ 			break;
+ 		rcu_read_lock();
+-		ssid_ie = ieee80211_bss_get_ie(&wdev->current_bss->pub,
+-					       WLAN_EID_SSID);
+-		if (ssid_ie &&
+-		    nla_put(msg, NL80211_ATTR_SSID, ssid_ie[1], ssid_ie + 2))
++		ssid_elem = ieee80211_bss_get_elem(&wdev->current_bss->pub,
++						   WLAN_EID_SSID);
++		if (ssid_elem &&
++		    nla_put(msg, NL80211_ATTR_SSID, ssid_elem->datalen,
++			    ssid_elem->data))
+ 			goto nla_put_failure_rcu_locked;
+ 		rcu_read_unlock();
+ 		break;
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index f0de22a6caf7..e8e12e628362 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -402,22 +402,20 @@ static int
+ cfg80211_add_nontrans_list(struct cfg80211_bss *trans_bss,
+ 			   struct cfg80211_bss *nontrans_bss)
+ {
+-	const u8 *ssid;
+-	size_t ssid_len;
++	const struct element *ssid_elem;
+ 	struct cfg80211_bss *bss = NULL;
+ 
+ 	rcu_read_lock();
+-	ssid = ieee80211_bss_get_ie(nontrans_bss, WLAN_EID_SSID);
+-	if (!ssid) {
++	ssid_elem = ieee80211_bss_get_elem(nontrans_bss, WLAN_EID_SSID);
++	if (!ssid_elem) {
+ 		rcu_read_unlock();
+ 		return -EINVAL;
+ 	}
+-	ssid_len = ssid[1];
+-	ssid = ssid + 2;
+ 
+ 	/* check if nontrans_bss is in the list */
+ 	list_for_each_entry(bss, &trans_bss->nontrans_list, nontrans_list) {
+-		if (is_bss(bss, nontrans_bss->bssid, ssid, ssid_len)) {
++		if (is_bss(bss, nontrans_bss->bssid, ssid_elem->data,
++			   ssid_elem->datalen)) {
+ 			rcu_read_unlock();
+ 			return 0;
+ 		}
+@@ -2253,7 +2251,8 @@ cfg80211_update_notlisted_nontrans(struct wiphy *wiphy,
+ 				   struct ieee80211_mgmt *mgmt, size_t len)
+ {
+ 	u8 *ie, *new_ie, *pos;
+-	const u8 *nontrans_ssid, *trans_ssid, *mbssid;
++	const struct element *nontrans_ssid;
++	const u8 *trans_ssid, *mbssid;
+ 	size_t ielen = len - offsetof(struct ieee80211_mgmt,
+ 				      u.probe_resp.variable);
+ 	size_t new_ie_len;
+@@ -2280,11 +2279,11 @@ cfg80211_update_notlisted_nontrans(struct wiphy *wiphy,
+ 		return;
+ 	new_ie_len -= mbssid[1];
+ 
+-	nontrans_ssid = ieee80211_bss_get_ie(nontrans_bss, WLAN_EID_SSID);
++	nontrans_ssid = ieee80211_bss_get_elem(nontrans_bss, WLAN_EID_SSID);
+ 	if (!nontrans_ssid)
+ 		return;
+ 
+-	new_ie_len += nontrans_ssid[1];
++	new_ie_len += nontrans_ssid->datalen;
+ 
+ 	/* generate new ie for nontrans BSS
+ 	 * 1. replace SSID with nontrans BSS' SSID
+@@ -2301,7 +2300,7 @@ cfg80211_update_notlisted_nontrans(struct wiphy *wiphy,
+ 	pos = new_ie;
+ 
+ 	/* copy the nontransmitted SSID */
+-	cpy_len = nontrans_ssid[1] + 2;
++	cpy_len = nontrans_ssid->datalen + 2;
+ 	memcpy(pos, nontrans_ssid, cpy_len);
+ 	pos += cpy_len;
+ 	/* copy the IEs between SSID and MBSSID */
+diff --git a/net/wireless/sme.c b/net/wireless/sme.c
+index 08a70b4f090c..ff4d48fcbfb2 100644
+--- a/net/wireless/sme.c
++++ b/net/wireless/sme.c
+@@ -680,7 +680,9 @@ void __cfg80211_connect_result(struct net_device *dev,
+ 			       bool wextev)
+ {
+ 	struct wireless_dev *wdev = dev->ieee80211_ptr;
+-	const u8 *country_ie;
++	const struct element *country_elem;
++	const u8 *country_data;
++	u8 country_datalen;
+ #ifdef CONFIG_CFG80211_WEXT
+ 	union iwreq_data wrqu;
+ #endif
+@@ -762,26 +764,22 @@ void __cfg80211_connect_result(struct net_device *dev,
+ 		cfg80211_upload_connect_keys(wdev);
+ 
+ 	rcu_read_lock();
+-	country_ie = ieee80211_bss_get_ie(cr->bss, WLAN_EID_COUNTRY);
+-	if (!country_ie) {
++	country_elem = ieee80211_bss_get_elem(cr->bss, WLAN_EID_COUNTRY);
++	if (!country_elem) {
+ 		rcu_read_unlock();
+ 		return;
+ 	}
+ 
+-	country_ie = kmemdup(country_ie, 2 + country_ie[1], GFP_ATOMIC);
++	country_datalen = country_elem->datalen;
++	country_data = kmemdup(country_elem->data, country_datalen, GFP_ATOMIC);
+ 	rcu_read_unlock();
+ 
+-	if (!country_ie)
++	if (!country_data)
+ 		return;
+ 
+-	/*
+-	 * ieee80211_bss_get_ie() ensures we can access:
+-	 * - country_ie + 2, the start of the country ie data, and
+-	 * - and country_ie[1] which is the IE length
+-	 */
+ 	regulatory_hint_country_ie(wdev->wiphy, cr->bss->channel->band,
+-				   country_ie + 2, country_ie[1]);
+-	kfree(country_ie);
++				   country_data, country_datalen);
++	kfree(country_data);
+ }
+ 
+ /* Consumes bss object one way or another */
+diff --git a/net/wireless/wext-sme.c b/net/wireless/wext-sme.c
+index 193a18a53142..cd09a9042261 100644
+--- a/net/wireless/wext-sme.c
++++ b/net/wireless/wext-sme.c
+@@ -212,18 +212,18 @@ int cfg80211_mgd_wext_giwessid(struct net_device *dev,
+ 
+ 	wdev_lock(wdev);
+ 	if (wdev->current_bss) {
+-		const u8 *ie;
++		const struct element *ssid_elem;
+ 
+ 		rcu_read_lock();
+-		ie = ieee80211_bss_get_ie(&wdev->current_bss->pub,
+-					  WLAN_EID_SSID);
+-		if (ie) {
++		ssid_elem = ieee80211_bss_get_elem(&wdev->current_bss->pub,
++						   WLAN_EID_SSID);
++		if (ssid_elem) {
+ 			data->flags = 1;
+-			data->length = ie[1];
++			data->length = ssid_elem->datalen;
+ 			if (data->length > IW_ESSID_MAX_SIZE)
+ 				ret = -EINVAL;
+ 			else
+-				memcpy(ssid, ie + 2, data->length);
++				memcpy(ssid, ssid_elem->data, data->length);
+ 		}
+ 		rcu_read_unlock();
+ 	} else if (wdev->wext.connect.ssid && wdev->wext.connect.ssid_len) {
+-- 
+2.17.1
+

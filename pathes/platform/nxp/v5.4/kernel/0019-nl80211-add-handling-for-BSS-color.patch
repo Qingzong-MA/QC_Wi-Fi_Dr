@@ -1,0 +1,167 @@
+From 42d99eca32fcce61e4fbfc7ca748a9a0dbed320e Mon Sep 17 00:00:00 2001
+From: John Crispin <john@phrozen.org>
+Date: Mon, 25 Jul 2022 11:21:19 +0800
+Subject: nl80211: add handling for BSS color
+
+This patch adds the attributes, policy and parsing code to allow userland
+to send the info about the BSS coloring settings to the kernel.
+
+Signed-off-by: John Crispin <john@phrozen.org>
+Link: https://lore.kernel.org/r/20191217141921.8114-1-john@phrozen.org
+[johannes: remove the strict policy parsing, that was a misunderstanding]
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h       | 15 +++++++++++++++
+ include/uapi/linux/nl80211.h | 23 +++++++++++++++++++++++
+ net/wireless/nl80211.c       | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 78 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index ddf4e88..aaeeefe 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -275,6 +275,19 @@ struct ieee80211_he_obss_pd {
+ };
+ 
+ /**
++ * struct cfg80211_he_bss_color - AP settings for BSS coloring
++ *
++ * @color: the current color.
++ * @disabled: is the feature disabled.
++ * @partial: define the AID equation.
++ */
++struct cfg80211_he_bss_color {
++	u8 color;
++	bool disabled;
++	bool partial;
++};
++
++/**
+  * struct ieee80211_sta_ht_cap - STA's HT capabilities
+  *
+  * This structure describes most essential parameters needed
+@@ -1019,6 +1032,7 @@ enum cfg80211_ap_settings_flags {
+  * @twt_responder: Enable Target Wait Time
+  * @flags: flags, as defined in enum cfg80211_ap_settings_flags
+  * @he_obss_pd: OBSS Packet Detection settings
++ * @he_bss_color: BSS Color settings
+  */
+ struct cfg80211_ap_settings {
+ 	struct cfg80211_chan_def chandef;
+@@ -1047,6 +1061,7 @@ struct cfg80211_ap_settings {
+ 	bool twt_responder;
+ 	u32 flags;
+ 	struct ieee80211_he_obss_pd he_obss_pd;
++	struct cfg80211_he_bss_color he_bss_color;
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index afbd1a8..36a8331 100755
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -6701,6 +6701,29 @@ enum nl80211_obss_pd_attributes {
+ };
+ 
+ /**
++ * enum nl80211_bss_color_attributes - BSS Color attributes
++ * @__NL80211_HE_BSS_COLOR_ATTR_INVALID: Invalid
++ *
++ * @NL80211_HE_BSS_COLOR_ATTR_COLOR: the current BSS Color.
++ * @NL80211_HE_BSS_COLOR_ATTR_DISABLED: is BSS coloring disabled.
++ * @NL80211_HE_BSS_COLOR_ATTR_PARTIAL: the AID equation to be used..
++ *
++ * @__NL80211_HE_BSS_COLOR_ATTR_LAST: Internal
++ * @NL80211_HE_BSS_COLOR_ATTR_MAX: highest BSS Color attribute.
++ */
++enum nl80211_bss_color_attributes {
++	__NL80211_HE_BSS_COLOR_ATTR_INVALID,
++
++	NL80211_HE_BSS_COLOR_ATTR_COLOR,
++	NL80211_HE_BSS_COLOR_ATTR_DISABLED,
++	NL80211_HE_BSS_COLOR_ATTR_PARTIAL,
++
++	/* keep last */
++	__NL80211_HE_BSS_COLOR_ATTR_LAST,
++	NL80211_HE_BSS_COLOR_ATTR_MAX = __NL80211_HE_BSS_COLOR_ATTR_LAST - 1,
++};
++ 
++/**
+  * enum nl80211_sae_pwe_mechanism - The mechanism(s) allowed for SAE PWE
+  *      derivation. Applicable only when WPA3-Personal SAE authentication is
+  *      used.
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index a8fc464..d8f3949 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -321,6 +321,13 @@ he_obss_pd_policy[NL80211_HE_OBSS_PD_ATTR_MAX + 1] = {
+ 		NLA_POLICY_RANGE(NLA_U8, 1, 20),
+ };
+ 
++static const struct nla_policy
++he_bss_color_policy[NL80211_HE_BSS_COLOR_ATTR_MAX + 1] = {
++	[NL80211_HE_BSS_COLOR_ATTR_COLOR] = NLA_POLICY_RANGE(NLA_U8, 1, 63),
++	[NL80211_HE_BSS_COLOR_ATTR_DISABLED] = { .type = NLA_FLAG },
++	[NL80211_HE_BSS_COLOR_ATTR_PARTIAL] = { .type = NLA_FLAG },
++};
++
+ const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 	[0] = { .strict_start_type = NL80211_ATTR_HE_OBSS_PD },
+ 	[NL80211_ATTR_WIPHY] = { .type = NLA_U32 },
+@@ -624,6 +631,7 @@ const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 					.len = SAE_PASSWORD_MAX_LEN },
+ 	[NL80211_ATTR_TWT_RESPONDER] = { .type = NLA_FLAG },
+ 	[NL80211_ATTR_HE_OBSS_PD] = NLA_POLICY_NESTED(he_obss_pd_policy),
++	[NL80211_ATTR_HE_BSS_COLOR] = NLA_POLICY_NESTED(he_bss_color_policy),
+ 	[NL80211_ATTR_SAE_PWE] =
+ 		NLA_POLICY_RANGE(NLA_U8, NL80211_SAE_PWE_HUNT_AND_PECK,
+ 				 NL80211_SAE_PWE_BOTH),
+@@ -4541,6 +4549,30 @@ static int nl80211_parse_he_obss_pd(struct nlattr *attrs,
+ 	return 0;
+ }
+ 
++static int nl80211_parse_he_bss_color(struct nlattr *attrs,
++				      struct cfg80211_he_bss_color *he_bss_color)
++{
++	struct nlattr *tb[NL80211_HE_BSS_COLOR_ATTR_MAX + 1];
++	int err;
++
++	err = nla_parse_nested(tb, NL80211_HE_BSS_COLOR_ATTR_MAX, attrs,
++			       he_bss_color_policy, NULL);
++	if (err)
++		return err;
++
++	if (!tb[NL80211_HE_BSS_COLOR_ATTR_COLOR])
++		return -EINVAL;
++
++	he_bss_color->color =
++		nla_get_u8(tb[NL80211_HE_BSS_COLOR_ATTR_COLOR]);
++	he_bss_color->disabled =
++		nla_get_flag(tb[NL80211_HE_BSS_COLOR_ATTR_DISABLED]);
++	he_bss_color->partial =
++		nla_get_flag(tb[NL80211_HE_BSS_COLOR_ATTR_PARTIAL]);
++
++	return 0;
++}
++
+ static void nl80211_check_ap_rate_selectors(struct cfg80211_ap_settings *params,
+ 					    const u8 *rates)
+ {
+@@ -4833,6 +4865,14 @@ static int nl80211_start_ap(struct sk_buff *skb, struct genl_info *info)
+ 			return err;
+ 	}
+ 
++	if (info->attrs[NL80211_ATTR_HE_BSS_COLOR]) {
++		err = nl80211_parse_he_bss_color(
++					info->attrs[NL80211_ATTR_HE_BSS_COLOR],
++					&params.he_bss_color);
++		if (err)
++			return err;
++	}
++
+ 	nl80211_calculate_ap_params(&params);
+ 
+ 	if (info->attrs[NL80211_ATTR_EXTERNAL_AUTH_SUPPORT])
+-- 
+2.7.4
+

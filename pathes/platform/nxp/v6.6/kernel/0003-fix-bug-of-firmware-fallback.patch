@@ -1,0 +1,28 @@
+From b6f9f9665153025c700ddfec3e39aef9929ebddb Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Sun, 27 Apr 2025 18:55:08 +0800
+Subject: [PATCH] fix bug of firmware fallback
+
+---
+ drivers/base/firmware_loader/main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/base/firmware_loader/main.c b/drivers/base/firmware_loader/main.c
+index b58c42f1b1ce..7969fdf017d3 100644
+--- a/drivers/base/firmware_loader/main.c
++++ b/drivers/base/firmware_loader/main.c
+@@ -905,9 +905,10 @@ _request_firmware(const struct firmware **firmware_p, const char *name,
+ 			dev_warn(device,
+ 				 "Direct firmware load for %s failed with error %d\n",
+ 				 name, ret);
+-		if (nondirect)
++		if (opt_flags & FW_OPT_USERHELPER) {
+ 			ret = firmware_fallback_sysfs(fw, name, device,
+ 						      opt_flags, ret);
++		}
+ 	} else
+ 		ret = assign_fw(fw, device);
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,221 @@
+From ce65a3324a540d7086a4763953a3fd35829eb456 Mon Sep 17 00:00:00 2001
+From: Johannes Berg <johannes.berg@intel.com>
+Date: Tue, 12 Apr 2022 22:09:59 +0200
+Subject: [PATCH 024/100] cfg80211: remove cfg80211_get_chan_state()
+
+We haven't used this function for years, since commit c781944b71f8
+("cfg80211: Remove unused cfg80211_can_use_iftype_chan()") which
+itself removed a function unused since commit 97dc94f1d933
+("cfg80211: remove channel_switch combination check"), almost eight
+years ago.
+
+Also remove the now unused enum cfg80211_chan_mode and some struct
+members that were only used for this function.
+
+Link: https://lore.kernel.org/r/20220412220958.1a191dca19d7.Ide4448f02d0e2f1ca2992971421ffc1933a5370a@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h |  5 ---
+ net/wireless/chan.c    | 93 +-----------------------------------------
+ net/wireless/core.h    | 14 +------
+ net/wireless/ibss.c    |  4 +-
+ 4 files changed, 3 insertions(+), 113 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 7214ffbe6f6f..558b64f802e8 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -5549,8 +5549,6 @@ static inline void wiphy_unlock(struct wiphy *wiphy)
+  * @conn_owner_nlportid: (private) connection owner socket port ID
+  * @disconnect_wk: (private) auto-disconnect work
+  * @disconnect_bssid: (private) the BSSID to use for auto-disconnect
+- * @ibss_fixed: (private) IBSS is using fixed BSSID
+- * @ibss_dfs_possible: (private) IBSS may change to a DFS channel
+  * @event_list: (private) list for internal event processing
+  * @event_lock: (private) lock for event list
+  * @owner_nlportid: (private) owner socket port ID
+@@ -5599,9 +5597,6 @@ struct wireless_dev {
+ 	struct cfg80211_chan_def preset_chandef;
+ 	struct cfg80211_chan_def chandef;
+ 
+-	bool ibss_fixed;
+-	bool ibss_dfs_possible;
+-
+ 	bool ps;
+ 	int ps_timeout;
+ 
+diff --git a/net/wireless/chan.c b/net/wireless/chan.c
+index 8b7fb4a9e07b..f74f176e0d9d 100644
+--- a/net/wireless/chan.c
++++ b/net/wireless/chan.c
+@@ -6,7 +6,7 @@
+  *
+  * Copyright 2009	Johannes Berg <johannes@sipsolutions.net>
+  * Copyright 2013-2014  Intel Mobile Communications GmbH
+- * Copyright 2018-2021	Intel Corporation
++ * Copyright 2018-2022	Intel Corporation
+  */
+ 
+ #include <linux/export.h>
+@@ -1344,97 +1344,6 @@ int cfg80211_set_monitor_channel(struct cfg80211_registered_device *rdev,
+ 	return rdev_set_monitor_channel(rdev, chandef);
+ }
+ 
+-void
+-cfg80211_get_chan_state(struct wireless_dev *wdev,
+-		        struct ieee80211_channel **chan,
+-		        enum cfg80211_chan_mode *chanmode,
+-		        u8 *radar_detect)
+-{
+-	int ret;
+-
+-	*chan = NULL;
+-	*chanmode = CHAN_MODE_UNDEFINED;
+-
+-	ASSERT_WDEV_LOCK(wdev);
+-
+-	if (wdev->netdev && !netif_running(wdev->netdev))
+-		return;
+-
+-	switch (wdev->iftype) {
+-	case NL80211_IFTYPE_ADHOC:
+-		if (wdev->current_bss) {
+-			*chan = wdev->current_bss->pub.channel;
+-			*chanmode = (wdev->ibss_fixed &&
+-				     !wdev->ibss_dfs_possible)
+-				  ? CHAN_MODE_SHARED
+-				  : CHAN_MODE_EXCLUSIVE;
+-
+-			/* consider worst-case - IBSS can try to return to the
+-			 * original user-specified channel as creator */
+-			if (wdev->ibss_dfs_possible)
+-				*radar_detect |= BIT(wdev->chandef.width);
+-			return;
+-		}
+-		break;
+-	case NL80211_IFTYPE_STATION:
+-	case NL80211_IFTYPE_P2P_CLIENT:
+-		if (wdev->current_bss) {
+-			*chan = wdev->current_bss->pub.channel;
+-			*chanmode = CHAN_MODE_SHARED;
+-			return;
+-		}
+-		break;
+-	case NL80211_IFTYPE_AP:
+-	case NL80211_IFTYPE_P2P_GO:
+-		if (wdev->cac_started) {
+-			*chan = wdev->chandef.chan;
+-			*chanmode = CHAN_MODE_SHARED;
+-			*radar_detect |= BIT(wdev->chandef.width);
+-		} else if (wdev->beacon_interval) {
+-			*chan = wdev->chandef.chan;
+-			*chanmode = CHAN_MODE_SHARED;
+-
+-			ret = cfg80211_chandef_dfs_required(wdev->wiphy,
+-							    &wdev->chandef,
+-							    wdev->iftype);
+-			WARN_ON(ret < 0);
+-			if (ret > 0)
+-				*radar_detect |= BIT(wdev->chandef.width);
+-		}
+-		return;
+-	case NL80211_IFTYPE_MESH_POINT:
+-		if (wdev->mesh_id_len) {
+-			*chan = wdev->chandef.chan;
+-			*chanmode = CHAN_MODE_SHARED;
+-
+-			ret = cfg80211_chandef_dfs_required(wdev->wiphy,
+-							    &wdev->chandef,
+-							    wdev->iftype);
+-			WARN_ON(ret < 0);
+-			if (ret > 0)
+-				*radar_detect |= BIT(wdev->chandef.width);
+-		}
+-		return;
+-	case NL80211_IFTYPE_OCB:
+-		if (wdev->chandef.chan) {
+-			*chan = wdev->chandef.chan;
+-			*chanmode = CHAN_MODE_SHARED;
+-			return;
+-		}
+-		break;
+-	case NL80211_IFTYPE_MONITOR:
+-	case NL80211_IFTYPE_AP_VLAN:
+-	case NL80211_IFTYPE_P2P_DEVICE:
+-	case NL80211_IFTYPE_NAN:
+-		/* these interface types don't really have a channel */
+-		return;
+-	case NL80211_IFTYPE_UNSPECIFIED:
+-	case NL80211_IFTYPE_WDS:
+-	case NUM_NL80211_IFTYPES:
+-		WARN_ON(1);
+-	}
+-}
+-
+ bool cfg80211_any_usable_channels(struct wiphy *wiphy,
+ 				  unsigned long sband_mask,
+ 				  u32 prohibited_flags)
+diff --git a/net/wireless/core.h b/net/wireless/core.h
+index 3a7dbd63d8c6..5436ada91b1a 100644
+--- a/net/wireless/core.h
++++ b/net/wireless/core.h
+@@ -3,7 +3,7 @@
+  * Wireless configuration interface internals.
+  *
+  * Copyright 2006-2010	Johannes Berg <johannes@sipsolutions.net>
+- * Copyright (C) 2018-2021 Intel Corporation
++ * Copyright (C) 2018-2022 Intel Corporation
+  */
+ #ifndef __NET_WIRELESS_CORE_H
+ #define __NET_WIRELESS_CORE_H
+@@ -281,12 +281,6 @@ struct cfg80211_cached_keys {
+ 	int def;
+ };
+ 
+-enum cfg80211_chan_mode {
+-	CHAN_MODE_UNDEFINED,
+-	CHAN_MODE_SHARED,
+-	CHAN_MODE_EXCLUSIVE,
+-};
+-
+ struct cfg80211_beacon_registration {
+ 	struct list_head list;
+ 	u32 nlportid;
+@@ -525,12 +519,6 @@ static inline unsigned int elapsed_jiffies_msecs(unsigned long start)
+ 	return jiffies_to_msecs(end + (ULONG_MAX - start) + 1);
+ }
+ 
+-void
+-cfg80211_get_chan_state(struct wireless_dev *wdev,
+-		        struct ieee80211_channel **chan,
+-		        enum cfg80211_chan_mode *chanmode,
+-		        u8 *radar_detect);
+-
+ int cfg80211_set_monitor_channel(struct cfg80211_registered_device *rdev,
+ 				 struct cfg80211_chan_def *chandef);
+ 
+diff --git a/net/wireless/ibss.c b/net/wireless/ibss.c
+index 8f98e546becf..5d89eec2869a 100644
+--- a/net/wireless/ibss.c
++++ b/net/wireless/ibss.c
+@@ -3,7 +3,7 @@
+  * Some IBSS support code for cfg80211.
+  *
+  * Copyright 2009	Johannes Berg <johannes@sipsolutions.net>
+- * Copyright (C) 2020-2021 Intel Corporation
++ * Copyright (C) 2020-2022 Intel Corporation
+  */
+ 
+ #include <linux/etherdevice.h>
+@@ -131,8 +131,6 @@ int __cfg80211_join_ibss(struct cfg80211_registered_device *rdev,
+ 		kfree_sensitive(wdev->connect_keys);
+ 	wdev->connect_keys = connkeys;
+ 
+-	wdev->ibss_fixed = params->channel_fixed;
+-	wdev->ibss_dfs_possible = params->userspace_handles_dfs;
+ 	wdev->chandef = params->chandef;
+ 	if (connkeys) {
+ 		params->wep_keys = connkeys->params;
+-- 
+2.17.1
+

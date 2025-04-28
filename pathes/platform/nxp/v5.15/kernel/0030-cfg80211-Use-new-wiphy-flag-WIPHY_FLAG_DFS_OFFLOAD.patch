@@ -1,0 +1,74 @@
+From e93337194b6e3258d7a6ff024b1426ccce2153b9 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 16:35:31 +0800
+Subject: [PATCH 3/4] cfg80211: Use new wiphy flag WIPHY_FLAG_DFS_OFFLOAD
+
+---
+ include/net/cfg80211.h | 2 ++
+ net/wireless/chan.c    | 8 +++++---
+ net/wireless/nl80211.c | 3 +++
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 7c7bcd4b88a1..43c9188e26d8 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -4542,6 +4542,7 @@ struct cfg80211_ops {
+  * @WIPHY_FLAG_HAS_STATIC_WEP: The device supports static WEP key installation
+  *	before connection.
+  * @WIPHY_FLAG_SUPPORTS_EXT_KEK_KCK: The device supports bigger kek and kck keys
++ * @WIPHY_FLAG_DFS_OFFLOAD: The driver handles all the DFS related operations.
+  */
+ enum wiphy_flags {
+ 	WIPHY_FLAG_SUPPORTS_EXT_KEK_KCK		= BIT(0),
+@@ -4568,6 +4569,7 @@ enum wiphy_flags {
+ 	WIPHY_FLAG_SUPPORTS_5_10_MHZ		= BIT(22),
+ 	WIPHY_FLAG_HAS_CHANNEL_SWITCH		= BIT(23),
+ 	WIPHY_FLAG_HAS_STATIC_WEP		= BIT(24),
++	WIPHY_FLAG_DFS_OFFLOAD                  = BIT(25),
+ };
+ 
+ /**
+diff --git a/net/wireless/chan.c b/net/wireless/chan.c
+index f74f176e0d9d..bc4406f0a935 100644
+--- a/net/wireless/chan.c
++++ b/net/wireless/chan.c
+@@ -529,8 +529,9 @@ static int cfg80211_get_chans_dfs_required(struct wiphy *wiphy,
+ 		if (!c)
+ 			return -EINVAL;
+ 
+-		if (c->flags & IEEE80211_CHAN_RADAR)
+-			return 1;
++                if ((c->flags & IEEE80211_CHAN_RADAR) &&
++                   !(wiphy->flags & WIPHY_FLAG_DFS_OFFLOAD))
++                        return 1;
+ 	}
+ 	return 0;
+ }
+@@ -826,7 +827,8 @@ static bool cfg80211_get_chans_dfs_available(struct wiphy *wiphy,
+ 		if (c->flags & IEEE80211_CHAN_DISABLED)
+ 			return false;
+ 
+-		if ((c->flags & IEEE80211_CHAN_RADAR) &&
++		if (!(wiphy->flags & WIPHY_FLAG_DFS_OFFLOAD) &&
++		    (c->flags & IEEE80211_CHAN_RADAR)  &&
+ 		    (c->dfs_state != NL80211_DFS_AVAILABLE) &&
+ 		    !(c->dfs_state == NL80211_DFS_USABLE && dfs_offload))
+ 			return false;
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index f4ee4b7c6566..7a70fb93cd96 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -9407,6 +9407,9 @@ static int nl80211_start_radar_detection(struct sk_buff *skb,
+ 		goto unlock;
+ 	}
+ 
++	if (rdev->wiphy.flags & WIPHY_FLAG_DFS_OFFLOAD)
++		return -EOPNOTSUPP;
++
+ 	if (netif_carrier_ok(dev)) {
+ 		err = -EBUSY;
+ 		goto unlock;
+-- 
+2.17.1
+

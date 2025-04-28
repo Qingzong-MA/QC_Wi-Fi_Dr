@@ -1,0 +1,76 @@
+From 49c4e62231f8ed13f1dda7bc114f0fcfd9f3fa50 Mon Sep 17 00:00:00 2001
+From: Ilan Peer <ilan.peer@intel.com>
+Date: Mon, 14 Feb 2022 17:29:57 +0100
+Subject: [PATCH 14/17] cfg80211: add NO-EHT flag to regulatory
+
+This may be necessary in some cases, add a flag and propagate
+it, just like the NO-HE that already exists.
+
+Signed-off-by: Ilan Peer <ilan.peer@intel.com>
+[split off from a combined 320/no-EHT patch]
+Link: https://lore.kernel.org/r/20220214173004.dbb85a7b86bb.Ifc1e2daac51c1cc5f895ccfb79faf5eaec3950ec@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h       | 2 ++
+ include/uapi/linux/nl80211.h | 3 +++
+ net/wireless/nl80211.c       | 3 +++
+ 3 files changed, 8 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 9c81a1f..adcc23c 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -115,6 +115,7 @@ struct wiphy;
+  *	channel as the control or any of the secondary channels.
+  *	This may be due to the driver or due to regulatory bandwidth
+  *	restrictions.
++ * @IEEE80211_CHAN_NO_EHT: EHT operation is not permitted on this channel.
+  *
+  */
+ enum ieee80211_channel_flags {
+@@ -132,6 +133,7 @@ enum ieee80211_channel_flags {
+ 	IEEE80211_CHAN_NO_20MHZ		= 1<<11,
+ 	IEEE80211_CHAN_NO_10MHZ		= 1<<12,
+ 	IEEE80211_CHAN_NO_320MHZ	= 1<<19,
++	IEEE80211_CHAN_NO_EHT		= 1<<20,
+ };
+ 
+ #define IEEE80211_CHAN_NO_HT40 \
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index 6386263..582a4fb 100755
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -3752,6 +3752,8 @@ enum nl80211_wmm_rule {
+  *	on this channel in current regulatory domain.
+  * @NL80211_FREQUENCY_ATTR_NO_320MHZ: any 320 MHz channel using this channel
+  *	as the primary or any of the secondary channels isn't possible
++ * @NL80211_FREQUENCY_ATTR_NO_EHT: EHT operation is not allowed on this channel
++ *	in current regulatory domain.
+  * @NL80211_FREQUENCY_ATTR_MAX: highest frequency attribute number
+  *	currently defined
+  * @__NL80211_FREQUENCY_ATTR_AFTER_LAST: internal use
+@@ -3789,6 +3791,7 @@ enum nl80211_frequency_attr {
+ 	NL80211_FREQUENCY_ATTR_8MHZ,
+ 	NL80211_FREQUENCY_ATTR_16MHZ,
+ 	NL80211_FREQUENCY_ATTR_NO_320MHZ,
++	NL80211_FREQUENCY_ATTR_NO_EHT,
+ 
+ 	/* keep last */
+ 	__NL80211_FREQUENCY_ATTR_AFTER_LAST,
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 7ea6bb5..334bbeb 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -983,6 +983,9 @@ static int nl80211_msg_put_channel(struct sk_buff *msg, struct wiphy *wiphy,
+ 		if ((chan->flags & IEEE80211_CHAN_NO_320MHZ) &&
+ 		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_NO_320MHZ))
+ 			goto nla_put_failure;
++		if ((chan->flags & IEEE80211_CHAN_NO_EHT) &&
++		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_NO_EHT))
++			goto nla_put_failure;
+ 	}
+ 
+ 	if (nla_put_u32(msg, NL80211_FREQUENCY_ATTR_MAX_TX_POWER,
+-- 
+2.7.4
+

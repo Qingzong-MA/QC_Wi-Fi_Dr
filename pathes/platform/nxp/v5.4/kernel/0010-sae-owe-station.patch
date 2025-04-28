@@ -1,0 +1,26 @@
+From c9c7241598db5530b47432f6312156275c79777f Mon Sep 17 00:00:00 2001
+From: bings <bings@codeaurora.org>
+Date: Mon, 6 Apr 2020 10:34:16 +0800
+Subject: [PATCH] sae
+
+---
+ include/net/cfg80211.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 4fdb7ad..563e14a 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -72,6 +72,9 @@ struct wiphy;
+  * wireless hardware capability structures
+  */
+ 
++/* Indicate backport support for external authentication*/
++#define CFG80211_EXTERNAL_AUTH_SUPPORT 1
++
+ /**
+  * enum ieee80211_channel_flags - channel flags
+  *
+-- 
+2.7.4
+

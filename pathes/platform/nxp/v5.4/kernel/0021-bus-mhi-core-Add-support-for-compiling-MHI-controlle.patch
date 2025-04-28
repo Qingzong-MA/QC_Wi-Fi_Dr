@@ -1,0 +1,38 @@
+From 9e7d20f8b37313b8131db66986773c170a92ad4f Mon Sep 17 00:00:00 2001
+From: Bing Sun <quic_bings@quicinc.com>
+Date: Thu, 29 Sep 2022 16:26:47 +0800
+Subject: [PATCH 02/17] bus: mhi: core: Add support for compiling MHI
+ controllers
+
+Add struct mhi_device_id to fix build error when enable MHI
+
+Signed-off-by: bings <quic_bings@quicinc.com>
+---
+ include/linux/mod_devicetable.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index 5714fd3..c89a151 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -821,4 +821,17 @@ struct wmi_device_id {
+ 	const void *context;
+ };
+ 
++#define MHI_DEVICE_MODALIAS_FMT "mhi:%s"
++#define MHI_NAME_SIZE 32
++
++/**
++ * struct mhi_device_id - MHI device identification
++ * @chan: MHI channel name
++ * @driver_data: driver data;
++ */
++struct mhi_device_id {
++	const char chan[MHI_NAME_SIZE];
++	kernel_ulong_t driver_data;
++};
++
+ #endif /* LINUX_MOD_DEVICETABLE_H */
+-- 
+2.7.4
+

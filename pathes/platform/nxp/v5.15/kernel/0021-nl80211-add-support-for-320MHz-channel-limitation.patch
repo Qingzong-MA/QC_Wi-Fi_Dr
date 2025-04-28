@@ -1,0 +1,107 @@
+From 71fe2f468e803986622bbfb63a71460cdd558777 Mon Sep 17 00:00:00 2001
+From: Sriram R <quic_srirrama@quicinc.com>
+Date: Mon, 14 Feb 2022 17:29:56 +0100
+Subject: [PATCH 021/100] nl80211: add support for 320MHz channel limitation
+
+Add support to advertise drivers or regulatory limitations on 320 MHz
+channels to userspace.
+
+Signed-off-by: Sriram R <quic_srirrama@quicinc.com>
+Co-authored-by: Karthikeyan Periyasamy <quic_periyasia@quicinc.com>
+Signed-off-by: Karthikeyan Periyasamy <quic_periyasia@quicinc.com>
+Co-authored-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Signed-off-by: Veerendranath Jakkam <quic_vjakkam@quicinc.com>
+Link: https://lore.kernel.org/r/1640163883-12696-6-git-send-email-quic_vjakkam@quicinc.com
+Link: https://lore.kernel.org/r/20220214163009.175289-3-johannes@sipsolutions.net
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/uapi/linux/nl80211.h | 5 +++++
+ net/wireless/nl80211.c       | 3 +++
+ net/wireless/reg.c           | 6 ++++++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index 2ad2795e0a7d..7df91ce6b887 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -3998,6 +3998,8 @@ enum nl80211_wmm_rule {
+  *	on this channel in current regulatory domain.
+  * @NL80211_FREQUENCY_ATTR_16MHZ: 16 MHz operation is allowed
+  *	on this channel in current regulatory domain.
++ * @NL80211_FREQUENCY_ATTR_NO_320MHZ: any 320 MHz channel using this channel
++ *	as the primary or any of the secondary channels isn't possible
+  * @NL80211_FREQUENCY_ATTR_MAX: highest frequency attribute number
+  *	currently defined
+  * @__NL80211_FREQUENCY_ATTR_AFTER_LAST: internal use
+@@ -4034,6 +4036,7 @@ enum nl80211_frequency_attr {
+ 	NL80211_FREQUENCY_ATTR_4MHZ,
+ 	NL80211_FREQUENCY_ATTR_8MHZ,
+ 	NL80211_FREQUENCY_ATTR_16MHZ,
++	NL80211_FREQUENCY_ATTR_NO_320MHZ,
+ 
+ 	/* keep last */
+ 	__NL80211_FREQUENCY_ATTR_AFTER_LAST,
+@@ -4232,6 +4235,7 @@ enum nl80211_sched_scan_match_attr {
+  * @NL80211_RRF_NO_80MHZ: 80MHz operation not allowed
+  * @NL80211_RRF_NO_160MHZ: 160MHz operation not allowed
+  * @NL80211_RRF_NO_HE: HE operation not allowed
++ * @NL80211_RRF_NO_320MHZ: 320MHz operation not allowed
+  */
+ enum nl80211_reg_rule_flags {
+ 	NL80211_RRF_NO_OFDM		= 1<<0,
+@@ -4250,6 +4254,7 @@ enum nl80211_reg_rule_flags {
+ 	NL80211_RRF_NO_80MHZ		= 1<<15,
+ 	NL80211_RRF_NO_160MHZ		= 1<<16,
+ 	NL80211_RRF_NO_HE		= 1<<17,
++	NL80211_RRF_NO_320MHZ		= 1<<18,
+ };
+ 
+ #define NL80211_RRF_PASSIVE_SCAN	NL80211_RRF_NO_IR
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 5207b38f02de..b1ffab377270 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -1148,6 +1148,9 @@ static int nl80211_msg_put_channel(struct sk_buff *msg, struct wiphy *wiphy,
+ 		if ((chan->flags & IEEE80211_CHAN_16MHZ) &&
+ 		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_16MHZ))
+ 			goto nla_put_failure;
++		if ((chan->flags & IEEE80211_CHAN_NO_320MHZ) &&
++		    nla_put_flag(msg, NL80211_FREQUENCY_ATTR_NO_320MHZ))
++			goto nla_put_failure;
+ 	}
+ 
+ 	if (nla_put_u32(msg, NL80211_FREQUENCY_ATTR_MAX_TX_POWER,
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index 379d7747669c..0b7d6d8589f5 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -1221,6 +1221,8 @@ unsigned int reg_get_max_bandwidth(const struct ieee80211_regdomain *rd,
+ {
+ 	unsigned int bw = reg_get_max_bandwidth_from_range(rd, rule);
+ 
++	if (rule->flags & NL80211_RRF_NO_320MHZ)
++		bw = min_t(unsigned int, bw, MHZ_TO_KHZ(160));
+ 	if (rule->flags & NL80211_RRF_NO_160MHZ)
+ 		bw = min_t(unsigned int, bw, MHZ_TO_KHZ(80));
+ 	if (rule->flags & NL80211_RRF_NO_80MHZ)
+@@ -1594,6 +1596,8 @@ static u32 map_regdom_flags(u32 rd_flags)
+ 		channel_flags |= IEEE80211_CHAN_NO_160MHZ;
+ 	if (rd_flags & NL80211_RRF_NO_HE)
+ 		channel_flags |= IEEE80211_CHAN_NO_HE;
++	if (rd_flags & NL80211_RRF_NO_320MHZ)
++		channel_flags |= IEEE80211_CHAN_NO_320MHZ;
+ 	return channel_flags;
+ }
+ 
+@@ -1756,6 +1760,8 @@ static uint32_t reg_rule_to_chan_bw_flags(const struct ieee80211_regdomain *regd
+ 			bw_flags |= IEEE80211_CHAN_NO_80MHZ;
+ 		if (max_bandwidth_khz < MHZ_TO_KHZ(160))
+ 			bw_flags |= IEEE80211_CHAN_NO_160MHZ;
++		if (max_bandwidth_khz < MHZ_TO_KHZ(320))
++			bw_flags |= IEEE80211_CHAN_NO_320MHZ;
+ 	}
+ 	return bw_flags;
+ }
+-- 
+2.17.1
+

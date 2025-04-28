@@ -1,0 +1,99 @@
+From 868184d73b556229db515371d785275d76a4b647 Mon Sep 17 00:00:00 2001
+From: Li Feng <quic_lifeng@quicinc.com>
+Date: Thu, 14 Apr 2022 14:59:56 +0800
+Subject: [PATCH 1/3] cfg80211: Add support to advertize OCV support
+
+Add a new feature flag that drivers can use to advertize support for
+Operating Channel Validation (OCV) when using driver's SME for RSNA
+handshakes.
+
+Signed-off-by: Veerendranath Jakkam <vjakkam@codeaurora.org>
+Link: https://lore.kernel.org/r/20200720074225.8990-1-vjakkam@codeaurora.org
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Veerendranath Jakkam <vjakkam@codeaurora.org>
+---
+ include/net/cfg80211.h       |  2 ++
+ include/uapi/linux/nl80211.h | 47 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 563e14a..5dbbd05 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -36,6 +36,8 @@
+  * use restrictions.
+  */
+ 
++/* Indicate backport support for OCV feature flag */
++#define CFG80211_OCV_CONFIGURATION_SUPPORT 1
+ 
+ /**
+  * DOC: Device registration
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index beee59c..1c048e9 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -5484,6 +5484,42 @@ enum nl80211_feature_flags {
+  * @NL80211_EXT_FEATURE_SAE_OFFLOAD: Device wants to do SAE authentication in
+  *	station mode (SAE password is passed as part of the connect command).
+  *
++ * @NL80211_EXT_FEATURE_VLAN_OFFLOAD: The driver supports a single netdev
++ *      with VLAN tagged frames and separate VLAN-specific netdevs added using
++ *      vconfig similarly to the Ethernet case.
++ *
++ * @NL80211_EXT_FEATURE_AQL: The driver supports the Airtime Queue Limit (AQL)
++ *      feature, which prevents bufferbloat by using the expected transmission
++ *      time to limit the amount of data buffered in the hardware.
++ *
++ * @NL80211_EXT_FEATURE_BEACON_PROTECTION: The driver supports Beacon protection
++ *      and can receive key configuration for BIGTK using key indexes 6 and 7.
++ * @NL80211_EXT_FEATURE_BEACON_PROTECTION_CLIENT: The driver supports Beacon
++ *      protection as a client only and cannot transmit protected beacons.
++ *
++ * @NL80211_EXT_FEATURE_CONTROL_PORT_NO_PREAUTH: The driver can disable the
++ *      forwarding of preauth frames over the control port. They are then
++ *      handled as ordinary data frames.
++ *
++ * @NL80211_EXT_FEATURE_PROTECTED_TWT: Driver supports protected TWT frames
++ *
++ * @NL80211_EXT_FEATURE_DEL_IBSS_STA: The driver supports removing stations
++ *      in IBSS mode, essentially by dropping their state.
++ *
++ * @NL80211_EXT_FEATURE_MULTICAST_REGISTRATIONS: management frame registrations
++ *      are possible for multicast frames and those will be reported properly.
++ *
++ * @NL80211_EXT_FEATURE_SCAN_FREQ_KHZ: This driver supports receiving and
++ *      reporting scan request with %NL80211_ATTR_SCAN_FREQ_KHZ. In order to
++ *      report %NL80211_ATTR_SCAN_FREQ_KHZ, %NL80211_SCAN_FLAG_FREQ_KHZ must be
++ *      included in the scan request.
++ *
++ * @NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211_TX_STATUS: The driver
++ *      can report tx status for control port over nl80211 tx operations.
++ *
++ * @NL80211_EXT_FEATURE_OPERATING_CHANNEL_VALIDATION: Driver supports Operating
++ *      Channel Validation (OCV) when using driver's SME for RSNA handshakes.
++ *
+  * @NUM_NL80211_EXT_FEATURES: number of extended features.
+  * @MAX_NL80211_EXT_FEATURES: highest extended feature index.
+  */
+@@ -5529,6 +5565,17 @@ enum nl80211_ext_feature_index {
+ 	NL80211_EXT_FEATURE_EXT_KEY_ID,
+ 	NL80211_EXT_FEATURE_STA_TX_PWR,
+ 	NL80211_EXT_FEATURE_SAE_OFFLOAD,
++	NL80211_EXT_FEATURE_VLAN_OFFLOAD,
++	NL80211_EXT_FEATURE_AQL,
++	NL80211_EXT_FEATURE_BEACON_PROTECTION,
++	NL80211_EXT_FEATURE_CONTROL_PORT_NO_PREAUTH,
++	NL80211_EXT_FEATURE_PROTECTED_TWT,
++	NL80211_EXT_FEATURE_DEL_IBSS_STA,
++	NL80211_EXT_FEATURE_MULTICAST_REGISTRATIONS,
++	NL80211_EXT_FEATURE_BEACON_PROTECTION_CLIENT,
++	NL80211_EXT_FEATURE_SCAN_FREQ_KHZ,
++	NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211_TX_STATUS,
++	NL80211_EXT_FEATURE_OPERATING_CHANNEL_VALIDATION,
+ 
+ 	/* add new features before the definition below */
+ 	NUM_NL80211_EXT_FEATURES,
+-- 
+2.7.4
+

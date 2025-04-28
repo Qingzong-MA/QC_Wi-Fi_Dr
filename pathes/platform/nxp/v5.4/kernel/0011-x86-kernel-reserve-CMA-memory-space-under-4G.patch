@@ -1,0 +1,33 @@
+From d11d0c47791d7f7ed7d4087118cdcfa633dbe4f1 Mon Sep 17 00:00:00 2001
+From: Li Feng <lifeng@codeaurora.org>
+Date: Thu, 25 Mar 2021 18:56:32 +0800
+Subject: [PATCH] x86-kernel: reserve CMA memory space under 4G
+
+When bringing up napier, we're seeing MHI SYS_ERR.
+By debugging, reason should be host is sending
+FW memory physical address over 4G space as a
+response to REQUEST_MEM QMI event.
+
+Fix is to reserve CMA under 4G so that FW memory
+allocated is under 4G. This solves MHI SYS_ERR
+and napier is able to scan/connect/ping.
+---
+ arch/x86/kernel/setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index 77ea96b..21d1035 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -1211,7 +1211,7 @@ void __init setup_arch(char **cmdline_p)
+ 	early_acpi_boot_init();
+ 
+ 	initmem_init();
+-	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
++	dma_contiguous_reserve(max_low_pfn_mapped << PAGE_SHIFT);
+ 
+ 	/*
+ 	 * Reserve memory for crash kernel after SRAT is parsed so that it
+-- 
+2.7.4
+

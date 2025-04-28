@@ -1,0 +1,31 @@
+From 7d70be4a0f28903d3829627843a0661ea3aed021 Mon Sep 17 00:00:00 2001
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Thu, 7 Apr 2022 00:30:17 +0900
+Subject: [PATCH 027/100] kbuild: reuse suffix-search to refactor multi_depend
+
+The complicated part of multi_depend is the same as suffix-search.
+
+Reuse it.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ scripts/Makefile.lib | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0a8a4689c3eb..c307816e738b 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -238,7 +238,7 @@ endif
+ define multi_depend
+ $(foreach m, $(notdir $1), \
+ 	$(eval $(obj)/$m: \
+-	$(addprefix $(obj)/, $(foreach s, $3, $($(m:%$(strip $2)=%$(s)))))))
++	$(addprefix $(obj)/, $(call suffix-search, $m, $2, $3))))
+ endef
+ 
+ quiet_cmd_copy = COPY    $@
+-- 
+2.17.1
+

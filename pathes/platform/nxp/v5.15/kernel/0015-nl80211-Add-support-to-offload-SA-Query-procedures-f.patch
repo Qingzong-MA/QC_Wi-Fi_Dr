@@ -1,0 +1,72 @@
+From dce01e5a372583ff03d867b25130bd216ce7287a Mon Sep 17 00:00:00 2001
+From: Veerendranath Jakkam <vjakkam@codeaurora.org>
+Date: Fri, 26 Nov 2021 12:55:19 +0530
+Subject: [PATCH 015/100] nl80211: Add support to offload SA Query procedures
+ for AP SME device
+
+Add a flag attribute to use in ap settings to indicate userspace
+supports offloading of SA Query procedures to driver. Also add AP SME
+device feature flag to advertise that the SA Query procedures offloaded
+to driver when userspace indicates support for offloading of SA Query
+procedures.
+
+Driver handles SA Query procedures in driver's SME it self and skip
+sending SA Query request or response frames to userspace when userspace
+indicates support for SA Query procedures offload. But if userspace
+doesn't advertise support for SA Query procedures offload driver shall
+not offload SA Query procedures handling.
+
+Also userspace with SA Query procedures offload capability shall skip SA
+Query specific validations when driver indicates support for handling SA
+Query procedures.
+
+Signed-off-by: Veerendranath Jakkam <vjakkam@codeaurora.org>
+Link: https://lore.kernel.org/r/1637911519-21306-2-git-send-email-vjakkam@codeaurora.org
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/uapi/linux/nl80211.h | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index 0d7a229c6350..d29069b5e5e2 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -5759,13 +5759,15 @@ enum nl80211_tdls_operation {
+ 	NL80211_TDLS_DISABLE_LINK,
+ };
+ 
+-/*
++/**
+  * enum nl80211_ap_sme_features - device-integrated AP features
+- * Reserved for future use, no bits are defined in
+- * NL80211_ATTR_DEVICE_AP_SME yet.
++ * @NL80211_AP_SME_SA_QUERY_OFFLOAD: SA Query procedures offloaded to driver
++ *	when user space indicates support for SA Query procedures offload during
++ *	"start ap" with %NL80211_AP_SETTINGS_SA_QUERY_OFFLOAD_SUPPORT.
++ */
+ enum nl80211_ap_sme_features {
++	NL80211_AP_SME_SA_QUERY_OFFLOAD		= 1 << 0,
+ };
+- */
+ 
+ /**
+  * enum nl80211_feature_flags - device/driver features
+@@ -7493,9 +7495,15 @@ enum nl80211_mbssid_config_attributes {
+  *
+  * @NL80211_AP_SETTINGS_EXTERNAL_AUTH_SUPPORT: AP supports external
+  *	authentication.
++ * @NL80211_AP_SETTINGS_SA_QUERY_OFFLOAD_SUPPORT: Userspace supports SA Query
++ *	procedures offload to driver. If driver advertises
++ *	%NL80211_AP_SME_SA_QUERY_OFFLOAD in AP SME features, userspace shall
++ *	ignore SA Query procedures and validations when this flag is set by
++ *	userspace.
+  */
+ enum nl80211_ap_settings_flags {
+ 	NL80211_AP_SETTINGS_EXTERNAL_AUTH_SUPPORT	= 1 << 0,
++	NL80211_AP_SETTINGS_SA_QUERY_OFFLOAD_SUPPORT	= 1 << 1,
+ };
+ 
+ #endif /* __LINUX_NL80211_H */
+-- 
+2.17.1
+

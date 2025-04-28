@@ -1,0 +1,28 @@
+From 57aef771361a0bbad2b4eccfa65f96afafa46c09 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Sun, 27 Apr 2025 14:38:13 +0800
+Subject: [PATCH 2/2] fix unknown symbol error
+
+---
+ kernel/irq/irqdesc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/irq/irqdesc.c b/kernel/irq/irqdesc.c
+index 371eb1711d34..c7cc822a1c3f 100644
+--- a/kernel/irq/irqdesc.c
++++ b/kernel/irq/irqdesc.c
+@@ -380,9 +380,9 @@ struct irq_desc *irq_to_desc(unsigned int irq)
+ {
+ 	return mtree_load(&sparse_irqs, irq);
+ }
+-#ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
++//#ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
+ EXPORT_SYMBOL_GPL(irq_to_desc);
+-#endif
++//#endif
+ 
+ #ifdef CONFIG_SMP
+ static void free_masks(struct irq_desc *desc)
+-- 
+2.17.1
+

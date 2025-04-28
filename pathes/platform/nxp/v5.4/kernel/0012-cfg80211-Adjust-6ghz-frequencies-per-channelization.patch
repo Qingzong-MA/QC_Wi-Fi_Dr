@@ -1,0 +1,32 @@
+From 294372aa88290f7e4640effc98d3b5b9ba3d6b06 Mon Sep 17 00:00:00 2001
+From: Li Feng <lifeng@codeaurora.org>
+Date: Thu, 1 Apr 2021 12:14:07 +0800
+Subject: [PATCH] cfg80211: Adjust 6ghz frequencies per channelization
+
+Per 11ax draft 6.1, 6ghz frequencies need adjustment. Also orphan
+channel of frequency 5935MHz has been added. Mofify utilities
+accordingly.
+---
+ net/wireless/util.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/net/wireless/util.c b/net/wireless/util.c
+index 5b4ed5b..bff7ef8 100644
+--- a/net/wireless/util.c
++++ b/net/wireless/util.c
+@@ -93,8 +93,10 @@ int ieee80211_channel_to_frequency(int chan, enum nl80211_band band)
+ 		break;
+ 	case NL80211_BAND_6GHZ:
+ 		/* see 802.11ax D4.1 27.3.22.2 */
+-		if (chan <= 253)
+-			return 5940 + chan * 5;
++		if (chan == 2)
++			return 5925 + chan * 5;
++		if (chan <= 233)
++			return 5950 + chan * 5;
+ 		break;
+ 	case NL80211_BAND_60GHZ:
+ 		if (chan < 7)
+-- 
+2.7.4
+

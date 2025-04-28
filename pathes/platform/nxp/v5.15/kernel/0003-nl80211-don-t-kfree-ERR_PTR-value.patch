@@ -1,0 +1,31 @@
+From c6c37414414c6ddedfa397c7d545050f08f992fa Mon Sep 17 00:00:00 2001
+From: Johannes Berg <johannes.berg@intel.com>
+Date: Mon, 27 Sep 2021 13:44:03 +0200
+Subject: [PATCH 003/100] nl80211: don't kfree() ERR_PTR() value
+
+When parse_acl_data() fails, we get an ERR_PTR() value and
+then "goto out;", in this case we'd attempt to kfree() it.
+Fix that.
+
+Fixes: 9e263e193af7 ("nl80211: don't put struct cfg80211_ap_settings on stack")
+Link: https://lore.kernel.org/r/20210927134402.86c5ae06c952.Ic51e234d998b9045665e5ff8b6db7e29f25d70c0@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ net/wireless/nl80211.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 1f74516b4d48..9c2552b024da 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -5522,6 +5522,7 @@ static int nl80211_start_ap(struct sk_buff *skb, struct genl_info *info)
+ 		params->acl = parse_acl_data(&rdev->wiphy, info);
+ 		if (IS_ERR(params->acl)) {
+ 			err = PTR_ERR(params->acl);
++			params->acl = NULL;
+ 			goto out;
+ 		}
+ 	}
+-- 
+2.17.1
+

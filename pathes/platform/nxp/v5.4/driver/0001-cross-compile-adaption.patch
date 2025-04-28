@@ -1,0 +1,32 @@
+From 051c5163a2a33419ecd9bae0ea1bf24d52817877 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Sat, 26 Apr 2025 01:00:07 +0800
+Subject: [PATCH] cross-compile adaption
+
+---
+ .../chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10   | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10 b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+index 4d4412c15..c66074cab 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
++++ b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+@@ -1,12 +1,12 @@
+ #
+ # Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+ #
+-export KERNELPATH=/lib/modules/${shell uname -r}/build
++export KERNELPATH=${KBUILD_OUTPUT}
+ #export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+ 
+-export KERNELARCH=x86_64
++export KERNELARCH=${ARCH}
+ #export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+-#export TOOLPREFIX=${CROSS_COMPILE}
++export TOOLPREFIX=${CROSS_COMPILE}
+ #export BTPATH=<set the bt path>
+ 
+ # for backports
+-- 
+2.17.1
+

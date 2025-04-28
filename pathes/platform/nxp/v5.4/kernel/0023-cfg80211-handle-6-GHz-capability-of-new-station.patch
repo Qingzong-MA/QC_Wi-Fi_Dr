@@ -1,0 +1,95 @@
+From 1ce29981d6f7adf2d140b420eed4c860bcd3ed19 Mon Sep 17 00:00:00 2001
+From: Rajkumar Manoharan <rmanohar@codeaurora.org>
+Date: Thu, 28 May 2020 21:34:29 +0200
+Subject: [PATCH 04/17] cfg80211: handle 6 GHz capability of new station
+
+Handle 6 GHz HE capability while adding new station. It will be used
+later in mac80211 station processing.
+
+Signed-off-by: Rajkumar Manoharan <rmanohar@codeaurora.org>
+Link: https://lore.kernel.org/r/1589399105-25472-2-git-send-email-rmanohar@codeaurora.org
+[handle nl80211_set_station, require WME,
+ remove NL80211_HE_6GHZ_CAPABILITY_LEN]
+Link: https://lore.kernel.org/r/20200528213443.b6b711fd4312.Ic9b97d57b6c4f2b28d4b2d23d2849d8bc20bd8cc@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h |  2 ++
+ net/wireless/nl80211.c | 18 +++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 46d0bff..4b891f9 100755
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -1197,6 +1197,7 @@ struct sta_txpwr {
+  * @he_capa: HE capabilities of station
+  * @he_capa_len: the length of the HE capabilities
+  * @airtime_weight: airtime scheduler weight for this station
++ * @he_6ghz_capa: HE 6 GHz Band capabilities of station
+  */
+ struct station_parameters {
+ 	const u8 *supported_rates;
+@@ -1228,6 +1229,7 @@ struct station_parameters {
+ 	u8 he_capa_len;
+ 	u16 airtime_weight;
+ 	struct sta_txpwr txpwr;
++	const struct ieee80211_he_6ghz_capa *he_6ghz_capa;
+ };
+ 
+ /**
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index fa8578a..8768bcf 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -637,6 +637,10 @@ const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 				 NL80211_SAE_PWE_BOTH),
+ 	[NL80211_ATTR_PMK_LIFETIME] = NLA_POLICY_MIN(NLA_U32, 1),
+ 	[NL80211_ATTR_PMK_REAUTH_THRESHOLD] = NLA_POLICY_RANGE(NLA_U8, 1, 100),
++	[NL80211_ATTR_HE_6GHZ_CAPABILITY] = {
++		.type = NLA_EXACT_LEN,
++		.len = sizeof(struct ieee80211_he_6ghz_capa),
++	},
+ };
+ 
+ /* policy for the key attributes */
+@@ -5851,6 +5855,10 @@ static int nl80211_set_station(struct sk_buff *skb, struct genl_info *info)
+ 			nla_get_u8(info->attrs[NL80211_ATTR_OPMODE_NOTIF]);
+ 	}
+ 
++	if (info->attrs[NL80211_ATTR_HE_6GHZ_CAPABILITY])
++		params.he_6ghz_capa =
++			nla_data(info->attrs[NL80211_ATTR_HE_CAPABILITY]);
++
+ 	if (info->attrs[NL80211_ATTR_AIRTIME_WEIGHT])
+ 		params.airtime_weight =
+ 			nla_get_u16(info->attrs[NL80211_ATTR_AIRTIME_WEIGHT]);
+@@ -5982,6 +5990,10 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
+ 			return -EINVAL;
+ 	}
+ 
++	if (info->attrs[NL80211_ATTR_HE_6GHZ_CAPABILITY])
++		params.he_6ghz_capa =
++			nla_data(info->attrs[NL80211_ATTR_HE_6GHZ_CAPABILITY]);
++
+ 	if (info->attrs[NL80211_ATTR_OPMODE_NOTIF]) {
+ 		params.opmode_notif_used = true;
+ 		params.opmode_notif =
+@@ -6026,10 +6038,14 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
+ 		params.vht_capa = NULL;
+ 
+ 		/* HE requires WME */
+-		if (params.he_capa_len)
++		if (params.he_capa_len || params.he_6ghz_capa)
+ 			return -EINVAL;
+ 	}
+ 
++	/* Ensure that HT/VHT capabilities are not set for 6 GHz HE STA */
++	if (params.he_6ghz_capa && (params.ht_capa || params.vht_capa))
++		return -EINVAL;
++
+ 	/* When you run into this, adjust the code below for the new flag */
+ 	BUILD_BUG_ON(NL80211_STA_FLAG_MAX != 7);
+ 
+-- 
+2.7.4
+

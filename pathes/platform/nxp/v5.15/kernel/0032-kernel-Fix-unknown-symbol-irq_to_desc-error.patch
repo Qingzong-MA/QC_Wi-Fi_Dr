@@ -1,0 +1,28 @@
+From 69519a4bc1c831b755c19063e7c7c64a4591e646 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Sun, 27 Apr 2025 10:37:26 +0800
+Subject: [PATCH] kernel: Fix unknown symbol irq_to_desc error
+
+---
+ kernel/irq/irqdesc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/irq/irqdesc.c b/kernel/irq/irqdesc.c
+index 21b3ac2a29d2..d3e0c00669ec 100644
+--- a/kernel/irq/irqdesc.c
++++ b/kernel/irq/irqdesc.c
+@@ -352,9 +352,9 @@ struct irq_desc *irq_to_desc(unsigned int irq)
+ {
+ 	return radix_tree_lookup(&irq_desc_tree, irq);
+ }
+-#ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
++//#ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
+ EXPORT_SYMBOL_GPL(irq_to_desc);
+-#endif
++//#endif
+ 
+ static void delete_irq_desc(unsigned int irq)
+ {
+-- 
+2.17.1
+

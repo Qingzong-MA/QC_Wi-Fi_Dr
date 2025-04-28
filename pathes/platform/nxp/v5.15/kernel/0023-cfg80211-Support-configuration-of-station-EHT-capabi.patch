@@ -1,0 +1,168 @@
+From c07294552c033dc08d96ade4f2bb897e26587f3a Mon Sep 17 00:00:00 2001
+From: Ilan Peer <ilan.peer@intel.com>
+Date: Mon, 14 Feb 2022 17:29:58 +0100
+Subject: [PATCH 023/100] cfg80211: Support configuration of station EHT
+ capabilities
+
+Add attributes and some code bits to support userspace passing
+in EHT capabilities of stations.
+
+Signed-off-by: Ilan Peer <ilan.peer@intel.com>
+Link: https://lore.kernel.org/r/20220214173004.ecf0b3ff9627.Icb4a5f2ec7b41d9008ac4cfc16c59baeb84793d3@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/net/cfg80211.h       |  4 ++++
+ include/uapi/linux/nl80211.h | 10 +++++++++-
+ net/wireless/nl80211.c       | 37 ++++++++++++++++++++++++++++++++----
+ 3 files changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index ba6ad62d200d..7214ffbe6f6f 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -1487,6 +1487,8 @@ struct sta_txpwr {
+  * @airtime_weight: airtime scheduler weight for this station
+  * @txpwr: transmit power for an associated station
+  * @he_6ghz_capa: HE 6 GHz Band capabilities of station
++ * @eht_capa: EHT capabilities of station
++ * @eht_capa_len: the length of the EHT capabilities
+  */
+ struct station_parameters {
+ 	const u8 *supported_rates;
+@@ -1520,6 +1522,8 @@ struct station_parameters {
+ 	u16 airtime_weight;
+ 	struct sta_txpwr txpwr;
+ 	const struct ieee80211_he_6ghz_capa *he_6ghz_capa;
++	const struct ieee80211_eht_cap_elem *eht_capa;
++	u8 eht_capa_len;
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index 5299b5bb09e6..95dac4c912e6 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -11,7 +11,7 @@
+  * Copyright 2008 Jouni Malinen <jouni.malinen@atheros.com>
+  * Copyright 2008 Colin McCabe <colin@cozybit.com>
+  * Copyright 2015-2017	Intel Deutschland GmbH
+- * Copyright (C) 2018-2021 Intel Corporation
++ * Copyright (C) 2018-2022 Intel Corporation
+  *
+  * Permission to use, copy, modify, and/or distribute this software for any
+  * purpose with or without fee is hereby granted, provided that the above
+@@ -2659,6 +2659,10 @@ enum nl80211_commands {
+  *	enumerated in &enum nl80211_ap_settings_flags. This attribute shall be
+  *	used with %NL80211_CMD_START_AP request.
+  *
++ * @NL80211_ATTR_EHT_CAPABILITY: EHT Capability information element (from
++ *	association request when used with NL80211_CMD_NEW_STATION). Can be set
++ *	only if %NL80211_STA_FLAG_WME is set.
++ *
+  * @NUM_NL80211_ATTR: total number of nl80211_attrs available
+  * @NL80211_ATTR_MAX: highest attribute number currently defined
+  * @__NL80211_ATTR_AFTER_LAST: internal use
+@@ -3169,6 +3173,8 @@ enum nl80211_attrs {
+ 
+ 	NL80211_ATTR_AP_SETTINGS_FLAGS,
+ 
++	NL80211_ATTR_EHT_CAPABILITY,
++
+ 	/* add attributes here, update the policy in nl80211.c */
+ 
+ 	__NL80211_ATTR_AFTER_LAST,
+@@ -3224,6 +3230,8 @@ enum nl80211_attrs {
+ #define NL80211_HE_MAX_CAPABILITY_LEN           54
+ #define NL80211_MAX_NR_CIPHER_SUITES		5
+ #define NL80211_MAX_NR_AKM_SUITES		2
++#define NL80211_EHT_MIN_CAPABILITY_LEN          13
++#define NL80211_EHT_MAX_CAPABILITY_LEN          51
+ 
+ #define NL80211_MIN_REMAIN_ON_CHANNEL_TIME	10
+ 
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 626aececa393..87e52dab2114 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -5,7 +5,7 @@
+  * Copyright 2006-2010	Johannes Berg <johannes@sipsolutions.net>
+  * Copyright 2013-2014  Intel Mobile Communications GmbH
+  * Copyright 2015-2017	Intel Deutschland GmbH
+- * Copyright (C) 2018-2021 Intel Corporation
++ * Copyright (C) 2018-2022 Intel Corporation
+  */
+ 
+ #include <linux/if.h>
+@@ -779,6 +779,10 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
+ 	[NL80211_ATTR_MBSSID_ELEMS] = { .type = NLA_NESTED },
+ 	[NL80211_ATTR_RADAR_BACKGROUND] = { .type = NLA_FLAG },
+ 	[NL80211_ATTR_AP_SETTINGS_FLAGS] = { .type = NLA_U32 },
++	[NL80211_ATTR_EHT_CAPABILITY] =
++		NLA_POLICY_RANGE(NLA_BINARY,
++				 NL80211_EHT_MIN_CAPABILITY_LEN,
++				 NL80211_EHT_MAX_CAPABILITY_LEN),
+ };
+ 
+ /* policy for the key attributes */
+@@ -6427,7 +6431,7 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
+ 		if (params->supported_rates)
+ 			return -EINVAL;
+ 		if (params->ext_capab || params->ht_capa || params->vht_capa ||
+-		    params->he_capa)
++		    params->he_capa || params->eht_capa)
+ 			return -EINVAL;
+ 	}
+ 
+@@ -6630,6 +6634,18 @@ static int nl80211_set_station_tdls(struct genl_info *info,
+ 			nla_data(info->attrs[NL80211_ATTR_HE_CAPABILITY]);
+ 		params->he_capa_len =
+ 			nla_len(info->attrs[NL80211_ATTR_HE_CAPABILITY]);
++
++		if (info->attrs[NL80211_ATTR_EHT_CAPABILITY]) {
++			params->eht_capa =
++				nla_data(info->attrs[NL80211_ATTR_EHT_CAPABILITY]);
++			params->eht_capa_len =
++				nla_len(info->attrs[NL80211_ATTR_EHT_CAPABILITY]);
++
++			if (!ieee80211_eht_capa_size_ok((const u8 *)params->he_capa,
++							(const u8 *)params->eht_capa,
++							params->eht_capa_len))
++				return -EINVAL;
++		}
+ 	}
+ 
+ 	err = nl80211_parse_sta_channel_info(info, params);
+@@ -6887,6 +6903,18 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
+ 			nla_data(info->attrs[NL80211_ATTR_HE_CAPABILITY]);
+ 		params.he_capa_len =
+ 			nla_len(info->attrs[NL80211_ATTR_HE_CAPABILITY]);
++
++		if (info->attrs[NL80211_ATTR_EHT_CAPABILITY]) {
++			params.eht_capa =
++				nla_data(info->attrs[NL80211_ATTR_EHT_CAPABILITY]);
++			params.eht_capa_len =
++				nla_len(info->attrs[NL80211_ATTR_EHT_CAPABILITY]);
++
++			if (!ieee80211_eht_capa_size_ok((const u8 *)params.he_capa,
++							(const u8 *)params.eht_capa,
++							params.eht_capa_len))
++				return -EINVAL;
++		}
+ 	}
+ 
+ 	if (info->attrs[NL80211_ATTR_HE_6GHZ_CAPABILITY])
+@@ -6936,8 +6964,9 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
+ 		params.ht_capa = NULL;
+ 		params.vht_capa = NULL;
+ 
+-		/* HE requires WME */
+-		if (params.he_capa_len || params.he_6ghz_capa)
++		/* HE and EHT require WME */
++		if (params.he_capa_len || params.he_6ghz_capa ||
++		    params.eht_capa_len)
+ 			return -EINVAL;
+ 	}
+ 
+-- 
+2.17.1
+

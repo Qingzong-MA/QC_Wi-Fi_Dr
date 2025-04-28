@@ -1,0 +1,226 @@
+From 4a9734f75ece164916048907a9960f073e89345a Mon Sep 17 00:00:00 2001
+From: qianling <qianling@qti.qualcomm.com>
+Date: Wed, 13 Jul 2022 01:57:52 -0400
+Subject: [PATCH 1/2] net/bridge: Patching linux bridge code to support hyfi
+ bridge
+
+---
+ include/linux/if_bridge.h | 20 ++++++++++++++++++++
+ net/bridge/br.c           |  4 ++++
+ net/bridge/br_device.c    |  4 ++++
+ net/bridge/br_fdb.c       |  2 ++
+ net/bridge/br_if.c        |  4 ++++
+ net/bridge/br_input.c     | 26 +++++++++++++++++++++++++-
+ net/bridge/br_netlink.c   |  1 +
+ net/bridge/br_private.h   | 12 ++++++++++++
+ 8 files changed, 72 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/if_bridge.h b/include/linux/if_bridge.h
+index 9e57c44..fb67a93 100644
+--- a/include/linux/if_bridge.h
++++ b/include/linux/if_bridge.h
+@@ -13,6 +13,8 @@
+ #include <uapi/linux/if_bridge.h>
+ #include <linux/bitops.h>
+ 
++struct net_bridge_port;
++
+ struct br_ip {
+ 	union {
+ 		__be32	ip4;
+@@ -146,4 +148,22 @@ br_port_flag_is_set(const struct net_device *dev, unsigned long flag)
+ }
+ #endif
+ 
++typedef struct net_bridge_port *br_port_dev_get_hook_t(struct net_device *dev,
++                                                       struct sk_buff *skb,
++                                                       unsigned char *addr,
++                                                       unsigned int cookie);
++extern br_port_dev_get_hook_t __rcu *br_port_dev_get_hook;
++
++typedef struct net_bridge_port *br_get_dst_hook_t(const struct net_bridge_port *src,
++               struct sk_buff **skb);
++extern br_get_dst_hook_t __rcu *br_get_dst_hook;
++
++typedef int (br_multicast_handle_hook_t)(const struct net_bridge_port *src,
++               struct sk_buff *skb);
++extern br_multicast_handle_hook_t __rcu *br_multicast_handle_hook;
++
++typedef void (br_notify_hook_t)(int group, int event, const void *ptr);
++extern br_notify_hook_t __rcu *br_notify_hook;
++
++
+ #endif
+diff --git a/net/bridge/br.c b/net/bridge/br.c
+index 8a8f9e5..2b22f8e 100644
+--- a/net/bridge/br.c
++++ b/net/bridge/br.c
+@@ -391,6 +391,10 @@ static void __exit br_deinit(void)
+ 	br_fdb_fini();
+ }
+ 
++/* Hook for bridge event notifications */
++br_notify_hook_t __rcu *br_notify_hook __read_mostly;
++EXPORT_SYMBOL_GPL(br_notify_hook);
++
+ module_init(br_init)
+ module_exit(br_deinit)
+ MODULE_LICENSE("GPL");
+diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+index e804a30..655ece9 100644
+--- a/net/bridge/br_device.c
++++ b/net/bridge/br_device.c
+@@ -81,6 +81,10 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	if (is_broadcast_ether_addr(dest)) {
+ 		br_flood(br, skb, BR_PKT_BROADCAST, false, true);
+ 	} else if (is_multicast_ether_addr(dest)) {
++		br_multicast_handle_hook_t *multicast_handle_hook = rcu_dereference(br_multicast_handle_hook);
++		if (!__br_get(multicast_handle_hook, true, NULL, skb))
++			goto out;
++
+ 		if (unlikely(netpoll_tx_running(dev))) {
+ 			br_flood(br, skb, BR_PKT_MULTICAST, false, true);
+ 			goto out;
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index b1d3248..7e32004 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -146,6 +146,7 @@ struct net_bridge_fdb_entry *br_fdb_find_rcu(struct net_bridge *br,
+ {
+ 	return fdb_find_rcu(&br->fdb_hash_tbl, addr, vid);
+ }
++EXPORT_SYMBOL_GPL(br_fdb_find_rcu);
+ 
+ /* When a static FDB entry is added, the mac address from the entry is
+  * added to the bridge private HW address list and all required ports
+@@ -709,6 +710,7 @@ static void fdb_notify(struct net_bridge *br,
+ 		kfree_skb(skb);
+ 		goto errout;
+ 	}
++	__br_notify(RTNLGRP_NEIGH, type, fdb);
+ 	rtnl_notify(skb, net, 0, RTNLGRP_NEIGH, NULL, GFP_ATOMIC);
+ 	return;
+ errout:
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index 4fe30b1..57562ea 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -26,6 +26,10 @@
+ 
+ #include "br_private.h"
+ 
++/* Hook for external forwarding logic */
++br_port_dev_get_hook_t __rcu *br_port_dev_get_hook __read_mostly;
++EXPORT_SYMBOL_GPL(br_port_dev_get_hook);
++
+ /*
+  * Determine initial path cost based on speed.
+  * using recommendations from 802.1d standard
+diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+index 09b1dd8..2a0221d 100644
+--- a/net/bridge/br_input.c
++++ b/net/bridge/br_input.c
+@@ -66,6 +66,14 @@ static int br_pass_frame_up(struct sk_buff *skb)
+ 		       br_netif_receive_skb);
+ }
+ 
++/* Hook for external Multicast handler */
++br_multicast_handle_hook_t __rcu *br_multicast_handle_hook __read_mostly;
++EXPORT_SYMBOL_GPL(br_multicast_handle_hook);
++
++/* Hook for external forwarding logic */
++br_get_dst_hook_t __rcu *br_get_dst_hook __read_mostly;
++EXPORT_SYMBOL_GPL(br_get_dst_hook);
++
+ /* note: already called with rcu_read_lock */
+ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+@@ -76,6 +84,8 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 	bool local_rcv, mcast_hit = false;
+ 	struct net_bridge *br;
+ 	u16 vid = 0;
++	struct net_bridge_port *pdst = NULL;
++	br_get_dst_hook_t *get_dst_hook = rcu_dereference(br_get_dst_hook);
+ 
+ 	if (!p || p->state == BR_STATE_DISABLED)
+ 		goto drop;
+@@ -128,6 +138,12 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 
+ 	switch (pkt_type) {
+ 	case BR_PKT_MULTICAST:
++		if (!is_broadcast_ether_addr(eth_hdr(skb)->h_dest)) {
++			br_multicast_handle_hook_t *multicast_handle_hook = rcu_dereference(br_multicast_handle_hook);
++			if (!__br_get(multicast_handle_hook, true, p, skb))
++				goto out;
++		}
++
+ 		mdst = br_mdb_get(br, skb, vid);
+ 		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
+ 		    br_multicast_querier_exists(br, eth_hdr(skb))) {
+@@ -143,7 +159,13 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 		}
+ 		break;
+ 	case BR_PKT_UNICAST:
+-		dst = br_fdb_find_rcu(br, eth_hdr(skb)->h_dest, vid);
++		pdst = __br_get(get_dst_hook, NULL, p, &skb);
++                if (pdst) {
++                        if (!skb)
++                                goto out;
++                } else {
++			dst = br_fdb_find_rcu(br, eth_hdr(skb)->h_dest, vid);
++		}
+ 	default:
+ 		break;
+ 	}
+@@ -157,6 +179,8 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 		if (now != dst->used)
+ 			dst->used = now;
+ 		br_forward(dst->dst, skb, local_rcv, false);
++	} else if (pdst) {
++		br_forward(pdst, skb, local_rcv, false);
+ 	} else {
+ 		if (!mcast_hit)
+ 			br_flood(br, skb, pkt_type, local_rcv, false);
+diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+index a0a5448..2a3f73e 100644
+--- a/net/bridge/br_netlink.c
++++ b/net/bridge/br_netlink.c
+@@ -498,6 +498,7 @@ void br_ifinfo_notify(int event, const struct net_bridge *br,
+ 		kfree_skb(skb);
+ 		goto errout;
+ 	}
++	__br_notify(RTNLGRP_LINK, event, port);
+ 	rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL, GFP_ATOMIC);
+ 	return;
+ errout:
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index ce2ab14..bb3d33e 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -18,6 +18,7 @@
+ #include <linux/if_vlan.h>
+ #include <linux/rhashtable.h>
+ #include <linux/refcount.h>
++#include <linux/export.h>
+ 
+ #define BR_HASH_BITS 8
+ #define BR_HASH_SIZE (1 << BR_HASH_BITS)
+@@ -1256,4 +1257,15 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+ 		       u16 vid, struct net_bridge_port *p, struct nd_msg *msg);
+ struct nd_msg *br_is_nd_neigh_msg(struct sk_buff *skb, struct nd_msg *m);
++#define __br_get( __hook, __default, __args ... ) \
++               (__hook ? (__hook( __args )) : (__default))
++
++static inline void __br_notify(int group, int type, const void *data)
++{
++       br_notify_hook_t *notify_hook = rcu_dereference(br_notify_hook);
++
++       if (notify_hook)
++               notify_hook(group, type, data);
++}
++
+ #endif
+-- 
+2.7.4
+

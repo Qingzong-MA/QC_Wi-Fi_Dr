@@ -1,0 +1,86 @@
+From 1b2391b4604e7e5b8db58eeaaef757b900ea60f7 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Fri, 25 Apr 2025 17:11:51 +0800
+Subject: [PATCH] cross-compile adaption
+
+---
+ chss_host_LEA/chss_proc/host/AIO/build/Makefile            | 7 ++++++-
+ .../chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10  | 6 +++---
+ .../chss_proc/host/AIO/drivers/core_tech_modules/Kbuild    | 3 +--
+ chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild | 1 -
+ 4 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/Makefile b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+index b6072d221..a6ef84f40 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/Makefile
++++ b/chss_host_LEA/chss_proc/host/AIO/build/Makefile
+@@ -1,7 +1,11 @@
+ #
+ # Main Makefile
+ #
+-export ATH_TOPDIR=$(shell pwd)/..
++#export ATH_TOPDIR=$(shell pwd)/..
++BUILD_TIME=$(shell date +%s)
++AIO_TOPDIR=$(shell pwd)/../../AIO
++$(shell ln -sf ${AIO_TOPDIR} /tmp/AIO_${BUILD_TIME})
++export ATH_TOPDIR=/tmp/AIO_${BUILD_TIME}
+ export BACKPORT_PWD=$(shell pwd)/backports
+ # different customer want to use different wpa_supplicant
+ # in board_type config file, we can override it
+@@ -111,6 +115,7 @@ drivers: rootfs_prep
+ 	cp -fr $(INSTALL_ROOT)/lib/modules $(INSTALL_ROOT)/lib/unstripped_modules
+ 	@echo Strip modules
+ 	@cd ${INSTALL_ROOT}/lib/modules && ${TOOLPREFIX}strip --strip-unneeded *.ko
++	rm ${ATH_TOPDIR} -rf
+ 
+ 
+ drivers_firmware: rootfs_prep
+diff --git a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10 b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+index 4d4412c15..c66074cab 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
++++ b/chss_host_LEA/chss_proc/host/AIO/build/scripts/ve-f10/config.ve-f10
+@@ -1,12 +1,12 @@
+ #
+ # Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+ #
+-export KERNELPATH=/lib/modules/${shell uname -r}/build
++export KERNELPATH=${KBUILD_OUTPUT}
+ #export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+ 
+-export KERNELARCH=x86_64
++export KERNELARCH=${ARCH}
+ #export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+-#export TOOLPREFIX=${CROSS_COMPILE}
++export TOOLPREFIX=${CROSS_COMPILE}
+ #export BTPATH=<set the bt path>
+ 
+ # for backports
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+index 591824bd2..de4334ba5 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/core_tech_modules/Kbuild
+@@ -203,8 +203,7 @@ ifneq ($(CONFIG_MULTI_CARD),)
+ 	endif
+ endif
+ 
+-CDEFINES :=	-Wall\
+-		-Werror
++CDEFINES :=	-Wall
+ KBUILD_CPPFLAGS += $(CDEFINES)
+ 
+ ifneq ($(CONFIG_WLAN_CNSS_CORE), y)
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+index 0087b724f..78512959b 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/Kbuild
+@@ -2665,7 +2665,6 @@ ccflags-y += $(INCS)
+ 
+ cppflags-y +=	-DANI_OS_TYPE_ANDROID=6 \
+ 		-Wall\
+-		-Werror\
+ 		-D__linux__
+ 
+ cppflags-$(CONFIG_PTT_SOCK_SVC_ENABLE) += -DPTT_SOCK_SVC_ENABLE
+-- 
+2.17.1
+
