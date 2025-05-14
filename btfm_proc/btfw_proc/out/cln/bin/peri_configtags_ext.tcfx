@@ -1,0 +1,1395 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TCF>
+  <COPYRIGHT>Copyright (c) 2019-2025 Qualcomm Technologies, Inc.
+	All Rights Reserved.
+	Confidential and Proprietary - Qualcomm Technologies, Inc.</COPYRIGHT>
+  <FORMAT_VERSION>1.0</FORMAT_VERSION>
+  <TAG_GROUPS>
+    <TAG_GROUP Name="BT" Description="Configuration Tags in this group control some parameters of the Bluetooth protocol" />
+    <TAG_GROUP Name="SYS" Description="Configuration Tags in this group modify general system settings" />
+    <TAG_GROUP Name="RM" Description="Configuration Tags in this group modify the settings of the Radio" />
+    <TAG_GROUP Name="Voice" Description="Configuration Tags in this group are used to configure the platform setttings" />
+    <TAG_GROUP Name="USB" Description="Configuration Tags in this group modify the settings of USB transport" />
+    <TAG_GROUP Name="CBL" Description="Configuration Tags in this group control the Serial Cable Replacement Application" />
+    <TAG_GROUP Name="APP" Description="Configuration Tags in this group control the Higher layer Application settings" />
+    <TAG_GROUP Name="MMI" Description="Configuration Tags in this group control the MMI configuration" />
+  </TAG_GROUPS>
+
+  <PLATFORMS>
+    <PLATFORM Name="QCC2072" ID="33" Description="QCC2072 (Cologne)" />
+  </PLATFORMS>
+
+  <FEATURES/>
+  <TAGS>
+    <TAG Number="1" Name="BUILD_LABEL">
+      <DESCRIPTION>Fixed Array to represent BUILD LABEL in ASCII format and is utilized by Build system to generate the NVMX and make it as part of BIN file</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="BuildLabelArray" Type="FIXED_ARRAY" ElementSize="1" Size="64" Min="0x0" Max="0xFF" Signed="false" Description="" VariableName="BUILD_LABEL">
+        <ELEMENTS Name="Char_0" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_1" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_2" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_3" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_4" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_5" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_6" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_7" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_8" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_9" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_10" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_11" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_12" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_13" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_14" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_15" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_16" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_17" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_18" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_19" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_20" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_21" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_22" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_23" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_24" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_25" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_26" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_27" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_28" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_29" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_30" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_31" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_32" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_33" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_34" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_35" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_36" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_37" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_38" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_39" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_40" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_41" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_42" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_43" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_44" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_45" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_46" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_47" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_48" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_49" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_50" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_51" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_52" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_53" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_54" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_55" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_56" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_57" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_58" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_59" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_60" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_61" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_62" Default="0x0" Description="Element Description" />
+        <ELEMENTS Name="Char_63" Default="0x0" Description="Element Description" />
+      </ELEMENTS>
+    </TAG>
+    <TAG Number="17" Name="HCI Uart Settings">
+      <DESCRIPTION>This parameter is used for HCI UART communication control.  If the UART transport parameters are changed, the new settings take affect after an HCI_Reset command is issued. The HCI Command_Complete Event that is returned from the HCI_Reset will return at the new baud rate.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="HCI Uart Settings" Type="STRUCTURE" Size="6">
+        <ELEMENTS Name="H4 UART Config" Type="BITFIELD" Size="1">
+          <ELEMENTS Name="HW Flow Control En" Default="0x1" Start="0" End="0" Description="Configure UART HW FLOW CONTROL. Set 1 to enable or 0 to disable HW Flow Control." />
+          <ELEMENTS Name="FIFO Empty Entries to Flow Off" Default="0x2" Start="1" End="3" Description="If the number of empty entries in the Rx FIFO falls below this number, the host will be flowed off." />
+          <ELEMENTS Name="8 Byte FIFO" Default="0x1" Start="4" End="4" Description="When set to 1 this will enable the 8 byte FIFO.  When set to 0, the default 2 byte FIFO will be used." />
+        </ELEMENTS>
+        <ELEMENTS Name="UART Baud Rate" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="Baud_115200" Default="0x0" Description="115200 baud" />
+          <ELEMENTS Name="Baud_57600" Default="0x1" Description="57600 Baud" />
+          <ELEMENTS Name="Baud_38400" Default="0x2" Description="38400 Baud" />
+          <ELEMENTS Name="Baud_19200" Default="0x3" Description="19200 Baud" />
+          <ELEMENTS Name="Baud_9600" Default="0x4" Description="9600 Baud" />
+          <ELEMENTS Name="Baud_230400" Default="0x5" Description="230400 Baud" />
+          <ELEMENTS Name="Baud_250000" Default="0x6" Description="250000 Baud" />
+          <ELEMENTS Name="Baud_460800" Default="0x7" Description="460800 Baud" />
+          <ELEMENTS Name="Baud_500000" Default="0x8" Description="500000 Baud" />
+          <ELEMENTS Name="Baud_720000" Default="0x9" Description="720000 Baud" />
+          <ELEMENTS Name="Baud_921600" Default="0xA" Description="921600 Baud" />
+          <ELEMENTS Name="Baud_1000000" Default="0xB" Description="1000000 Baud" />
+          <ELEMENTS Name="Baud_125000" Default="0xC" Description="125000 Baud" />
+          <ELEMENTS Name="Baud_2000000" Default="0xD" Description="2000000 Baud" />
+          <ELEMENTS Name="Baud_3000000" Default="0xE" Description="3000000 Baud" />
+          <ELEMENTS Name="Baud_4000000" Default="0xF" Description="4000000 Baud" />
+          <ELEMENTS Name="Baud_1600000" Default="0x10" Description="1600000 Baud" />
+          <ELEMENTS Name="Baud_3200000" Default="0x11" Description="3200000 Baud" />
+          <ELEMENTS Name="Baud_3500000" Default="0x12" Description="3500000 Baud" />
+          <ELEMENTS Name="Baud_6000000" Default="0x13" Description="6000000 Baud" />
+          <ELEMENTS Name="Baud_6400000" Default="0x14" Description="6400000 Baud" />
+          <ELEMENTS Name="Baud_8000000" Default="0x15" Description="8000000 Baud" />
+          <ELEMENTS Name="Baud_5000000" Default="0x16" Description="5000000 Baud" />
+          <ELEMENTS Name="Baud_6250000" Default="0x17" Description="6250000 Baud" />
+          <ELEMENTS Name="Baud_Fixed_Last" Default="0x17" Description="It indicates to the Last of Fixed Baud List. Any fixed baudrate to add should update Baud_Fixed_Last as well." />
+          <ELEMENTS Name="Baud_KeepBaudrate" Default="0xFD" Description="Use current working baudrate. This is only valid for NVMX. Do not set as default." />
+          <ELEMENTS Name="Baud_Auto" Default="0xFE" Description="Enables AutoBaud (SiW4000 and later processors only)" />
+          <ELEMENTS Name="Baud_UserDefined" Default="0xFF" Description="User defined Baud" />
+        </ELEMENTS>
+        <ELEMENTS Name="User Defined Baud" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="Integer Rate Divisor" Type="INTEGER" Size="2" Min="0x0" Max="0xFFFF" Default="0x22" Signed="false" Description="Integer Baud Rate divisor;  Formula's to Calculate Baud Rate Registers: ibrd = ( BBCLK/(8*BAUD) ); For SiW1750/1760: BBCLK = 16,000,000; For the SiW3000 : BBCLK = 32,000,000; For QCA6174 2.x : BBCLK = 32,000,000; For QCA6174 3.x : BBCLK = 32,000,000 or 64,000,000" />
+          <ELEMENTS Name="Fractional Rate Divisor" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x2E" Signed="false" Description="SiW1750/1760: BBCLK = 16,000,000; For the SiW3000 : BBCLK = 32,000,000; For QCA6174 2.x : BBCLK = 32,000,000; For QCA6174 3.x : BBCLK = 32,000,000 or 64,000,000" />
+          <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0x0" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        </ELEMENTS>
+      </ELEMENTS>
+    </TAG>
+    <TAG Number="27" Name="Sleep Control">
+      <DESCRIPTION>Controls when the Bluetooth device goes into a low-power 'sleep' state.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="Sleep Control" Type="STRUCTURE" Size="20">
+        <ELEMENTS Name="SleepEn" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="Disable" Default="0x0" Description="Disable sleep" />
+          <ELEMENTS Name="Enable" Default="0x1" Description="Enable sleep" />
+        </ELEMENTS>
+        <ELEMENTS Name="TxpSleepMode" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="DISABLE" Default="0x0" Description="Transport layer sleep is disabled" />
+          <ELEMENTS Name="UART_SIBS" Default="0x1" Description="Softeware in-band sleep mode for Uart interface" />
+          <ELEMENTS Name="USB_SUSPEND" Default="0x2" Description="USB suspend resume sleep mode for USB interface" />
+          <ELEMENTS Name="GPIO_OOB" Default="0x3" Description="Hardware Out-of-band sleep mode for both UART and USB interface" />
+          <ELEMENTS Name="UART_HWIBS" Default="0x4" Description="Hardware in-band sleep mode for Uart interface" />
+          <ELEMENTS Name="MIXED_GPIO_SIBS" Default="0x5" Description="Mixed GPIO HostWake Pin and Softeware in-band sleep mode for Uart interface. HostWake Pin will continue outputing Square Wave while sending SIBS Wake signal to Host. The parameter 'Wake Retransmission Timeout' is also used as the Square Wave width. Do not suggest to set the flag 'Dynamic Wake Retransmit Timeout' in this mode." />
+        </ELEMENTS>
+        <ELEMENTS Name="BridgeSleepMode" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="DISABLE" Default="0x0" Description="Disbale sleep mode for the bridging." />
+          <ELEMENTS Name="UART_SIBS" Default="0x1" Description="Softeware in-band sleep mode for Uart interface" />
+        </ELEMENTS>
+        <ELEMENTS Name="Reserved2" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="SIBS Parameters" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="Wake Retransmission Timeout" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xA" Signed="false" Description="Software In-Band Sleep Wake Retransmission Timeout in ms. Wake will be re-transmitted after this number of ms if a Wake Ack is not received." />
+          <ELEMENTS Name="Tx Idle Timeout" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFA" Signed="false" Description="Software In-Band Sleep Tx Idle Timeout in ms. Sleep signal will be sent if Tx stays idle for the defined timeout period." />
+          <ELEMENTS Name="Options" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="Wake Byte Required" Default="0x0" Start="0" End="0" Description="When enabled (set to 1), an actual Wake byte must be received to respond with a Wake Ack byte.  When disabled, a Wake Ack byte will be sent on wakeup due to any Rx activity." />
+            <ELEMENTS Name="Dynamic Wake Retransmit Timeout" Default="0x0" Start="1" End="1" Description="Wake Retransmit Timeout can be set to either constant value always or can be configured to increment dynamically based on number of Wake Indication Timeouts. When this BIT is set to 1: Wake Retransmit timeout will increment linearly. For example if the Wake Retransmit timeout is set to 10msec then Wake Indication will be sent out at 0, 10, 20, 30, 40, 50, 60msec timeouts." />
+            <ELEMENTS Name="Wakeup Source" Default="0x0" Start="2" End="3" Description="Wakeup source selection for SIBS mode. Value of 0x0(default) is used when both HCI RxD &amp; RxD Fast are configured as wakeup source., Value of 0x1 is used when HCI RxD only is configured as wakeup source." />
+          </ELEMENTS>
+          <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        </ELEMENTS>
+        <ELEMENTS Name="HWOOB Parameters" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="BTWake Polarity" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Active_Low" Default="0x0" Description="Active Low" />
+            <ELEMENTS Name="Active_High" Default="0x1" Description="Active High" />
+          </ELEMENTS>
+          <ELEMENTS Name="HostWake Polarity" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Active_Low" Default="0x0" Description="Active Low" />
+            <ELEMENTS Name="Active_High" Default="0x1" Description="Active High" />
+          </ELEMENTS>
+          <ELEMENTS Name="BTWake Pin" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFF" Signed="false" Description="" />
+          <ELEMENTS Name="HostWake Pin" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFF" Signed="false" Description="" />
+        </ELEMENTS>
+        <ELEMENTS Name="HCLK Scaling" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="DIV1" Default="0x0" Description="Disable HCLK_ungated scaling" />
+          <ELEMENTS Name="DIV4" Default="0x1" Description="" />
+          <ELEMENTS Name="DIV8" Default="0x2" Description="" />
+          <ELEMENTS Name="DIV16" Default="0x3" Description="" />
+          <ELEMENTS Name="DIV32" Default="0x4" Description="" />
+          <ELEMENTS Name="DIV64" Default="0x5" Description="" />
+          <ELEMENTS Name="CLK OFF" Default="0x6" Description="" />
+        </ELEMENTS>
+        <ELEMENTS Name="EXT HCLK Scaling" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="DIV1" Default="0x0" Description="Disable ext hclk scaling" />
+          <ELEMENTS Name="DIV4" Default="0x1" Description="" />
+          <ELEMENTS Name="DIV8" Default="0x2" Description="" />
+          <ELEMENTS Name="DIV16" Default="0x3" Description="" />
+          <ELEMENTS Name="DIV32" Default="0x4" Description="" />
+          <ELEMENTS Name="DIV64" Default="0x5" Description="" />
+          <ELEMENTS Name="CLK_OFF" Default="0x6" Description="" />
+        </ELEMENTS>
+        <ELEMENTS Name="ROM LOW POWER MODE" Type="ENUM" Size="1" Default="0x0" Signed="false">
+          <ELEMENTS Name="DISABLE" Default="0x0" Description="Disable ROM LOW power mode" />
+          <ELEMENTS Name="ENABLE" Default="0x1" Description="Enable ROM LOW power mode" />
+        </ELEMENTS>
+        <ELEMENTS Name="Reserved3" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="Reset Deep Sleep Delay Time" Type="INTEGER" Size="2" Min="0x0" Max="0xFFFF" Default="0x3E8" Signed="false" Description="Amount of time in milliseconds to prevent deep sleep after a cold boot or HCI reset." />
+        <ELEMENTS Name="Reserved4" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="Reserved5" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+      </ELEMENTS>
+    </TAG>
+    <TAG Number="31" Name="NVM Version - FW">
+      <DESCRIPTION>Contains a version identifier to track the contents of the NVM settings. This Tag is owned by Dev/FW team and gets updated when any FW owned NVM tags are updated.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="NVM Version FW" Type="INTEGER" Size="2" Min="0x0" Max="0xFFFF" Default="0x0" Signed="false" Description="NVM Version to be incremented on every change to the NVM settings." />
+    </TAG>
+    <TAG Number="32" Name="NVM Version - VI">
+      <DESCRIPTION>Contains a version identifier to track the contents of the NVM settings. This Tag is owned by VI/HW team and gets updated on every NVM release by VI team.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="NVM Version VI" Type="INTEGER" Size="2" Min="0x0" Max="0xFFFF" Default="0x0" Signed="false" Description="Contains a version identifier for the contents of NVM. Defaults to 0x000." />
+    </TAG>
+    <TAG Number="55" Name="GPIO Mapping">
+      <DESCRIPTION></DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="GPIO_Assignments" Type="STRUCT_ARRAY" Size="56" VariableName="GPIO_ASSIGNMENTS_TABLE">
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_0" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_1" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_2" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_3" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_4" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_5" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_6" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_7" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_8" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_9" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_10" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_11" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_12" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+        <ELEMENTS Name="GPIO_ASSIGNMENTS_TABLE_13" Type="STRUCTURE" Size="4">
+          <ELEMENTS Name="GPIO_Function" Type="ENUM" Size="1" Default="0x0" Signed="false">
+            <ELEMENTS Name="Invalid_Function" Default="0x0" Description="Invalid Function" />
+            <ELEMENTS Name="HCI_UART_TXD" Default="0x1" Description="HCI/UART TXD" />
+            <ELEMENTS Name="HCI_UART_RXD" Default="0x2" Description="HCI/UART RXD" />
+            <ELEMENTS Name="HCI_UART_RTS" Default="0x3" Description="HCI/UART RTS" />
+            <ELEMENTS Name="HCI_UART_CTS" Default="0x4" Description="HCI/UART CTS" />
+            <ELEMENTS Name="I2S_0_SDI" Default="0x5" Description="I2S_0_SDI" />
+            <ELEMENTS Name="I2S_0_SDO" Default="0x6" Description="I2S_0_SDO" />
+            <ELEMENTS Name="I2S_0_WS" Default="0x7" Description="I2S_0_WS" />
+            <ELEMENTS Name="I2S_0_SCK" Default="0x8" Description="I2S_0_SCK" />
+            <ELEMENTS Name="SENSOR_UART_TX" Default="0x9" Description="Sensor/UART TXD" />
+            <ELEMENTS Name="SENSOR_UART_RX" Default="0xA" Description="Sensor/UART RXD" />
+            <ELEMENTS Name="SENSOR_UART_RTS" Default="0xB" Description="Sensor/UART RTS" />
+            <ELEMENTS Name="SENSOR_UART_CTS" Default="0xC" Description="Sensor/UART CTS" />
+            <ELEMENTS Name="COEX_RXD" Default="0xD" Description="LTE Coex" />
+            <ELEMENTS Name="COEX_TXD" Default="0xE" Description="LTE Coex" />
+            <ELEMENTS Name="SWR_CLK" Default="0xF" Description="Soundwire Clock" />
+            <ELEMENTS Name="SWR_DATA" Default="0x10" Description="Soundwire Data" />
+            <ELEMENTS Name="COEX_CLK" Default="0x11" Description="WSI for Coex" />
+            <ELEMENTS Name="COEX_DATA" Default="0x12" Description="WSI for Coex" />
+            <ELEMENTS Name="I2C_SCK" Default="0x13" Description="I2C Master CLOCK" />
+            <ELEMENTS Name="I2C_SDA" Default="0x14" Description="I2C Master DATA" />
+            <ELEMENTS Name="SPIM_CLK" Default="0x15" Description="BT_SPIM_CLK" />
+            <ELEMENTS Name="SPIM_CS" Default="0x16" Description="BT_SPIM_CS" />
+            <ELEMENTS Name="SPIM_MOSI" Default="0x17" Description="BT_SPIM_MOSI" />
+            <ELEMENTS Name="SPIM_MISO" Default="0x18" Description="BT_SPIM_MISO" />
+            <ELEMENTS Name="SPIM_WUP" Default="0x19" Description="BT_SPIM_WUP" />
+            <ELEMENTS Name="DBG_UART_TXD" Default="0x1A" Description="DBG_UART_TXD" />
+            <ELEMENTS Name="DBG_UART_RXD" Default="0x1B" Description="DBG_UART_RXD" />
+            <ELEMENTS Name="AOA_0" Default="0x1C" Description="AOA_0" />
+            <ELEMENTS Name="AOA_1" Default="0x1D" Description="AOA_1" />
+            <ELEMENTS Name="AOA_2" Default="0x1E" Description="AOA_2" />
+            <ELEMENTS Name="AOA_3" Default="0x1F" Description="AOA_3" />
+            <ELEMENTS Name="AOA_4" Default="0x20" Description="AOA_4" />
+            <ELEMENTS Name="AOA_5" Default="0x21" Description="AOA_5" />
+            <ELEMENTS Name="COEX_SPTA_ACTIVE" Default="0x22" Description="COEX_SPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_SPTA_CONFX" Default="0x23" Description="COEX_SPTA_CONFX" />
+            <ELEMENTS Name="COEX_SPTA_STATUS" Default="0x24" Description="COEX_SPTA_STATUS" />
+            <ELEMENTS Name="COEX_MPTA_ACTIVE" Default="0x25" Description="COEX_MPTA_ACTIVE" />
+            <ELEMENTS Name="COEX_MPTA_CONFX" Default="0x26" Description="COEX_MPTA_CONFX" />
+            <ELEMENTS Name="COEX_MPTA_STATUS" Default="0x27" Description="COEX_MPTA_STATUS" />
+            <ELEMENTS Name="I2S_1_SDI" Default="0x28" Description="I2S_1_SDI" />
+            <ELEMENTS Name="I2S_1_SDO" Default="0x29" Description="I2S_1_SDO" />
+            <ELEMENTS Name="I2S_1_WS" Default="0x2A" Description="I2S_1_WS" />
+            <ELEMENTS Name="I2S_1_SCK" Default="0x2B" Description="I2S_1_SCK" />
+            <ELEMENTS Name="I2C_DATA_SLV" Default="0x2C" Description="I2C_DATA_SLV" />
+            <ELEMENTS Name="I2C_CLK_SLV" Default="0x2D" Description="I2C_CLK_SLV" />
+            <ELEMENTS Name="Q2SPI_CLK" Default="0x2E" Description="Q2SPI_CLK" />
+            <ELEMENTS Name="Q2SPI_CS" Default="0x2F" Description="Q2SPI_CS" />
+            <ELEMENTS Name="Q2SPI_MOSI" Default="0x30" Description="Q2SPI_MOSI" />
+            <ELEMENTS Name="Q2SPI_MISO" Default="0x31" Description="Q2SPI_MISO" />
+            <ELEMENTS Name="Q2SPI_IRQ" Default="0x32" Description="Q2SPI_IRQ" />
+            <ELEMENTS Name="I3C_DATA_SLV" Default="0x33" Description="I3C_DATA_SLV" />
+            <ELEMENTS Name="I3C_CLK_SLV" Default="0x34" Description="I3C_CLK_SLV" />
+            <ELEMENTS Name="QSPMI_CLK" Default="0x35" Description="QSPMI_CLK" />
+            <ELEMENTS Name="QSPMI_DATA" Default="0x36" Description="QSPMI_DATA" />
+            <ELEMENTS Name="Host_Wake" Default="0x37" Description="BT WAKE UP HOST" />
+            <ELEMENTS Name="Ext_Wake" Default="0x38" Description="HOST WAKE UP BT" />
+            <ELEMENTS Name="BT_RFKILL" Default="0x39" Description="BT_RFKILL" />
+            <ELEMENTS Name="BT_LED" Default="0x3A" Description="BT_LED" />
+            <ELEMENTS Name="SENS_WAKE_BT" Default="0x3B" Description="Sensor Core wakeup BT" />
+            <ELEMENTS Name="BT_WAKE_SENS" Default="0x3C" Description="BT wakeup Sensor Core" />
+            <ELEMENTS Name="I2C_IRQ" Default="0x3D" Description="I2C_IRQ" />
+            <ELEMENTS Name="No_Function" Default="0x3E" Description="No_Function" />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPinCfg" Type="BITFIELD" Size="1">
+            <ELEMENTS Name="INTP_EN" Default="0x0" Start="0" End="0" Description="Enable Interrupt. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="INTP_POL" Default="0x0" Start="1" End="1" Description="Interrupt polarity. 0 : active high; 1 : active low." />
+            <ELEMENTS Name="WAKEUP_EN" Default="0x0" Start="2" End="2" Description="Enable Wake up. 0 : Disable; 1 : Enable." />
+            <ELEMENTS Name="WAKEUP_POL" Default="0x0" Start="3" End="3" Description="Wake up polarity. 0 : active high; 1 : active low." />
+          </ELEMENTS>
+          <ELEMENTS Name="GpioPadCfg" Type="BITFIELD" Size="2">
+            <ELEMENTS Name="MODE_SEL" Default="0x0" Start="0" End="3" Description="Pin mode selector. 00 : FUNC0 for GPIO; 01 : FUNC1 for a default function; 10 : FUNC2 for TMUX (Test Mux); 11 : FUNC3 for an alternative function." />
+            <ELEMENTS Name="OE_GPIO" Default="0x0" Start="4" End="4" Description="PAD OE control (Valid in GPIO mode). 0 : Disable - Input mode; 1 : Enable - Output mode." />
+            <ELEMENTS Name="PULL_SEL" Default="0x0" Start="5" End="6" Description="Pull Up/Down Control. 00 : No Pull; 01 : Pull Down; 10 : Pull Up; 11 : Not allowed." />
+            <ELEMENTS Name="DRIVE_LEVEL" Default="0x0" Start="7" End="9" Description="Driving Strength. 00 : Lowest; 01 : Low; 10 : High; 11 : Highest." />
+            <ELEMENTS Name="HIHYS_CTRL" Default="0x0" Start="10" End="10" Description="Controls the hihys_en for GPIO" />
+            <ELEMENTS Name="OUT_GPIO" Default="0x0" Start="11" End="11" Description="Output value (Valid in GPIO mode). 0 : output 0; 1 : output 1." />
+          </ELEMENTS>
+        </ELEMENTS>
+      </ELEMENTS>
+    </TAG>
+    <TAG Number="157" Name="Audio Options">
+      <DESCRIPTION>Controls audio options that apply to all system audio features, including BT SCO, BT A2DP, and FM.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="SYS" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="Audio Config" Type="STRUCTURE" Size="16">
+        <ELEMENTS Name="AudioFlags" Type="BITFIELD" Size="4">
+          <ELEMENTS Name="Soundwire" Default="0x1" Start="0" End="0" Description="If set, all audio bus data uses a single Soundwire interface.  If clear, audio bus data uses PCM/I2S pins specific to each audio feature.  Applies to all voice and audio data that interfaces to an external audio bus, including BT Mono, BT Stereo/A2DP, and FM.  Default=1." />
+          <ELEMENTS Name="Soundwire Always On" Default="0x0" Start="1" End="1" Description="1-enable. Enable Soundwire when BT on and wakeup; 0- disable. Enable Soundwire only when need use it." />
+        </ELEMENTS>
+        <ELEMENTS Name="Num Audio Buses" Type="INTEGER" Size="1" Min="0x0" Max="0x2" Default="0x1" Signed="false" Description="Number of Audio Buses Supported. Default=1." />
+        <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="Reserved2" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="Reserved3" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="ISO Audio IOP Configuration" Type="STRUCTURE" Size="8">
+          <ELEMENTS Name="Clock Divisor" Type="INTEGER" Size="2" Min="0x0" Max="0xFFFF" Default="0x3C00" Signed="false" Description="Clock divisor register.  Default = 0x3C00" />
+          <ELEMENTS Name="Control Reg" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x58" Signed="false" Description="ACI control register value.  Default=0x58.  Bit0:enable.  Bit3:1:Frame sync type (100=I2S).  Bit4: slave.  Bit5: loopback.  Bit6: invert BClk.  The tag shouldn't set the enable bit; IOP will enable it during initialization." />
+          <ELEMENTS Name="Frame Divisor" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x1F" Signed="false" Description="Number of bit clocks per frame.  Default = 0x1F, 31d." />
+          <ELEMENTS Name="Slot Width" Type="INTEGER" Size="1" Min="0x0" Max="0xF" Default="0xF" Signed="false" Description="Number of bits per time slot.  Default = 0xF, 15d." />
+          <ELEMENTS Name="Data Width" Type="INTEGER" Size="1" Min="0x0" Max="0xF" Default="0xF" Signed="false" Description="Number of bits of data per sample.  Default = 0xF, 15d." />
+          <ELEMENTS Name="Slot Count" Type="INTEGER" Size="1" Min="0x1" Max="0x3" Default="0x1" Signed="false" Description="Slot count enabled." />
+          <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0x0" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        </ELEMENTS>
+      </ELEMENTS>
+    </TAG>
+    <TAG Number="265" Name="Soundwire Configuration">
+      <DESCRIPTION>Configures sound wire IO level.</DESCRIPTION>
+      <TAG_ATTRIBUTES Version="0" GenerateSource="true" Internal="false" Dynamic="false" TagGroups="Voice" PlatformSpecific="false" Platforms="Default" Features="" />
+      <ELEMENTS Name="Soundwire" Type="STRUCTURE" Size="4">
+        <ELEMENTS Name="Voltage Level" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="0 - Voltage trims for the 1.8V default setting as programmed by HW, 1 - Voltage trims for the 1.2V should be programmed by FW." />
+        <ELEMENTS Name="SWR Unique ID" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="It will store the alternate non default unique ID of SWR slave enumeration address" />
+        <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Reserved" />
+        <ELEMENTS Name="Reserved2" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Reserved" />
+      </ELEMENTS>
+    </TAG>
+  </TAGS>
+</TCF>

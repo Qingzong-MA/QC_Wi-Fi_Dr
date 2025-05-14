@@ -1,0 +1,53 @@
+From ea40aef6a2859bfcb3226c4d330cc0c08d65db61 Mon Sep 17 00:00:00 2001
+From: Shi Hong <quic_hongsh@quicinc.com>
+Date: Tue, 16 Apr 2024 14:12:20 +0800
+Subject: [PATCH] qcacld-3.0: add small address check
+
+HW doesn't not allow dma address<0x2000. Add physical address check for
+skb and dma memory.
+
+Signed-off-by: Hong Shi <quic_hongsh@quicinc.com>
+---
+ Kbuild                       | 4 ++++
+ core/hdd/src/wlan_hdd_main.c | 3 +++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/Kbuild b/Kbuild
+index decc88d..1cc49c7 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -3533,6 +3533,10 @@ ccflags-y += -DCONFIG_RHINE
+ ccflags-y += -DDP_OFFLOAD_FRAME_WITH_SW_EXCEPTION
+ endif
+ 
++ifeq ($(CONFIG_PADDR_CHECK_ON_3TH_PLATFORM), y)
++cppflags-y += -DQCA_PADDR_CHECK_ON_3TH_PLATFORM
++endif
++
+ ccflags-$(CONFIG_TALLOC_DEBUG) += -DWLAN_TALLOC_DEBUG
+ ccflags-$(CONFIG_QDF_TEST) += -DWLAN_DELAYED_WORK_TEST
+ ccflags-$(CONFIG_QDF_TEST) += -DWLAN_HASHTABLE_TEST
+diff --git a/core/hdd/src/wlan_hdd_main.c b/core/hdd/src/wlan_hdd_main.c
+index 2627f42..3cdf38d 100644
+--- a/core/hdd/src/wlan_hdd_main.c
++++ b/core/hdd/src/wlan_hdd_main.c
+@@ -12253,6 +12253,8 @@ void hdd_wlan_exit(struct hdd_context *hdd_ctx)
+ 
+ 	qdf_nbuf_deinit_replenish_timer();
+ 
++	qdf_nbuf_invalid_nbuf_queue_deinit();
++
+ 	if (QDF_GLOBAL_MONITOR_MODE ==  hdd_get_conparam()) {
+ 		hdd_info("Release wakelock for monitor mode!");
+ 		qdf_wake_lock_release(&hdd_ctx->monitor_mode_wakelock,
+@@ -18501,6 +18503,7 @@ int hdd_wlan_startup(struct hdd_context *hdd_ctx)
+ 
+ 	hdd_enter();
+ 
++	qdf_nbuf_invalid_nbuf_queue_init();
+ 	qdf_nbuf_init_replenish_timer();
+ 
+ 	status = wlan_hdd_cache_chann_mutex_create(hdd_ctx);
+-- 
+2.7.4
+

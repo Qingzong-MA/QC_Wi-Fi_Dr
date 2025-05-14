@@ -1,0 +1,8 @@
+export AIO_VER=1.4.2.cgn-f10.017.001
+export BOARD_TYPE=cgn-f10
+export HOST_DRIVER_VERSION=5.2.1.118Y
+export BLUETOOTHSTACK=fluoride
+export BOARD_TYPE_AIO_PATCH_CLO=
+export IF_TYPE=PCIE
+export ENG_PATCH=0
+export WLAN_BUILD_VER=017

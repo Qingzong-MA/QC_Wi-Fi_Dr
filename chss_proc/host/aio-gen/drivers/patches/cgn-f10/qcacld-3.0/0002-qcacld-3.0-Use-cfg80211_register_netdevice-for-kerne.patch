@@ -1,0 +1,40 @@
+From 8a2cf2b63cb8b27a9be175598eb1f07fc6b09b1b Mon Sep 17 00:00:00 2001
+From: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+Date: Wed, 10 Apr 2024 10:07:21 +0800
+Subject: [PATCH] qcacld-3.0: Use cfg80211_register_netdevice() for kernel 5.4+
+
+For Kernel 5.4+ in order to be in line with cfg80211 changes
+in upstream code, use cfg80211_register_netdevice() and
+cfg80211_unregister_netdevice() when request to register device is
+coming from add virtual interface.
+
+Signed-off-by: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+---
+ core/hdd/src/wlan_hdd_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/hdd/src/wlan_hdd_main.c b/core/hdd/src/wlan_hdd_main.c
+index 3cdf38d..ddccc34 100644
+--- a/core/hdd/src/wlan_hdd_main.c
++++ b/core/hdd/src/wlan_hdd_main.c
+@@ -7391,7 +7391,7 @@ free_net_dev:
+ 	return NULL;
+ }
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0) || \
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0) || \
+ 	(defined CFG80211_CHANGE_NETDEV_REGISTRATION_SEMANTICS))
+ static int
+ hdd_register_netdevice(struct hdd_adapter *adapter, struct net_device *dev,
+@@ -8492,7 +8492,7 @@ static void hdd_sta_destroy_ctx_all(struct hdd_context *hdd_ctx)
+ 	}
+ }
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0) || \
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0) || \
+ 	(defined CFG80211_CHANGE_NETDEV_REGISTRATION_SEMANTICS))
+ static void
+ hdd_unregister_netdevice(struct hdd_adapter *adapter, struct net_device *dev)
+-- 
+2.7.4
+

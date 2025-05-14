@@ -1,0 +1,3109 @@
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+Copyright (c) 2019 Qualcomm Technologies, Inc. All rights reserved.
+
+Qualcomm is a trademark of Qualcomm Incorporated, registered in the United States and other countries. All Qualcomm Incorporated trademarks are used with permission. Other products and brand names may be trademarks or registered trademarks of their respective owners.
+
+ =============================================================================*/
+ 
+/*
+ * Copyright (c) 2002-2004, Karlsruhe University
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+/*
+ * Australian Public Licence B (OZPLB)
+ *
+ * Version 1-0
+ *
+ * Copyright (c) 2007, Open Kernel Labs, Inc.
+ *
+ * All rights reserved. 
+ *
+ * Developed by: Embedded, Real-time and Operating Systems Program (ERTOS)
+ *               National ICT Australia
+ *               http://www.ertos.nicta.com.au
+ *
+ * Permission is granted by National ICT Australia, free of charge, to
+ * any person obtaining a copy of this software and any associated
+ * documentation files (the "Software") to deal with the Software without
+ * restriction, including (without limitation) the rights to use, copy,
+ * modify, adapt, merge, publish, distribute, communicate to the public,
+ * sublicense, and/or sell, lend or rent out copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject
+ * to the following conditions:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimers.
+ *
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimers in the documentation and/or other materials provided
+ *       with the distribution.
+ *
+ *     * Neither the name of National ICT Australia, nor the names of its
+ *       contributors, may be used to endorse or promote products derived
+ *       from this Software without specific prior written permission.
+ *
+ * EXCEPT AS EXPRESSLY STATED IN THIS LICENCE AND TO THE FULL EXTENT
+ * PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED "AS-IS", AND
+ * NATIONAL ICT AUSTRALIA AND ITS CONTRIBUTORS MAKE NO REPRESENTATIONS,
+ * WARRANTIES OR CONDITIONS OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO ANY REPRESENTATIONS, WARRANTIES OR CONDITIONS
+ * REGARDING THE CONTENTS OR ACCURACY OF THE SOFTWARE, OR OF TITLE,
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NONINFRINGEMENT,
+ * THE ABSENCE OF LATENT OR OTHER DEFECTS, OR THE PRESENCE OR ABSENCE OF
+ * ERRORS, WHETHER OR NOT DISCOVERABLE.
+ *
+ * TO THE FULL EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL
+ * NATIONAL ICT AUSTRALIA OR ITS CONTRIBUTORS BE LIABLE ON ANY LEGAL
+ * THEORY (INCLUDING, WITHOUT LIMITATION, IN AN ACTION OF CONTRACT,
+ * NEGLIGENCE OR OTHERWISE) FOR ANY CLAIM, LOSS, DAMAGES OR OTHER
+ * LIABILITY, INCLUDING (WITHOUT LIMITATION) LOSS OF PRODUCTION OR
+ * OPERATION TIME, LOSS, DAMAGE OR CORRUPTION OF DATA OR RECORDS; OR LOSS
+ * OF ANTICIPATED SAVINGS, OPPORTUNITY, REVENUE, PROFIT OR GOODWILL, OR
+ * OTHER ECONOMIC LOSS; OR ANY SPECIAL, INCIDENTAL, INDIRECT,
+ * CONSEQUENTIAL, PUNITIVE OR EXEMPLARY DAMAGES, ARISING OUT OF OR IN
+ * CONNECTION WITH THIS LICENCE, THE SOFTWARE OR THE USE OF OR OTHER
+ * DEALINGS WITH THE SOFTWARE, EVEN IF NATIONAL ICT AUSTRALIA OR ITS
+ * CONTRIBUTORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH CLAIM, LOSS,
+ * DAMAGES OR OTHER LIABILITY.
+ *
+ * If applicable legislation implies representations, warranties, or
+ * conditions, or imposes obligations or liability on National ICT
+ * Australia or one of its contributors in respect of the Software that
+ * cannot be wholly or partly excluded, restricted or modified, the
+ * liability of National ICT Australia or the contributor is limited, to
+ * the full extent permitted by the applicable legislation, at its
+ * option, to:
+ * a.  in the case of goods, any one or more of the following:
+ * i.  the replacement of the goods or the supply of equivalent goods;
+ * ii.  the repair of the goods;
+ * iii. the payment of the cost of replacing the goods or of acquiring
+ *  equivalent goods;
+ * iv.  the payment of the cost of having the goods repaired; or
+ * b.  in the case of services:
+ * i.  the supplying of the services again; or
+ * ii.  the payment of the cost of having the services supplied again.
+ *
+ * The construction, validity and performance of this licence is governed
+ * by the laws in force in New South Wales, Australia.
+ */
+ 
+ -----------------------------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+ ------------------------------------------------------------------------------------------------------------------------------
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)string.h	5.10 (Berkeley) 3/9/91
+ */
+ ------------------------------------------------------------------------------------------------------------------------------
+# Copyright (c) 2003-2013  Paul T. McGuire
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+------------------------------------------------------------------------------------------------------------------------------
+#===- cindex.py - Python Indexing Library Bindings -----------*- python -*--===#
+#
+#                     The LLVM Compiler Infrastructure
+#
+# This file is distributed under the University of Illinois Open Source
+# License. See LICENSE.TXT for details.
+#
+#===------------------------------------------------------------------------===#
+
+r"""
+Clang Indexing Library Bindings
+===============================
+
+This module provides an interface to the Clang indexing library. It is a
+low-level interface to the indexing library which attempts to match the Clang
+API directly while also being "pythonic". Notable differences from the C API
+are:
+
+ * string results are returned as Python strings, not CXString objects.
+
+ * null cursors are translated to None.
+
+ * access to child cursors is done via iteration, not visitation.
+
+The major indexing objects are:
+
+  Index
+
+	The top-level object which manages some global library state.
+
+  TranslationUnit
+
+	High-level object encapsulating the AST for a single translation unit. These
+	can be loaded from .ast files or parsed on the fly.
+
+  Cursor
+
+	Generic object for representing a node in the AST.
+
+  SourceRange, SourceLocation, and File
+
+	Objects representing information about the input source.
+
+Most object information is exposed using properties, when the underlying API
+call is efficient.
+"""
+------------------------------------------------------------------------------------------------------------------------------
+
+
+
+This Notice.txt file contains certain notices of software components included 
+with the software that Qualcomm Atheros, Inc. (¡°Qualcomm Atheros¡±) is required
+to provide you. Except where prohibited by the open source license, the content 
+of this notices file is only provided to satisfy Qualcomm Atheros's attribution 
+and notice requirement; your use of these software components together with the 
+Qualcomm Atheros software (Qualcomm Atheros software hereinafter referred to 
+as ¡°Software¡±) is subject to the terms of your agreement from Qualcomm Atheros. 
+Compliance with all copyright laws and software license agreements included in 
+the notice section of this file are the responsibility of the user. Except as 
+may be granted by separate express written agreement, this file provides no 
+license to any patents, trademarks, copyrights, or other intellectual property 
+ 
+ 
+of Qualcomm Incorporated or any of its subsidiaries. 
+Qualcomm is a trademark of Qualcomm Incorporated, registered in the United States 
+and other countries. All Qualcomm Incorporated trademarks are used with permission. 
+Other products and brand names may be trademarks or registered trademarks of their 
+respective owners.
+ 
+NOTICES:
+ 
+=============================================================================
+
+/*
+ * FILE:	sha2.c
+ * AUTHOR:	Aaron D. Gifford - http://www.aarongifford.com/
+ * 
+ * Copyright (c) 2000-2001, Aaron D. Gifford
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTOR(S) ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTOR(S) BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/1.0.0/src/nan/sha2.c
+
+/*
+ * SHA-512 internal definitions
+ * Copyright (c) 2015, Pali Roh?r <pali.rohar@gmail.com>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+ p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha512_i.h
+ 
+/*
+ * Copyright (c) 2017 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Qualcomm Technologies, Inc. Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant - WPA state machine and EAPOL-Key processing
+ * Copyright (c) 2002-2015, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/fils.h
+
+/*
+ * Copyright (c) 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * 
+ * 2012 - 2016 Qualcomm Atheros, Inc.
+ */
+
+/*
+ * For this file, which was received with alternative licensing options for   
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+//-
+// Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+// All rights reserved.
+// $ATH_LICENSE_NULL$
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer,
+//    without modification.
+// 2. Redistributions in binary form must reproduce at minimum a disclaimer
+//    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+//    redistribution must be conditioned upon including a substantially
+//    similar Disclaimer requirement for further binary redistribution.
+// 3. Neither the names of the above-listed copyright holders nor the names
+//    of any contributors may be used to endorse or promote products derived
+//    from this software without specific prior written permission.
+//
+// Alternatively, this software may be distributed under the terms of the
+// GNU General Public License ("GPL") version 2 as published by the Free
+// Software Foundation.
+//
+// NO WARRANTY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF NONINFRINGEMENT, MERCHANTIBILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+// IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGES.
+//
+// $Id: //components/rel/wlanfw.cnss/1.0.1/cnss_proc/wlan/fw/target/src/wlan/proto/include/if_llc.h#3 $
+// $NetBSD: if_llc.h,v 1.12 1999/11/19 20:41:19 thorpej Exp $
+// $Id: //components/rel/wlanfw.cnss/1.0.1/cnss_proc/wlan/fw/target/src/wlan/proto/include/if_llc.h#3 $
+//
+
+/*
+ * Copyright (c) 1988, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)if_llc.h	8.1 (Berkeley) 6/10/93
+ * $FreeBSD: src/sys/net/if_llc.h,v 1.9 2002/09/23 06:25:08 alfred Exp $
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/if_llc.h
+
+ /*
+ * SHA-384 hash implementation and interface functions
+ * Copyright (c) 2015, Pali Roh?r <pali.rohar@gmail.com>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha384-internal.c
+
+/*
+ * SHA-512 hash implementation and interface functions
+ * Copyright (c) 2015, Pali Roh?r <pali.rohar@gmail.com>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+ p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha512-internal.c
+
+ /*
+  * Copyright (c) 2017-2018 Qualcomm Technologies, Inc.
+  * All Rights Reserved.
+  * Qualcomm Technologies, Inc. Confidential and Proprietary.
+  * Notifications and licenses are retained for attribution purposes only.
+  */
+ /*
+  * For this file, which was received with alternative licensing options for
+  * distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+  */
+ 
+ /*
+  * WPA Supplicant - WPA state machine and EAPOL-Key processing
+  * Copyright (c) 2002-2015, Jouni Malinen <jkmaline@cc.hut.fi>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
+  *
+  * Alternatively, this software may be distributed under the terms of BSD
+  * license.
+  *
+  * See README and COPYING for more details.
+  */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/fils.c
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant / Configuration file structures
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */  
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/config.h
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant / wrapper functions for crypto libraries
+ * Copyright (c) 2004-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ *
+ * This file defines the cryptographic functions that need to be implemented
+ * for wpa_supplicant and hostapd. When TLS is not used, internal
+ * implementation of MD5, SHA1, and AES is used and no external libraries are
+ * required. When TLS is enabled (e.g., by enabling EAP-TLS or EAP-PEAP), the
+ * crypto library used by the TLS implementation is expected to be used for
+ * non-TLS needs, too, in order to save space by not implementing these
+ * functions twice.
+ *
+ * Wrapper code for using each crypto library is in its own file (crypto*.c)
+ * and one of these files is build and linked in to provide the functions
+ * defined here.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/crypto.h
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * wpa_supplicant - WPA definitions
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/wpa.h
+
+/*
+* Copyright (c) 2016 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Confidential and Proprietary - Qualcomm Technologies, Inc.
+* Notifications and licenses are retained for attribution purposes only
+*/ 
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * SHA-256 hash implementation and interface functions
+ * Copyright (c) 2003-2007, Jouni Malinen <j@w1.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha256.c 
+
+/*
+ * Copyright (c) 2014 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * SHA256 hash implementation and interface functions
+ * Copyright (c) 2003-2006, Jouni Malinen <j@w1.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha256.h
+
+/*
+ * Copyright (c) 2011-2017 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2011-2016 Qualcomm Atheros, Inc.
+ *
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+ */
+
+/*
+ * wpa_supplicant/hostapd / common helper functions, etc.
+ * Copyright (c) 2002-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/common.h
+
+/*
+ * Copyright (c) 2016-2018 Qualcomm Technologies, Inc.
+ * 2014 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * WPA definitions shared between hostapd and wpa_supplicant
+ * Copyright (c) 2002-2013, Jouni Malinen <j@w1.fi>
+ 
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa_common.h
+
+/*
+ * Copyright (c) 2014-2018 Qualcomm Technologies, Inc.
+ * 2014 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant - Common definitions
+ * Copyright (c) 2004-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/suppl_auth_api.h
+
+/*
+ * Copyright (c) 2014 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * WPA Supplicant - IEEE 802.11r - Fast BSS Transition
+ * Copyright (c) 2006-2007, Jouni Malinen <j@w1.fi>
+
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa_ft.h
+
+/*
+ * Copyright (c) 2011, 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * wpa_supplicant - Internal WPA state machine definitions
+ * Copyright (c) 2004-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/include/wpa_i.h
+
+/*
+ * Copyright (c) 2017-2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only
+ */ 
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+/*
+ * AES SIV (RFC 5297)
+ * Copyright (c) 2013 Cozybit, Inc.
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/aes_siv.h
+
+/*
+* Copyright (c) 2016-2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+* Notifications and licenses are retained for attribution purposes only.
+*/
+/*
+* For this file, which was received with alternative licensing options for
+* distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+*/
+/*
+* 2016-2017 Qualcomm Atheros, Inc.
+* All Rights Reserved.
+*/
+/*
+* Wi-Fi Protected Setup - message definitions
+* Copyright (c) 2008, Jouni Malinen <j@w1.fi>
+*
+* This software may be distributed under the terms of the BSD license.
+* See README for more details.
+*/
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/802_11_mac/p2p_listen_offload/wlan_p2p_listen_offload_int.h
+
+/*
+ * FILE:	sha2.c
+ * AUTHOR:	Aaron D. Gifford - http://www.aarongifford.com/
+ * 
+ * Copyright (c) 2000-2001, Aaron D. Gifford
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTOR(S) ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTOR(S) BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/nan/sha2.c
+
+/*
+ * Copyright (c) 2014, 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2014 Qualcomm Atheros, Inc.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * WPA/RSN - Shared functions for supplicant and authenticator
+ * Copyright (c) 2002-2013, Jouni Malinen <j@w1.fi>
+
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa_common.c
+
+/*
+* Copyright (c) 2016, 2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Confidential and Proprietary - Qualcomm Technologies, Inc.
+* Notifications and licenses are retained for attribution purposes only
+*/ 
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant - WPA state machine and EAPOL-Key processing
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/my_nan_sec.c
+
+/*
+* Copyright (c) 2017-2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Confidential and Proprietary - Qualcomm Technologies, Inc.
+* Notifications and licenses are retained for attribution purposes only
+*/ 
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * AES SIV (RFC 5297)
+ * Copyright (c) 2013 Cozybit, Inc.
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/aes-siv.c
+
+/*
+ * Copyright (c) 2011, 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2011 Qualcomm Atheros, Inc.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant - WPA state machine and EAPOL-Key processing
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa.c
+
+/*
+ * Copyright (c) 2014, 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2014 Qualcomm Atheros, Inc.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+ 
+/*
+ * WPA Supplicant - IEEE 802.11r - Fast BSS Transition
+ * Copyright (c) 2006-2007, Jouni Malinen <j@w1.fi>
+
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa_ft.c
+
+/*
+* Copyright (c) 2016-2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+* Notifications and licenses are retained for attribution purposes only.
+*/
+/*
+* For this file, which was received with alternative licensing options for
+* distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+*/
+/*
+* 2016-2017 Qualcomm Atheros, Inc.
+* All Rights Reserved.
+*/
+/*
+* Wi-Fi Protected Setup - attribute parsing
+* Copyright (c) 2008, Jouni Malinen <j@w1.fi>
+*
+* This software may be distributed under the terms of the BSD license.
+* See README for more details.
+*/
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/802_11_mac/p2p_listen_offload/wlan_p2p_listen_offload.c
+
+/*
+* Copyright (c) 2016-2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+* Notifications and licenses are retained for attribution purposes only.
+*/
+/*
+* For this file, which was received with alternative licensing options for
+* distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+*/
+/*
+* 2016-2017 Qualcomm Atheros, Inc.
+* All Rights Reserved.
+*/
+/*
+* Wi-Fi Protected Setup - message definitions
+* Copyright (c) 2008, Jouni Malinen <j@w1.fi>
+*
+* This software may be distributed under the terms of the BSD license.
+* See README for more details.
+*/
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/p2p/wlan_p2p_disc_offload_internal.h
+
+/*
+* Copyright (c) 2016-2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+* Notifications and licenses are retained for attribution purposes only.
+*/
+/*
+* For this file, which was received with alternative licensing options for
+* distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+*/
+/*
+* 2016-2017 Qualcomm Atheros, Inc.
+* All Rights Reserved.
+*/
+/*
+* Wi-Fi Protected Setup - attribute parsing
+* Copyright (c) 2008, Jouni Malinen <j@w1.fi>
+*
+* This software may be distributed under the terms of the BSD license.
+* See README for more details.
+*/
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/p2p/wlan_p2p_disc_offload.c
+
+/*
+* Copyright (c) 2016-2017 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+* Notifications and licenses are retained for attribution purposes only.
+*/
+/*
+* For this file, which was received with alternative licensing options for
+* distribution, Qualcomm Technologies, Inc. has selected the BSD license.
+*/
+/*
+* 2016-2017 Qualcomm Atheros, Inc.
+* All Rights Reserved.
+*/
+/*
+* Wi-Fi Protected Setup - attribute parsing
+* Copyright (c) 2008, Jouni Malinen <j@w1.fi>
+*
+* This software may be distributed under the terms of the BSD license.
+* See README for more details.
+*/
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/802_11_mac/p2p_listen_offload/wlan_p2p_listen_offload_int.c
+
+/*
+ * Copyright 2015, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/l2/bpf/apf_interpreter.h
+
+/*
+ * Copyright 2018, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/l2/bpf/apf_interpreter.c
+
+/*
+ * Copyright 2018, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/offloads/src/l2/bpf/apf.h
+
+/*
+ * WPA Supplicant - CCX Fast Roaming with CCKM Enhancements
+ * Copyright (c) 2003-2008, Jouni Malinen <j@w1.fi>
+ * Copyright (c) 2010-2011, embWiSe Technologies
+ *
+ * Licensed under a proprietary license.
+ * Notifications and licenses are retained for attribution purposes only.
+
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name(s) of the above-listed copyright holder(s) nor the
+ *    names of its contributors may be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/mywpa_cckm.c
+
+/*
+ * SHA-384 internal definitions
+ * Copyright (c) 2015, Pali Roh?r <pali.rohar@gmail.com>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha384_i.h
+
+/*
+ * SHA384 hash implementation and interface functions
+ * Copyright (c) 2015-2017, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+ 
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha384.h
+
+/*
+ * HMAC-SHA256 KDF (RFC 5295) and HKDF-Expand(SHA256) (RFC 5869)
+ * Copyright (c) 2014-2017, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha256-kdf.c
+
+
+/*
+ * AES-128/192/256 CTR
+ *
+ * Copyright (c) 2003-2007, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/aes-ctr.c
+
+/*
+ * SHA384-based KDF (IEEE 802.11ac)
+ * Copyright (c) 2003-2017, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha384-prf.c
+
+/*
+ * SHA-384 hash implementation and interface functions
+ * Copyright (c) 2003-2017, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_protocol_cmn.cnss/2.0/src/supplicant/sha384.c
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+ * This file was originally distributed by Qualcomm Atheros, Inc.
+ * under proprietary terms before Copyright ownership was assigned
+ * to the Linux Foundation.
+ */
+
+/*
+ * This file contains extensions of the WMI protocol specified in the
+ * Wireless Module Interface (WMI).  It includes definitions of all
+ * extended commands and events.  Extensions include useful commands
+ * that are not directly related to wireless activities.  They may
+ * be hardware-specific, and they might not be supported on all
+ * implementations.
+ *
+ * Extended WMIX commands are encapsulated in a WMI message with
+ * cmd=WMI_EXTENSION_CMD.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmix.h
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+ * This file was originally distributed by Qualcomm Atheros, Inc.
+ * under proprietary terms before Copyright ownership was assigned
+ * to the Linux Foundation.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt_common.h
+
+/*
+ * Copyright (c) 2010-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/targcfg.h
+
+/*
+ * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/wal_rx_desc.h
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/cepci.h
+
+/*
+ * Copyright (c) 2010-2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi.h
+
+/*
+ * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi_tlv_helper.h
+
+//
+// Copyright (c) 1991, 1993
+//  The Regents of the University of California.  All rights reserved.
+// $ATH_LICENSE_NULL$
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. All advertising materials mentioning features or use of this software
+//    must display the following acknowledgement:
+//      This product includes software developed by the University of
+//      California, Berkeley and its contributors.
+// 4. Neither the name of the University nor the names of its contributors
+//    may be used to endorse or promote products derived from this software
+//    without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
+//
+//  @(#)queue.h 8.5 (Berkeley) 8/20/94
+// $FreeBSD: src/sys/sys/queue.h,v 1.58 2004/04/07 04:19:49 imp Exp $
+// $Id: //components/rel/wlanfw_cmn.cnss/1.0/cnss_proc/wlan/fwcommon/include/queue.h#1 $
+//
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/stail_queue.h
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/dbglog.h
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/targaddrs.h
+
+/*
+ * Copyright (c) 2017-2018 The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt_stats/htt_stats.h
+
+/*
+ * Copyright (c) 2012, 2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/a_usb_defs.h
+
+/*
+ * Copyright (c) 2014-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wlan_nan_msg.h
+
+/*
+ * Copyright (c) 2011-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/wlan_module_ids.h
+
+/*
+ * Copyright (c) 2010-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi_unified.h
+
+/*
+ * Copyright (c) 2010-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi_tlv_defs.h
+
+/*
+ * Copyright (c) 2011-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi_services.h
+
+/*
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wmi_version.h
+
+/*
+ * Copyright (c) 2017-2018 The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt_stats/htt_ppdu_stats.h
+
+/*
+ * Copyright (c) 2018 The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/tools/wifistats/wifistats_wlanfw_htt.c
+
+/*
+ * Copyright (c) 2017-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wlan_nan_msg_common.h
+
+/*
+ * Copyright (c) 2013-2016, 2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wlan_defs.h
+
+/*
+ * Copyright (c) 2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */ 
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/queue.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/ip_prot.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/ol_fw_tx_dbg.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/ipv4.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/athdefs.h
+
+/*
+ * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/ipv6.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/bin_sig.h
+
+/*
+ * Copyright (c) 2012 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/epping_test.h
+
+/*
+ * Copyright (c) 2011-2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wdi_ipa.h
+
+/*
+ * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt_isoc.h
+
+/*
+ * Copyright (c) 2012, 2014 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/enet.h
+
+/*
+ * Copyright (c) 2012, 2014-2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/htc_services.h
+
+/*
+ * Copyright (c) 2011-2017 The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt_deps.h
+
+/*
+ * Copyright (c) 2012,2015,2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/pktlog_if.h
+
+/*
+ * Copyright (c) 2012, 2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/bmi_msg.h
+
+/*
+ * Copyright (c) 2012, 2014-2016, 2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/htc.h
+
+
+/*
+ * Copyright (c) 2011-2018 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/htt.h
+
+/*
+ * Copyright (c) 2010-2017 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/include/dbglog_id.h
+
+/*
+ * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_cmn.cnss/1.0.0/fw_interface/include/wlan_nan_msg_common_v2.h
+
+/*
+ * Copyright (c) 2017 - 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * $ATH_LICENSE_TARGET_C$
+ */
+/*
+ * Galois/Counter Mode (GCM) and GMAC with AES
+ *
+ * Copyright (c) 2012, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/aes_gcm.c
+
+/*
+ * Copyright (c) 2011, 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ *
+ * 2011 Qualcomm Atheros, Inc.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * wpa_supplicant/hostapd / common helper functions, etc.
+ * Copyright (c) 2002-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/common.h
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * WPA Supplicant / wrapper functions for crypto libraries
+ * Copyright (c) 2004-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ *
+ * This file defines the cryptographic functions that need to be implemented
+ * for wpa_supplicant and hostapd. When TLS is not used, internal
+ * implementation of MD5, SHA1, and AES is used and no external libraries are
+ * required. When TLS is enabled (e.g., by enabling EAP-TLS or EAP-PEAP), the
+ * crypto library used by the TLS implementation is expected to be used for
+ * non-TLS needs, too, in order to save space by not implementing these
+ * functions twice.
+ *
+ * Wrapper code for using each crypto library is in its own file (crypto*.c)
+ * and one of these files is build and linked in to provide the functions
+ * defined here.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/crypto.h
+
+/*
+ * Copyright (c) 2014-2015 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * SHA1 hash implementation and interface functions
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/sha1.c
+
+/*
+ * Copyright (c) 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * AES (Rijndael) cipher
+ *
+ * Modifications to public domain implementation:
+ * - support only 128-bit keys
+ * - cleanup
+ * - use C pre-processor to make it easier to change S table access
+ * - added option (AES_SMALL_TABLES) for reducing code size by about 8 kB at
+ *   cost of reduced throughput (quite small difference on Pentium 4,
+ *   10-25% when using -O1 or -O2 optimization)
+ *
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+
+/*
+ * rijndael-alg-fst.c
+ *
+ * @version 3.0 (December 2000)
+ *
+ * Optimised ANSI C code for the Rijndael cipher (now AES)
+ *
+ * @author Vincent Rijmen <vincent.rijmen@esat.kuleuven.ac.be>
+ * @author Antoon Bosselaers <antoon.bosselaers@esat.kuleuven.ac.be>
+ * @author Paulo Barreto <paulo.barreto@terra.com.br>
+ *
+ * This code is hereby placed in the public domain.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ''AS IS'' AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/aes.c
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * AES-based functions
+ *
+ * - AES Key Wrap Algorithm (128-bit KEK) (RFC3394)
+ * - One-Key CBC MAC (OMAC1) hash with AES-128
+ * - AES-128 CTR mode encryption
+ * - AES-128 EAX mode encryption/decryption
+ * - AES-128 CBC
+ *
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core.cnss/5.0.0/src/misc/crypto/aes_wrap.c
+
+
+//
+// Copyright (c) 1991, 1993
+//  The Regents of the University of California.  All rights reserved.
+// $ATH_LICENSE_NULL$
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. All advertising materials mentioning features or use of this software
+//    must display the following acknowledgement:
+//      This product includes software developed by the University of
+//      California, Berkeley and its contributors.
+// 4. Neither the name of the University nor the names of its contributors
+//    may be used to endorse or promote products derived from this software
+//    without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
+//
+//  @(#)queue.h 8.5 (Berkeley) 8/20/94
+// $FreeBSD: src/sys/sys/queue.h,v 1.58 2004/04/07 04:19:49 imp Exp $
+// $Id: //components/rel/wlanfw_cmn.cnss/1.0/cnss_proc/wlan/fwcommon/include/queue.h#1 $
+//
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/src/wal/AR/pcielp/utest_include/queue.h
+
+/*
+ * Copyright (c) 2012 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ */
+
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+// -
+// Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+// All rights reserved.
+// $ATH_LICENSE_NULL$
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer,
+// without modification.
+// 2. Redistributions in binary form must reproduce at minimum a disclaimer
+// similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+// redistribution must be conditioned upon including a substantially
+// similar Disclaimer requirement for further binary redistribution.
+// 3. Neither the names of the above-listed copyright holders nor the names
+// of any contributors may be used to endorse or promote products derived
+// from this software without specific prior written permission.
+//
+// Alternatively, this software may be distributed under the terms of the
+// GNU General Public License ("GPL") version 2 as published by the Free
+// Software Foundation.
+//
+// NO WARRANTY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF NONINFRINGEMENT, MERCHANTIBILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+// IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGES.
+//
+// $Id: //components/rel/wlanfw.cnss/1.0.1/cnss_proc/wlan/fw/target/src/wlan/proto/include/if_ethersubr.h#3 $
+//
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/wlanfw_common/if_ethersubr.h
+
+/*
+ * FILE:    sha2.h
+ * AUTHOR:  Aaron D. Gifford - http://www.aarongifford.com/
+ *
+ * Copyright (c) 2000-2001, Aaron D. Gifford
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTOR(S) ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTOR(S) BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $Id: //depot/sw/branches/qca_rome_main/perf_pwr_offload/drivers/target/include/sha2.h#1 $
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/sha2.h
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * MD5 hash implementation and interface functions
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/md5_api.h
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * Notifications and licenses are retained for attribution purposes only.
+ */
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * SHA1 hash implementation and interface functions
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/sha1.h
+
+/*
+ * Copyright (c) 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * 
+ * 2011 - 2016 Qualcomm Atheros, Inc.
+*/
+/*
+ * For this file, which was received with alternative licensing options for
+ * distribution, Qualcomm Atheros, Inc. has selected the BSD license.
+ */
+
+/*
+ * AES-based functions
+ *
+ *
+ * - AES Key Wrap Algorithm (128-bit KEK) (RFC3394)
+ * - One-Key CBC MAC (OMAC1) hash with AES-128
+ * - AES-128 CTR mode encryption
+ * - AES-128 EAX mode encryption/decryption
+ * - AES-128 CBC
+ *
+ * Copyright (c) 2003-2005, Jouni Malinen <jkmaline@cc.hut.fi>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Alternatively, this software may be distributed under the terms of BSD
+ * license.
+ *
+ * See README and COPYING for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/aes_wrap.h
+
+
+/*
+ * Copyright (c) 2017-2018 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * $ATH_LICENSE_TARGET_C$
+ */ 
+/*
+ * Galois/Counter Mode (GCM) and GMAC with AES
+ *
+ * Copyright (c) 2012, Jouni Malinen <j@w1.fi>
+ *
+ * This software may be distributed under the terms of the BSD license.
+ * See README for more details.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/include/aes_gcm.h
+
+/*
+* Copyright (c) 2018 Qualcomm Technologies, Inc.
+* All Rights Reserved.
+* Confidential and Proprietary - Qualcomm Technologies, Inc.
+*Notifications and licenses are retained for attribution purposes only
+*/
+
+/*
+ *  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or
+ *  code or tables extracted from it, as desired without restriction.
+ *
+ *  First, the polynomial itself and its table of feedback terms.  The
+ *  polynomial is
+ *  X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X^1+X^0
+ *
+ *  Note that we take it "backwards" and put the highest-order term in
+ *  the lowest-order bit.  The X^32 term is "implied"; the LSB is the
+ *  X^31 term, etc.  The X^0 term (usually shown as "+1") results in
+ *  the MSB being 1
+ *
+ *  Note that the usual hardware shift register implementation, which
+ *  is what we're using (we're merely optimizing it by doing eight-bit
+ *  chunks at a time) shifts bits into the lowest-order term.  In our
+ *  implementation, that means shifting towards the right.  Why do we
+ *  do it this way?  Because the calculated CRC must be transmitted in
+ *  order from highest-order term to lowest-order term.  UARTs transmit
+ *  characters in order from LSB to MSB.  By storing the CRC this way
+ *  we hand it to the UART in the order low-byte to high-byte; the UART
+ *  sends each low-bit to hight-bit; and the result is transmission bit
+ *  by bit from highest- to lowest-order term without requiring any bit
+ *  shuffling on our part.  Reception works similarly
+ *
+ *  The feedback terms table consists of 256, 32-bit entries.  Notes
+ *
+ *      The table can be generated at runtime if desired; code to do so
+ *      is shown later.  It might not be obvious, but the feedback
+ *      terms simply represent the results of eight shift/xor opera
+ *      tions for all combinations of data and CRC register values
+ *
+ *      The values must be right-shifted by eight bits by the "updcrc
+ *      logic; the shift must be unsigned (bring in zeroes).  On some
+ *      hardware you could probably optimize the shift in assembler by
+ *      using byte-swap instructions
+ *      polynomial $edb88320
+ *
+ *
+ * CRC32 code derived from work by Gary S. Brown.
+ */
+p4://qctp411.qualcomm.com/components/rel/wlanfw_mac_core_cmn.cnss/1.0/src/wlanfw_common/ieee_crc32.c
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+Copyright (c) 2013 Qualcomm Technologies, Inc. All rights reserved.
+
+Qualcomm is a trademark of Qualcomm Incorporated, registered in the United States and other countries. All Qualcomm Incorporated trademarks are used with permission. Other products and brand names may be trademarks or registered trademarks of their respective owners.
+
+-----------------------------------------------------------
+
+The following notice is provided for elfStructs.py
+
+p4://qctp411.qualcomm.com/components/rel/scripts.npr/1.1/myps/elfManipulator/include/elfStructs.py
+/*
+ * See p.9 of [http://www.skyfree.org/linux/references/ELF_Format.pdf] for matching code
+ * Discussion of ELF in [https://en.wikipedia.org/wiki/Executable_and_Linkable_Format]
+ */
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+Copyright (c) 2013 Qualcomm Technologies, Inc. All rights reserved.
+
+Qualcomm is a trademark of Qualcomm Incorporated, registered in the United States and other countries. All Qualcomm Incorporated trademarks are used with permission. Other products and brand names may be trademarks or registered trademarks of their respective owners.
+
+-----------------------------------------------------------
+
+The following notice is provided for openssl.exe
+
+  LICENSE ISSUES
+  ==============
+
+  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
+  the OpenSSL License and the original SSLeay license apply to the toolkit.
+  See below for the actual license texts. Actually both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL
+  please contact openssl-core@openssl.org.
+
+  OpenSSL License
+  ---------------
+
+/* ====================================================================
+ * Copyright (c) 1998-2011 The OpenSSL Project.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. All advertising materials mentioning features or use of this
+ *    software must display the following acknowledgment:
+ *    "This product includes software developed by the OpenSSL Project
+ *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+ *
+ * 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
+ *    endorse or promote products derived from this software without
+ *    prior written permission. For written permission, please contact
+ *    openssl-core@openssl.org.
+ *
+ * 5. Products derived from this software may not be called "OpenSSL"
+ *    nor may "OpenSSL" appear in their names without prior written
+ *    permission of the OpenSSL Project.
+ *
+ * 6. Redistributions of any form whatsoever must retain the following
+ *    acknowledgment:
+ *    "This product includes software developed by the OpenSSL Project
+ *    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
+ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ */
+
+ Original SSLeay License
+ -----------------------
+
+/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+ * All rights reserved.
+ *
+ * This package is an SSL implementation written
+ * by Eric Young (eay@cryptsoft.com).
+ * The implementation was written so as to conform with Netscapes SSL.
+ *
+ * This library is free for commercial and non-commercial use as long as
+ * the following conditions are aheared to.  The following conditions
+ * apply to all code found in this distribution, be it the RC4, RSA,
+ * lhash, DES, etc., code; not just the SSL code.  The SSL documentation
+ * included with this distribution is covered by the same copyright terms
+ * except that the holder is Tim Hudson (tjh@cryptsoft.com).
+ *
+ * Copyright remains Eric Young's, and as such any Copyright notices in
+ * the code are not to be removed.
+ * If this package is used in a product, Eric Young should be given attribution
+ * as the author of the parts of the library used.
+ * This can be in the form of a textual message at program startup or
+ * in documentation (online or textual) provided with the package.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *    "This product includes cryptographic software written by
+ *     Eric Young (eay@cryptsoft.com)"
+ *    The word 'cryptographic' can be left out if the rouines from the library
+ *    being used are not cryptographic related :-).
+ * 4. If you include any Windows specific code (or a derivative thereof) from
+ *    the apps directory (application code) you must include an acknowledgement:
+ *    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
+ *
+ * THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * The licence and distribution terms for any publically available version or
+ * derivative of this code cannot be changed.  i.e. this code cannot simply be
+ * copied and put under another distribution licence
+ * [including the GNU Public Licence.]
+ */
+
+
+Boost Software License - Version 1.0 - August 17th, 2003
+
+Permission is hereby granted, free of charge, to any person or organization
+obtaining a copy of the software and accompanying documentation covered by
+this license (the "Software") to use, reproduce, display, distribute,
+execute, and transmit the Software, and to prepare derivative works of the
+Software, and to permit third-parties to whom the Software is furnished to
+do so, all subject to the following:
+
+The copyright notices in the Software and this entire statement, including
+the above license grant, this restriction and the following disclaimer,
+must be included in all copies of the Software, in whole or in part, and
+all derivative works of the Software, unless such copies or derivative
+works are solely in the form of machine-executable object code generated by
+a source language processor.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Compilation Copyright (c) 1995-2013 by Wei Dai.  All rights reserved.
+This copyright applies only to this software distribution package
+as a compilation, and does not imply a copyright on any particular
+file in the package.
+
+All individual files in this compilation are placed in the public domain by
+Wei Dai and other contributors.
+
+I would like to thank the following authors for placing their works into
+the public domain:
+
+Joan Daemen - 3way.cpp
+Leonard Janke - cast.cpp, seal.cpp
+Steve Reid - cast.cpp
+Phil Karn - des.cpp
+Andrew M. Kuchling - md2.cpp, md4.cpp
+Colin Plumb - md5.cpp
+Seal Woods - rc6.cpp
+Chris Morgan - rijndael.cpp
+Paulo Baretto - rijndael.cpp, skipjack.cpp, square.cpp
+Richard De Moliner - safer.cpp
+Matthew Skala - twofish.cpp
+Kevin Springle - camellia.cpp, shacal2.cpp, ttmac.cpp, whrlpool.cpp, ripemd.cpp
+Ronny Van Keer - sha3.cpp
+
+The Crypto++ Library (as a compilation) is currently licensed under the Boost
+Software License 1.0 (http://www.boost.org/users/license.html).
+
+-------------------------------------------------------------------------------
+The following notice is for xmltodict.py
+Copyright (C) 2012 Martin Blech and individual contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in the
+Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------------------------------
+The following notice is for colorama
+Copyright (c) 2010 Jonathan Hartley
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holders, nor those of its contributors
+  may be used to endorse or promote products derived from this software without
+  specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * $ATH_LICENSE_TARGET_C$
+ */
+
+/*
+* Copyright (c) 2017 Qualcomm Technologies, Inc
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+*/
+/*
+ * Copyright (c) 2011,2014-2015 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+* Copyright (c) 2017 Qualcomm Technologies, Inc
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+*/
+/*
+ * Copyright (c) 2008, Atheros Communications Inc.
+ *
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * Qualcomm Atheros, Inc. has chosen to take madwifi subject to the BSD license and terms.
+ *
+ */
+
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+Qualcomm is a trademark of Qualcomm Incorporated, registered in the United States and other countries. All Qualcomm Incorporated trademarks are used with permission. Other products and brand names may be trademarks or registered trademarks of their respective owners.
+
+-----------------------------------------------------------
+
+// Copyright (c) 2015-2019 Qualcomm Technologies Inc.
+// All Rights Reserved.
+// Confidential and Proprietary - Qualcomm Technologies, Inc.
+
+------------------------------------------------------------
+/* Copyright (c) 2009 - 2015 ARM LIMITED
+
+
+
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+
+   modification, are permitted provided that the following conditions are met:
+
+   - Redistributions of source code must retain the above copyright
+
+     notice, this list of conditions and the following disclaimer.
+
+   - Redistributions in binary form must reproduce the above copyright
+
+     notice, this list of conditions and the following disclaimer in the
+
+     documentation and/or other materials provided with the distribution.
+
+   - Neither the name of ARM nor the names of its contributors may be used
+
+     to endorse or promote products derived from this software without
+
+     specific prior written permission.
+
+   *
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+
+   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+
+   POSSIBILITY OF SUCH DAMAGE.
+
+   ---------------------------------------------------------------------------*/
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+/*
+ * Copyright (c) 2018 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+*/
+
+/*===========================================================================
+
+  Copyright (c) 2018 Qualcomm Technologies, Inc. All Rights Reserved
+
+  Qualcomm Technologies Confidential and Proprietary.
+
+  Export of this technology or software is regulated by the U.S. Government.
+  Diversion contrary to U.S. law prohibited.
+
+  All ideas, data and information contained in or disclosed by
+  this document are confidential and proprietary information of
+  Qualcomm Technologies, Inc and all rights therein are expressly reserved.
+  By accepting this material the recipient agrees that this material
+  and the information contained therein are held in confidence and in
+  trust and will not be used, copied, reproduced in whole or in part,
+  nor its contents revealed in any manner to others without the express
+  written permission of Qualcomm Technologies, Inc.
+
+===========================================================================*/
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+/*
+ * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+ * This file was originally distributed by Qualcomm Atheros, Inc.
+ * under proprietary terms before Copyright ownership was assigned
+ * to the Linux Foundation.
+ */
+
+
+/*
+* Copyright (c) 2000-2018 Qualcomm Technologies, Inc. 
+* 2000-2016 Qualcomm Atheros, Inc. 
+* All Rights Reserved. 
+* Confidential and Proprietary - Qualcomm Technologies, Inc. 
+* $ATH_LICENSE_TARGET_C$ 
+*/
+
+
+/*
+    Copyright (c) 2011, Dongsheng Song <songdongsheng@live.cn>
+
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+
+
+This Notice.txt file contains certain notices Qualcomm Technologies, Inc. ("QTI") is required to provide with certain software components. Notwithstanding anything in the notices in this file, your use of such software components together with the QTI software ("Software") is subject to the terms of your separate license from QTI. Compliance with all copyright laws and software licenses included in this file are the responsibility of the user. Except as may be granted by separate express written agreement, this file provides no license to any patents, trademarks, copyrights, or other intellectual property of QTI or its affiliates.
+Software provided with this notice is NOT A CONTRIBUTION to any open source project. If alternative licensing is available for any of the components with licenses or attributions provided below, a license choice is made for receiving such code by QTI.
+
+/*
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Qualcomm Atheros Confidential and Proprietary.
+ * $ATH_LICENSE_TARGET_C$
+ */
+
+/*
+* Copyright (c) 2017 Qualcomm Technologies, Inc
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+*/
+/*
+ * Copyright (c) 2011,2014-2015 The Linux Foundation. All rights reserved.
+ *
+ * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
+ *
+ *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ * WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+* Copyright (c) 2017 Qualcomm Technologies, Inc
+* All Rights Reserved.
+* Qualcomm Technologies Confidential and Proprietary.
+*/
+/*
+ * Copyright (c) 2008, Atheros Communications Inc.
+ *
+ * Copyright (c) 2011 Qualcomm Atheros, Inc.
+ * Qualcomm Atheros, Inc. has chosen to take madwifi subject to the BSD license and terms.
+ *
+ */
+
+
+

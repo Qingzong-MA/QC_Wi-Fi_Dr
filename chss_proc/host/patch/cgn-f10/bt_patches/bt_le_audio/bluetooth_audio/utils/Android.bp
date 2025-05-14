@@ -1,0 +1,21 @@
+cc_library_shared {
+    name: "libbluetooth_audio_session_aidl_qti",
+    vendor: true,
+    srcs: [
+        "aidl_session/BluetoothAudioCodecs.cpp",
+        "aidl_session/BluetoothAudioSession.cpp",
+    ],
+    export_include_dirs: ["aidl_session/"],
+    header_libs: ["libhardware_headers"],
+    shared_libs: [
+        "android.hardware.bluetooth.audio@2.0",
+        "android.hardware.bluetooth.audio@2.1",
+        "libbase",
+        "libcutils",
+        "libbinder_ndk",
+        "libfmq",
+        "liblog",
+        "android.hardware.bluetooth.audio-V2-ndk",
+        "libhidlbase",
+    ],
+}

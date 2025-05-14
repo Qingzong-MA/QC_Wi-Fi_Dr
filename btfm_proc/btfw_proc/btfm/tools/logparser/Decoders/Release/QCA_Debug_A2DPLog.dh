@@ -1,0 +1,1436 @@
+/************************************************
+ * File: QCA_Debug_A2DPLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ * 2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+************************************************/
+
+/************************************************
+ * A2DP log main table
+************************************************/
+TABLE tQca_AudioLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0900 "LOG_ID_A2DP_PKT_TIMER_EXPIRED"         "LOG_ID_A2DP_PKT_TIMER_EXPIRED"         0 gQca_A2DP_PktTimerExpired}
+    {0x0901 "LOG_ID_A2DP_SAMPLE_BUF_OVERFLOW"       "LOG_ID_A2DP_SAMPLE_BUF_OVERFLOW"       0 gQca_A2DP_SampleBufOverflow}
+    {0x0902 "LOG_ID_A2DP_MEDIA_PKT"                 "LOG_ID_A2DP_MEDIA_PKT"                 0 gQca_AUDIO_BUFFER_DATA}
+    {0x0903 "LOG_ID_A2DP_L2CAP_RINGBUFFER_FULL"     "LOG_ID_A2DP_L2CAP_RINGBUFFER_FULL"     0 gQca_AUDIO_DATA_RINGBUFFER_FULL}
+    {0x0905 "LOG_ID_A2DP_TIMESTAMP"                 "LOG_ID_A2DP_TIMESTAMP"                 0 gQca_A2DP_Timestamp}
+    {0x0906 "LOG_ID_A2DP_HCI_WRITE_CFG_ERR"         "LOG_ID_A2DP_HCI_WRITE_CFG_ERR"         0 gQca_A2DP_HCI_WriteCfgErr}
+    {0x0907 "LOG_ID_A2DP_LINK_QUALITY"              "LOG_ID_A2DP_LINK_QUALITY"              0 gQca_A2DP_LINK_QUALITY}
+    {0x0908 "LOG_ID_A2DP_LINK_QUALITY_TXDONE"       "LOG_ID_A2DP_LINK_QUALITY_TXDONE"       0 gQca_COPFeedbackInfo}
+    {0x0909 "LOG_ID_COP_CODEC_MISMATCH"             "LOG_ID_COP_CODEC_MISMATCH"             0 gQca_CodecMismatch}
+    {0x090A "LOG_ID_A2DP_INVALID_HANDLE"            "LOG_ID_A2DP_INVALID_HANDLE"            0 gQca_A2DP_InvalidConn}
+    {0x090B "LOG_ID_A2DP_MEDIA_BUFFER_SIZE"         "LOG_ID_A2DP_MEDIA_BUFFER_SIZE"         0 gQca_BufferSize}
+    {0x090C "LOG_ID_COP_MEDIA_PKT_INFO"             "LOG_ID_COP_MEDIA_PKT_INFO"             0 gQca_COPMediaPktInfo}
+    {0x090F "LOG_ID_A2DP_BB_BW_REPORT"              "LOG_ID_A2DP_BB_BW_REPORT"              0 gQca_A2DP_bbBwReport}
+    {0x0910 "LOG_ID_A2DP_LINK_THROUGHPUT"           "LOG_ID_A2DP_LINK_THROUGHPUT"           0 gQca_A2DPThroughput}
+    {0x0911 "LOG_ID_A2DP_DBG_UNDERFLOW_STATS"       "LOG_ID_A2DP_DBG_UNDERFLOW_STATS"       0 gQca_A2DP_UnderflowStats}
+    {0x0912 "LOG_ID_A2DP_WATERMARK_CODEC"           "LOG_ID_A2DP_WATERMARK_CODEC"           0 gQca_A2DPWatermarkCodec}
+    {0x0913 "LOG_ID_A2DP_BUFFER_DEPTH"              "LOG_ID_A2DP_BUFFER_DEPTH"              0 gQca_A2DPBufferDepth}
+    {0x0914 "LOG_ID_COP_FEEDBACK_INFO"              "LOG_ID_COP_FEEDBACK_INFO"              0 gQca_COPFeedbackInfo}
+    {0x0915 "LOG_ID_A2DP_NUM_INTR_MISSED"           "LOG_ID_A2DP_NUM_INTR_MISSED"           0 gQca_A2DPNumIntrMiss}
+    {0x0916 "LOG_ID_A2DP_NUM_EXTRA_TASKLOOP"        "LOG_ID_A2DP_NUM_EXTRA_TASKLOOP"        0 gQca_A2DPNumExtraLoop}
+
+
+    {0x0920 "LOG_ID_A2DP_SINK_CONFIG"               "LOG_ID_A2DP_SINK_CONFIG"               0 gQca_A2dpSinkConfig}
+    {0x0921 "LOG_ID_A2DP_SINK_COP_PACKET"           "LOG_ID_A2DP_SINK_COP_PACKET"           0 gQca_AUDIO_BUFFER_DATA}
+    {0x0922 "LOG_ID_A2DP_SINK_PKT_INSTANT_PASSED"   "LOG_ID_A2DP_SINK_PKT_INSTANT_PASSED"   0 gQca_A2dpSinkPacketTTPInfo}
+	{0x0923 "LOG_ID_A2DP_SBC_CODEC_INFO"            "LOG_ID_A2DP_SBC_CODEC_INFO"            0 gQca_SBCCodecInfo}
+	{0x0924 "LOG_ID_A2DP_ENCODER_CONFIG_ERROR"      "LOG_ID_A2DP_ENCODER_CONFIG_ERROR"      0 gQca_EncodeConfigError}	
+	{0x0925 "LOG_ID_A2DP_RAW_PKT_TIMER_EXPIRED"     "LOG_ID_A2DP_RAW_PKT_TIMER_EXPIRED"     0 gQca_A2DP_RawPktTimerExpired}
+    {0x0940 "LOG_ID_VOICE_BUFFER_MIC_DATA"          "LOG_ID_VOICE_BUFFER_MIC_DATA"          0 gQca_VOICE_BUFFER_MIC_DATA}
+    {0x0941 "LOG_ID_VOICE_BUFFER_SPKR_DATA"         "LOG_ID_VOICE_BUFFER_SPKR_DATA"         0 gQca_VOICE_BUFFER_SPKR_DATA}
+    {0x0942 "LOG_ID_VOICE_TRANSPARENT_DRIFT"        "LOG_ID_VOICE_TRANSPARENT_DRIFT"        0 gQca_VOICE_TRANSPARENT_DRIFT}
+    {0x0943 "LOG_ID_VOICE_TRANSPARENT_RX_PKT_LATE"  "LOG_ID_VOICE_TRANSPARENT_RX_PKT_LATE"  0 gQca_VOICE_TRANSPARENT_RX_PKT_LATE}
+    {0x0944 "LOG_ID_VOICE_TRANSPARENT_SAMPLE_RATE_INVALID"          "LOG_ID_VOICE_TRANSPARENT_SAMPLE_RATE_INVALID"  0 gQca_VOICE_TRANSPARENT_INVALID_RATE}
+    {0x0945 "LOG_ID_VOICE_TRANSPARENT_PRIMER_TIMING_OFFSET_INVALID" "LOG_ID_VOICE_TRANSPARENT_PRIMER_TIMING_OFFSET_INVALID"  0 gQca_VOICE_TRANSPARENT_PRIMER_TIMING_OFFSET_INVALID}
+    {0x0946 "LOG_ID_VOICE_TRANSPARENT_SB_NOT_ACTIVE"            "LOG_ID_VOICE_TRANSPARENT_SB_NOT_ACTIVE"  0 gQca_VOICE_TRANSPARENT_SLIMBUS_NOT_ACTIVE}
+    {0x0947 "LOG_ID_VOICE_TRANSPARENT_PRIMER_RETRY"             "LOG_ID_VOICE_TRANSPARENT_PRIMER_RETRY"  0 gQca_VOICE_TRANSPARENT_PRIMER_RETRY}
+    {0x0948 "LOG_ID_VOICE_TRANSPARENT_PRIMER_HISTORY"           "LOG_ID_VOICE_TRANSPARENT_PRIMER_HISTORY"  0 gQca_VOICE_TRANSPARENT_PRIMER_HISTORY}
+    {0x0949 "LOG_ID_VOICE_TRANSPARENT_FROM_AIR_PATH_SWITCH"     "LOG_ID_VOICE_TRANSPARENT_FROM_AIR_PATH_SWITCH"  0 gQca_VOICE_TRANSPARENT_FROM_AIR_PATH_SWITCH}
+    {0x094A "LOG_ID_VOICE_TRANSPARENT_PRIMER_SM"                "LOG_ID_VOICE_TRANSPARENT_PRIMER_SM"  0 gQca_VOICE_TRANSPARENT_PRIMER_SM}
+    {0x094B "LOG_ID_VOICE_TRANSPARENT_ERR_FRAMELEN" "LOG_ID_VOICE_TRANSPARENT_ERR_FRAMELEN"     0   gQca_VOICE_TRANSPARENT_ERR_FRAMELEN}
+    {0x094D "LOG_ID_VOICE_VS_DECODE_ERROR"                     "LOG_ID_VOICE_VS_DECODE_ERROR"   0   gQca_VOICE_VsDecodeError}
+    {0x094E "LOG_ID_VOICE_VS_ERR"                              "LOG_ID_VOICE_VS_ERR"            0   gQca_VOICE_VsErr}
+    {0x0952 "LOG_ID_VOICE_ISO_TRANSPORT_STATE"      "LOG_ID_VOICE_ISO_TRANSPORT_STATE"          0   gQca_VOICE_IsoTransportState}
+    {0x0953 "LOG_ID_VOICE_ISO_PRIMER"               "LOG_ID_VOICE_ISO_PRIMER"                   0   gQca_VOICE_IsoPrimer}
+    {0x0955 "LOG_ID_VOICE_ISO_FROM_AIR_NO_DATA"     "LOG_ID_VOICE_ISO_FROM_AIR_NO_DATA"         0   gQca_VOICE_ISO_FROM_AIR_NO_DATA}
+    {0x0956 "LOG_ID_VOICE_ISO_COP_SIDEBAND"         "LOG_ID_VOICE_ISO_COP_SIDEBAND"             0   gQca_VOICE_ISO_COP_SIDEBAND}
+    {0x0958 "LOG_ID_COP_PACKET_FROM_ADSP"           "LOG_ID_COP_PACKET_FROM_ADSP"               0   gQca_AUDIO_BUFFER_DATA_COP_FROM_ADSP}
+    {0x0959 "LOG_ID_COP_PACKET_TO_ADSP"             "LOG_ID_COP_PACKET_TO_ADSP"                 0   gQca_AUDIO_BUFFER_DATA_COP_TO_ADSP}
+    {0x095A "LOG_ID_ISO_RX_SDU_DUMP"                "LOG_ID_ISO_RX_SDU_DUMP"                    0   gQca_ISO_RX_SDU_DUMP}
+    {0x095B "LOG_ID_AUDIO_TX_PORT_CONGESTION"  		"LOG_ID_AUDIO_TX_PORT_CONGESTION"           0   gQca_AUDIO_TX_PORT_CONGESTION}
+    {0x095C "LOG_ID_VOICE_ISO_TOAIR_SDU_SIZE"       "LOG_ID_VOICE_ISO_TOAIR_SDU_SIZE"           0   gQca_ChangeInSDUSize}
+    {0x095D "LOG_ID_AUDIO_SESSION_ERROR"            "LOG_ID_AUDIO_SESSION_ERROR"                0   gQca_AUDIO_SESSION_ERROR}
+    {0x095E "LOG_ID_SBC_FRAGMENT"                   "LOG_ID_SBC_FRAGMENT"                       0   gQca_SBC_Fragment}
+    {0x095F "LOG_ID_A2DP_SRC_INACTIVE"              "LOG_ID_A2DP_SRC_INACTIVE"                  0   gQca_A2DP_InvalidConn}
+    {0x0960 "LOG_ID_VOICE_ISO_LATENCY"              "LOG_ID_VOICE_ISO_LATENCY"                  0   gQca_VOICE_ISO_LATENCY}
+    {0x0961 "LOG_ID_COP_VER_UNMATCH"                "LOG_ID_COP_VER_UNMATCH"                    0   gQca_COP_VER_UNMATCH}
+    {0x0962 "LOG_ID_COP_SEQ_UNMATCH"                "LOG_ID_COP_SEQ_UNMATCH"                    0   gQca_COP_SEQ_UNMATCH}
+    {0x0963 "LOG_ID_COP_PARSE_TIME"                 "LOG_ID_COP_PARSE_TIME"                     0   gQca_COP_PARSE_TIME}
+
+    {0x0965 "LOG_ID_VOICE_ISO_STATS_SDU_MISS"       "LOG_ID_VOICE_ISO_STATS_SDU_MISS"           0   gQca_ISO_sduMissDbg_stats}
+    {0x0966 "LOG_ID_A2DP_WRONG_PACKET"              "LOG_ID_A2DP_WRONG_PACKET"                  0   gQca_A2DP_WrongPacket}
+    {0x0967 "LOG_ID_PFAL_VOICE_RAM_BAD_ALLOC"       "LOG_ID_PFAL_VOICE_RAM_BAD_ALLOC"           0   gQca_voiceBadAlloc}
+
+    {0x09A0 "LOG_ID_SALF_A2DP_LINK_QUALITY"         "LOG_ID_SALF_A2DP_LINK_QUALITY"         0 gQca_A2DP_SALF_LQ}
+
+    {0x09FF "Audio End"}
+ENDTABLE
+
+
+TABLE tEdpErrCode
+    {0x00 "EDP_STATUS_GOOD"}
+    {0x01 "EDP_STATUS_CRC_FAIL_ONE"}
+    {0x02 "EDP_STATUS_CRC_FAIL_MULT"}
+    {0x03 "EDP_STATUS_LOST "}
+ENDTABLE
+
+
+TABLE tDecodeLenErrCode
+    {0x00    "VS_DECODE_SYNC_ERR"}
+    {0x78    "VS_DECODE_SUCC"}
+    {0x79    "VS_DECODE_PKTLOST_ERR"}
+    {0xFFFC  "VS_DECODE_CRC_ERR"}
+    {Default "VS_UNKNOWN_ERR"}
+ENDTABLE
+
+GROUP gQca_VOICE_VSDecodeError "VS Decode Error"
+{
+    FIELD fQca_VS_pClk                         (Fixed 4 Bytes)     (Hex)                          	   "pClk"
+    FIELD fQca_VS_DecodedLen                   (Fixed 2 Bytes)     (TABLE tDecodeLenErrCode)          "status"
+    FIELD fQca_VS_decodeMask                   (Fixed 2 Bytes)     (Hex)  				               "mask"
+    FIELD fQca_VS_outData                      (Fixed 240 Bytes)   (HEX)          					   "outData"
+
+	GROUP gQca_VOICE_decFrameInfo "savedFrame"
+	{
+		FIELD fQca_VS_wbCnt                        (Fixed 2 Bytes)     (Decimal)                          "WeakbitCount"
+		FIELD fQca_VS_inData                       (Fixed 28 Bytes)    (HEX)          					  "inData"
+		FIELD fQca_VS_quality                      (Fixed 28 Bytes)    (HEX)          					  "quality"
+		FIELD fQca_VS_decodeEdpStatus              (Fixed 1 Bytes)     (TABLE tEdpErrCode)                "decodeEdpStatus"
+		RESERVED                         		   (Fixed 1 Bytes)
+	}
+
+	GROUP gQca_VOICE_anotherFrameInfo "F0"
+	{
+		FIELD fQca_VS_wbCnt1                       (Fixed 2 Bytes)     (Decimal)                          "f0WeakbitCount"
+		FIELD fQca_VS_inData1                      (Fixed 28 Bytes)    (HEX)          					   "f0inData"
+		FIELD fQca_VS_quality1                     (Fixed 28 Bytes)    (HEX)          					   "f0quality"
+		FIELD fQca_VS_decodeEdpStatus1             (Fixed 1 Bytes)     (TABLE tEdpErrCode)                "f0decodeEdpStatus"
+		RESERVED                                   (Fixed 1 Bytes)
+	}
+}
+
+GROUP gQca_VOICE_VSErr "VS Error"
+{
+	FIELD fQca_VS_note 						(Fixed 16 Bytes)	(Hex)							"note"
+    FIELD fQca_VS_1    						(Fixed 4 Bytes)     (Hex)                           "p1"
+    FIELD fQca_VS_2    						(Fixed 4 Bytes)     (Hex)                           "p2"
+    FIELD fQca_VS_3    						(Fixed 4 Bytes)     (Hex)                           "p3"
+    FIELD fQca_VS_4    						(Fixed 4 Bytes)     (Hex)                           "p4"
+}
+
+TABLE tTransportRole
+    {0, "Source"}
+    {1, "Sink"}
+ENDTABLE
+
+TABLE tTransportState
+    {0, "TRANSPORT_STOPPED"}
+    {1, "TRANSPORT_IDLE"}
+    {2, "TRANSPORT_ALIVE"}
+    {3, "TRANSPORT_ACTIVE"}
+ENDTABLE
+
+
+GROUP gQca_VOICE_IsoTransportState "Voice Transport State"
+{
+    FIELD fQca_VOICE_IsoTransportState_role    (Fixed 1 Byte)      (TABLE tTransportRole)         "Transport Role" 
+    FIELD fQca_VOICE_IsoTransportState_state   (Fixed 1 Byte)      (TABLE tTransportState)        "Transport State"
+    FIELD fQca_VOICE_IsoTransportState_primerRetryCtr         (Fixed 2 Byte) IF(MoreBytes) (Decimal) "primerRetryCtr"
+    FIELD fQca_VOICE_IsoTransportState_txSBCtr                (Fixed 2 Byte) IF(MoreBytes) (Decimal) "txSBCtr"
+    FIELD fQca_VOICE_IsoTransportState_rxSampleCount          (Fixed 2 Byte) IF(MoreBytes) (Decimal) "rxSampleCount"
+    FIELD fQca_VOICE_IsoTransportState_rxFrameCount           (Fixed 2 Byte) IF(MoreBytes) (Decimal) "rxFrameCount"
+    FIELD fQca_VOICE_IsoTransportState_rxCopSyncWordCount     (Fixed 2 Byte) IF(MoreBytes) (Decimal) "rxCopSyncWordCount"
+    GROUP fQca_VOICE_IsoTransportState_rxErrStatus   IF(MoreBytes)  "IOPErrStatus(SWB/ISO)"
+    {
+        RESERVED (Fixed 3 bits)
+        FIELD fQca_VOICE_IsoTransportState_rxErrStatus_BIT4_EndMarkerInvalid    (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "EndMarkerInvalid"
+        FIELD fQca_VOICE_IsoTransportState_rxErrStatus_BIT3_ZeroLenFrame        (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "ZeroLenFrame"
+        FIELD fQca_VOICE_IsoTransportState_rxErrStatus_BIT2_UnsupportedNframes  (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "UnsupportedNframes"
+        FIELD fQca_VOICE_IsoTransportState_rxErrStatus_BIT1_UnsupportedVer      (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "UnsupportedVer"
+        FIELD fQca_VOICE_IsoTransportState_rxErrStatus_BIT0_Busy                (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "Busy"
+        RESERVED (Fixed 1 Bytes)
+    }
+    FIELD fQca_VOICE_IsoTransportState_toAirIOPDropCnt        (Fixed 1 Byte) IF(MoreBytes) (Decimal) "toAirIOPDropCnt"
+    FIELD fQca_VOICE_IsoTransportState_activeStreamNdx        (Fixed 1 Byte) IF(MoreBytes) (Decimal) "activeStreamNdx"
+    FIELD fQca_VOICE_IsoTransportState_txSampleCount          (Fixed 2 Byte) IF(MoreBytes) (Decimal) "txSampleCount"
+    FIELD fQca_VOICE_IsoTransportState_more                   (toendoflayer) IF(MoreBytes) (stringofhex) "This is unparsed data"
+}
+
+GROUP gQca_VOICE_IsoPrimer "Voice ISO Primer info"
+{
+    FIELD gQca_VOICE_IsoPrimer_FrameTiming     (Fixed 4 Byte)      (Hex)                           "Frame Timing: CE Time"
+    FIELD gQca_VOICE_IsoPrimer_FrameInterval   (Fixed 2 Byte)      (Decimal)                       "Frame Interval in usec"
+    FIELD gQca_VOICE_IsoPrimer_FrameSize       (Fixed 2 Byte)      (Decimal)                       "Frame Size"
+}
+
+GROUP gQca_A2DP_PktTimerExpired "Stereo ACI IOP Data"
+{
+    FIELD fQca_IOP_btClkCapture                (Fixed 4 Bytes)     (Hex)                           "btClkCapture"
+    FIELD fQca_IOP_configClkDivisor            (Fixed 2 Bytes)     (Hex)                           "configClkDivisor"
+    FIELD fQca_IOP_status                      (Fixed 2 Bytes)     (Hex)                           "status"
+    FIELD fQca_IOP_pDataBlock                  (Fixed 2 Bytes)     (Hex)                           "pDataBlock"
+    FIELD fQca_IOP_pStart                      (Fixed 2 Bytes)     (Hex)                           "pStart"
+    FIELD fQca_IOP_pEnd                        (Fixed 2 Bytes)     (Hex)                           "pEnd"
+    FIELD fQca_IOP_pHead                       (Fixed 2 Bytes)     (Hex)                           "pHead"
+    FIELD fQca_IOP_pTail                       (Fixed 2 Bytes)     (Hex)                           "pTail"
+    FIELD fQca_IOP_dropCount                   (Fixed 2 Bytes)     (Hex)                           "drop Count"
+    FIELD fQca_IOP_sampleHolder                (Fixed 2 Bytes)     (Hex)                           "sampleHolder"
+    FIELD fQca_IOP_numSubframeCount            (Fixed 2 Bytes)     (Hex)                           "numSubframeCount"
+    FIELD fQca_IOP_currHeader                  (Fixed 2 Bytes)     (Hex)                           "currHeader"
+    FIELD fQca_IOP_currSubframeLength          (Fixed 2 Bytes)     (Hex)                           "currSubframeLength"
+    FIELD fQca_IOP_ringBufferHeadSave          (Fixed 2 Bytes)     (Hex)                           "ringBufferHeadSave"
+    FIELD fQca_IOP_scratchpad_1                (Fixed 2 Bytes)     (Hex)                           "scratchpad_1"
+    FIELD fQca_IOP_scratchpad_2                (Fixed 2 Bytes)     (Hex)                           "scratchpad_2"
+    FIELD fQca_IOP_scratchpad_3                (Fixed 2 Bytes)     (Hex)                           "scratchpad_3"
+    FIELD fQca_IOP_scratchpad_4                (Fixed 2 Bytes)     (Hex)                           "scratchpad_4"
+    FIELD fQca_IOP_sampleCount                 (Fixed 2 Bytes)     (Hex)                           "sampleCount"
+    FIELD fQca_IOP_totalFrameLength_Bytes      (Fixed 2 Bytes)     (Hex)                           "totalFrameLength_Bytes"
+    FIELD fQca_IOP_numSubframes                (Fixed 2 Bytes)     (Hex)                           "numSubframes"
+    FIELD fQca_IOP_encodedFrameLength          (Fixed 2 Bytes)     (Hex)                           "encodedFrameLength"
+    FIELD fQca_IOP_debugWord_1                 (Fixed 2 Bytes)     (Hex)                           "debugWord_1"
+    FIELD fQca_IOP_debugWord_2                 (Fixed 2 Bytes)     (Hex)                           "debugWord_2"
+    FIELD fQca_IOP_numRxSyncWords              (Fixed 2 Bytes)     (Hex)                           "numRxSyncWords"
+    FIELD fQca_IOP_numRxFrames                 (Fixed 2 Bytes)     (Hex)                           "numRxFrames"
+    FIELD fQca_IOP_configControlReg            (Fixed 1 Bytes)     (Hex)                           "configControlReg"
+    FIELD fQca_IOP_configFrameDivisor          (Fixed 1 Bytes)     (Hex)                           "configFrameDivisor"
+    FIELD fQca_IOP_configSlotWidth             (Fixed 1 Bytes)     (Hex)                           "configSlotWidth"
+    FIELD fQca_IOP_configDataWidth             (Fixed 1 Bytes)     (Hex)                           "configDataWidth"
+    FIELD fQca_IOP_configFlag                  (Fixed 1 Bytes)     (Hex)                           "configFlag"
+    FIELD fQca_IOP_flag                        (Fixed 1 Bytes)     (Hex)                           "flag"
+    FIELD fQca_IOP_currState                   (Fixed 1 Bytes)     (Hex)                           "currState"
+}
+
+GROUP gQca_A2DP_SampleBufOverflow "Overflow Count"
+{
+    FIELD fQca_A2DP_OverflowCount              (Fixed 2 Bytes)     (Decimal)                       "Overflow Count"
+}
+
+
+TABLE tWifiActivity
+{0x00 "no wifi 2.4G"}
+{0x01 "wifi on 2.4G"}
+ENDTABLE
+
+TABLE tGenericEncodeSubId
+{0x01 "scan status" "scan status" 0 gQca_SB_Generic_SubSB_scanStatus}
+{0x02 "QHS support" "QHS support" 0 gQca_SB_Generic_SubSB_QHSSupport}
+{0x03 "ULL support" "ULL support" 0 gQca_SB_Generic_SubSB_ULLSupport}
+{0x04 "sink battery level" "sink battery level" 0 gQca_SB_Generic_SubSB_BatteryLevel}
+{0x05 "CQDDR support" "CQDDR support" 0 gQca_SB_Generic_SubSB_CQDDR}
+ENDTABLE
+
+GROUP gQca_SB_Generic_SubSB_scanStatus
+{
+    FIELD fQca_SB_Generic_SubSB_scanStatus_1   (Fixed 1 Byte)   (Hex)  "pageScan"
+    FIELD fQca_SB_Generic_SubSB_scanStatus_2   (Fixed 1 Byte)   (Hex)  "LEScan"
+}
+
+GROUP gQca_SB_Generic_SubSB_QHSSupport
+{
+    FIELD fQca_SB_Generic_SubSB_QHSSupport_1   (Fixed 1 Byte)   (Hex)  "QHS support"
+}
+
+GROUP gQca_SB_Generic_SubSB_ULLSupport
+{
+    FIELD fQca_SB_Generic_SubSB_ULLSupport_1   (Fixed 1 Byte)   (Hex)  "ULL support"
+}
+
+GROUP gQca_SB_Generic_SubSB_BatteryLevel
+{
+    FIELD fQca_SB_Generic_SubSB_BatteryLevel_1   (Fixed 1 Byte)   (Decimal)  "battery level"
+}
+
+TABLE tPrefRate
+{0 "2M"}
+{1 "3M"}
+{DEFAULT "BLE"}
+ENDTABLE
+
+GROUP gQca_SB_Generic_SubSB_CQDDR
+{
+    FIELD fQca_SB_Generic_SubSB_CQDDR_1   (Fixed 1 Byte)   (TABLE tPrefRate)  "preferRate"
+    FIELD fQca_SB_Generic_SubSB_CQDDR_2   (Fixed 1 Byte)   (Decimal)  "preferSlots"
+}
+
+GROUP gQca_Audio_SB_encodeMode
+{
+    FIELD fQca_COP_encodeMode   (FromField Bytes sbLen)    (Hex)  "data"
+}
+
+GROUP gQca_Audio_SB_Rssi
+{
+    FIELD fQca_COP_Rssi      (Fixed 1 Byte)    RETRIEVE (SignExtension 8) (Decimal)  "RSSI"
+}
+
+GROUP gQca_Audio_SB_otherLinksNum
+{
+    FIELD fQca_COP_SB_otherLinksNum_num   (Fixed 1 Byte)    (Decimal)  "number of other links"
+}
+
+GROUP gQca_Audio_SB_wifiActivity
+{
+    FIELD fQca_COP_SB_wifiActivity   (Fixed 1 Byte)    (TABLE tWifiActivity)  "wifiActivity"
+}
+
+GROUP gQca_Audio_SB_genericEncode
+{
+    FIELD fQca_COP_SB_genericEncode_SubId   (Fixed 1 Byte)    (TABLE tGenericEncodeSubId)  "subSBid"
+    FIELD fQca_COP_SB_genericEncode_dataLen (Fixed 0) RETRIEVE (SubtractFieldMinusInteger sbLen 1) (Decimal) SUPPRESS_DETAIL
+    BRANCH (FromTable tGenericEncodeSubId fQca_COP_SB_genericEncode_SubId)
+}
+
+GROUP gQca_Audio_COPv1_SB_Quality
+{
+    FIELD fQca_COPv1_SB_Quality_MaskLen   (Fixed 0) RETRIEVE (SubtractFieldMinusInteger sbLen 3) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_COPv1_SB_Quality_Weakbits  (Fixed 2 Bytes) RETRIEVE (AndMask 0x3FFF) ALSO (ShiftRight 0) (Decimal) "Num of Weak bits" NO_MOVE
+    FIELD fQca_COPv1_SB_Quality_Status    (Fixed 2 Bytes) RETRIEVE (AndMask 0xC000) ALSO (ShiftRight 14) (Table EDP_STATUS) "Status"
+    FIELD fQca_COPv1_SB_Quality_Mask      (FromField Bytes fQca_COPv1_SB_Quality_MaskLen) (HEX)  "Quality Mask"
+}
+
+GROUP gQca_Audio_COPv2_SB_Quality
+{
+    FIELD fQca_COPv2_SB_Quality_MaskLen   (Fixed 0) RETRIEVE (SubtractFieldMinusInteger sbLen 3) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_COPv2_SB_Quality_StrId     (Fixed 1 Byte)    (Decimal)  "Stream ID"
+    FIELD fQca_COPv2_SB_Quality_Weakbits  (Fixed 2 Bytes) RETRIEVE (AndMask 0x3FFF) ALSO (ShiftRight 0) (Decimal) "Num of Weak bits" NO_MOVE
+    FIELD fQca_COPv2_SB_Quality_Status    (Fixed 2 Bytes) RETRIEVE (AndMask 0xC000) ALSO (ShiftRight 14) (Table EDP_STATUS) "Status"
+    FIELD fQca_COPv2_SB_Quality_Mask      (FromField Bytes fQca_COPv2_SB_Quality_MaskLen) (HEX)  "Quality Mask"
+}
+
+GROUP gQca_Audio_SB_QualityFB
+{
+    FIELD fQca_COP_SB_QualityFB_StrId     (Fixed 1 Byte)    (Decimal)  "Stream ID"
+    FIELD fQca_COP_SB_QualityFB_quality   (Fixed 1 Byte)    (Decimal)  "quality"
+    FIELD fQca_COP_SB_QualityFB_rssi      (Fixed 1 Byte)    RETRIEVE (SignExtension 8) (Decimal)  "RSSI"
+}
+
+GROUP gQca_LE_Audio_EncoderReady
+{
+    FIELD fQca_COP_SB_EncReady_CodecId          (Fixed 1 Byte)      (Hex)      "CodecId"
+    FIELD fQca_COP_SB_EncReady_Ver              (Fixed 2 Byte)      (Decimal)  "Version"
+    FIELD fQca_COP_SB_EncReady_Metadata         (Fixed 5 Bytes)     (Hex)      "Metadata"
+}
+
+GROUP gQca_Audio_SB_Primer
+{
+    FIELD fQca_Audio_SB_Primer_1     (Fixed 4 Bytes)    RETRIEVE (SignExtension 32)(Decimal)  "timeOffset"
+    FIELD fQca_Audio_SB_Primer_2     (Fixed 2 Bytes)    (Decimal)  "interval"
+    FIELD fQca_Audio_SB_Primer_3     (Fixed 1 Bytes)    (Decimal)  "size"
+}
+
+GROUP gQca_Audio_SB_Primer_v2
+{
+    FIELD fQca_Audio_SB_Primer_v2_1     (Fixed 4 Bytes)    RETRIEVE (SignExtension 32)(Decimal)  "timeOffset"
+    FIELD fQca_Audio_SB_Primer_v2_2     (Fixed 2 Bytes)    (Decimal)  "interval"
+    FIELD fQca_Audio_SB_Primer_v2_3     (Fixed 2 Bytes)    (Decimal)  "size"
+}
+
+GROUP gQca_Audio_SB_drift
+{
+    FIELD fQca_Audio_SB_drift     (Fixed 1 Bytes)    RETRIEVE (SignExtension 8)(Decimal)  "drift"
+}
+GROUP gQca_Audio_SB_sequence
+{
+    FIELD fQca_Audio_SB_sequence_1     (Fixed 2 Bytes)    (Decimal)  "Sequence"
+}
+
+GROUP gQca_Audio_SB_sampleCnt
+{
+    FIELD fQca_Audio_SB_sampleCnt_StrId     (Fixed 1 Byte)    (Decimal)  "Stream ID"
+    FIELD fQca_Audio_SB_sampleCnt_cnt       (Fixed 2 Bytes)    (Decimal)  "sampleCnt"
+}
+
+GROUP gQca_COP_SB "SideBand"
+{
+    FIELD fQca_COP_SB_Id        (Fixed 1 Byte)     (TABLE tSbIds)   "SideBand ID"
+    GROUP gQca_COP_SBLen_len1 IF(FieldIs EqualTo 0x1 copVer)
+    {
+        FIELD fQca_COP_SB_Len1       (Fixed 1 Byte)     (Decimal)        "SideBand Length" STORE sbLen
+    }
+    GROUP gQca_COP_SBLen_len2 IF(FieldIs EqualTo 0x2 copVer)
+    {
+        FIELD fQca_COP_SB_Len2       (Fixed 2 Byte)     (Decimal)        "SideBand Length" STORE sbLen
+    }
+    BRANCH (FromTable tSbIds fQca_COP_SB_Id)
+
+    /*FIELD fQca_COP_SB_Pld       (ToEndOfLayer) (HEX)  "SideBand Data" */
+}
+
+GROUP gQca_COPv2_SDU "SDU"
+{
+    FIELD fQca_COPv2_SDU_StrId  (Fixed 1 Bytes) (Decimal) "Stream ID"
+    FIELD fQca_COPv2_SDU_Len    (Fixed 2 Bytes) (Decimal) "SDU Length"
+    FIELD fQca_COPv2_SDU_Pld    (FromField Bytes fQca_COPv2_SDU_Len) (HEX) "SDU Data"
+}
+
+GROUP gQca_COP_Pkt "COP Pkt"
+{
+    FIELD fQca_Audio_COP_Header1_1  (Fixed 5 Bits)    (Hex)    SUPPRESS_DETAIL //"fmt_id_l4"
+    FIELD fQca_Audio_COP_Header_SB  (Fixed 1 Bit)     (Hex)    "sidebandPresense"
+    FIELD fQca_Audio_COP_Header_version  (Fixed 2 Bits)    (Hex)    "version"
+    GROUP gQca_Audio_COPv1_quality IF(FieldIs EqualTo 0x1 fQca_Audio_COP_Header_version)
+    {
+        FIELD fQca_Audio_COPv1_Header2_1  (Fixed 7 Bits)    (Hex)    "Quality"
+    }
+    GROUP gQca_Audio_COPv2_Header2_1 IF(FieldIs EqualTo 02 fQca_Audio_COP_Header_version)
+    {
+        FIELD fQca_Audio_COPv2_Header2_1  (Fixed 7 Bits)    (Hex)    SUPPRESS_DETAIL
+    }
+    FIELD fQca_Audio_COP_Header2_2  (Fixed 1 Bits)    (Hex)    SUPPRESS_DETAIL  //"fmt_id_h5"
+    FIELD fQca_Audio_COPv2_Length     (Fixed 2 Bytes) (Decimal) "Length" NO_MOVE
+    FIELD fQca_Audio_COPv2_Length_odd      (Fixed 2 Bytes) RETRIEVE (AndMask 0x1) ALSO (ShiftRight 0) (Decimal) SUPPRESS_DETAIL
+    
+    GROUP fQca_Audio_COPv2_SB IF(FieldIs EqualTo 0x1 fQca_Audio_COP_Header_SB)
+    {
+        FIELD fQca_Audio_COPv2_SB_Num     (Fixed 1 Bytes) (Decimal) "SideBand Num"
+
+        GROUP gQca_COP_SB_Loop REPEAT COUNT (FromField Times fQca_Audio_COPv2_SB_Num 0)
+        {
+            GROUP gQca_COP_SB;
+        }
+    }
+
+    GROUP gQca_Audio_COPv2_odd IF(FieldIs EqualTo 0x1 fQca_Audio_COPv2_Length_odd)
+    {
+        GROUP gQca_Audio_COPv2_SDU_LoopOdd    REPEAT SIZE (ToEndOfLayer 3)
+        {
+            GROUP gQca_COPv2_SDU;
+        }
+    }
+
+    GROUP gQca_Audio_COPv2_even IF(FieldIs EqualTo 0x0 fQca_Audio_COPv2_Length_odd)
+    {
+        GROUP gQca_Audio_COPv2_SDU_LoopEven    REPEAT SIZE (ToEndOfLayer 2)
+        {
+            GROUP gQca_COPv2_SDU;
+        }
+    }
+}
+
+GROUP gQca_AUDIO_BUFFER_DATA "Audio Data"
+{
+    FIELD fQca_Audio_Pkt_Sqn_No                 (Fixed 2 Bytes)                         (Decimal)                           "Sequence No"
+    FIELD fQca_Audio_Pkt_Len_                   (Fixed 2 Byte)                          (Decimal)                           "Pkt Length"
+    FIELD fQca_Audio_IOP_Data                   (FromField Bytes fQca_Audio_Pkt_Len_)   (HEX)                               "Audio Data"
+}
+
+GROUP gQca_AUDIO_BUFFER_DATA_COP_TO_ADSP "Audio Data (COP)"
+{
+    FIELD fQca_Cop_Audio_Pkt_Sqn_No_TA      (Fixed 2 Bytes)                         (Decimal)                           "Sequence No"
+    FIELD fQca_Cop_Audio_Pkt_Len_TA         (Fixed 2 Byte)                          (Decimal)                           "Pkt Length"
+
+    GROUP fQca_Audio_COPv2_TO_ADSP
+    {
+        GROUP gQca_COPFeedbackInfo;
+    }
+
+    FIELD fQca_Cop_Audio_Pkt_Dummy_TA       (toendoflayer) (Hex)  SUPPRESS_DETAIL
+}
+
+GROUP gQca_Audio_COPv0_Header
+{
+    FIELD fQca_Audio_COPv0_Header_ver  (Fixed 2 Bits)     (Hex)    "version"
+    FIELD fQca_Audio_COPv0_Header_err  (Fixed 1 Bit)      PRINT_IF (FieldIs NotEqualTo 0x0) (Hex)    "error" 
+    FIELD fQca_Audio_COPv0_Header_fmt  (Fixed 6 Bits)     (Hex)    "fmtId" 
+    FIELD fQca_Audio_COPv0_Header1_1   (Fixed 7 Bits)     (Hex)    SUPPRESS_DETAIL
+}
+
+GROUP gQca_AUDIO_BUFFER_DATA_COP_FROM_ADSP "Audio Data (COP)"
+{
+    FIELD fQca_Cop_Audio_Pkt_Sqn_No_FA     (Fixed 2 Bytes)                         (Decimal)                           "Sequence No"
+    FIELD fQca_Cop_Audio_Pkt_Len_FA        (Fixed 2 Byte)                          (Decimal)                           "Pkt Length"
+
+    /* 6B Timestamp */
+    FIELD fQca_Audio_TStamp_FA             (Fixed 6 Bytes) RETRIEVE (AndMask 0xFFFFFFFFFFFF) ALSO (ShiftRight 4) (Decimal) "Timestamp (us)"
+    FIELD fQca_Audio_COP_Header_Ver_FA     (Fixed 2 Bytes) RETRIEVE (AndMask 0x3) ALSO (ShiftRight 0) (Decimal) SUPPRESS_DETAIL NO_MOVE STORE copVer
+    
+    GROUP Qca_Audio_BigFrame_FROM_ADSP IF(FieldIs GreaterThan 0x400 fQca_Cop_Audio_Pkt_Len_FA)
+    {
+        FIELD fQca_Cop_Audio_LogBuf_size       (Fixed 0)    RETRIEVE (SubtractFieldMinusInteger fQca_Cop_Audio_Pkt_Len_FA 1024)   (Decimal)  "Frame_length exceeded logging buffer by :"    
+    }    
+
+    GROUP Qca_Audio_COPv0_FROM_ADSP IF(FieldIs EqualTo 0x0 fQca_Audio_COP_Header_Ver_FA)
+    {
+        GROUP gQca_Audio_COPv0_Header;
+        FIELD fQca_Audio_COPv0_fLen          (Fixed 2 Bytes)     (Decimal)    "flen" NO_MOVE
+        FIELD fQca_Audio_COPv0_fLen_odd      (Fixed 2 Bytes) RETRIEVE (AndMask 0x1) ALSO (ShiftRight 0) (Decimal) SUPPRESS_DETAIL
+        FIELD fQca_Cop_Audio_IOP_Data_FA     (FromField Bytes fQca_Audio_COPv0_fLen)   (HEX)      "Audio Data"
+        GROUP gQca_Audio_COPv0_zeroPad  IF(FieldIs EqualTo 0x1 fQca_Audio_COPv0_fLen_odd)
+        {
+            FIELD fQca_Audio_COPv0_zeroPad (Fixed 1 Byte) (Hex)  SUPPRESS_DETAIL
+        }
+        FIELD fQca_Audio_COPv0_zeroStuffLen (Fixed 2 Bytes) (Decimal) "zeroStuffLen"
+    }
+
+    /* COP Ver 1 or 2 */
+    GROUP fQca_Audio_COPv2_FROM_ADSP IF(FieldIs NotEqualTo 0x0 fQca_Audio_COP_Header_Ver_FA)
+    {
+        GROUP gQca_COP_Pkt;
+    }
+
+    FIELD fQca_Cop_Audio_Pkt_Dummy_FA      (toendoflayer) (Hex)  SUPPRESS_DETAIL
+}
+
+GROUP gQca_ISO_RX_SDU_DUMP "ISO RX SDU Dump"
+{
+    FIELD fQca_Iso_Rx_Sdu_Dump_Sdu_Seq_No   (Fixed 4 Bytes)                         (Decimal)                           "SDU Sequence No"
+    FIELD fQca_Iso_Rx_Sdu_Dump_Event_Count  (Fixed 2 Bytes)                         (Decimal)                           "ISO event counter"
+    FIELD fQca_Iso_Rx_Sdu_Dump_Sdu_Len      (Fixed 2 Bytes)                         (Decimal)                           "SDU Length"
+    FIELD fQca_Iso_Rx_Sdu_Dump_Sdu_Data     (toendoflayer)                          (Hex)                               "SDU Data..."
+}
+
+GROUP gQca_VOICE_ISO_LATENCY "ISO Latency"
+{
+    FIELD fQca_VOICE_ISO_Latency_LogId         (Fixed 1 Bytes) (TABLE LogIDTable) SUPPRESS_DETAIL
+
+    GROUP fQca_Voice_ISO_Latency_TimeArrival IF(FieldIs EqualTo 0x00 fQca_VOICE_ISO_Latency_LogId) "ToAir SDU Arrival Time"
+    {
+        RESERVED                               (Fixed 1 Bytes)
+
+        FIELD fQca_ISO_T_Arrival_Length        (Fixed 2 Bytes) (Decimal) "Length"
+        FIELD fQca_ISO_T_Arrival_Expected      (Fixed 4 Bytes) (Hex) "Expected Time (ToAir ISR Start)"
+        FIELD fQca_ISO_T_Arrival_COP_Tstamp    (Fixed 4 Bytes) (Hex) "COP Pkt Timestamp"
+
+        FIELD fQca_ISO_T_Arrival_Tmp1          (Fixed 0) RETRIEVE (AddFieldToInteger fQca_ISO_T_Arrival_Length 8) (Decimal) SUPPRESS_DETAIL
+        FIELD fQca_ISO_T_Arrival_Tmp2          (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_ISO_T_Arrival_Tmp1 1000) (Decimal) SUPPRESS_DETAIL
+        FIELD fQca_ISO_T_Arrival_Tmp3          (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_ISO_T_Arrival_Tmp2 384) (Decimal) SUPPRESS_DETAIL
+        FIELD fQca_ISO_T_Arrival_COP_Arrival   (Fixed 0) RETRIEVE (AddFieldToField fQca_ISO_T_Arrival_COP_Tstamp fQca_ISO_T_Arrival_Tmp3) ALSO (AndMask 0xFFFFFFF)  (Hex) "COP Arrival Time"
+
+        FIELD fQca_ISO_T_Arrival_Delta         (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_ISO_T_Arrival_Expected fQca_ISO_T_Arrival_COP_Arrival) ALSO (AndMask 0xFFFFFFFF)  (Decimal) "Delta (Expected_Time - COP_Arrival_Time)"
+    }
+
+    GROUP fQca_Voice_ISO_Latency_SetupTx IF(FieldIs EqualTo 0x01 fQca_VOICE_ISO_Latency_LogId) "ToAir PDU Setup Time"
+    {
+        FIELD fQca_ISO_T_SetupTx_CisHandle     (Fixed 1 Bytes) (Decimal) "CIS Handle"
+        FIELD fQca_ISO_T_SetupTx_TxPduSeqn     (Fixed 1 Bytes) (Decimal) "Tx PDU Seqn"
+        FIELD fQca_ISO_T_SetupTx_TxSduSeqn     (Fixed 1 Bytes) (Decimal) "Tx SDU Seqn"
+        FIELD fQca_ISO_T_SetupTx_Length        (Fixed 2 Bytes) (Decimal) "PDU Length"
+
+        FIELD fQca_ISO_T_SetupTx_Anchor        (Fixed 4 Bytes) (Hex) "Anchor Time"
+        FIELD fQca_ISO_T_SetupTx_Current       (Fixed 4 Bytes) (Hex) "Current Time"
+
+	/* COP Timestamp */
+        FIELD fQca_ISO_T_SetupTx_ArrivalTime   (Fixed 4 Bytes) (Hex) "Arrival Time"
+	/* ToAir ISR Timestamp */
+        FIELD fQca_ISO_T_SetupTx_ProcessTime   (Fixed 4 Bytes) (Hex) "Process Time"
+
+        FIELD fQca_ISO_T_SetupTx_Delta         (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_ISO_T_SetupTx_Anchor fQca_ISO_T_SetupTx_ArrivalTime) ALSO (AndMask 0xFFFFFFFF)  (Decimal) "Delta (Anchor - SDU_Arrival_Time)"
+        FIELD fQca_ISO_T_SetupTx_Delta2        (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_ISO_T_SetupTx_ProcessTime fQca_ISO_T_SetupTx_ArrivalTime) ALSO (AndMask 0xFFFFFFFF)  (Decimal) "Delta (SDU_Process_Time - SDU_Arrival_Time)"
+
+	FIELD fQca_ISO_T_SetupTx_MoreData      (toendoflayer) IF(MoreBytes) (stringofhex) "Some PDU data"
+    }
+
+
+    FIELD fQca_ISO_Latency_More                (toendoflayer) IF(MoreBytes) (stringofhex) "This is unparsed data"
+}
+
+TABLE LogIDTable
+    {0, "ToAir SDU Arrival Time"}
+    {1, "ToAir PDU Setup Time"}
+ENDTABLE
+
+TABLE tSidebandId
+    {0x0A, "COP_V2 Drift"}
+    {0x0D, "COP_V2 Primer Ack"}
+    {0x10, "COP_V2 Primer"}
+    {0x11, "COP_V2 Link Quality"}
+    {0x13, "COP_V2 Generic Encoder Feedback"}
+    {0x14, "COP_V2 Encoder Ready"}
+    {0x15, "COP_V2 LE ISO Link Quality"}
+    {0x16, "COP_V2 Codec Metadata"}
+    {0x17, "COP_V2 Codec Metadata ACK"}
+ENDTABLE
+
+TABLE tGenericEncoderFeedbackSubId
+    {1, "QHS Capability"}
+    {2, "BT WIFI Activity"}
+    {3, "CIG QHS map"}
+    {4, "Set Encoder Limits"}
+    {5, "HID Report"}
+    {6, "ASE VS Metadata"}
+    {7, "CIG QHS map Ext"}
+ENDTABLE
+
+TABLE tCodecMetadataSubId
+    {1, "Config Update"}
+ENDTABLE
+
+GROUP gQca_VOICE_ISO_COP_SIDEBAND "Sideband Info"
+{
+    FIELD fQca_SidebandInfo_Id                  (Fixed 1 Byte)                          (TABLE tSidebandId)         "Sideband Id"
+    FIELD fQca_SidebandInfo_Len                 (Fixed 2 Byte)                          (Decimal)                   "Sideband Length"
+    GROUP gQca_SidebandPrimer                   IF(FieldIs EqualTo 0x10 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandPrimerTimeOffset     (Fixed 4 Bytes)                         (Hex)                       "Exp Arrival Time(Native Clk)"
+        FIELD fQca_SidebandPrimerInterval       (Fixed 2 Bytes)                         (Decimal)                   "Frame interval in usec"
+        FIELD fQca_SidebandPrimerFrameSize      (Fixed 2 Bytes)                         (Decimal)                   "Frame size"
+    }
+    GROUP gQca_SidebandLinkQuality              IF(FieldIs EqualTo 0x11 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandLinkQualityStreamId  (Fixed 1 Byte)                          (Hex)                       "Stream Id"
+        FIELD fQca_SidebandLinkQualityLevel     (Fixed 1 Byte)                          (Decimal)                   "Link Quality level"
+        FIELD fQca_SidebandLinkQualityRssi      (Fixed 1 Byte) RETRIEVE (SignExtension 8)   (Decimal)               "RSSI(dbm)"
+    }
+    GROUP gQca_SidebandGenericEncoderFeedback   IF(FieldIs EqualTo 0x13 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandGEFStreamId          (Fixed 1 Byte)              (Hex)                                   "Stream Id"
+        FIELD fQca_SidebandGEFSubId             (Fixed 1 Byte)              (TABLE tGenericEncoderFeedbackSubId)    "Sub Sideband Id"
+        GROUP gQca_SidebandGEFQHSCapability     IF(FieldIs EqualTo 1 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFQHSCapabilityQHS6Support          (Fixed 1 bit)  (Binary)                         "QHS6"
+            FIELD fQca_SidebandGEFQHSCapabilityQHS5Support          (Fixed 1 bit)  (Binary)                         "QHS5"
+            FIELD fQca_SidebandGEFQHSCapabilityQHS4Support          (Fixed 1 bit)  (Binary)                         "QHS4"
+            FIELD fQca_SidebandGEFQHSCapabilityQHS3Support          (Fixed 1 bit)  (Binary)                         "QHS3"
+            FIELD fQca_SidebandGEFQHSCapabilityQHS2Support          (Fixed 1 bit)  (Binary)                         "QHS2"
+            FIELD fQca_SidebandGEFQHSCapabilityBnVarationSupport    (Fixed 1 bit)  (Binary)                         "BN Variation"
+            FIELD fQca_SidebandGEFQHSCapabilityFtChangeSupport      (Fixed 1 bit)  (Binary)                         "FT Varitaion"
+            FIELD fQca_SidebandGEFQHSCapabilityExtIsoSupport        (Fixed 1 bit)  (Binary)                         "Extended ISO"
+            RESERVED                                                (Fixed 8 bits)
+        }
+        GROUP gQca_SidebandGEFBtWifiActivity    IF(FieldIs EqualTo 2 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFBtWifiActivityHighSpeedLinks      (Fixed 1 Byte)      (Hex)                       "Num High Speed BT Links"
+            FIELD fQca_SidebandGEFBtWifiActivityBrEdrScanStatus     (Fixed 1 Byte)      (Hex)                       "BR/EDR Scan Status"
+            FIELD fQca_SidebandGEFBtWifiActivityLeScanStatus        (Fixed 1 Byte)      (Hex)                       "LE Scan Status"
+            FIELD fQca_SidebandGEFBtWifiActivityWifiActivity        (Fixed 2 Bytes)     (Hex)                       "WIFI Acitvity"
+        }
+        GROUP gQca_SidebandGEFCigQhsMap   IF(FieldIs EqualTo 3 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFCigQhsMapCigId                    (Fixed 1 Byte)      (Decimal)                   "CIG Id"
+            FIELD fQca_SidebandGEFCigQhsMapFlags                    (Fixed 1 Byte)      (Decimal)                   "Flags"
+            FIELD fQca_SidebandGEFCigQhsMapCisCount                 (Fixed 1 Byte)      (Decimal)                   "CIS Count"
+            GROUP gQca_SidebandGEFCigQhsMapArray REPEAT COUNT (FromField Times fQca_SidebandGEFCigQhsMapCisCount)
+            {
+                FIELD gQca_SidebandGEFCigQhsMapArrayCisHandle       (Fixed 1 Byte)      (Decimal)                   "CIS Id"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPdu2PQhs6       (Fixed 2 Bytes)     (Decimal)                   "QHS6 PDU size Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPduP2CQhs6      (Fixed 2 Bytes)     (Decimal)                   "QHS6 PDU size Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnC2PQhs6       (Fixed 1 Byte)      (Decimal)                   "QHS6 BN Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnP2CQhs6       (Fixed 1 Byte)      (Decimal)                   "QHS6 BN Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPdu2PQhs5       (Fixed 2 Bytes)     (Decimal)                   "QHS5 PDU size Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPduP2CQhs5      (Fixed 2 Bytes)     (Decimal)                   "QHS5 PDU size Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnC2PQhs5       (Fixed 1 Byte)      (Decimal)                   "QHS5 BN Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnP2CQhs5       (Fixed 1 Byte)      (Decimal)                   "QHS5 BN Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPdu2PQhs4       (Fixed 2 Bytes)     (Decimal)                   "QHS4 PDU size Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPduP2CQhs4      (Fixed 2 Bytes)     (Decimal)                   "QHS4 PDU size Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnC2PQhs4       (Fixed 1 Byte)      (Decimal)                   "QHS4 BN Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnP2CQhs4       (Fixed 1 Byte)      (Decimal)                   "QHS4 BN Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPdu2PQhs3       (Fixed 2 Bytes)     (Decimal)                   "QHS3 PDU size Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPduP2CQhs3      (Fixed 2 Bytes)     (Decimal)                   "QHS3 PDU size Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnC2PQhs3       (Fixed 1 Byte)      (Decimal)                   "QHS3 BN Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnP2CQhs3       (Fixed 1 Byte)      (Decimal)                   "QHS3 BN Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPdu2PQhs2       (Fixed 2 Bytes)     (Decimal)                   "QHS2 PDU size Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayPduP2CQhs2      (Fixed 2 Bytes)     (Decimal)                   "QHS2 PDU size Slave to Master"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnC2PQhs2       (Fixed 1 Byte)      (Decimal)                   "QHS2 BN Master to Slave"
+                FIELD gQca_SidebandGEFCigQhsMapArrayBnP2CQhs2       (Fixed 1 Byte)      (Decimal)                   "QHS2 BN Slave to Master"
+            }
+        }
+        GROUP gQca_SidebandGEFSetEncoderLimits   IF(FieldIs EqualTo 4 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFSetEncoderLimitsCigId             (Fixed 1 Byte)          (Decimal)               "CIG Id"
+            FIELD fQca_SidebandGEFSetEncoderLimitsNumLimits         (Fixed 1 Byte)          (Decimal)               "Num Limits"
+            FIELD fQca_SidebandGEFSetEncoderLimitsTLVArray  (toendoflayer) IF(MoreBytes)    (stringofhex)           "TLV Array"
+        }
+        GROUP gQca_SidebandGEFHidReport   IF(FieldIs EqualTo 5 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFHidReportNumReports               (Fixed 1 Byte)      (Decimal)                   "Num Reports"
+            FIELD fQca_SidebandGEFHidReportArray    (toendoflayer) IF(MoreBytes)        (stringofhex)               "Array of ReportLen and Report"
+        }
+        GROUP gQca_SidebandGEFAseVsMetadata   IF(FieldIs EqualTo 6 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFAseVsMetadataCigId    (Fixed 1 Byte)      (Decimal)                               "CIG Id"
+            FIELD fQca_SidebandGEFAseVsMetadataLen      (Fixed 1 Byte)      (Decimal)                               "VS metadata Len"
+            FIELD fQca_SidebandGEFAseVsMetadata         (FromField Bytes fQca_SidebandGEFAseVsMetadataLen)  (Hex)   "VS metadata"
+        }
+        GROUP gQca_SidebandGEFCigQhsMapExt   IF(FieldIs EqualTo 7 fQca_SidebandGEFSubId)
+        {
+            FIELD fQca_SidebandGEFCigQhsMapExtISOInt     (Fixed 2 Byte)      (Decimal)                               SUPPRESS_DETAIL
+            FIELD fQca_SidebandGEFCigQhsMapExtISOIntTmp1 (Fixed 0) RETRIEVE (MultiplyFieldByInteger fQca_SidebandGEFCigQhsMapExtISOInt 1250) (Decimal) SUPPRESS_DETAIL
+            FIELD fQca_SidebandGEFCigQhsMapExtISOIntTmp2 (Fixed 0) RETRIEVE (DivideFieldByInteger fQca_SidebandGEFCigQhsMapExtISOIntTmp1 1000) (Decimal) "ISO Interval(ms)"
+            FIELD fQca_SidebandGEFCigQhsMapExtMaxFT      (Fixed 1 Byte)      (Decimal)                               "Max FT"
+            FIELD fQca_SidebandGEFCigQhsMapExtNominalFT  (Fixed 1 Bytes)     (Decimal)                               "Nominal FT"
+            FIELD fQca_SidebandGEFCigQhsMapExtNSE        (Fixed 1 Bytes)     (Decimal)                               "NSE"
+        }         
+    }
+    GROUP gQca_SidebandEncoderReady             IF(FieldIs EqualTo 0x14 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandEncoderReadyCodecId          (Fixed 1 Byte)                  (Hex)                       "Codec ID"
+        FIELD fQca_SidebandEncoderReadyCodecVersion     (Fixed 2 Bytes)                 (Decimal)                   "Codec version"
+        FIELD fQca_SidebandEncoderReadyCodecMetadata    (Fixed 5 Bytes)                 (Hex)                       "Codec metadata"
+    }
+    GROUP gQca_SidebandIsoLinkQuality           IF(FieldIs EqualTo 0x15 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandIsoLinkQualityStreamId           (Fixed 1 Byte)              (Hex)                       "Stream Id"
+        FIELD fQca_SidebandIsoLinkQualityRssi               (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal)     "RSSI(dbm)"
+        FIELD fQca_SidebandIsoLinkQualitySduSize            (Fixed 2 Bytes)             (Decimal)                   "recommend SDU Size"
+        FIELD fQca_SidebandIsoLinkQualityTxUnACKed          (Fixed 4 Bytes)             (Decimal)                   "Tx UnACKed Packets"
+        FIELD fQca_SidebandIsoLinkQualityTxFlushed          (Fixed 4 Bytes)             (Decimal)                   "Tx Flushed Packets"
+        FIELD fQca_SidebandIsoLinkQualityTxLastSubEvtPkts   (Fixed 4 Bytes)             (Decimal)                   "Tx Last Subevent Packets"
+        FIELD fQca_SidebandIsoLinkQualityRetransPkts        (Fixed 4 Bytes)             (Decimal)                   "Retransmitted Packets"
+        FIELD fQca_SidebandIsoLinkQualityCRCErrPkts         (Fixed 4 Bytes)             (Decimal)                   "CRC error Packets"
+        FIELD fQca_SidebandIsoLinkQualityRxUnreceivedPkts   (Fixed 4 Bytes)             (Decimal)                   "Rx Unreceived Packets"
+        FIELD fQca_SidebandIsoLinkQualityDuplicatePkts      (Fixed 4 Bytes)             (Decimal)                   "Duplicate Packets"
+    }
+    GROUP gQca_SidebandCodecMetadata            IF(FieldIs EqualTo 0x16 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandCodecMetadataStreamId        (Fixed 1 Byte)                  (Hex)                       "Stream Id"
+        FIELD fQca_SidebandCodecMetadataSubId           (Fixed 1 Byte)                  (TABLE tCodecMetadataSubId) "Sub Sideband Id"
+        GROUP gQca_SidebandCodecMetadataConfigUpdate    IF(FieldIs EqualTo 1 fQca_SidebandCodecMetadataSubId)
+        {
+            FIELD fQca_SidebandCodecMetadataConfigUpdateFormat          (Fixed 1 Byte)  (Decimal)                   "Format"
+            FIELD fQca_SidebandCodecMetadataConfigUpdateFtC2P           (Fixed 1 Byte)  (Decimal)                   "FT Mater to Slave"
+            FIELD fQca_SidebandCodecMetadataConfigUpdateFtP2C           (Fixed 1 Byte)  (Decimal)                   "FT Slave to Master"
+            FIELD fQca_SidebandCodecMetadataConfigUpdateTtpAdjRate      (Fixed 1 Byte)  (Decimal)                   "TTP Adj Rate"
+            FIELD fQca_SidebandCodecMetadataConfigUpdateQhsModulation   (Fixed 1 Byte)  (Decimal)                   "QHS modulation"
+            FIELD fQca_SidebandCodecMetadataConfigUpdateNse             (Fixed 1 Byte)  (Decimal)                   "NSE"
+        }
+    }
+    GROUP gQca_SidebandCodecMetadataAck         IF(FieldIs EqualTo 0x17 fQca_SidebandInfo_Id)
+    {
+        FIELD fQca_SidebandCodecMetadataAckStreamId     (Fixed 1 Byte)                  (Hex)                       "Stream Id"
+        FIELD fQca_SidebandCodecMetadataAckSubId        (Fixed 1 Byte)                  (TABLE tCodecMetadataSubId) "Sub Sideband Id"
+        GROUP gQca_SidebandCodecMetadataAckConfigUpdate    IF(FieldIs EqualTo 1 fQca_SidebandCodecMetadataAckSubId)
+        {
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateFormat               (Fixed 1 Byte)  (Decimal)           "Format"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateStatus               (Fixed 1 Byte)  (Decimal)           "Status"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateFtC2P                (Fixed 1 Byte)  (Decimal)           "FT Mater to Slave"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateFtP2C                (Fixed 1 Byte)  (Decimal)           "FT Slave to Master"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateCurCisEventCount     (Fixed 2 Bytes) (Decimal)           "Current CIS Event Count"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateFtChangeEventCount   (Fixed 2 Bytes) (Decimal)           "FT Change Event Count"
+            FIELD fQca_SidebandCodecMetadataAckConfigUpdateQhsModulation        (Fixed 1 Byte)  (Decimal)           "QHS modulation"
+        }
+    }
+}
+
+TABLE tRBFullCase
+    {1, "Overflow"}
+    {2, "OverflowAddr1Null"}
+    {3, "OverflowAddr2Null"}
+    {4, "Flush"}
+    {5, "PktLate"}
+ENDTABLE
+GROUP gQca_AUDIO_DATA_RINGBUFFER_FULL "RingbufferFull"
+{
+    FIELD fQca_Rbfull1                    (Fixed 4 Bytes)                          (TABLE tRBFullCase)                 "case"
+    GROUP gQca_RINGBUF_Overflow IF(FieldIs Lessthan 4 fQca_Rbfull1)
+	{
+	    FIELD fQca_Rbfull11                (Fixed 4 Bytes)                          (Decimal)                           "available"
+    	FIELD fQca_Rbfull12                (Fixed 4 Bytes)                          (Decimal)                           "required"
+    	FIELD fQca_Rbfull13                (Fixed 4 Bytes)                          (Decimal)                           "clkN"
+	}
+    GROUP gQca_RINGBUF_FLUSH IF(FieldIs EqualTo 4 fQca_Rbfull1)
+	{
+	    FIELD fQca_Rbfull21                (Fixed 4 Bytes)                         (Decimal)                           "flushCnt"
+	    FIELD fQca_Rbfull22                (Fixed 4 Bytes)                         (Decimal)                           "flushBytes"
+    	FIELD fQca_Rbfull23                (Fixed 4 Bytes)                         (Decimal)                           "LatencyMs"
+	}
+    GROUP gQca_RINGBUF_PKTLATE IF(FieldIs EqualTo 4 fQca_Rbfull1)
+	{
+	    FIELD fQca_Rbfull31                (Fixed 4 Bytes)                         (Decimal)                           "flushCnt"
+	    FIELD fQca_Rbfull32                (Fixed 4 Bytes)                         (Decimal)                           "arrClkN"
+    	FIELD fQca_Rbfull33                (Fixed 4 Bytes)                         (Decimal)                           "clkN"
+	}
+}
+
+GROUP gQca_VOICE_BUFFER_MIC_DATA "TO AIR"
+{
+    FIELD fQca_Pkt_Sqn                          (Fixed 2 Bytes)                         (Decimal)                           "Sequence No"
+    FIELD fQca_Handle_Mic                       (Fixed 2 Bytes)                         (Decimal)                           "handle"
+    FIELD fQca_ToAirRingSampleLevel_Mic         (Fixed 2 Bytes)                         (Decimal)                           "toAirRingSampleLevel"
+    FIELD fQca_ToAirAddCnt_Mic                  (Fixed 1 Bytes)                         (Decimal)                           "toAirAddCnt"
+    FIELD fQca_ToAirDropCnt_Mic                 (Fixed 1 Bytes)                         (Decimal)                           "toAirDropCnt"
+    FIELD fQca_ToAirStuffCnt_Mic                (Fixed 1 Bytes)                         (Decimal)                           "toAirStuffCnt"
+    FIELD fQca_ToAirFlushCnt_Mic                (Fixed 1 Bytes)                         (Decimal)                           "toAirFlushCnt"
+    FIELD fQca_ToAirIOPStuffCnt_Mic             (Fixed 1 Bytes)                         (Decimal)                           "toAirIOPStuffCnt"
+
+    FIELD fQca_IOP_Pkt_Len                      (Fixed 1 Byte)                          (Decimal)                           "IOP Pkt Length"
+    FIELD fQca_IOP_Pkt_Data_Mic                 (FromField Bytes fQca_IOP_Pkt_Len)      (StringOfHex)                       "IOP DATA"
+    FIELD fQca_Interpoller_Pkt_Len              (Fixed 1 Byte)                          (Decimal)                           "Interpoller pkt Length"
+    FIELD fQca_Pkt_Interpoller_Data_Mic         (FromField Bytes fQca_Interpoller_Pkt_Len) (StringOfHex)                    "Interpoller DATA"
+    FIELD fQca_Air_Pkt_Len                      (Fixed 1 Byte)                          (Decimal)                           "Air Pkt Length"
+    FIELD fQca_Pkt_Air_Data_Mic                 (FromField Bytes fQca_Air_Pkt_Len)      (StringOfHex)                       "Air DATA"
+}
+
+TABLE EDP_STATUS
+    {0, "GOOD"}
+    {1, "CRC_FAIL_ONE"}
+    {2, "CRC_FAIL_MULT"}
+    {3, "LOST"}
+ENDTABLE
+
+GROUP gQca_VOICE_BUFFER_SPKR_DATA "FROM AIR"
+{
+    FIELD fQca_Pkt_Sqn_spkr                     (Fixed 2 Bytes)                         (Decimal)                           "Sequence No"
+    FIELD fQca_Handle_spkr                      (Fixed 2 Bytes)                         (Decimal)                           "handle"
+    FIELD fQca_FromAirRingSampleLevel_spkr      (Fixed 2 Bytes)                         (Decimal)                           "fromAirRingSampleLevel"
+    FIELD fQca_FromAirRxStatus                  (Fixed 1 Bytes)                         (TABLE EDP_STATUS)                  "rxStatus"
+    FIELD fQca_FromAirAddCnt_spkr               (Fixed 1 Bytes)                         (Decimal)                           "fromAirAddCnt"
+    FIELD fQca_FromAirDropCnt_spkr              (Fixed 1 Bytes)                         (Decimal)                           "fromAirDropCnt"
+    FIELD fQca_FromAirStuffCnt_spkr             (Fixed 1 Bytes)                         (Decimal)                           "fromAirStuffCnt"
+    FIELD fQca_FromAirFlushCnt_spkr             (Fixed 1 Bytes)                         (Decimal)                           "fromAirFlushCnt"
+    FIELD fQca_FromAirIOPStuffCnt_spkr          (Fixed 1 Bytes)                         (Decimal)                           "fromAirIOPStuffCnt"
+
+    FIELD fQca_Air_Pkt_Len_spkr                 (Fixed 1 Byte)                          (Decimal)                           "Air Pkt Length"
+    FIELD fQca_Pkt_AIR_Data_spkr                (FromField Bytes fQca_Air_Pkt_Len_spkr) (StringOfHex)                       "Air DATA"
+    FIELD fQca_Air_Pkt_Decode_Len_spkr          (Fixed 1 Byte)                          (Decimal)                           "Air Pkt decode Length"
+    FIELD fQca_Pkt_AIR_Decode_Data_spkr         (FromField Bytes fQca_Air_Pkt_Decode_Len_spkr) (StringOfHex)                "Air decode DATA"
+    FIELD fQca_IOP_Pkt_Len_spkr                 (Fixed 1 Byte)                          (Decimal)                           "IOP Pkt Length"
+    FIELD fQca_IOP_Pkt_Data_spkr                (FromField Bytes fQca_IOP_Pkt_Len_spkr) (StringOfHex)                       "IOP DATA"
+}
+
+GROUP gQca_VOICE_ISO_FROM_AIR_NO_DATA "FROM AIR INFO"
+{
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_SeqNumber         (Fixed 2 Bytes)             (Decimal)                           "Sequence No"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_txPacketCounter   (Fixed 2 Bytes)             (Decimal)                           "Tx Packet counter"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_payLoadCounter    (Fixed 4 Bytes)             (Decimal)                           "Payload counter"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_eventCounter      (Fixed 2 Bytes)             (Decimal)                           "Event counter(Not accurate, refer to payload count as well.)"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_length            (Fixed 2 Bytes)             (Decimal)                           "Length"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_streamNdx         (Fixed 1 Bytes)             (Decimal)                           "Stream Index"
+    FIELD fQca_VOICE_ISO_FROM_AIR_NO_DATA_status            (Fixed 1 Bytes)             (Decimal)                           "Status"
+}
+
+GROUP gQca_A2DP_Timestamp "A2DP Timestamp"
+{
+    FIELD fQca_TS_Timestamp                 (Fixed 4 Bytes)                        (HEX)                                 "Timestamp (1us)"
+    FIELD fQca_TS_ClkN_Int                  (Fixed 4 Bytes)                        (HEX)                                 "ClkN INT Low"
+    FIELD fQca_TS_ClkN_Frac                 (Fixed 2 Bytes)                        (HEX)                                 "ClkN Frac"
+    FIELD fQca_TS_piconetClk_Int            (Fixed 4 Bytes)                        (HEX)                                 "Piconet Clk Offset Int"
+    FIELD fQca_TS_piconetClk_Frac           (Fixed 2 Bytes)                        (HEX)                                 "Piconet Clk Offset Frac"
+    FIELD fQca_TS_ttpClk_Int                (Fixed 4 Bytes)                        (HEX)                                 "TTP Clk Offset Int"
+    FIELD fQca_TS_ttpClk_Frac               (Fixed 2 Bytes)                        (HEX)                                 "TTP Clk Offset Frac"
+}
+
+GROUP gQca_A2DP_HCI_WriteCfgErr "A2DP HCI Write Cfg Error"
+{
+    FIELD fQca_HCI_WriteCfgErr_Param1           (Fixed 4 Bytes)                        (HEX)                                 "Param 1"
+    FIELD fQca_HCI_WriteCfgErr_Param2           (Fixed 4 Bytes)                        (HEX)                                 "Param 2"
+    FIELD fQca_HCI_WriteCfgErr_ID               (Fixed 1 Bytes)                        (Decimal)                             "ID"
+    FIELD fQca_HCI_WriteCfgErr_ErrCode          (Fixed 1 Bytes)                        (HEX)                                 "Error Code"
+}
+
+
+TABLE tSbIds
+{ 0x05 "SB_EncodeMode" "SB_EncodeMode" 0 gQca_Audio_SB_encodeMode}
+{ 0x06 "SB_Rssi" "SB_Rssi" 0 gQca_Audio_SB_Rssi}
+{ 0x07 "SB_numBTLinks" "SB_numBTLinks" 0 gQca_Audio_SB_otherLinksNum}
+{ 0x08 "SB_wifiActivity" "SB_wifiActivity" 0 gQca_Audio_SB_wifiActivity}
+{ 0x09 "SB_primer_v1" "SB_primer" 0 gQca_Audio_SB_primer}
+{ 0x0a "SB_drift" "SB_drift" 0 gQca_Audio_SB_drift}
+{ 0x0b "SB_quality_v1" "SB_quality_v1" 0 gQca_Audio_COPv1_SB_Quality}
+{ 0x0d "SB_primer_ack_v2" "SB_primerAck"}
+{ 0x0e "SB_genericEncode" "SB_genericEncode" 0 gQca_Audio_SB_genericEncode}
+{ 0x0f "SB_RX_QUALITY MASK" "SB_RX_QUALITY MASK" 0 gQca_Audio_COPv2_SB_Quality}
+{ 0x10 "SB_primer_v2" "SB_primer" 0 gQca_Audio_SB_primer_v2}
+{ 0x11 "SB_quality" "SB_quality" 0 gQca_Audio_SB_QualityFB}
+{ 0x14 "SB_EncoderReady" "SB_encoderReady" 0 gQca_LE_Audio_EncoderReady}
+{ 0x18 "SB_sequence" "SB_sequence" 0 gQca_Audio_SB_sequence}
+{ 0x19 "SB_sampleCnt" "SB_sampleCnt" 0 gQca_Audio_SB_sampleCnt}
+ENDTABLE
+
+GROUP gQca_COPFeedbackInfo "COP feedback"
+{
+	FIELD fQca_COP_SYNC01      (Fixed 2 Bytes)   (Hex)    SUPPRESS_DETAIL
+	FIELD fQca_COP_SYNC02      (Fixed 2 Bytes)   (Hex)    SUPPRESS_DETAIL
+    
+    FIELD fQca_COP_Header_Ver_TA      (Fixed 2 Bytes) RETRIEVE (AndMask 0x3) ALSO (ShiftRight 0) (Decimal) SUPPRESS_DETAIL NO_MOVE STORE copVer
+	
+    GROUP fQca_COP_V0 IF(FieldIs EqualTo 0x00 fQca_COP_Header_Ver_TA) "COPV0"
+    {
+        FIELD fQca_COP_Header01_1  (Fixed 5 Bits)    (Hex)    SUPPRESS_DETAIL //"fmt_id_l4"
+        FIELD fQca_COP_Header01_2  (Fixed 1 Bit)     (Hex)    "sidebandPresense"
+        FIELD fQca_COP_Header01_3  (Fixed 2 Bits)    (Hex)    "version"
+        FIELD fQca_COP_Header02_1  (Fixed 5 Bits)    (Hex)    "Quality"
+        FIELD fQca_COP_Header02_2  (Fixed 3 Bits)    (Hex)    SUPPRESS_DETAIL
+        RESERVED (Fixed 2 Bytes)
+    }
+    GROUP fQca_COP_V1 IF(FieldIs EqualTo 0x01 fQca_COP_Header_Ver_TA) "COPV1"
+    {
+        FIELD fQca_COP_Header11_1  (Fixed 5 Bits)    (Hex)    SUPPRESS_DETAIL //"fmt_id_l4"
+        FIELD fQca_COP_Header11_2  (Fixed 1 Bit)     (Hex)    "sidebandPresense"
+        FIELD fQca_COP_Header11_3  (Fixed 2 Bits)    (Hex)    "version"
+        FIELD fQca_COP_Header12_1  (Fixed 7 Bits)    (Hex)    "Quality"
+        FIELD fQca_COP_Header12_2  (Fixed 1 Bits)    (Hex)    SUPPRESS_DETAIL  //"fmt_id_h5"
+        FIELD fQca_COP_numSB       (Fixed 1 Byte)    (Hex)    "SBNum" STORE sbNum
+        GROUP gQca_sbloop REPEAT COUNT (FromField Times fQca_COP_numSB 0)  "SideBand"
+        {
+            GROUP gQca_COP_SB;
+        }
+        FIELD fQca_COP_FrameNo (Fixed 1 Bytes) RETRIEVE (AndMask 0xF) (Decimal)  "FrameNo" NO_MOVE
+        FIELD fQca_COP_PyldLen (Fixed 2 Bytes) RETRIEVE (ShiftRight  4)   (Decimal) "Payldlen"
+        GROUP gQca_COP_Data IF(FieldIs NotEqualTo 0x00 fQca_COP_PyldLen) "Frame"
+        {
+            FIELD fQca_COP_Data    (FromField Bytes fQca_COP_PyldLen)     (Hex)       "Data"
+        }
+        RESERVED (Fixed 2 Bytes) //end marker: c000
+    }
+    GROUP fQca_COP_V2 IF(FieldIs EqualTo 0x2 fQca_COP_Header_Ver_TA)
+    {
+        GROUP gQca_COP_Pkt;
+    }
+}
+GROUP gQca_A2DPNumIntrMiss "Difference in stall intr"
+{
+    FIELD fQca_A2DPNumIntrMiss                  (Fixed 4 Bytes)    (Decimal)    "No. of intrps missed at Task"
+}
+
+GROUP gQca_A2DPNumExtraLoop "Difference in stall intr"
+{
+    FIELD fQca_A2DPNumExtraLoop                 (Fixed 4 Bytes)    (Decimal)    "Num extra loop run by task"
+}
+
+GROUP gQca_A2dpSinkConfig "A2DP Sink Stream Configuration"
+{
+    FIELD fQca_A2dpSinkConfig_aclHandle         (Fixed 2 Byte)  (Hex)           "ACL Handle"
+    FIELD fQca_A2dpSinkConfig_lcid              (Fixed 2 Byte)  (Hex)           "Streaming Channel LCID"
+    FIELD fQca_A2dpSinkConfig_bitrate           (Fixed 4 Byte)  (Hex)           "Peak bitrate"
+    FIELD fQca_A2dpSinkConfig_l2capMTU          (Fixed 2 Byte)  (Hex)           "L2CAP MTU"
+    FIELD fQca_A2dpSinkConfig_packetHeaderSize  (Fixed 1 Byte)  (Hex)           "AVDTP Media Header Size"
+    FIELD fQca_A2dpSinkConfig_codecId           (Fixed 1 Byte)  (Hex)           "Codec Id"
+}
+
+GROUP gQca_A2dpSinkPacketTTPInfo "A2DP Sink Media Packet Instant Passed"
+{
+    FIELD fQca_A2dpSinkPacketTTPInfotimeToPlay  (Fixed 4 Bytes) (Decimal)       "Time To Play (us)"
+    FIELD fQca_A2dpSinkPacketTTPInfocurInstant  (Fixed 4 Bytes) (Decimal)       "Current Piconet instant (us)"
+}
+
+TABLE tA2dpSbcChannelMode
+    {1, "MONO"}
+    {2, "STEREO"}
+ENDTABLE
+
+TABLE tA2dpSbcAllocMethod
+    {0, "LOUDNESS"}
+    {2, "SNR"}
+ENDTABLE
+
+GROUP gQca_SBCCodecInfo "A2DP Encoder Parameters"
+{
+    FIELD fQca_samplingFrequency  	(Fixed 2 Bytes)  (Decimal)                      "samplingFrequency"
+    FIELD fQca_channelMode   		(Fixed 1 Byte)   (TABLE tA2dpSbcChannelMode)    "channelMode"
+    FIELD fQca_allocMethod		    (Fixed 1 Byte)   (TABLE tA2dpSbcAllocMethod)    "allocMethod"
+    FIELD fQca_nrofSubbands   		(Fixed 1 Byte)   (Decimal)                      "nrofSubbands"
+	FIELD fQca_nrofBlocks   		(Fixed 1 Byte)   (Decimal)                      "nrofBlocks"
+	FIELD fQca_minBitpool   		(Fixed 1 Byte)   (Decimal)                      "minBitpool"
+	FIELD fQca_maxBitpool    		(Fixed 1 Byte)   (Decimal)                      "maxBitpool"
+}
+
+GROUP gQca_EncodeConfigError "A2DP Encoder Config Errors"
+{
+    FIELD fQca_enoderReturnStatus					(Fixed 4 Bytes)  (Decimal)           "enoderReturnStatus"
+    FIELD fQca_encoderResetFailed					(Fixed 1 Bytes)  (Decimal)           "encoderResetFailed"
+	FIELD fQca_encoderConfigFailed					(Fixed 1 Bytes)  (Decimal)           "encoderConfigFailed"
+    FIELD fQca_encoderInitFailed					(Fixed 1 Byte)   (Decimal)           "encoderInitFailed"
+    FIELD fQca_encodingFailed                       (Fixed 1 Byte)   (Decimal)           "encodingFailed"
+    FIELD fQca_pcmBufMemAllocFailed                 (Fixed 1 Byte)   (Decimal)           "pcmBufMemAllocFailed"
+    FIELD fQca_encoderConfigMemAllocFailed          (Fixed 1 Byte)   (Decimal)           "encoderConfigMemAllocFailed"
+    FIELD fQca_encoderContextMemAllocFailed         (Fixed 1 Byte)   (Decimal)           "encoderContextMemAllocFailed"
+    FIELD fQca_encoderDataMonoMemAllocFailed        (Fixed 1 Byte)   (Decimal)           "encoderDataMonoMemAllocFailed"	
+    FIELD fQca_encoderDataStereoMemAllocFailed      (Fixed 1 Byte)   (Decimal)           "encoderDataStereoMemAllocFailed"
+	FIELD fQca_encoderMinBitpoolSetFailed           (Fixed 1 Byte)   (Decimal)           "encoderMinBitpoolSetFailed"
+    FIELD fQca_encoderBitpoolSetFailed              (Fixed 1 Byte)   (Decimal)           "encoderBitpoolSetFailed"	
+    FIELD fQca_sbcBufAllocFailed                    (Fixed 1 Byte)   (Decimal)           "sbcBufAllocFailed"	
+	FIELD fQca_noMemoryInPcmRingToWrite             (Fixed 1 Byte)   (Decimal)           "noMemoryInPcmRingToWrite"
+	FIELD fQca_noMemoryInPcmRingToRead              (Fixed 1 Byte)   (Decimal)           "noMemoryInPcmRingToRead"		
+	FIELD fQca_noMemoryInIopRingToRead              (Fixed 1 Byte)   (Decimal)           "noMemoryInIopRingToRead"	
+}
+
+GROUP gQca_A2DP_LINK_QUALITY "A2DP Link Quality"
+{
+    FIELD fQca_A2DP_Packet_Latency              (Fixed 2 Bytes)        (Decimal)          "Avg Packet Latency(ms)"
+    FIELD fQca_A2DP_Active_Conn_Count           (Fixed 2 Bytes)        (Decimal)          "Active Conn Count"
+    FIELD fQca_A2DP_Dur_Cxm_Denials             (Fixed 4 Bytes)        (Decimal)          "Avg Cxm Denial Duration(ms)"
+    FIELD fQca_A2DP_FlowOnOffGap                (Fixed 4 Bytes)        (Decimal)          "Avg Flow Off-On Gap(ms)"
+    FIELD fQca_A2DP_endLatency                  (Fixed 2 Bytes)        (Decimal)          "A2DP packet endlatency"
+    FIELD fQca_A2DP_Link_Quality                (Fixed 1 Byte)         (Decimal)          "A2DP Link Quality Level"
+}
+
+GROUP gQca_LINK_QUAL_TXDONE "A2DP Link Qual TxDone"
+{
+    FIELD fQca_Audio_IOP_Tx_Data                   (FromField Bytes fQca_Audio_Pkt_Len_)   (HEX)                               "Audio Data"
+}
+
+GROUP gQca_COPMediaPktInfo "COP Media Packet Info"
+{
+    FIELD fQca_COPMediaPktTTPAdj        (Fixed 4 Bytes)     (Decimal)                   "TTP Adjust in usec"
+    FIELD fQca_COPMediaPktInterval      (Fixed 2 Bytes)     (Decimal)                   "Interval in usec"
+    FIELD fQca_pktTypeHint              (Fixed 1 Bytes)     (TABLE tAptXAdPktTypeHint)  "Packet Type Hint"
+    RESERVED                            (Fixed 1 Bytes)
+    FIELD fQca_ssrc                     (Fixed 4 Bytes)     (Hex)                       "SSRC"
+}
+
+GROUP gQca_A2DPFeedbackChnlCongestion "A2DP Feedback Channel Congested"
+{
+    FIELD fQca_A2DPFeedbackChnlQueuedPackets    (Fixed 4 Bytes)     (Decimal)       "Feedback Packets in Queue"
+    FIELD fQca_A2DPFeedbackChnlTotalPackets     (Fixed 4 Bytes)     (Decimal)       "Total Feedback packets"
+    FIELD fQca_A2DPFeedbackChnlDroppedPackets   (Fixed 4 Bytes)     (Decimal)       "Feedback packets dropped"
+}
+
+TABLE TxPortSubId
+   {0x00 "DROP_ISO_TX"}
+   {0x01 "QUEUE_ISO_TX"}
+ENDTABLE
+
+GROUP gQca_AUDIO_TX_PORT_CONGESTION "Audio Tx Port congestion"
+{
+    FIELD fQca_AudioTxPortCongestionError_Line_No   (Fixed 2 Bytes)                 (Decimal)                            "Line No"
+    FIELD fQca_AudioTxPortCongestionError_SubId     (Fixed 1 Byte)                  (TABLE TxPortSubId)                  "Sub Id"
+    FIELD fQca_AudioTxPortCongestionError_overflow  (Fixed 1 Byte)                  (Decimal)                            "OverflowCount"
+    FIELD fQca_AudioTxPortCongestionError_SbId      (Fixed 1 Byte)                  (TABLE tSidebandId)                  "SB Id"
+    FIELD fQca_AudioTxPortCongestionError_SubSbId   (Fixed 1 Byte)                  (TABLE tGenericEncoderFeedbackSubId) "Sub SB Id"
+}
+
+TABLE tLPASS_CodecFmtId
+    {0x00 "DATA_FMT_ID_NULL"}
+    {0x01 "DATA_FMT_ID_PAUSE"}
+    {0x02 "DATA_FMT_ID_SBC"}
+    {0x03 "DATA_FMT_ID_AAC"}
+    {0x04 "DATA_FMT_ID_APTX"}
+    {0x05 "DATA_FMT_ID_APTXHD"}
+    {0x06 "DATA_FMT_ID_APTX_ADAPTIVE"}
+    {0x07 "DATA_FMT_ID_MP3"}
+    {0x08 "DATA_FMT_ID_LDAC"}
+    {0x09 "DATA_FMT_ID_APTX_TWS+"}
+    {0x0A "DATA_FMT_ID_APTX_ADAPTIVE_TWS+"}
+    {0x0B "LHDC"}
+    {0x0C "CVSD"}
+    {0x0D "MSBC"}
+    {0x0E "LC3"}
+    {0x3F "DATA_FMT_ID_UNSET"}
+ENDTABLE
+
+GROUP gQca_CodecMismatch "LPASS Codec Info not Matching with Host"
+{
+    FIELD fQca_CodecMismatchLpass               (Fixed 1 Bytes)                        (TABLE tLPASS_CodecFmtId)                "LPASS codec"
+}
+
+GROUP gQca_A2DP_InvalidConn
+{
+    FIELD fQca_A2DP_InvalidConnHandle           (Fixed 1 Bytes)        (Hex)                "A2DP Handle"
+}
+
+TABLE tA2dpCodecType
+    {0, "SBC"}
+    {2, "AAC"}
+    {4, "LDAC"}
+    {8, "APT-X"}
+    {9, "APT-X HD"}
+    {10, "APT-X Adaptive"}
+    {11, "APT-X TWS+"}
+    {64, "LHDC"}
+ENDTABLE
+
+TABLE tAptXAdPktTypeHint
+    {0, "PKT_TYPE_2DH3"}
+    {1, "PKT_TYPE_2DH5"}
+    {2, "PKT_TYPE_4QHD1"}
+    {3, "PKT_TYPE_5QHD1"}
+    {4, "PKT_TYPE_3QHD3"}
+    {5, "PKT_TYPE_4QHD3"}
+    {6, "PKT_TYPE_5QHD3"}
+ENDTABLE
+
+GROUP gQca_BufferSize "A2DP Buffer info"
+{
+    FIELD fQca_TimeToBuffer                     (Fixed 2 Bytes)         (Decimal)                       "Time to buffer in msec"
+    FIELD fQca_BufferSize                       (Fixed 2 Bytes)         (Decimal)                       "Buffer Size in bytes"
+    FIELD fQca_CodecInfo                        (Fixed 1 Byte)          (TABLE tA2dpCodecType)          "Codec type"
+    FIELD fQca_a2dpMaxQlen                      (Fixed 1 Byte)          (Decimal)                       "A2DP Max QLen"
+    FIELD fQca_a2dpWaterMark0                   (Fixed 2 Byte)          (Decimal)                       "Water Mark in Msec"
+}
+
+TABLE tA2DPRole
+	{0, "Tx"}
+	{1, "Rx"}
+ENDTABLE
+
+TABLE tDeviceRole
+	{0, "Master"}
+	{1, "Slave"}
+ENDTABLE
+
+GROUP gQca_A2DP_bbBwReport "A2DP baseband bandwidth report"
+{
+    FIELD fQca_bbBwReport_handle (Fixed 6 Bits) (Decimal) "Handle"
+    FIELD fQca_bbBwReport_type (Fixed 1 Bits) (Decimal) SUPPRESS_DETAIL
+    FIELD fQca_bbBwReport_dir   (Fixed 1 Bits) (TABLE tA2DPRole) "Report Direction"
+    RESERVED (Fixed 1 Bytes)
+    FIELD fQca_bbBwReport_empty (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0)    (Decimal) "Empty Slots"
+    FIELD fQca_bbBwReport_overall (Fixed 4 Bytes) (Decimal)   "Overall Slots used"
+    FIELD fQca_bbBwReport_overallretrans (Fixed 4 Bytes) (Decimal)   "Overall Retrans Slots used"
+    FIELD fQca_bbBwReport_slotsUsed  (Fixed 2 Bytes)  (Decimal) "Slots Used this second"
+    GROUP gQca_A2DP_bbBwReport_edrStat IF (FieldIs EqualTo 0x00 fQca_bbBwReport_type) "EDR packet statistics"
+    {
+        FIELD fQca_bbBwReport_edr1Slot   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "2DH1/3DH1 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr2slot   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "2DH3 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr3slot   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "3DH3 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr4slot   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "2DH5 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr5slot   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "3DH5 Counts"
+        RESERVED (Fixed 2 Bytes)
+    }
+    GROUP gQca_A2DP_bbBwReport_QHSStat IF (FieldIs EqualTo 0x01 fQca_bbBwReport_type) "QHS packet statistics"
+    {
+        FIELD fQca_bbBwReport_qhs2M_s1   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 2M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs2M_s3   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 2M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs3M_s1   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 3M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs3M_s3   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 3M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs4M_s1   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 4M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs4M_s3   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 4M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs5M_s1   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 5M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs5M_s3   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 5M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs6M_s1   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 6M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs6M_s3   (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "QHS 6M 3 Slots Counts"
+    }
+    FIELD fQca_bbBwReport_retrans (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0)    (Decimal) "Retrans Slots"
+    GROUP gQca_A2DP_bbBwReport_edrStatRetrans IF (FieldIs EqualTo 0x00 fQca_bbBwReport_type) "EDR Retrans packet statistics"
+    {
+        FIELD fQca_bbBwReport_edr1SlotRetrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans 2DH1/3DH1 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr2slotRetrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans 2DH3 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr3slotRetrans    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans 3DH3 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr4slotRetrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans 2DH5 Counts"
+        RESERVED (Fixed 2 Bytes)
+        FIELD fQca_bbBwReport_edr5slotRetrans    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans 3DH5 Counts"
+        RESERVED (Fixed 2 Bytes)
+    }
+    GROUP gQca_A2DP_bbBwReport_QHSStatRetrans IF (FieldIs EqualTo 0x01 fQca_bbBwReport_type) "QHS packet Retrans statistics"
+    {
+        FIELD fQca_bbBwReport_qhs2M_s1Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 2M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs2M_s3Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 2M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs3M_s1Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 3M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs3M_s3Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 3M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs4M_s1Retrans    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 4M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs4M_s3Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 4M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs5M_s1Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 5M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs5M_s3Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 5M 3 Slots Counts"
+        FIELD fQca_bbBwReport_qhs6M_s1Retrans    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 6M 1 Slots Counts"
+        FIELD fQca_bbBwReport_qhs6M_s3Retrans    (Fixed 2 Bytes) PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Retrans QHS 6M 3 Slots Counts"
+    }
+    GROUP gQca_A2DP_bbBwReport_TxerrorStatus IF (FieldIs EqualTo 0x00 fQca_bbBwReport_dir)
+    {
+        FIELD fQca_bbBwReport_RfLoss	 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "No Ack packets detected"
+        FIELD fQca_bbBwReport_Nak	 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Nak packets counts"
+        FIELD fQca_bbBwReport_txAbort	 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Coex Tx abort counts"
+        FIELD fQca_bbBwReport_txDenial	 (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Coex Tx Denial counts"
+    }
+    GROUP gQca_A2DP_bbBwReport_RxerrorStatus IF (FieldIs EqualTo 0x01 fQca_bbBwReport_dir)
+    {
+        FIELD fQca_bbBwReport_errNoAec   (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Rx No address code decteted Slots"
+        FIELD fQca_bbBwReport_errHecBad  (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Rx Hec Bad Slots"
+        FIELD fQca_bbBwReport_errCrcBad  (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Rx Crc bad Slots"
+        FIELD fQca_bbBwReport_errPhyError    (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "Rx Phy error Slots"
+    }
+    FIELD fQca_bbBwReport_txPwrLv  (Fixed 1 Bytes) (Decimal)           "Tx Power Level"
+    FIELD fQca_bbBwReport_txPwr    (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal)           "Tx Power in dBm"
+    FIELD fQca_bbBwReport_role     (Fixed 1 Bytes) (TABLE tDeviceRole) "DUT Role"
+    FIELD fQca_bbBwReport_linkQual (Fixed 1 Bytes) (Decimal)           "Link Quality Level"
+    FIELD fQca_bbBwReport_avgRSSI  (Fixed 1 Bytes) RETRIEVE (SignExtension 8) (Decimal)           "Avg RSSI in DBM"
+    FIELD fQca_a2dpStats_numChain        (FIXED 1 BYTES) (DECIMAL) SUPPRESS_DETAIL
+
+    FIELD fQca_MaxpowerCntr_a2dp (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE MaxpowerCntr_a2dp
+    GROUP gQca_SAR_MAX_POWER REPEAT COUNT (FromField Times fQca_a2dpStats_numChain) "SAR Max Power(dBM)"
+    {
+        GROUP gQca_MaxPower_a2dp
+        {
+            FIELD fQca_Max_power_a2dp        (Fixed 1 Bytes) PRINT_IF (FieldIs NotEqualTo -1)  RETRIEVE (SignExtension 8) (DecimalWithFieldLabel MaxpowerCntr_a2dp) "Antenna"
+        }
+        FIELD fQca_MaxpowerCntrIncr_a2dp (Fixed 0) RETRIEVE (StoreField MaxpowerCntr_a2dp) ALSO (AddInteger 1) (Hex) SUPPRESS_DETAIL STORE Maxpowercntr_a2dp
+    }
+}
+
+GROUP gQca_A2DPThroughput "A2DP Link Throughput"
+{
+    FIELD fQca_A2DPTpt    (Fixed 4 Bytes)    (Decimal)    "Throughput_kbps"
+}
+
+GROUP gQca_A2DP_UnderflowStats
+{
+    FIELD fQca_A2dp_AclBytesSent                (Fixed 4 bytes) (Decimal)       "ACL Bytes Sent"
+    FIELD fQca_A2dp_NumberofUnderflowBytes      (Fixed 4 bytes) (Decimal)       "Number of undeflow bytes"
+}
+
+GROUP gQca_A2DPBufferDepth "A2DP Buffer Depth"
+{
+    FIELD fQca_A2DPBufferDepth    (Fixed 4 Bytes)    (Decimal)    "Buffer Depth (ms)"
+}
+
+GROUP gQca_A2DPWatermarkCodec "A2DP Watermark and codec"
+{
+    FIELD fQca_A2DPWatermark    (Fixed 2 Bytes)    (Decimal)    "Watermark (ms)"
+    FIELD fQca_A2DPCodec        (Fixed 1 Byte)     (TABLE tA2dpCodecType)    "Codec Type"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_DRIFT "Voice Transparent Drift Info"
+{
+    FIELD fQca_VoiceTransparentDrift_time       (Fixed 4 Bytes)         (Hex)                                    "Drift Detected Clock"
+    FIELD fQca_VoiceTransparentDrift_delta      (Fixed 4 Bytes)         RETRIEVE (SignExtension 32) (Decimal)    "Delta Samples from Expected"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_RX_PKT_LATE "Voice Transparent Rx Pkt Late Info"
+{
+    FIELD fQca_VoiceTransparentRxPktLate_delta      (Fixed 2 Bytes)    (Decimal)                       "Rx Pkt to ToAir ISR (us)"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_INVALID_RATE "Voice Transparent Sample Rate Invalid Info"
+{
+    FIELD fQca_VoiceTransparentRateInvalid_sampleCount      (Fixed 2 Bytes)    (Decimal)               "Measured Sample Count"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_PRIMER_TIMING_OFFSET_INVALID "Voice Transparent Primer Timing Offset Invalid Info"
+{
+    FIELD fQca_VoiceTransparentPrimerOffsetInvalid_sampleCount      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_SLIMBUS_NOT_ACTIVE "Voice Transparent Slimbus Not Active Info"
+{
+    FIELD fQca_VoiceTransparentSlimbusNotActive_CheckCount      (Fixed 2 Bytes)     (Decimal)    "Active Check Count"
+    FIELD fQca_VoiceTransparentSlimbusNotActive_AciSampleCount  (Fixed 2 Bytes)     (Decimal)    "ACI Sample Count"
+    FIELD fQca_VoiceTransparentSlimbusNotActive_AciFrameCount   (Fixed 2 Bytes)     (Decimal)    "ACI Frame Count"
+}
+
+TABLE tPrimerState
+    {0, "PRIMER_STATE_IDLE"}
+    {1, "PRIMER_STATE_WAIT4SAMPLES"}
+    {2, "PRIMER_STATE_WAIT4PRIMERACK"}
+    {3, "PRIMER_STATE_ACTIVE"}
+ENDTABLE
+
+GROUP gQca_VOICE_TRANSPARENT_PRIMER_SM "Voice Transparent Primer SM"
+{
+    FIELD fQca_VoiceTransparentPrimerSM_PrimerState      (Fixed 2 Bytes)     (TABLE tPrimerState)    "PrimerState"
+    FIELD fQca_VoiceTransparentPrimerSM_CheckCount       (Fixed 2 Bytes)     (Decimal)    "Active Check Count"
+    FIELD fQca_VoiceTransparentPrimerSM_AciSampleCount   (Fixed 2 Bytes)     (Decimal)    "ACI Sample Count"
+    FIELD fQca_VoiceTransparentPrimerSM_AciFrameCount    (Fixed 2 Bytes)     (Decimal)    "ACI Frame Count"
+    FIELD fQca_VoiceTransparentPrimerSM_deltaSampleCount (Fixed 2 Bytes)     (Decimal)    "delta Sample Count"
+    FIELD fQca_VoiceTransparentPrimerSM_deltaFrameCount  (Fixed 2 Bytes)     (Decimal)    "delta Frame Count"
+    FIELD fQca_VoiceTransparentPrimerSM_txOtaCount       (Fixed 2 Bytes)     (Decimal)    "TxFromAirCount"
+    FIELD fQca_VoiceTransparentPrimerSM_TxSBCount        (Fixed 2 Bytes)     (Decimal)    "TxSBCount"
+    FIELD fQca_VoiceTransparentPrimerSM_txOtaWrong       (Fixed 2 Bytes)     (Decimal)    "TxFromAirWrongCount"
+    FIELD fQca_VoiceTransparentPrimerSM_TxSBWrong        (Fixed 2 Bytes)     (Decimal)    "TxSBWrongCount"
+    FIELD fQca_VoiceTransparentPrimerSM_otaDrop          (Fixed 2 Bytes)     (Decimal)    "DropFromAirCount"
+    FIELD fQca_VoiceTransparentPrimerSM_sbOF        	 (Fixed 2 Bytes)     (Decimal)    "sbOverflow"
+    FIELD fQca_VoiceTransparentPrimerSM_expClk           (Fixed 4 Bytes)     (Decimal) "expectedClk"
+    FIELD fQca_VoiceTransparentPrimerSM_arrClk           (Fixed 4 Bytes)     (Decimal) "arrivalClk"
+    FIELD fQca_VoiceTransparentPrimerSM_DeltaClk         (Fixed 0) IF(FieldIs NotEqualTo 0 fQca_VoiceTransparentPrimerSM_arrClk) RETRIEVE (SubtractFieldMinusField  fQca_VoiceTransparentPrimerSM_expClk fQca_VoiceTransparentPrimerSM_arrClk) ALSO (AndMask 0xFFFFFFF)  (Decimal) "deltaClk"
+    FIELD fQca_VoiceTransparentPrimerSM_hdlFrameCount    (Fixed 2 Bytes)     (Decimal)    "handled rxFrame Count"
+    FIELD fQca_VoiceTransparentPrimerSM_COPverRx         (Fixed 1 Bytes)     (Decimal)    "sourceCopVer"
+    FIELD fQca_VoiceTransparentPrimerSM_COPverTx         (Fixed 1 Bytes)     (Decimal)    "feedbackCopVer"
+
+}
+
+
+GROUP gQca_VOICE_TRANSPARENT_PRIMER_RETRY "Voice Transparent Primer Retry Info"
+{
+    FIELD fQca_VoiceTransparentPrimerRetry_Count                (Fixed 2 Bytes)     (Decimal)    "Retry Count"
+    FIELD fQca_VoiceTransparentPrimerRetry_AciSampleCount       (Fixed 2 Bytes)     (Decimal)    "ACI Sample Count"
+    FIELD fQca_VoiceTransparentPrimerRetry_AciFrameCount        (Fixed 2 Bytes)     (Decimal)    "ACI Frame Count"
+    FIELD fQca_VoiceTransparentPrimerRetry_txOtaCount       	(Fixed 2 Bytes)     (Decimal)    "TxFromAirCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_TxSBCount        	(Fixed 2 Bytes)     (Decimal)    "TxSBCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_txOtaWrong        	(Fixed 2 Bytes)     (Decimal)    "TxFromAirWrongCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_TxSBWrong       		(Fixed 2 Bytes)     (Decimal)    "TxSBWrongCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_otaDrop        		(Fixed 2 Bytes)     (Decimal)    "DropFromAirCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_sbOF      		  	(Fixed 2 Bytes)     (Decimal)    "sbOverflowCount"
+    FIELD fQca_VoiceTransparentPrimerRetry_RxCopSyncWordCnt     (Fixed 2 Bytes)     (Decimal)    "ACI RxCopSyncWord Count"
+    GROUP fQca_VoiceTransparentPrimerRetry_RxErrStatus "IOPErrStatus"
+    {
+        RESERVED (Fixed 3 bits)
+        FIELD fQca_VoiceTransparentPrimerRetry_RxErrStatus_BIT4_EndMarkerInvalid    (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "EndMarkerInvalid"
+        FIELD fQca_VoiceTransparentPrimerRetry_RxErrStatus_BIT3_ZeroLenFrame        (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "ZeroLenFrame"
+        FIELD fQca_VoiceTransparentPrimerRetry_RxErrStatus_BIT2_UnsupportedNframes  (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "UnsupportedNframes"
+        FIELD fQca_VoiceTransparentPrimerRetry_RxErrStatus_BIT1_UnsupportedVer      (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "UnsupportedVer"
+        FIELD fQca_VoiceTransparentPrimerRetry_RxErrStatus_BIT0_Busy                (Fixed 1 bit)  PRINT_IF   (FieldIs NotEqualTo 0) (TABLE t_truefalse)     "Busy"
+        RESERVED (Fixed 1 Bytes)
+    }
+    FIELD fQca_VoiceTransparentPrimerRetry_TxSampleCnt          (Fixed 2 Bytes)      (Decimal)   "ACI TxSample Count"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_PRIMER_HISTORY "Voice Transparent Primer History"
+{
+    FIELD fQca_VoiceTransparentPrimerHist0                      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset 0"
+    FIELD fQca_VoiceTransparentPrimerHist1                      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset 1"
+    FIELD fQca_VoiceTransparentPrimerHist2                      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset 2"
+    FIELD fQca_VoiceTransparentPrimerHist3                      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset 3"
+    FIELD fQca_VoiceTransparentPrimerHist4                      (Fixed 4 Bytes)     RETRIEVE (SignExtension 32) (Decimal)    "Timing Offset 4"
+    FIELD fQca_VoiceTransparentPrimerHistLogIdx                 (Fixed 1 Byte)     (Decimal)    "Last Log Index Updated"
+    FIELD fQca_VoiceTransparentPrimerHist_rsvd                  (Fixed 3 Bytes)     (Decimal)    SUPPRESS_DETAIL
+}
+
+TABLE tFromAirPathType
+    {0, "PRIMARY"}
+    {1, "SECONDARY"}
+ENDTABLE
+
+GROUP gQca_VOICE_TRANSPARENT_FROM_AIR_PATH_SWITCH "Voice Transparent From Air Path Switch"
+{
+    FIELD fQca_VoiceTransparentFromAirPathNew                   (Fixed 1 Byte)      (TABLE tFromAirPathType)    "New Path"
+}
+
+TABLE tLQ_levels
+{0x00 "GOOD"}
+{0x01 "MEDIUM"}
+{0x02 "BAD"}
+{0x03 "VERYBAD"}
+{Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_A2DP_SALF_LQ
+{
+    FIELD fQca_A2DP_SALF_LQ	(Fixed 1 Bytes)		(TABLE tLQ_levels)	"Link Quality"
+}
+
+GROUP gQca_VOICE_TRANSPARENT_ERR_FRAMELEN "Voice Transparent Error FrameLen From LPASS"
+{
+    FIELD fQca_VOICE_TRANSPARENT_ERR_FRAMELEN_frameLen                    (Fixed 2 Bytes)  (Decimal)  "frameLenInRingbuf"
+    FIELD fQca_VOICE_TRANSPARENT_ERR_FRAMELEN_subFrameLen                 (Fixed 2 Bytes)  (Decimal)  "subFramelenInRxSharedData"
+    FIELD fQca_VOICE_TRANSPARENT_ERR_FRAMELEN_expLen                      (Fixed 2 Bytes)  (Decimal)  "expectLen"
+}
+
+GROUP gQca_COP_VER_UNMATCH "version unmatch"
+{
+    FIELD gQca_COP_VER_UNMATCH_1 (Fixed 1 Byte) (Decimal) "RecVer"
+    FIELD gQca_COP_VER_UNMATCH_2 (Fixed 1 Byte) (Decimal) "CfgVer"
+}
+
+GROUP gQca_COP_SEQ_UNMATCH "SEQ unmatch"
+{
+    FIELD gQca_COP_SEQ_UNMATCH_1 (Fixed 2 Bytes) (Decimal) "RecSeq"
+    FIELD gQca_COP_SEQ_UNMATCH_2 (Fixed 2 Bytes) (Decimal) "ExpSeq"
+}
+
+GROUP gQca_COP_PARSE_TIME "COP parse time"
+{
+    FIELD gQca_COP_ParseTime_maxtime (Fixed 4 Bytes) (Decimal) "maxTime(us)"
+    FIELD gQca_COP_ParseTime_curtime (Fixed 4 Bytes) (Decimal) "curTime(us)"
+    FIELD gQca_COP_ParseTime_rbLen   (Fixed 2 Bytes) (Decimal) "ringbufLen(Bytes)"
+    FIELD gQca_COP_ParseTime_rdLen   (Fixed 2 Bytes) (Decimal) "readLen(Bytes)"
+    FIELD gQca_COP_ParseTime_pktCnt  (Fixed 1 Bytes) (Decimal) "pktCount"
+}
+
+TABLE t_ErrorId
+    {0x00 "STREAM STATE INACTIVE"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE t_StreamState
+    {0x00 "IDLE"}        /* Stream IDLE */
+    {0x01 "ACTIVE"}         /* Stream ACTIVE. */
+    {0x02 "PENDING_START"}
+    {0x03 "PENDING_STOP"}
+    {0x04 "PENDING_SEQ_ENABLE"}
+    {0x05 "PENDING_SEQ_DISABLE"}
+    {0x06 "PENDING_SLC_STOP"}
+ENDTABLE
+
+GROUP gQca_AUDIO_SESSION_ERROR "Audio Session Error"
+{
+    FIELD fQca_AudioSessionError_ErrId             (Fixed 2 Bytes)                  (TABLE t_ErrorId)                   "Error Id"
+    GROUP fQca_AudioSessionErro_ExtInfo   IF(FieldIs EqualTo 0x00 fQca_AudioSessionError_ErrId)                         "Ext Info"
+    {
+        FIELD fQca_AudioSessionError_StreamState       (Fixed 2 Bytes)              (TABLE t_StreamState)               "stream state"
+    }
+}
+
+TABLE maxBRTypeTable
+{3, "DM1"}
+{4, "DH1"}
+{0xB, "DH3"}
+{0xF, "DH5"}
+ENDTABLE
+
+TABLE maxTypeTable
+{3, "DM1"}
+{4, "DH1/2DH1"}
+{8, "3DH1"}
+{0xA, "2DH3"}
+{0xB, "DH3/3DH3"}
+{0xE, "2DH5"}
+{0xF, "DH5/3DH5"}
+ENDTABLE
+
+GROUP gQca_SBC_Fragment "SBC Fragment"
+{
+    
+    FIELD fQca_SBC_hostMtu        (Fixed 2 Bytes) (Decimal)            "hostMtu"
+    FIELD fQca_SBC_maxPktSize     (Fixed 2 Bytes) (Decimal)            "maxPktSize"
+    FIELD fQca_SBC_maxPkt         (Fixed 2 Bytes) (TABLE maxTypeTable) "maxPkt" 
+    FIELD fQca_SBC_subframeLength (Fixed 2 Bytes) (Decimal)            "subframeLenth"
+    FIELD fQca_SBC_ltType         (Fixed 1 Bytes) (Decimal)            "ltType"
+    FIELD fQca_SBC_result         (Fixed 1 Bytes) (Decimal)            "frameCmplt"
+    FIELD fQca_SBC_MediaPktSize   (Fixed 2 Bytes) (Decimal)            "MediaPktSize"
+    FIELD fQca_SBC_newSize        (Fixed 2 Bytes) (Decimal)            "newSize"
+    FIELD fQca_SBC_subframeNo     (Fixed 1 Bytes) (Decimal)            "subframeNo"
+    FIELD fQca_SBC_reserve        (Fixed 1 Bytes) (Decimal)            SUPPRESS_DETAIL
+    FIELD fQca_SBC_evalTime       (Fixed 4 Bytes) (Decimal)            "evalTime_us"
+    
+}
+
+GROUP gQca_ChangeInSDUSize "Change in LPASS to BT SDU size"
+{
+    FIELD fQca_ChangeInSDUSize (Fixed 2 Bytes) (Decimal) "NewSDUSize"
+}
+
+GROUP gQca_A2DP_RawPktTimerExpired "Raw Stereo ACI IOP Data"
+{
+    FIELD fQca_Raw_IOP_status               	(Fixed 2 Bytes)     (Hex)                           "Status"
+    FIELD fQca_Raw_IOP_pStart                   (Fixed 2 Bytes)     (Hex)                           "pStart"
+    FIELD fQca_Raw_IOP_pEnd                     (Fixed 2 Bytes)     (Hex)                           "pEnd"
+    FIELD fQca_Raw_IOP_pHead                    (Fixed 2 Bytes)     (Hex)                           "pHead"
+    FIELD fQca_Raw_IOP_pTail                    (Fixed 2 Bytes)     (Hex)                           "pTail"
+    FIELD fQca_Raw_IOP_scratchpad_1             (Fixed 2 Bytes)     (Hex)                           "scratchpad_1"
+    FIELD fQca_Raw_IOP_scratchpad_2             (Fixed 2 Bytes)     (Hex)                           "scratchpad_2"
+    FIELD fQca_Raw_IOP_ringdropCount            (Fixed 2 Bytes)     (Hex)                           "Ring drop Count"
+    FIELD fQca_Raw_IOP_samplesSkipped          	(Fixed 2 Bytes)     (Hex)                      	    "Samples Skipped"
+    FIELD fQca_Raw_IOP_missedSamples            (Fixed 2 Bytes)     (Hex)                           "Missed Samples"
+    FIELD fQca_Raw_IOP_currSlot                 (Fixed 2 Bytes)     (Hex)                           "Current Slot"
+    FIELD fQca_Raw_IOP_flag                     (Fixed 2 Bytes)     (Hex)                           "Flag"
+    FIELD fQca_Raw_IOP_configControlReg         (Fixed 1 Bytes)     (Hex)                           "ConfigControlReg"
+    FIELD fQca_Raw_IOP_configSlotWidth          (Fixed 1 Bytes)     (Hex)                           "ConfigSlotWidth"
+    FIELD fQca_Raw_IOP_configDataWidth          (Fixed 1 Bytes)     (Hex)                           "ConfigDataWidth"
+    FIELD fQca_Raw_IOP_configSlot0	        (Fixed 1 Bytes)     (Hex)                           "ConfigSlot0"
+    FIELD fQca_Raw_IOP_configSlot1	        (Fixed 1 Bytes)     (Hex)                           "ConfigSlot1"
+    FIELD fQca_Raw_IOP_debug		        (Fixed 1 Bytes)     (Hex)                           "Debug"
+}
+
+GROUP gQca_ISO_sduMissDbg_stats "SDU miss debug stats"
+{
+	FIELD fQca_ISO_Periodic_stats1   (Fixed 4 Byte)      (Decimal)         "TxQctr"
+    FIELD fQca_ISO_Periodic_stats2   (Fixed 4 Byte)      (Decimal)         "TxDoneCtr"
+    FIELD fQca_ISO_Periodic_stats3   (Fixed 4 Byte)      (Decimal)         "RxCtr"
+    FIELD fQca_ISO_Periodic_stats4   (Fixed 4 Byte)      (Decimal)         "NoRxCtr"
+    FIELD fQca_ISO_Periodic_stats5   (Fixed 4 Byte)      (Decimal)         "driftDetectedCtr"
+    FIELD fQca_ISO_Periodic_stats6   (Fixed 4 Byte)      (Decimal)         "txPktQueueOverflowCtr"
+    FIELD fQca_ISO_Periodic_stats7   (Fixed 2 Byte)      (Decimal)         "rxPktToIntMin"
+    FIELD fQca_ISO_Periodic_stats8   (Fixed 2 Byte)      (Decimal)         "rxPktLateCtr"    
+}
+
+GROUP gQca_voiceBadAlloc ""
+{
+    FIELD fQca_sizeReq                         (Fixed 2 Bytes)     (Decimal)                               "Requested_size"
+    FIELD fQca_URsize                          (Fixed 2 Bytes)     (Decimal)                               "UpperRamPoolSize"
+    FIELD fQca_LRSize                          (Fixed 2 Bytes)     (Decimal)                               "LowerRamPoolSize"
+}
+
+GROUP gQca_A2DP_WrongPacket "A2DP wrong packet"
+{
+    FIELD fQca_A2DP_WrongPacket_LineNo                    (Fixed 1 Byte)                          (Decimal)                           "Line No"
+    RESERVED (Fixed 1 Byte) 
+    FIELD fQca_A2DP_WrongPacket_flen                      (Fixed 2 Byte)                          (Decimal)                           "FrameLen"
+}

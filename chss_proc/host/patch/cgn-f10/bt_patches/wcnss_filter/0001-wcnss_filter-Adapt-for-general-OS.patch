@@ -1,0 +1,770 @@
+From 8b6924fc33f6a5afb7b0cb707d756ad923006ddd Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Tue, 26 Nov 2019 18:00:17 +0800
+Subject: [PATCH 1/2] wcnss_filter: Adapt for general OS
+
+Adapt for general OS.
+---
+ Makefile.am               |  12 +++--
+ configure.ac              | 114 ++++++++++++++++++++++++----------------------
+ inc/bt_qxdmlog.h          |  10 ++--
+ inc/main.h                |  18 ++++----
+ inc/uart_utils.h          |   1 +
+ inc/utils.h               |   2 +-
+ inc/wcnss_ibs.h           |   6 +--
+ src/bt_nv.cpp             |  18 ++++----
+ src/bt_qxdmlog.c          |  44 ++++++++++++------
+ src/bt_vendor_persist.cpp |   4 ++
+ src/hw_cherokee.c         |  14 ++++--
+ src/main.c                |  38 ++++++++++++----
+ src/uart_utils.c          |   2 +
+ src/utils.c               |   4 ++
+ src/wcnss_ibs.c           |   9 +++-
+ 15 files changed, 182 insertions(+), 114 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0b68c8a..d1ab6f9 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -7,13 +7,14 @@ AM_CFLAGS = -Wall \
+     -std=c99 \
+     -DWCNSS_IBS_ENABLED \
+     -DWAKE_LOCK_ENABLED \
+-    -DDIAG_ENABLED \
+-    -DLOG_BT_ENABLE
++    -DBT_NV_SUPPORT \
++    -UDIAG_ENABLED \
++    -ULOG_BT_ENABLE
+ 
+ AM_CPPFLAGS= \
+     -Iinc/ \
+-    -I$(WORKSPACE)/diag/include \
+-    -I$(WORKSPACE)/system/core/include
++    -I${top_srcdir}/../fluoride/hci/include \
++    -I${top_srcdir}/../fluoride
+ 
+ # HAL layer
+ c_sources = \
+@@ -23,6 +24,7 @@ c_sources = \
+     src/hw_cherokee.c \
+     src/uart_utils.c \
+     src/utils.c \
++    src/bt_nv.cpp \
+     src/bt_vendor_persist.cpp
+ 
+ if USE_GLIB
+@@ -52,4 +54,4 @@ bin_PROGRAMS = wcnssfilter
+ wcnssfilter_CC = @CC@
+ wcnssfilter_SOURCES = $(c_sources)
+ 
+-wcnssfilter_LDADD = -ldl -lrt -lresolv -lpthread -ldiag
++wcnssfilter_LDADD = -ldl -lrt -lresolv -lpthread
+diff --git a/configure.ac b/configure.ac
+index dc7a318..ed2517f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,11 +5,11 @@
+ 
+ # Process this file with autoconf to produce a configure script.
+ 
+-AC_PREREQ([2.68])
++AC_PREREQ([2.69])
+ AC_INIT([hci-qcomm-init], [1.0.0])
+ AM_INIT_AUTOMAKE([foreign subdir-objects])
+ AM_MAINTAINER_MODE
+-AC_CONFIG_SRCDIR([bthci_qcomm_linux.cpp])
++AC_CONFIG_SRCDIR([src/wcnss_ibs.c])
+ AC_CONFIG_HEADER([config.h])
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+@@ -26,18 +26,57 @@ AC_PROG_LN_S
+ AC_PROG_MAKE_SET
+ PKG_PROG_PKG_CONFIG
+ 
+-# Library configs
+-AC_ARG_WITH([common_includes],
+-      AC_HELP_STRING([--with-common-includes=@<:@dir@:>@],
+-         [Specify the location of the common headers]),
+-      [common_incdir=$withval],
+-      with_common_includes=no)
+-
+-if test "x$with_common_includes" != "xno"; then
+-   CFLAGS="${CFLAGS} -I${common_incdir} -I${common_incdir}/qmi-framework -I${common_incdir}/qmi"
+-   CPPFLAGS="${CPPFLAGS} -I${common_incdir} -I${common_incdir}/qmi-framework -I${common_incdir}/qmi"
++CFLAGS="${CFLAGS} -UANDROID -UOS_GENERIC -DCSP_BUILD"
++CFLAGS="${CFLAGS} -D_HW_DONT_INCLUDE_CORE_=1 -DUSE_LIBHW_AOSP"
++CFLAGS="${CFLAGS} -DUSE_SYSLOG_LOGGING"
++
++AC_ARG_WITH([common-includes],
++AS_HELP_STRING([--with-common-includes=IDIR],[Specify common include directory IDIR]),
++[],
++[
++	with_common_includes=no
++])
++if test "x${with_common_includes}" != "xno" ; then
++	CFLAGS="${CFLAGS} -I${with_common_includes}"
++fi
++
++AC_ARG_WITH([common-libraries],
++AS_HELP_STRING([--with-common-libraries=LDIR],[Specify common library directory IDIR]),
++[],
++[
++        with_common_libraries=no
++])
++if test "x${with_common_libraries}" != "xno" ; then
++	LDFLAGS="${LDFLAGS} -L${with_common_libraries}"
++fi
++
++AC_ARG_WITH([bt-workspace-dir],
++AS_HELP_STRING([--with-bt-workspace-dir=BWSDIR],[Specify BT workspace directory BWSDIR]),
++[
++        BT_WORKSPACE_DIR=${withval}
++],[
++        BT_WORKSPACE_DIR=no
++])
++if test "x${BT_WORKSPACE_DIR}" == "xno" ; then
++	AC_MSG_ERROR([[invalid BT_WORKSPACE_DIR]])
++fi
++AC_SUBST([BT_WORKSPACE_DIR])
++CFLAGS="${CFLAGS} -I${BT_WORKSPACE_DIR}/third_party/bluetooth/hal/include -I${BT_WORKSPACE_DIR}/third_party/bluetooth/vhal/include"
++
++AC_ARG_WITH([bt-controller-type],
++AS_HELP_STRING([--with-bt-controller-type=BCTYPE],[Specify bluetooth controller type BCTYPE]),
++[],
++[
++        with_bt_controller_type=no
++])
++if test "x${with_bt_controller_type}" == "xgno_usb" ; then
++	CPPFLAGS="${CPPFLAGS} -DBT_CONTROLLER_TYPE_GNO_USB"
++fi
++if test "x${with_bt_controller_type}" == "xgno_uart" ; then
++	CPPFLAGS="${CPPFLAGS} -DBT_CONTROLLER_TYPE_GNO_UART"
+ fi
+ 
++# Library configs
+ AC_SUBST([CPPFLAGS])
+ AC_SUBST([CFLAGS])
+ AC_SUBST([CC])
+@@ -58,46 +97,17 @@ fi
+ AC_SUBST(SYS_LIB)
+ 
+ AC_CHECK_FUNC(signalfd, dummy=yes,
+-    AC_MSG_ERROR(signalfd support is required))
++      AC_MSG_ERROR(signalfd support is required))
+ 
+ AC_CHECK_LIB(rt, clock_gettime, dummy=yes,
+-    AC_MSG_ERROR(realtime clock support is required))
++      AC_MSG_ERROR(realtime clock support is required))
+ 
+ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
+-    AC_MSG_ERROR(posix thread support is required))
+-
+-AC_ARG_ENABLE(target,
+-  [AS_HELP_STRING([--enable-target=TARGET], [Specify the target product to build])],
+-  [TARGET=$enableval],
+-  [TARGET=none]
+-)
+-
+-AC_ARG_ENABLE(rome,
+-  [AS_HELP_STRING([--enable-rome=ROME], [Specify the rome product to build])],
+-  [ROME=$enableval],
+-  [ROME=none]
+-)
+-
+-AC_ARG_ENABLE([pronto],
+-        [  --enable-pronto Enable Pronto],
+-        [case "${enableval}" in
+-            yes) pronto=true ;;
+-            no)  pronto=false ;;
+-            *) AC_MSG_ERROR([bad value ${enableval} for --enable-pronto]) ;;
+-        esac],[pronto=false])
+-
+-AC_ARG_ENABLE([som],
+-        [  --enable-som Enable Rome or Naples],
+-        [case "${enableval}" in
+-            yes) som=true ;;
+-            no)  som=false ;;
+-            *) AC_MSG_ERROR([bad value ${enableval} for --enable-som]) ;;
+-        esac],[som=false])
+-
+-AM_CONDITIONAL([MDM_ROME], [test "x$TARGET" = "xmdm9607" -o "x$TARGET" = "xmdm9635" -o "x$TARGET" = "xmdm9640" -o "x$TARGET" = "xmdm9650" -o "x$TARGET" = "xapq8096" -o "x$TARGET" = "xsdx20" -o "x$ROME" = "xqsap" -o "x$ROME" = "xrobot-rome" -o "x$TARGET" = "xsdxpoorwills" -o "x$TARGET" = "xsdxprairie" -o "x$som" = "xtrue"])
+-AM_CONDITIONAL([MDM_PRONTO], [test "x$TARGET" = "xapq8017" -o "x$TARGET" = "xapq8053" -o "x$TARGET" = "xapq8016" -o "x$pronto" = "xtrue"])
+-
+-AM_CONDITIONAL([MDM_CHEROKEE], [test "x$TARGET" = "xapq8098" -o "x$TARGET" = "xqcs605" -o "x$TARGET" = "xsdm845"])
++      AC_MSG_ERROR(posix thread support is required))
++
++AM_CONDITIONAL([MDM_ROME], false)
++AM_CONDITIONAL([MDM_PRONTO], false)
++AM_CONDITIONAL([MDM_CHEROKEE], false)
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_HEADER_STDBOOL
+@@ -107,8 +117,7 @@ AC_TYPE_UINT32_T
+ AC_TYPE_UINT8_T
+ 
+ AC_ARG_WITH([glib],
+-     AC_HELP_STRING([--with-glib],
+-        [enable glib, building HLOS systems which use glib]))
++     AS_HELP_STRING([--with-glib],[enable glib, building HLOS systems which use glib]))
+ 
+ if (test "x${with_glib}" = "xyes"); then
+        PKG_CHECK_MODULES(GTHREAD, gthread-2.0 >= 2.16, dummy=yes,
+@@ -122,10 +131,6 @@ if (test "x${with_glib}" = "xyes"); then
+        AC_SUBST(GLIB_LIBS)
+ fi
+ 
+-PKG_CHECK_MODULES([DIAG], [diag])
+-AC_SUBST([DIAG_CFLAGS])
+-AC_SUBST([DIAG_LIBS])
+-
+ AM_CONDITIONAL(USE_GLIB, test "x${with_glib}" = "xyes")
+ # Checks for library functions.
+ AC_FUNC_MALLOC
+@@ -133,7 +138,6 @@ AC_CHECK_FUNCS([gettimeofday memset select socket strerror])
+ 
+ AC_CONFIG_FILES([ \
+     Makefile \
+-    wcnss_filter/Makefile \
+     ])
+ 
+ AC_OUTPUT
+diff --git a/inc/bt_qxdmlog.h b/inc/bt_qxdmlog.h
+index 0494f08..91345ab 100644
+--- a/inc/bt_qxdmlog.h
++++ b/inc/bt_qxdmlog.h
+@@ -127,13 +127,13 @@ typedef PACKED struct
+ } bt_log_pkt;
+ 
+ 
+-bool qxdm_property_init();
+-bool diag_init();
+-void diag_deinit();
++bool qxdm_property_init(void);
++bool diag_init(void);
++void diag_deinit(void);
+ void send_btlog_pkt(uint8 *pBtPaktBuf, int packet_len, int direction);
+ #endif// DIAG_ENABLED
+-int is_snoop_log_enabled();
+-void bt_kernel_panic();
++int is_snoop_log_enabled(void);
++void bt_kernel_panic(void);
+ void  dump_uart_ipc_logs(int inx);
+ bool is_crashdump_enabled(void);
+ int get_dump_index(void);
+diff --git a/inc/main.h b/inc/main.h
+index b649e17..496eb2b 100644
+--- a/inc/main.h
++++ b/inc/main.h
+@@ -49,15 +49,15 @@ typedef enum {
+ 
+ void report_soc_failure(void);
+ 
+-void commit_out_ring_buffer();
+-void commit_in_ring_buffer();
+-bool is_debug_out_ring_buf_enabled();
+-bool is_debug_in_ring_buf_enabled();
+-bool is_debug_force_special_bytes();
+-bool soc_crash_wait_timer_stop();
++void commit_out_ring_buffer(int);
++void commit_in_ring_buffer(int);
++bool is_debug_out_ring_buf_enabled(void);
++bool is_debug_in_ring_buf_enabled(void);
++bool is_debug_force_special_bytes(void);
++bool soc_crash_wait_timer_stop(void);
+ void update_ring_buffer (RING_BUF *rb, unsigned char* buf, int len, RING_BUF *swapb,  bool is_in_buf);
+-bool is_diag_enabled();
+-static void cleanup_and_suicide();
+-int init_hci_transport();
++bool is_diag_enabled(void);
++static void cleanup_and_suicide(void);
++int init_hci_transport(void);
+ 
+ #endif//__MAIN_H__
+diff --git a/inc/uart_utils.h b/inc/uart_utils.h
+index dc7ca05..79b725d 100644
+--- a/inc/uart_utils.h
++++ b/inc/uart_utils.h
+@@ -27,6 +27,7 @@
+ #ifndef _UART_UTILS_H_
+ #define _UART_UTILS_H_
+ 
++#include <stdint.h>
+ #include "hw_cherokee.h"
+ 
+ #define TRUE           1
+diff --git a/inc/utils.h b/inc/utils.h
+index 4dbbd37..be15994 100644
+--- a/inc/utils.h
++++ b/inc/utils.h
+@@ -22,6 +22,6 @@ typedef enum {
+     BT_SOC_RESERVED
+ }bt_soc_type;
+ 
+-int get_bt_soc_type();
++int get_bt_soc_type(void);
+ 
+ #endif//_UTILS_H_
+diff --git a/inc/wcnss_ibs.h b/inc/wcnss_ibs.h
+index 3ea45ac..32d0c4e 100644
+--- a/inc/wcnss_ibs.h
++++ b/inc/wcnss_ibs.h
+@@ -43,7 +43,7 @@ extern "C"
+ #endif
+ extern pthread_mutex_t signal_mutex;
+ int wcnss_wake_assert(void);
+-void wcnss_ibs_cleanup();
++void wcnss_ibs_cleanup(void);
+ void wcnss_ibs_init(int fd);
+ void wcnss_tx_done(uint8_t tx_done);
+ void wcnss_device_can_sleep(void);
+@@ -53,8 +53,8 @@ void wcnss_vote_on_clk(void);
+ 
+ void wcnss_wakelock_init(char *lock_name);
+ void wcnss_wakelock_destroy(void);
+-void wcnss_acquire_wakelock();
+-void wcnss_release_wakelock();
++void wcnss_acquire_wakelock(void);
++void wcnss_release_wakelock(void);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/src/bt_nv.cpp b/src/bt_nv.cpp
+index 57e53b2..2b721f1 100644
+--- a/src/bt_nv.cpp
++++ b/src/bt_nv.cpp
+@@ -38,9 +38,9 @@ when        who  what, where, why
+ #include <stdio.h>
+ #include <string.h>
+ #include <errno.h>
+-#include "comdef.h"
+ #include "bt_nv.h"
+ #include <unistd.h>
++#include <stdint.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+@@ -76,13 +76,13 @@ typedef enum {
+ typedef struct {
+   nv_persist_items_enum_type item;     /* Item to access */
+   nv_persist_write_type writeprotect;
+-  uint8 nSize;
++  uint8_t nSize;
+   unsigned char pCmdBuffer[MAX_PAYLOAD_SIZE];    /* Pointer to read or write data */
+ } nv_persist_params;
+ 
+ typedef struct _nv_items_tag {
+   nv_persist_items_enum_type type;
+-  uint8 size;
++  uint8_t size;
+   nv_persist_write_type multi_time_wr;
+ }nv_items;
+ 
+@@ -138,7 +138,7 @@ FUNCTION:  bt_nv_write
+ int bt_nv_write
+ (
+   nv_persist_params *params,
+-  uint8 nparams
++  uint8_t nparams
+ )
+ {
+   int nFd;
+@@ -209,12 +209,12 @@ int bt_nv_write
+     {
+       BTNV_INFO("BT-NV-WRITE: params[%d] is valid\n",i);
+     }
+-    cmd[0] = (uint8)params[i].item;
+-    cmd[1] = (uint8)params[i].writeprotect;
+-    cmd[2] = (uint8)params[i].nSize;
++    cmd[0] = (uint8_t)params[i].item;
++    cmd[1] = (uint8_t)params[i].writeprotect;
++    cmd[2] = (uint8_t)params[i].nSize;
+ 
+     BTNV_INFO("BT-NV-WRITE:****** params[i].writeprotect_0ld = %d new  = %d\n",
+-                    (uint8)params[i].writeprotect,(uint8)cmd[1]);
++                    (uint8_t)params[i].writeprotect,(uint8_t)cmd[1]);
+ 
+     memcpy(&cmd[NV_CMD_HDR_SIZE], params[i].pCmdBuffer, params[i].nSize);
+ 
+@@ -457,7 +457,7 @@ int bt_nv_cmd(nv_persist_func_enum_type nvReadWriteFunc,  nv_persist_items_enum_
+         }
+         params_temp[item].item = (nv_persist_items_enum_type)nvitem;
+         params_temp[item].writeprotect = nvItems[nvitem - 1].multi_time_wr;
+-        params_temp[item].nSize = (uint8)nvItems[nvitem -1].size;
++        params_temp[item].nSize = (uint8_t)nvItems[nvitem -1].size;
+         if(nvitem == NV_BD_ADDR_I)
+         {
+             /* Overridden. Since in case of BD address it can be either
+diff --git a/src/bt_qxdmlog.c b/src/bt_qxdmlog.c
+index cc99e07..f719889 100644
+--- a/src/bt_qxdmlog.c
++++ b/src/bt_qxdmlog.c
+@@ -14,7 +14,12 @@ Description
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include <stdint.h>
++#ifdef ANDROID
+ #include <cutils/properties.h>
++#else
++#include "osi/include/properties.h"
++#endif
+ #include <fcntl.h>
+ #include <sys/time.h>
+ #include <stdlib.h>
+@@ -23,6 +28,13 @@ Description
+ #include <sys/types.h>
+ #include <dirent.h>
+ #include "utils.h"
++#ifdef WCNSS_IBS_ENABLED
++#include "wcnss_ibs.h"
++#endif
++#ifdef  LOG_TAG
++#undef  LOG_TAG
++#endif
++#define LOG_TAG "WCNSS_FILTER"
+ 
+ #define UART_IPC_LOG_COLLECTION_OLD_PATH  "/sys/kernel/debug/ipc_logging/msm_serial_hs/log"
+ #define UART_IPC_LOG_COLLECTION_DIR  "/sys/kernel/debug/ipc_logging/"
+@@ -43,13 +55,6 @@ Description
+ #include "diag/diaglogi.h"
+ #include "diag/diagpkt.h"
+ #include "diag/diagcmd.h"
+-#ifdef WCNSS_IBS_ENABLED
+-#include "wcnss_ibs.h"
+-#endif
+-#ifdef  LOG_TAG
+-#undef  LOG_TAG
+-#endif
+-#define LOG_TAG "WCNSS_FILTER"
+ 
+ #define LLM_DEBUG_LE_CONTROL_PDU_RX(ppkt)\
+         MSG_SPRINTF_3(MSG_SSID_BT,MSG_LEGACY_MED,"LE CPDU RX: %s, c: 0x%2X, len:%d", psLE_ControlPDU[( (((ppkt)[4]) >= MAX_LE_CONTROL_PDU_SIZE) ?  (MAX_LE_CONTROL_PDU_SIZE-1) :  ((ppkt)[4]))], ppkt[4],(ppkt)[3]);
+@@ -75,6 +80,9 @@ Description
+ #define LLM_DEBUG_LE_ENCRYTION_STATE(ppkt)\
+         MSG_SPRINTF_3(MSG_SSID_BT,MSG_LEGACY_HIGH,"LLM-LE ENCR h:%d, st: %s, ev:%s", (ppkt)[2],psLE_EncryptionState[(ppkt)[0]], psCMevent[(ppkt)[1]]);
+ 
++#endif
++#endif
++
+ #define MAX_LE_CONTROL_PDU_SIZE (0x16)
+ #define DIAG_SSR_BT_CMD     0x0007
+ #define PRINT_BUF_SIZE      (260*3 +2)
+@@ -89,19 +97,19 @@ Description
+ #define MAX_CRASH_DUMP_SIZE (416 << 10)
+ 
+ static char *get_reset_reason_str(Reset_reason_e reason);
+-static void handle_event(uint8 *eventBuf, int length);
+-static void send_str_log(uint8 *strBuf);
+-static void send_cntlr_log(uint8 *cntlrBuf, int length);
+-static void format_lmp(uint8 *dst, uint8 *src, int32 pktLen);
+-static void send_log(uint8 *Buf, int length, int type);
+-void *ssr_bt_handle(void *req_pkt, uint16 pkt_len);
++static void handle_event(uint8_t *eventBuf, int length);
++static void send_str_log(uint8_t *strBuf);
++static void send_cntlr_log(uint8_t *cntlrBuf, int length);
++static void format_lmp(uint8_t *dst, uint8_t *src, int32_t pktLen);
++static void send_log(uint8_t *Buf, int length, int type);
++void *ssr_bt_handle(void *req_pkt, uint16_t pkt_len);
+ static int dump_UART_logs(char* spath, char* dpath, int buffer_size, int water_mark);
+ int bt_ssr_level ();
+ extern int fd_transport;
+ #ifdef PANIC_ON_SOC_CRASH
+ extern int fd_sysrq;
+ #endif //PANIC_ON_SOC_CRASH
+-extern g_crash_dump_started;
++extern int g_crash_dump_started;
+ int g_timer_stopped_instance = false;
+ bool uart_dump_collected = false;
+ 
+@@ -111,10 +119,15 @@ static bool enable_snoop_log = false;
+ static bool enable_crashdump = true;
+ 
+ static unsigned char dump_cnt =0;
++
++#ifdef DIAG_ENABLED
++#ifdef LOG_BT_ENABLE
+ static const diagpkt_user_table_entry_type ssr_bt_tbl[] =
+ { /* susbsys_cmd_code lo = 7 , susbsys_cmd_code hi = 7, call back function */
+     {DIAG_SSR_BT_CMD, DIAG_SSR_BT_CMD, ssr_bt_handle},
+ };
++#endif
++#endif
+ 
+ static Reason_map_st reset_reason [] = {
+     { BT_CRASH_REASON_UNKNOWN        ,    "Unknown"},
+@@ -726,6 +739,9 @@ char * psSECevent[] = {
+    "LMP_PROCeINVALID_EVENT"
+ };
+ 
++#ifdef DIAG_ENABLED
++#ifdef LOG_BT_ENABLE
++
+ bool qxdm_property_init()
+ {
+     int ret =0;
+diff --git a/src/bt_vendor_persist.cpp b/src/bt_vendor_persist.cpp
+index edf6a3b..7d05630 100644
+--- a/src/bt_vendor_persist.cpp
++++ b/src/bt_vendor_persist.cpp
+@@ -9,7 +9,11 @@
+ 
+ #ifdef BT_NV_SUPPORT
+ #include "bt_nv.h"
++#ifdef ANDROID
+ #include <utils/Log.h>
++#else
++#include "wcnss_ibs.h"
++#endif
+ 
+ /*===========================================================================
+ FUNCTION   bt_vendor_nv_read
+diff --git a/src/hw_cherokee.c b/src/hw_cherokee.c
+index 738edd6..96ea4b9 100644
+--- a/src/hw_cherokee.c
++++ b/src/hw_cherokee.c
+@@ -34,7 +34,9 @@ extern "C" {
+ #define LOG_TAG "WCNSS_FILTER"
+ 
+ #include <sys/socket.h>
++#ifdef ANDROID
+ #include <utils/Log.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <signal.h>
+@@ -43,7 +45,11 @@ extern "C" {
+ #include <fcntl.h>
+ #include <dirent.h>
+ #include <ctype.h>
++#ifdef ANDROID
+ #include <cutils/properties.h>
++#else
++#include "osi/include/properties.h"
++#endif
+ #include <stdlib.h>
+ #include <termios.h>
+ #include <string.h>
+@@ -1156,10 +1162,12 @@ error:
+ 
+ int download_tlv_file(int fd)
+ {
++    int tmp;
+     int tlv_size, err = -1;
+-    char nvm_file_path_bid[32] = { 0,};
++    char nvm_file_path_bid[64] = { 0,};
+ 
+-    memcpy(nvm_file_path_bid, nvm_file_path, strlen(nvm_file_path) - 3);
++    tmp = strlen(nvm_file_path) - 3;
++    memcpy(nvm_file_path_bid, nvm_file_path, tmp);
+ 
+     /* Rampatch TLV file Downloading */
+     pdata_buffer = NULL;
+@@ -1205,7 +1213,7 @@ nvm_download:
+         goto default_download;
+     }
+ 
+-    strlcat(nvm_file_path_bid, (char*)board_id, sizeof(nvm_file_path_bid));
++    snprintf(nvm_file_path_bid + tmp, sizeof(nvm_file_path_bid) - tmp, "%s", (char*)board_id);
+     if((tlv_size = get_tlv_file(nvm_file_path_bid)) < 0) {
+         ALOGI("%s: %s: file doesn't exist, falling back to default file", __FUNCTION__, nvm_file_path_bid);
+ default_download:
+diff --git a/src/main.c b/src/main.c
+index 7856a50..8e5bc0b 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -62,7 +62,11 @@ Description
+ #include <stdlib.h>
+ #include <signal.h>
+ #include <sys/socket.h>
++#ifdef ANDROID
+ #include <cutils/sockets.h>
++#endif
++#include <unistd.h>
++#include <sys/syscall.h>
+ #include <pthread.h>
+ #include <sys/select.h>
+ #include <sys/types.h>
+@@ -71,7 +75,13 @@ Description
+ #include <termios.h>
+ #include <fcntl.h>
+ #include <sys/un.h>
++#include <errno.h>
++
++#ifdef ANDROID
+ #include <cutils/properties.h>
++#else
++#include "osi/include/properties.h"
++#endif
+ #include <sys/ioctl.h>
+ #ifdef ANDROID
+ #include "private/android_filesystem_config.h"
+@@ -203,9 +213,9 @@ void ibs_recv_ibs_cmd(uint8_t *data);
+ bool enable_diag = false ;
+ int copy_fm_data_to_channel(int src_fd, int dest_fd, unsigned char protocol_byte,int dir);
+ 
+-static void handle_cleanup();
+-static void cleanup_and_suicide();
+-extern int bt_ssr_level ();
++static void handle_cleanup(void);
++static void cleanup_and_suicide(void);
++extern int bt_ssr_level (void);
+ bool send_special_bytes = false ;
+ static int do_write(int fd, unsigned char *buf,int len);
+ #ifdef ENABLE_CAPABLITY_UPDATE
+@@ -233,6 +243,11 @@ bool is_diag_enabled() {
+ }
+ bool g_fwsnoop = false;
+ 
++pid_t q_gettid(void)
++{
++  return syscall(SYS_gettid);
++}
++
+ #ifndef ANDROID
+ int property_get_bt(const char *key, char *value, const char *default_value)
+ {
+@@ -258,7 +273,7 @@ int property_get_bt(const char *key, char *value, const char *default_value)
+     if (bytes_read) {
+         return 0;
+     } else {
+-        strlcpy(value, default_value, strlen(default_value) + 1);
++        memcpy(value, default_value, strlen(default_value) + 1);
+         return 1;
+     }
+ }
+@@ -274,7 +289,7 @@ int property_set_bt(const char *key, const char *value)
+ }
+ #endif
+ 
+-void set_debug_properties() {
++void set_debug_properties(void) {
+     int ret =0;
+     char value[PROPERTY_VALUE_MAX] = {'\0'};
+ #ifdef ENABLE_DBG_FLAGS
+@@ -517,7 +532,7 @@ static int extract_uid(int uuid)
+ }
+ 
+ 
+-static void init_server_sock_status() {
++static void init_server_sock_status(void) {
+     int i;
+     for (i=0;i<MAX_NUM_SOCKS; i++) {
+         server_socket_status[i] = DOWN;
+@@ -526,7 +541,7 @@ static void init_server_sock_status() {
+ 
+ /* Blocking call
+  */
+-static void wait_for_server_socks_ready() {
++static void wait_for_server_socks_ready(void) {
+     int i = 0;
+     const int WAIT_TIMEOUT = 1000;
+ 
+@@ -858,7 +873,9 @@ int handle_command_writes(int fd) {
+             if (!g_crash_dump_started) {
+                 send_special_buffer();
+                 inx = get_dump_index();
++#ifdef DIAG_ENABLED
+                 dump_uart_ipc_logs(inx);
++#endif
+                 ssrlevel = bt_ssr_level();
+                 if (ssrlevel == 1 || ssrlevel == 2) {
+                 //   bt_kernel_panic();
+@@ -1512,6 +1529,8 @@ int copy_bt_data_to_channel(int src_fd, int dest_fd, unsigned char protocol_byte
+ //             wcnss_device_can_sleep();
+            }
+ #endif
++
++#ifdef DIAG_ENABLED
+            if((hdr[0] == 0x10) && !uart_dump_collected) {
+                ALOGI("%s: hardware error event received without crashdump, collecting UART IPC logs", __func__);
+                int inx = get_dump_index();
+@@ -1521,6 +1540,7 @@ int copy_bt_data_to_channel(int src_fd, int dest_fd, unsigned char protocol_byte
+                delete_crashdump_file(inx);
+            }
+ 
++#endif
+            len = hdr[BT_EVT_HDR_LEN_OFFSET];
+            ALOGV("len: %d\n", len);
+            buf = (unsigned char*)calloc(len+BT_EVT_HDR_SIZE+1, sizeof(char));
+@@ -1952,7 +1972,7 @@ int deinit_hci_transport() {
+             deinit_uart_transport (&fd_transport);
+         } break;
+         case BT_SOC_CHEROKEE: {
+-            if (getpid() == gettid()) {
++            if (getpid() == q_gettid()) {
+                 ALOGI("%s: called from Rx&main thread, do not send pre-shutdown",
+                     __func__);
+             }
+@@ -2111,7 +2131,7 @@ int main() {
+     /*Create the address of the server.*/
+     memset(&name, 0, sizeof(struct sockaddr_un));
+     name.sun_family = AF_UNIX;
+-    strlcpy(name.sun_path, SOCKETNAME, sizeof(name.sun_path));
++    snprintf(name.sun_path, sizeof(name.sun_path), "%s", SOCKETNAME);
+     len = sizeof(name.sun_family) + strlen(name.sun_path);
+     /*Connect to the server.*/
+     if (connect(bt_prop_socket, (struct sockaddr *) &name, len) < 0){
+diff --git a/src/uart_utils.c b/src/uart_utils.c
+index 8dbe555..5a4a68f 100644
+--- a/src/uart_utils.c
++++ b/src/uart_utils.c
+@@ -30,7 +30,9 @@
+ #include <asm-generic/ioctls.h>
+ #include <asm-generic/termios.h>
+ #endif
++#ifdef ANDROID
+ #include <cutils/log.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+diff --git a/src/utils.c b/src/utils.c
+index be41605..5a83193 100644
+--- a/src/utils.c
++++ b/src/utils.c
+@@ -9,8 +9,12 @@ Description
+ ===========================================================================*/
+ 
+ 
++#ifdef ANDROID
+ #include <cutils/log.h>
+ #include <cutils/properties.h>
++#else
++#include "osi/include/properties.h"
++#endif
+ #include <strings.h>
+ #include "utils.h"
+ #include "wcnss_ibs.h"
+diff --git a/src/wcnss_ibs.c b/src/wcnss_ibs.c
+index 2dc8c2f..2715e6a 100644
+--- a/src/wcnss_ibs.c
++++ b/src/wcnss_ibs.c
+@@ -13,9 +13,15 @@ Description
+ #include <string.h>
+ #include <errno.h>
+ #include <signal.h>
++#include <unistd.h>
+ #include <sys/time.h>
++#include <sys/ioctl.h>
++#ifdef ANDROID
+ #include <cutils/log.h>
+ #include <cutils/properties.h>
++#else
++#include "osi/include/properties.h"
++#endif
+ #include <fcntl.h>
+ #include <string.h>
+ #include "wcnss_ibs.h"
+@@ -689,7 +695,8 @@ void wcnss_wakelock_init(char *wl_name)
+ {
+     ALOGD("%s",__func__);
+     int name_len = 20;
+-    strlcpy(wake_lock_name,wl_name,name_len);
++    snprintf(wake_lock_name, sizeof(wake_lock_name), "%s", wl_name);
++
+     wl_fd = open(WAKELOCK_PATH,O_WRONLY|O_APPEND);
+     if (wl_fd < 0)
+     {
+-- 
+2.7.4
+

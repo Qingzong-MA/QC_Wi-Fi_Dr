@@ -1,0 +1,2744 @@
+/************************************************
+ * File: QCA_Debug_LLMLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+************************************************/
+
+TABLE tQca_LLMLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0200 "LOG_ID_LLM_LM_SM"              "LOG_ID_LLM_LM_SM"              0   gQca_LLM_LMStateInfo}
+    {0x0201 "LOG_ID_LLM_CM_SM"              "LOG_ID_LLM_CM_SM"              0   gQca_LLM_CMStateInfo}
+    {0x0202 "LOG_ID_LLM_SEQ_SM"             "LOG_ID_LLM_SEQ_SM"             0   gQca_LLM_SeqStateInfo}
+    {0x0203 "LOG_ID_LLM_LE_LL_SM"           "LOG_ID_LLM_LE_LL_SM"           0   gQca_LLM_LELLStateInfo}
+    {0x0204 "LOG_ID_LLM_LE_CM_SM"           "LOG_ID_LLM_LE_CM_SM"           0   gQca_LLM_LECMStateInfo}
+    {0x0205 "LOG_ID_LLM_LE_ENC_SM"          "LOG_ID_LLM_LE_ENC_SM"          0   gQca_LLM_LEEncrStateInfo}
+    {0x0206 "LOG_ID_LLM_AFH_ASSESSMENT"     "LOG_ID_LLM_AFH_ASSESSMENT"     0   gQca_LLM_AFHEvalInfo}
+    {0x0207 "LOG_ID_LLM_LMP_TIMEOUT"        "LOG_ID_LLM_LMP_TIMEOUT"        0   gQca_DefaultPrint}
+    {0x0208 "LOG_ID_LLM_LNKMNGR"            "LOG_ID_LLM_LNKMNGR"            0   gQca_DefaultPrint}
+    {0x0209 "LOG_ID_LLM_ALLOC_EVENT_NOBUFF" "LOG_ID_LLM_ALLOC_EVENT_NOBUFF" 0   gQca_LLM_AllocEventNoBuff}
+    {0x020A "LOG_ID_LLM_LP_MODE_STATUS"     "LOG_ID_LLM_LP_MODE_STATUS"     0   gQca_DefaultPrint}
+    {0x020B "LOG_ID_LLM_RMCDCMD"            "llm_rmcdCommand.c"             0   gQca_DefaultPrint}
+    {0x020C "LOG_ID_LLM_SET_REP_ATTEMPTS"   "LOG_ID_LLM_SET_REP_ATTEMPTS"   0   gQca_LLM_AuthenRetry}
+    {0x020D "LOG_ID_LLM_UPDATE_REP_ATTEMPTS" "LOG_ID_LLM_UPDATE_REP_ATTEMPTS" 0   gQca_LLM_AuthenRetry}
+    {0x020E "LOG_ID_LLM_LE_ADV_FILTER"      "LOG_ID_LLM_LE_ADV_FILTER"      0   gQca_LLM_LEAdvFilterMatchInfo}
+    {0x020F "LOG_ID_LLM_PHYSEL"             "LOG_ID_LLM_PHYSEL"             0   gQca_LLM_PhySelInfo}
+    {0x0210 "LOG_ID_LLM_PHYSEL_STATS"       "LOG_ID_LLM_PHYSEL_STATS"       0   gQca_LLM_PhySelStats}
+    {0x0211 "LOG_ID_LLM_SET_REP_ATTEMPTS_NOBUFF" "LOG_ID_LLM_SET_REP_ATTEMPTS_NOBUFF" 0 gQca_LLM_SetRepAttemptsNoBuff}
+    {0x0212 "LOG_ID_LLM_AFH_HANGOVER"       "LOG_ID_LLM_AFH_HANGOVER"       0   gQca_LLM_AFHHangOverData}
+    {0x0213 "LOG_ID_LLM_POWER_LEVEL"        "LOG_ID_LLM_POWER_LEVEL"        0   gQca_LLM_LMPowerLevelInfo}
+    {0x0214 "LOG_ID_LLM_FORCE_2PAGE"        "LOG_ID_LLM_FORCE_2PAGE"        0   gQca_LLM_Force_2PageInfo}
+    {0x0215 "LOG_ID_LLM_PSCAN_INFO"         "LOG_ID_LLM_PSCAN_INFO"         0   gQca_LLM_PscanInfo}
+    {0x0216 "LOG_ID_LLM_AFH_RSSIDATA"       "LOG_ID_LLM_AFH_RSSIDATA"       0   gQca_LLM_AFHRssiData}
+    {0x0221 "LOG_ID_LLM_AFH_SLOT_REM"       "LOG_ID_LLM_AFH_SLOT_REM"       0   gQca_LLM_AFH_SlotRem}
+    {0x0222 "LOG_ID_LLM_AFH_RSSIDATA_RAW"   "LOG_ID_LLM_AFH_RSSIDATA_RAW"   0   gQca_LLM_AFHRssiData}
+    {0x0223 "LOG_ID_LLM_AFH_BAND_FindBand"  "LOG_ID_LLM_AFH_BAND_FindBand"  0   gQca_LLM_AFHBand}
+    {0x0224 "LOG_ID_LLM_AFH_BAND_TrimBand"  "LOG_ID_LLM_AFH_BAND_TrimBand"  0   gQca_LLM_AFHBand}
+    {0x0225 "LOG_ID_LLM_AFH_BAND_AdjBand"   "LOG_ID_LLM_AFH_BAND_AdjBand"   0   gQca_LLM_AFHBand}
+    {0x021B "LOG_ID_LLM_BLACKLIST_LE2M"     "LOG_ID_LLM_BLACKLIST_LE2M"     0   gQca_LE_TX_RX_PHY}
+    {0x021C "LOG_ID_LLM_SCAN_AFH_DATA"      "LOG_ID_LLM_SCAN_AFH_DATA"      0   gQca_LLM_SCANAfhEvalInfo}         
+    {0x0227 "LOG_ID_LLM_CIG_PARAMS"         "LOG_ID_LLM_CIG_PARAMS"         0   gQca_LLM_CigParams}
+    {0x0228 "LOG_ID_LLM_BIG_PARAMS"         "LOG_ID_LLM_BIG_PARAMS"         0   gQca_LLM_BigParams}
+    {0x0229 "LOG_ID_LLM_BIG_INFO"           "LOG_ID_LLM_BIG_INFO"           0   gQca_LLM_BigInfo}
+    {0x022A "LOG_ID_LLM_ISO_DATA_STATS"     "LOG_ID_LLM_ISO_DATA_STATS"     0   gQca_LLM_IsoDataStats}
+    {0x022B "LOG_ID_LLM_L2CAP_TX_FLOW"      "LOG_ID_LLM_L2CAP_TX_FLOW"      0   gQca_LLM_l2capTxflow}
+    
+    {0x022C "LOG_ID_LLM_AFH_STATE_CHANGE_LOG" "LOG_ID_LLM_AFH_STATE_CHANGE_LOG" 0   gQca_LLM_AfhStateChangeInfo}
+    {0x022D "LOG_ID_LLM_AFH_EVENT_LOG"      "LOG_ID_LLM_AFH_EVENT_LOG"      0   gQca_LLM_AfhEventInfo}
+    {0x022E "LOG_ID_LLM_AFH_ACTION_LOG"     "LOG_ID_LLM_AFH_ACTION_LOG"     0   gQca_LLM_AfhActionInfo}
+
+    {0x022F "LOG_ID_LLM_LE_PWR_CTRL"        "LOG_ID_LLM_LE_PWR_CTRL"        0   gQca_LLM_LepCtrlInfo}
+
+    {0x0230 "LOG_ID_LLM_PCONV_SET_BASIC"    "LOG_ID_LLM_PCONV_SET_BASIC"    0   gQca_LLM_PConv_SetBasic}
+    {0x0231 "LOG_ID_LLM_PCONV_TUNE_FT"      "LOG_ID_LLM_PCONV_TUNE_FT"      0   gQca_LLM_PConv_TuneFt}
+    {0x0232 "LOG_ID_LLM_PCONV_TUNE_NSE"     "LOG_ID_LLM_PCONV_TUNE_NSE"     0   gQca_LLM_PConv_TuneNse}
+    {0x0233 "LOG_ID_LLM_PCONV_BETTER_SET"   "LOG_ID_LLM_PCONV_BETTER_SET"   0   gQca_LLM_PConv_BetterSet }
+    {0x0234 "LOG_ID_LLM_PCONV_SAVE"         "LOG_ID_LLM_PCONV_SAVE"         0   gQca_LLM_PConv_Save }
+    {0x0235 "LOG_ID_LLM_PCONV_RESTORE"      "LOG_ID_LLM_PCONV_RESTORE"      0   gQca_LLM_PConv_Restore }
+    {0x0236 "LOG_ID_LLM_PCONV_DONE"         "LOG_ID_LLM_PCONV_DONE"         0   gQca_LLM_PConv_Done }
+    {0x0238 "LOG_ID_LLM_LE_AFH_ASSESSMENT"  "LOG_ID_LLM_LE_AFH_ASSESSMENT"  0   gQca_LLM_LE_AFHEvalInfo }
+    {0x0239 "LOG_ID_LLM_LE_PAST_INVALID_HANDLE" "LOG_ID_LLM_LE_PAST_INVALID_HANDLE" 0 gQca_LLM_LE_PAST_invalidHandle }
+    {0x023A "LOG_ID_LLM_RTSC_BUFF_STATUS"   "LOG_ID_LLM_RTSC_BUFF_STATUS"  0 gQca_LLM_RtscBuffStatus }
+    {0x023B "LOG_ID_LLM_POWER_CONTROL_INFO"   "LOG_ID_LLM_POWER_CONTROL_INFO" 0 gQca_LLM_PowerControlInfo }
+    {0x023C "LOG_ID_LLM_LE_PWR_CTRL_CONN_STATS"   "LOG_ID_LLM_LE_PWR_CTRL_CONN_STATS" 0 gQca_LLM_PclConnStats }
+    {0x023D "LOG_ID_LLM_UTILITY_TIMER_TIMEOUT"   "LOG_ID_LLM_UTILITY_TIMER_TIMEOUT" 0 gQca_LLM_UtilityTimerTimeout }
+    {0x023E "LOG_ID_LLM_UTILITY_TIMER_ALLOC_FAILURE_INFO"    "LOG_ID_LLM_UTILITY_TIMER_ALLOC_FAILURE_INFO"    0    gQca_LLM_UtilityTimerAllocFailed}
+    {0x0240 "LOG_ID_LLM_ESCO_NEGO"          "LOG_ID_LLM_ESCO_NEGO"          0   gQca_LLM_ESCO_Nego}
+    {0x0243 "LOG_ID_LLM_LE_RPA_RESOLVE_FAIL" "LOG_ID_LLM_LE_RPA_RESOLVE_FAIL" 0 gQca_le_rpa_resolve_fail}
+    {0x0244 "LOG_ID_LLM_ESCO_VOICE_ALLOC"   "LOG_ID_LLM_ESCO_VOICE_ALLOC"   0   gQca_LLM_VoiceAlloc}
+    {0x0245 "LOG_ID_LLM_LE_ADV_FILTER_ALLOC_STATUS" "LOG_ID_LLM_LE_ADV_FILTER_ALLOC_STATUS" 0 gQca_le_adv_filter_alloc_status}
+    {0x0246 "LOG_ID_LLM_LE_POWER_CONTROL_INFO"   "LOG_ID_LLM_LE_POWER_CONTROL_INFO" 0 gQca_LE_LLM_PowerControlInfo }
+    {0x0247 "LOG_ID_LLM_LUT_MATCH"   "LOG_ID_LLM_LUT_MATCH" 0 gQca_LE_LLM_LUT_Result }
+    {0x0248 "LOG_ID_LLM_LE_BCS_STEP_DATA"   "LOG_ID_LLM_LE_BCS_STEP_DATA" 0 gQca_LE_LLM_BCS_StepData }
+    {0x0249 "LOG_ID_LLM_LE_BCS_EVENT_DATA"   "LOG_ID_LLM_LE_BCS_EVENT_DATA" 0 gQca_LE_LLM_BCS_EventData }
+    {0x0250 "LOG_ID_LLM_LE_BCS_STEP_TIMINGS"   "LOG_ID_LLM_LE_BCS_STEP_TIMINGS" 0 gQca_LE_LLM_BCS_StepTimings }
+    {0x0251 "LOG_ID_LLM_LE_BCS_BUILD_PROC_INFO"   "LOG_ID_LLM_LE_BCS_BUILD_PROC_INFO" 0 gQca_LE_LLM_BCS_ProcInfo }
+    {0x0252 "LOG_ID_LLM_LE_BCS_FILTERED_CH_MAP"   "LOG_ID_LLM_LE_BCS_FILTERED_CH_MAP" 0 gQca_LE_LLM_BCS_FILTERED_CH_MAP }
+    {0x0253 "LOG_ID_LLM_LE_BCS_SHUFFLED_CH_MAP_MODE0"   "LOG_ID_LLM_LE_BCS_SHUFFLED_CH_MAP_MODE0" 0 gQca_GenericShuffledMapParams }
+    {0x0254 "LOG_ID_LLM_LE_BCS_SHUFFLED_CH_MAP_NONMODE0"   "LOG_ID_LLM_LE_BCS_SHUFFLED_CH_MAP_NONMODE0" 0 gQca_GenericShuffledMapParams}
+    {0x0255 "LOG_ID_LLM_LE_BCS_DRBG_SECURITY_DATA"   "LOG_ID_LLM_LE_BCS_DRBG_SECURITY_DATA" 0 gQca_LE_LLM_BCS_SECURITY_DRBG_DATA}
+    {0x0256 "LOG_ID_LLM_LE_BCS_DRBG_HR1_DATA"   "LOG_ID_LLM_LE_BCS_DRBG_HR1_DATA" 0 gQca_LLM_BCS_DRBG_SECURITY_DATA_HR1 }
+    {0x0258 "LOG_ID_LLM_LE_BCS_CONFIG_CH_MAP"   "LOG_ID_LLM_LE_BCS_CONFIG_CH_MAP" 0 gQca_LOG_ID_LLM_BCS_CONFIG_CH_MAP }
+    {0x0259 "LOG_ID_LLM_LE_BCS_CHAN_MAP_INFO"   "LOG_ID_LLM_LE_BCS_CHAN_MAP_INFO" 0 gQca_LE_LLM_BCS_CHAN_MAP_INFO }
+    {0x0260 "LOG_ID_LLM_LE_BCS_PROC_OFFSETS_DEBUG"   "LOG_ID_LLM_LE_BCS_PROC_OFFSETS_DEBUG" 0 gQca_LLM_LE_BCS_PROC_OFFSETS_DEBUG }
+    {0x0261 "LOG_ID_LLM_LE_BCS_PROC_SUBEVENTLEN_DEBUG"   "LOG_ID_LLM_LE_BCS_PROC_SUBEVENTLEN_DEBUG" 0 gQca_LLM_LE_BCS_PROC_SUBEVENTLEN_DEBUG }
+    {0x0262 "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_LOCAL_PARAM_ERR"   "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_LOCAL_PARAM_ERR" 0 gQca_LLM_LE_BCS_PROC_SYNCLINK_ERR }
+    {0x0263 "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_REMOTE_PARAM_ERR"   "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_REMOTE_PARAM_ERR" 0 gQca_LLM_LE_BCS_PROC_SYNCLINK_ERR }
+    {0x0264 "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_MEMORY_ERR"   "LOG_ID_LLM_LE_BCS_PROC_SYNCLINK_MEMORY_ERR" 0 gQca_LLM_LE_BCS_PROC_SYNCLINK_ERR }
+    {0x0265 "LOG_ID_LLM_LE_BCS_PROC_CONFIG_LOG"       "LOG_ID_LLM_LE_BCS_PROC_CONFIG_LOG"         0   gQca_LOG_ID_LLM_LE_BCS_PROC_CONFIG_LOG}
+    {0x0266 "LOG_ID_LLM_LE_BCS_IGNORE_REMOTE_CHAN_MAP_UPDATE_ERR"       "LOG_ID_LLM_LE_BCS_IGNORE_REMOTE_CHAN_MAP_UPDATE_ERR"         0   gQca_LOG_ID_LLM_LE_BCS_IGNORE_REMOTE_CHAN_MAP_UPDATE_ERR}
+    {0x0267 "LOG_ID_LLM_LE_BCS_TX_POWER_UPDATE"       "LOG_ID_LLM_LE_BCS_TX_POWER_UPDATE"         0   gQca_LE_LLM_BCS_TXPowerUpdate}
+    {0x0268 "LOG_ID_LLM_LE_BCS_SKIP_CONNECTION_UPDATE"       "LOG_ID_LLM_LE_BCS_SKIP_CONNECTION_UPDATE"         0   gQca_LE_LLM_BCS_ConnUpdateSkip}
+    {0x0269 "LOG_ID_LLM_LE_BCS_PROC_ENABLE_ERR_CONFIG_DISABLED"   "LOG_ID_LLM_LE_BCS_PROC_ENABLE_ERR_CONFIG_DISABLED" 0 gQca_LLM_LE_BCS_PROC_ENABLE_ERR }
+    {0x026A "LOG_ID_LLM_LE_BCS_PROC_PARAMS"   "LOG_ID_LLM_LE_BCS_PROC_PARAMS" 0 gQca_LLM_LE_BCS_PROC_PARAMS }
+    {0x026B "LOG_ID_LLM_LE_BCS_PROC_INTERVAL_ERR"   "LOG_ID_LLM_LE_BCS_PROC_INTERVAL_ERR" 0 gQca_LLM_LE_BCS_PROC_INTERVAL_ERR }	
+    {0x026C "LOG_ID_LLM_LE_BCS_TERMINATE_PROC_COUNTER_ERR"   "LOG_ID_LLM_LE_BCS_TERMINATE_PROC_COUNTER_ERR" 0 gQca_LLM_LE_BCS_TERMINATE_PROC_COUNTER_ERR }	
+    {0x026D "LOG_ID_LLM_LE_BCS_QBCE_STEP_DATA_EVENT" "LOG_ID_LLM_LE_BCS_QBCE_STEP_DATA_EVENT" 0 gQca_LOG_ID_LLM_LE_BCS_QBCE_STEP_DATA_EVENT }
+    {0x026F "LOG_ID_LLM_LE_BCS_TX_POWER_DEBUG"       "LOG_ID_LLM_LE_BCS_TX_POWER_DEBUG"         0   gQca_LE_LLM_BCS_TX_POWERDebug}
+    {0x0270 "LOG_ID_LLM_LE_CTRL_PDU_PARAM_VALIDATION_ERR"       "LOG_ID_LLM_LE_CTRL_PDU_PARAM_VALIDATION_ERR"         0   gQca_LLM_LE_PDUValidationFail}
+    {0x0271 "LOG_ID_LLM_BREDR_CTRL_PDU_PARAM_VALIDATION_ERR"       "LOG_ID_LLM_BREDR_CTRL_PDU_PARAM_VALIDATION_ERR"         0   gQca_LLM_BREDR_PDUValidationFail}
+    {0x02A0 "LOG_ID_LLM_LE_RAW_RSSI"       "LOG_ID_LLM_LE_RAW_RSSI"         0   gQca_LLM_LE_Rssi}
+    {0x02A1 "LOG_ID_LLM_DHKEY_SM"          "LOG_ID_LLM_DHKEY_SM"            0   gQca_dhkey_sm}
+    {0x02A2 "LOG_ID_LLM_MPC_STATE"         "LOG_ID_LLM_MPC_STATE"           0   gQca_mpc_state}
+    {0x02A3 "LOG_ID_LLM_CIS_CREATION"      "LOG_ID_LLM_CIS_CREATION" 0   gQca_cis_creation_timestamp }
+    {0x02A4 "LOG_ID_LLM_CONFIG_DATA_PATH_VENDOR_DATA" "LOG_ID_LLM_CONFIG_DATA_PATH_VENDOR_DATA" 0 gQca_ConfigDataPathVendorInfo}
+    {0x02FF "LLM End"}
+ENDTABLE
+
+/* LLM Link Manager Debug Info */
+
+TABLE tQca_LLM_PscanStates
+    { 0x07 "ERR_MEMORY_FULL"}
+    {default "Invalid"}
+ENDTABLE
+
+GROUP gQca_LLM_PscanInfo "Page Scan Info"
+{
+    FIELD fQca_PScan_Struct_Opcode          (Fixed 4 Bytes)         (Hex)         "Page Scan Struct Opcode"
+	FIELD fQca_PScan_ErrorState             (Fixed 1 Byte) IF (FieldIs EqualTo 255 fQca_PScan_Struct_Opcode) 	(TABLE tQca_LLM_PscanStates)      "State"  
+	FIELD fQca_PScan_State                  (Fixed 1 Byte) IF NOT (FieldIs EqualTo 255 fQca_PScan_Struct_Opcode) (Hex)      "State" 
+}
+
+GROUP gQca_LLM_LMStateInfo "Link Manager SM"
+{
+    FIELD fQca_LMCurrState      (Fixed 1 Byte)      (TABLE tQca_LLM_LinkMngrStates)         "CurrState"
+    FIELD fQca_LMEvent          (Fixed 1 Byte)      (TABLE tQca_LLM_LinkMngrEvents)         "Event"
+    FIELD fQca_LLMHandle        (Fixed 1 Byte)      (Decimal)                               "Handle"
+    FIELD fQca_LMNewState       (Fixed 1 Byte)      (TABLE tQca_LLM_LinkMngrStates)         "NewState"
+    FIELD fQca_LMExtState       (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (Hex)   SUPPRESS_DETAIL
+}
+
+/* LLM Connection Manager Debug Info */
+GROUP gQca_LLM_CMStateInfo "Conn Manager SM"
+{
+    FIELD fQca_CMCurrState      (Fixed 1 Byte)      (TABLE tQca_LLM_ConnMngrStates)         "CurrState"
+    FIELD fQca_CMEvent          (Fixed 1 Byte)      (TABLE tQca_LLM_ConnMngrEvents)         "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_CMNewState       (Fixed 1 Byte)      (TABLE tQca_LLM_ConnMngrStates)         "NewState"
+    FIELD fQca_CMExtState       (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_LLM_SeqStateInfo "Seq SM"
+{
+    FIELD fQca_SeqCurrState     (Fixed 1 Byte)      (TABLE tQca_LLM_SeqStates)             "CurrState"
+    FIELD fQca_SeqEvent         (Fixed 1 Byte)      (TABLE tQca_LLM_SeqEvents)             "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_SeqNewState      (Fixed 1 Byte)      (TABLE tQca_LLM_SeqStates)             "NewState"
+    FIELD fQca_SeqExtState      (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_LLM_LELLStateInfo "LE LinkLayer SM"
+{
+    FIELD fQca_LLCurrState      (Fixed 1 Byte)      (TABLE tQca_LE_LLCPStates)             "CurrState"
+    FIELD fQca_LLEvent          (Fixed 1 Byte)      (TABLE tQca_LLM_LE_ConnMngrEvents)     "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_LLNewState       (Fixed 1 Byte)      (TABLE tQca_LE_LLCPStates)             "NewState"
+    FIELD fQca_LLExtState       (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (TABLE tQca_LE_LLCPStates)   "RemoteCurrState"
+    FIELD fQca_LLExtNewState    (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (TABLE tQca_LE_LLCPStates)   "RemoteNewState"
+}
+
+GROUP gQca_LLM_LECMStateInfo "LE ConnMngr SM"
+{
+    FIELD fQca_LECMCurrState    (Fixed 1 Byte)      (TABLE tQca_LE_ConnMngrStates)         "CurrState"
+    FIELD fQca_LECMEvent        (Fixed 1 Byte)      (TABLE tQca_LLM_LE_ConnMngrEvents)     "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_LECMNewState     (Fixed 1 Byte)      (TABLE tQca_LE_ConnMngrStates)         "NewState"
+    FIELD fQca_LECMExtState     (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (Hex)   SUPPRESS_DETAIL
+}
+
+GROUP gQca_LLM_LEEncrStateInfo "LE Encr SM"
+{
+    FIELD fQca_LEEncCurrState   (Fixed 1 Byte)      (TABLE tQca_LE_EncrSeqStates)          "CurrState"
+    FIELD fQca_LEEncEvent       (Fixed 1 Byte)      (TABLE tQca_LLM_LE_ConnMngrEvents)     "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_LEEncNewState    (Fixed 1 Byte)      (TABLE tQca_LE_EncrSeqStates)          "NewState"
+    FIELD fQca_LEEncExtState    (Fixed 1 Byte)  IF NOT (FieldIs EqualTo 5 fQca_sMainVer) (TABLE tQca_LE_EncrEnableStates)       "EncrEnable"
+}
+
+GROUP gQca_LLM_LEAdvFilterMatchInfo "LE Adv Filter Match"
+{
+    FIELD fQca_filterMatchMask  (Fixed 2 Byte)      (Hex)                       "Match Mask"
+    FIELD fQca_filterEnableMask (Fixed 2 Byte)      (Hex)                       "Enable Mask"
+    FIELD fQca_filterId         (Fixed 1 Byte)      (Hex)                       "Filter Id"
+    FIELD fQca_flags            (Fixed 1 Byte)      (Hex)                       "Flags"
+}
+
+GROUP gQca_LLM_AFHEvalInfo "AFH Eval Info"
+{
+    FIELD fQca_HCIChanneltMap           (Fixed 10 Bytes)      (Hex)          "HCI Channel Map"
+    FIELD fQca_WLANChannelMap           (Fixed 10 Bytes)      (Hex)          "WLAN Channel Map"
+    FIELD fQca_LTEChannelMap            (Fixed 10 Bytes)      (Hex)          "LTE Channel Map"
+    FIELD fQca_WlanGuardChannelMap      (Fixed 10 Bytes)      (Hex)          "Wlan Guard Channel Map"
+    FIELD fQca_LocalChannelMap          (Fixed 10 Bytes)      (Hex)          "Local Channel Map"
+    FIELD fQca_FinalAFHMap              (Fixed 10 Bytes)      (Hex)          "Final AFH Map"
+    FIELD fQca_HCIConnHandle1           (Fixed 2 Bytes)       (Hex)          "HCI Connection Handle"
+    FIELD fQca_RemoteChannClass         (Fixed 10 Bytes)      (Hex)          "Remote Channel Classisficaion"
+}
+
+GROUP gQca_LLM_AllocEventNoBuff "Alloc Event Buffer Info"
+{
+    FIELD fQca_EventID                  (Fixed 1 Byte)        PRINT_IF (FieldIs NotEqualTo 0)        (Hex)          "HCI Event ID"
+    GROUP gQca_HciEventFailure          IF(FieldIs NotEqualTo 0 fQca_EventID)
+    {
+        FIELD fQca_EventLen                 (Fixed 1 Byte)        (Hex)          "Event Payload length"
+        RESERVED                            (Fixed 2 Bytes)
+    }
+    GROUP gQca_LmpFailure               IF(FieldIs EqualTo 0 fQca_EventID)
+    {
+        FIELD fQca_lmpOpcode               (Fixed 1 Byte)        (Hex)          "LMP opcode"
+        FIELD fQca_lmpLength               (Fixed 1 Byte)        (Hex)          "LMP PDU length"
+        RESERVED                            (Fixed 1 Bytes)
+    }
+}
+
+GROUP gQca_LLM_AuthenRetry "Authenticate Retry Attempts"
+{
+    FIELD fQca_AuthRetryAttempts        (Fixed 1 Byte)        (Hex)          "Retry Attempts Count"
+    FIELD fQca_AuthRetryAttemptsActive  (Fixed 1 Byte)        (Hex)          "Retry Attempts Active"
+    FIELD fQca_AuthRetryAttemptsBdAddr  (Fixed 6 Byte)        (Hex)          "Retry Attempts BdAddr"
+}
+
+GROUP gQca_LLM_SetRepAttemptsNoBuff "Alloc Set Repeat Attempts Device Info"
+{
+    FIELD fQca_AuthRetryNoBuffBdAddr    (Fixed 6 Byte)        (Hex)          "Retry Attempts BdAddr"
+}
+
+GROUP gQca_LLM_AFHHangOverData "AFH Hang Over Data"
+{
+    /* Init the Counter to 1 */
+    FIELD fQca_AFHCntr1 (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE AFHCntr
+    GROUP gQca_Interferes1 REPEAT COUNT (Fixed 3 Times)
+    {
+        GROUP gQCA_InterfereType1 LABEL(LabelCount "AFH Interference Band #" AFHCntr )
+        {
+        FIELD fQca_AFHBadChanCnt1               (Fixed 1 Bytes)       (Decimal)      "BadChanCnt"
+        FIELD fQca_AFHPeakLoChan1               (Fixed 1 Bytes)       (Decimal)      "PeakLoChan"
+        FIELD fQca_AFHPeakHiChan1               (Fixed 1 Bytes)       (Decimal)      "PeakHiChan"
+        FIELD fQca_AFHInBandAvgRssi1            (Fixed 1 Bytes)       RETRIEVE (SignExtension 8) (Decimal) ALSO (Constant "dbm")    "InBandAvgRssi"
+        }
+        /* Increment the Counter */
+        FIELD fQca_AFHCntrIncr1 (Fixed 0) RETRIEVE (StoreField AFHCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE AFHCntr
+    }
+
+    /* Init the Counter to 1 */
+    FIELD fQca_AFHCntr2 (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE AFHCntr
+    GROUP gQca_Interferes2 REPEAT COUNT (Fixed 3 Times)
+    {
+        GROUP gQCA_InterfereType2 LABEL(LabelCount "AFH HangOver Band #" AFHCntr )
+        {
+        FIELD fQca_AFHPeakLoChan2               (Fixed 1 Bytes)       (Decimal)      "PeakLoChan"
+        FIELD fQca_AFHPeakHiChan2               (Fixed 1 Bytes)       (Decimal)      "PeakHiChan"
+        FIELD fQca_AFHInBandAvgRssi2            (Fixed 1 Bytes)       RETRIEVE (SignExtension 8) (Decimal)      "InBandAvgRssi"
+        FIELD fQca_AFHHangOver2                 (Fixed 1 Bytes)       (Decimal)      "hangOver cycles"
+        }
+        /* Increment the Counter */
+        FIELD fQca_AFHCntrIncr2 (Fixed 0) RETRIEVE (StoreField AFHCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE AFHCntr
+    }
+}
+
+GROUP gQca_LLM_LMPowerLevelInfo "Power Level Info"
+{
+    FIELD fQca_ConnectionHandle         (Fixed 2 Bytes)        (Decimal)             "Connection Handle"
+    FIELD fQca_AdvertisingIndex         (Fixed 1 Bytes)        (Decimal)             "LE Advt Index"
+    RESERVED                            (Fixed 1 Bytes)
+    FIELD fQca_TxPowerLevel             (Fixed 4 Bytes)        (Decimal)             "Tx Power Level"
+    FIELD fQca_AvgRSSI                  (Fixed 4 Bytes) IF (MoreBytes)        RETRIEVE (SignExtension 8) (Decimal)            "Avg rssi"
+    FIELD fQca_TxMaxPowerLevel          (ToEndOfLayer) IF (MoreBytes)        (Decimal)             "Tx Max Power Level"
+}
+
+GROUP gQca_LLM_Force_2PageInfo "InForce2PageList"
+{
+    FIELD fQca_MatchIndex               (Fixed 1 Byte)        (Decimal)             "MatchListIndex"
+}
+
+GROUP gQca_LLM_AFHRssiData "AFH Rssi Data"
+{
+    FIELD fQca_ChannelCntr (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE ChannelCntr
+
+    GROUP gQca_AFHRssi REPEAT COUNT (Fixed 79 Times) "Raw RSSI Data"
+    {
+        GROUP gQca_AFHRssiType
+        {
+        FIELD fQca_AFHRssiByte          (Fixed 1 Bytes)   RETRIEVE (SignExtension 8)   (DecimalWithFieldLabel ChannelCntr)      "Channel"
+        }
+        FIELD fQca_ChannelIncr (Fixed 0) RETRIEVE (StoreField ChannelCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE ChannelCntr
+    }
+    
+    /* Init the Counter to 1 */
+    FIELD fQca_AFHCntr (Fixed 0) RETRIEVE (StoreInteger 1) (hex) SUPPRESS_DETAIL STORE AFHCntr
+    GROUP gQca_Interferes REPEAT COUNT (Fixed 3 Times)
+    {
+        GROUP gQCA_InterfereType LABEL(LabelCount "AFH Interference Band #" AFHCntr )
+        {
+        FIELD fQca_AFHBadChanCnt               (Fixed 1 Bytes)       (Decimal)      "BadChanCnt"
+        FIELD fQca_AFHPeakLoChan               (Fixed 1 Bytes)       (Decimal)      "PeakLoChan"
+        FIELD fQca_AFHPeakHiChan               (Fixed 1 Bytes)       (Decimal)      "PeakHiChan"
+        FIELD fQca_AFHInBandAvgRssi            (Fixed 1 Bytes)      RETRIEVE (SignExtension 8) (Decimal) ALSO (Constant "dbm")      "InBandAvgRssi"
+        }
+        /* Increment the Counter */
+        FIELD fQca_AFHCntrIncr (Fixed 0) RETRIEVE (StoreField AFHCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE AFHCntr
+    }
+}
+
+GROUP gQca_LE_TX_RX_PHY "LE_TX_RX_PHY"
+{
+    FIELD fQca_TX_PHY               (Fixed 1 Byte)        (TABLE tQca_PHY)             "TX_PHY"
+    FIELD fQca_RX_PHY               (Fixed 1 Byte)        (TABLE tQca_PHY)             "RX_PHY"
+}
+
+GROUP gQca_LLM_SCANAfhEvalInfo "SCAN Afh Eval Info"
+{
+    FIELD fQca_InqScanAfhMap           (Fixed 4 Bytes)      (Hex)          "Inq Scan Afh Map"
+    FIELD fQca_PageScanAfhMap          (Fixed 4 Bytes)      (Hex)          "Page Scan Afh Map"
+    FIELD fQca_InqScanChTbl            (Fixed 32 Bytes)     (Hex)          "Inq Scan Ch Tbl"
+    FIELD fQca_PageScanChTbl           (Fixed 32 Bytes)     (Hex)          "Page Scan Ch Tbl"
+    FIELD fQca_BdAddr                  (Fixed 6 Bytes)      (Hex)          "BD Addr"
+}
+
+
+
+GROUP gQca_LLM_PhySelInfo "PHY Select Info"
+{
+    FIELD fQca_PhySelDir                (Fixed 1 Byte)        (TABLE tQca_LE_PhySel_Direction)          "Direction"
+    GROUP gQCA_LE_PhySelState_1                                                                         "Current State"
+    {
+        FIELD fQca_PhySelState_PHY_1             (Fixed 1 Byte)      (TABLE tQca_LE_PhySelStates)       "PHY State"
+        FIELD fQca_PhySelState_LEN_1             (Fixed 1 Byte)      (TABLE tQca_LE_PhySel_LenStates)   "Packet Len State"
+    }
+    GROUP gQCA_LE_PhySelState_2                                                                         "New State"
+    {
+        FIELD fQca_PhySelState_PHY_2              (Fixed 1 Byte)      (TABLE tQca_LE_PhySelStates)      "PHY State"
+        FIELD fQca_PhySelState_LEN_2              (Fixed 1 Byte)      (TABLE tQca_LE_PhySel_LenStates)  "Packet Len State"
+    }
+    FIELD fQca_EntryPER                 (Fixed 1 Byte)        (Decimal)                                 "Entry PER"
+    FIELD fQca_EntryRSSI                (Fixed 1 Byte)         RETRIEVE (SignExtension 8)(Decimal)      "Entry RSSI"
+    RESERVED                            (Fixed 1 Byte)
+
+    FIELD fQca_DeltaPER                 (Fixed 4 Byte)        RETRIEVE (SignExtension 32) (Decimal)     "Delta PER"
+    FIELD fQca_DeltaRSSI                (Fixed 1 Byte)        RETRIEVE (SignExtension 8) (Decimal)      "Delta RSSI"
+    FIELD fQca_PhySelStatus             (Fixed 1 Byte)        (TABLE tQca_LE_PhySelStatus)              "Status"
+    FIELD fQca_PhySelStateMachineEvt    (Fixed 1 Byte)        (TABLE tQca_LE_PhySelStateMachineEvt)     "SM Event"
+    RESERVED                            (Fixed 1 Bytes)
+}
+
+GROUP gQca_LLM_PhySelStats "PHY Select Stats"
+{
+    FIELD fQca_PhySelBadPkts            (Fixed 4 Bytes)        (Decimal)          "Bad Packets"
+    FIELD fQca_PhySelGoodPkts           (Fixed 4 Bytes)        (Decimal)          "Good Packets"
+    FIELD fQca_PhySelPer                (Fixed 4 Bytes)        (Decimal)          "PER"
+    FIELD fQca_PhySelRssi               (Fixed 1 Byte)        RETRIEVE (SignExtension 8) (Decimal)     "RSSI"
+    FIELD fQca_PhySelPhyRate            (Fixed 1 Byte)         (TABLE tQca_LE_PhyRate)  "PHY"
+}
+
+GROUP gQca_LLM_AFH_SlotRem "Slots: "
+{
+    FIELD fgQca_LLM_AFH_SlotRem                 (Fixed 2 Bytes)        (Decimal)  "Slots"
+}
+
+GROUP gQca_LLM_AFHBand "AFH Rssi Data"
+{
+    FIELD fQca_AFHBadChanCntband               (Fixed 1 Bytes)       (Decimal)      "BadChanCnt"
+    FIELD fQca_AFHPeakLoChanband               (Fixed 1 Bytes)       (Decimal)      "PeakLoChan"
+    FIELD fQca_AFHPeakHiChanband               (Fixed 1 Bytes)       (Decimal)      "PeakHiChan"
+    FIELD fQca_AFHInBandAvgRssiband            (Fixed 1 Bytes)      RETRIEVE (SignExtension 8) (Decimal) ALSO (Constant "dbm")      "InBandAvgRssi"
+}
+
+GROUP gQca_LLM_CigParams "CIG Parameters"
+{
+    FIELD fQca_CigParamsId                   (Fixed 1 Bytes)      (Decimal)                                 "CIG ID"
+    FIELD fQca_CigParamsCisCount             (Fixed 1 Bytes)      (Decimal)                                 "CIS Count"
+    FIELD fQca_CigParamsSca                  (Fixed 1 Bytes)      (Decimal)                                 "Sleep Clock Accuracy"
+    FIELD fQca_IsoParamsPacking              (Fixed 1 Bytes)      (TABLE tQca_LE_ISO_Packing)               "Packing"
+    FIELD fQca_IsoParamsFraming              (Fixed 1 Bytes)      (TABLE tQca_LE_ISO_Framing)               "Framing"
+    FIELD fQca_CigParamsFtMS                 (Fixed 1 Bytes)      (Decimal)                                 "FT M2S"
+    FIELD fQca_CigParamsFtSM                 (Fixed 1 Bytes)      (Decimal)                                 "FT S2M"
+    FIELD fQca_CigParamsState                (Fixed 1 Bytes)      (TABLE tQca_LE_ISO_CigState)              "CIG State"
+    FIELD fQca_IsoParamsIsoInterval          (Fixed 2 Bytes)      (Scale 1.25 2) ALSO (Constant "ms")       "ISO Interval"
+    FIELD fQca_CigSyncDelay                  (Fixed 2 Bytes)      (Decimal) ALSO (Constant "us")            "CIG Sync Delay"
+    FIELD fQca_CigParamsSduIntervalMS        (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "SDU Interval M2S"
+    FIELD fQca_CigParamsSduIntervalSM        (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "SDU Interval S2M"
+    GROUP gQca_CisParams REPEAT COUNT (FromField Times fQca_CigParamsCisCount) "CIS Parameters"
+    {
+        FIELD fQca_IsoParamsId                   (Fixed 1 Bytes)      (Decimal)             "CIS ID"
+        FIELD fQca_IsoParamsNse                  (Fixed 1 Bytes)      (Decimal)             "NSE"
+	FIELD fQca_IsoParamsCisSyncDelay         (Fixed 2 Bytes)      (Decimal) ALSO (Constant "us")        "CIS Sync Delay"
+	FIELD fQca_IsoParamsSubeventDuration     (Fixed 2 Bytes)      (Decimal) ALSO (Constant "us")        "Subevent Duration"
+
+        GROUP gQca_CisTxParams "TX"
+        {
+            FIELD fQca_IsoParamsBn                       (Fixed 1 Bytes)      (Decimal)                           "BN"
+            FIELD fQca_IsoParamsPhy                      (Fixed 1 Bytes)      (TABLE tQca_LE_PhyRate)             "PHY"
+            FIELD fQca_IsoParamsMaxPdu                   (Fixed 2 Bytes)      (Decimal)                           "Max PDU Size"
+            FIELD fQca_IsoParamsMaxSdu                   (Fixed 2 Bytes)      (Decimal)                           "Max SDU size"
+        }
+        GROUP gQca_CisRxParams "RX"
+        {
+            FIELD fQca_IsoParamsBn;   
+            FIELD fQca_IsoParamsPhy;
+            FIELD fQca_IsoParamsMaxPdu;
+            FIELD fQca_IsoParamsMaxSdu;
+        }
+    }
+    RESERVED            (ToEndOfLayer)
+}
+
+GROUP gQca_LLM_BigParams "BIG Parameters"
+{
+    FIELD fQca_BigRole                       (Fixed 1 Bytes)      (TABLE tQca_LE_BIG_Role)                  "Role"
+    FIELD fQca_BigHandle                     (Fixed 1 Bytes)      (Hex)                                     "BIG Handle"
+    FIELD fQca_BigParamsNumBis               (Fixed 1 Bytes)      (Decimal)                                 "Number of BIS"
+    FIELD fQca_IsoParamsNse;
+
+    GROUP fQca_BigM                          IF (FieldIs EqualTo 2 fQca_BigRole)
+    {
+    	FIELD fQca_BigAdvHandle_Str          (Fixed 1 Bytes)       (Hex)  "ADV Handle" 
+        RESERVED                             (Fixed 7 Bytes)
+    }
+
+    GROUP fQca_BigS                          IF (FieldIs EqualTo 3 fQca_BigRole)
+    {
+    	FIELD fQca_BigAdvAddr                (Fixed 6 Bytes) IF (FieldIs EqualTo 3 fQca_BigRole) (Hex)      "ADV Address" 
+    	FIELD fQca_BigAdvSid                 (Fixed 5 Bits)  IF (FieldIs EqualTo 3 fQca_BigRole) (Decimal)  "ADV SID" 
+    	FIELD fQca_BigAdvAddrType            (Fixed 3 Bits)  IF (FieldIs EqualTo 3 fQca_BigRole) (Decimal)  "ADV Address Type" 
+        RESERVED                             (Fixed 1 Bytes)
+    }
+
+    FIELD fQca_IsoParamsPhy;
+    FIELD fQca_IsoParamsPacking;
+    FIELD fQca_IsoParamsFraming;
+    FIELD fQca_IsoParamsBn;  
+
+    FIELD fQca_BigParamsIrc                  (Fixed 1 Bytes)      (Decimal)                                 "IRC"
+    FIELD fQca_BigParamsPto                  (Fixed 1 Bytes)      (Decimal)                                 "PTO"
+    FIELD fQca_BigParamsEnc                  (Fixed 1 Bytes)      (Decimal)                                 "Encryption"
+    FIELD fQca_BigParamsPwrLvl               (Fixed 1 Bytes)      (Decimal)                                 "Tx Power Level"
+
+    FIELD fQca_BigParamsBrctCode             (Fixed 16 Bytes)     (Hex)                                     "Broadcast Code"
+
+    FIELD fQca_IsoParamsMaxPdu;
+    FIELD fQca_IsoParamsMaxSdu;
+
+    FIELD fQca_IsoParamsIsoInterval;
+    RESERVED                                 (Fixed 2 Bytes)
+
+    FIELD fQca_BigParamsSduInterval          (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "SDU Interval"
+}
+
+GROUP gQca_LLM_BigInfo "BIG Info"
+{
+    FIELD fQca_BigParamsNumBis;
+    FIELD fQca_IsoParamsNse;
+    FIELD fQca_IsoParamsBn;  
+    FIELD fQca_BigParamsIrc;
+    FIELD fQca_BigParamsPto;
+    FIELD fQca_IsoParamsPhy;
+    FIELD fQca_IsoParamsFraming;
+    FIELD fQca_BigParamsEnc;
+    FIELD fQca_BigInfoGiv                    (Fixed 8 Bytes)      (Hex)                                     "GIV"
+    FIELD fQca_BigInfoGskd                   (Fixed 16 Bytes)     (Hex)                                     "GSKD"
+    FIELD fQca_ChannelMap                    (Fixed 5 bytes)      (Hex)                                     "Channel Map"
+    FIELD fQca_BigHandle;
+    FIELD fQca_SyncHanlde                    (Fixed 2 Bytes)      (Hex)                                     "Sync Handle"
+    FIELD fQca_IsoParamsMaxPdu;
+    FIELD fQca_IsoParamsIsoInterval;
+    FIELD fQca_IsoParamsMaxSdu;
+    FIELD fQca_BigInfoBaseCrcInit            (Fixed 2 Bytes)      (Hex)                                     "Base CRC Init"
+    FIELD fQca_BigInfoSaa                    (Fixed 4 Bytes)      (Hex)                                     "SAA"
+    FIELD fQca_BigInfoSubInterval            (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "Sub Interval"
+    FIELD fQca_BigInfoBisSpacing             (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "BIS Spacing"
+    FIELD fQca_BigParamsSduInterval;
+    FIELD fQca_BigInfoBigOffset              (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")            "BIG Offset"
+    GROUP gQca_BigInfoRxClock "Rx Clock"
+    {
+        FIELD fQca_BigInfoRxClockN           (Fixed 4 Bytes)      (Hex)                                     "CLKN"
+        FIELD fQca_BigInfoRxClockFrac        (Fixed 2 Bytes)      (Hex)                                     "FRAC"
+        RESERVED                             (Fixed 2 Bytes)
+    }
+    RESERVED                                 (Fixed 4 Bytes)
+    FIELD fQca_BigInfoPktCounter             (Fixed 8 Bytes)      (Decimal)                                 "Packet Count"
+}
+
+GROUP gQca_LLM_IsoDataStats "ISO Data Stats"
+{
+    FIELD fQca_IsoGroupId                   (Fixed 1 Bytes)      (Decimal)            "Group ID"
+    FIELD fQca_IsoStreamId                  (Fixed 1 Bytes)      (Decimal)            "Stream ID"
+    GROUP gQca_LLM_IsoDataIntfc "ISO Data Interface"
+    {
+        GROUP gQca_LLM_IsoDataIntfcTx "TX"
+        {
+            FIELD fQca_IsoDataSetup             (Fixed 2 Bytes)      (Decimal)        "Setup"
+            FIELD fQca_IsoDataCompl             (Fixed 2 Bytes)      (Decimal)        "Setup Complete"
+            FIELD fQca_IsoDataSetupBuf          (Fixed 2 Bytes)      (Decimal)        "Buffer Setup"
+            FIELD fQca_IsoDataComplBuf          (Fixed 2 Bytes)      (Decimal)        "Buffer Setup Complete"
+            FIELD fQca_IsoDataFlushBuf          (Fixed 2 Bytes)      (Decimal)        "Buffer Flush"
+            FIELD fQca_IsoDataNoBuf             (Fixed 2 Bytes)      (Decimal)        "No Buffer"
+        }
+        GROUP gQca_LLM_IsoDataIntfcRx "RX"
+        {
+            FIELD fQca_IsoDataSetup;
+            FIELD fQca_IsoDataCompl; 
+            FIELD fQca_IsoDataSetupBuf;
+            FIELD fQca_IsoDataComplBuf;
+            FIELD fQca_IsoDataFlushBuf;
+            FIELD fQca_IsoDataNoBuf;
+            FIELD fQca_IsoDataProc                 (Fixed 2 Bytes)      (Decimal)      "Proc"
+            FIELD fQca_IsoDataProcGood             (Fixed 2 Bytes)      (Decimal)      "Good"
+            FIELD fQca_IsoDataProcNoReap           (Fixed 2 Bytes)      (Decimal)      "No Data"
+            FIELD fQca_IsoDataPutPdu               (Fixed 2 Bytes)      (Decimal)      "Put PDU"
+            FIELD fQca_IsoDataGetSdu               (Fixed 2 Bytes)      (Decimal)      "Get SDU"
+            FIELD fQca_IsoDataGetNoSdu             (Fixed 2 Bytes)      (Decimal)      "Get No SDU"
+            FIELD fQca_IsoDataForceFreeSdu         (Fixed 2 Bytes)      (Decimal)      "Force Free SDU"
+            FIELD fQca_IsoDataPrepTxBuf            (Fixed 2 Bytes)      (Decimal)      "Pre Tx Buffer"
+        }
+    }
+
+    GROUP gQca_LLM_IsoDataAdapt "ISO Data Adapt"
+    {
+        GROUP gQca_LLM_IsoalTx "TX"
+        {
+            FIELD fQca_isoalFreeSduAtStop                   (Fixed 2 Bytes)         (Decimal)                                 "Free SDU At Stop"
+            FIELD fQca_isoalFreeUsed                        (Fixed 2 Bytes)         (Decimal)                                 "Free Used"
+            FIELD fQca_isoalFreeNotUsed                     (Fixed 2 Bytes)         (Decimal)                                 "Free Not Used"
+            FIELD fQca_isoalFreeAsLate                      (Fixed 2 Bytes)         (Decimal)                                 "Free Not Used"
+            FIELD fQca_isoalEmp                             (Fixed 2 Bytes)         (Decimal)                                 "Empty"
+            FIELD fQca_isoalEmpAsLate                       (Fixed 2 Bytes)         (Decimal)                                 "Empty As Late"
+            FIELD fQca_isoalEmpAsNotStarted                 (Fixed 2 Bytes)         (Decimal)                                 "Empty As Not Started"
+            FIELD fQca_isoalEmpAsNotAlignedBN               (Fixed 2 Bytes)         (Decimal)                                 "Empty As Not Aligned BN"
+            FIELD fQca_isoalFlushed                         (Fixed 2 Bytes)         (Decimal)                                 "Flushed"
+            FIELD fQca_isoalGetSdu                          (Fixed 2 Bytes)         (Decimal)                                 "Get SDU"
+            FIELD fQca_isoalPutSdu                          (Fixed 2 Bytes)         (Decimal)                                 "Put SDU"
+            FIELD fQca_isoalSduNoBuf                        (Fixed 2 Bytes)         (Decimal)                                 "SDU No Buffer"
+
+            FIELD fQca_isoalIcbAlloc                        (Fixed 2 Bytes)         (Decimal)                                 "ICB Alloc"
+            FIELD fQca_isoalIcbUsed                         (Fixed 2 Bytes)         (Decimal)                                 "ICB Used"
+            FIELD fQca_isoalIcbNotUsed                      (Fixed 2 Bytes)         (Decimal)                                 "ICB Not Used"
+            FIELD fQca_isoalFreeIcbAtStop                   (Fixed 2 Bytes)         (Decimal)                                 "ICB Freed At Stop"
+            FIELD fQca_isoalTxSkipPrepare                   (Fixed 2 Bytes)         (Decimal)                                 "Skip Prepare"
+            FIELD fQca_isoalTxSduNoBufAsDepth               (Fixed 2 Bytes)         (Decimal)                                 "SDU No Buf AsDepth"
+
+            FIELD fQca_isoalToHostNoBuf                     (Fixed 2 Bytes)         (Decimal)                                 "Loop No Buffer"
+            FIELD fQca_isoalToHostSkipRetx                  (Fixed 2 Bytes)         (Decimal)                                 "Loop Skip Retransmission"
+            FIELD fQca_isoalToHostCnt                       (Fixed 2 Bytes)         (Decimal)                                 "Loop Count"
+        }                                                   
+        GROUP gQca_LLM_IsoalRx "RX"                   
+        {
+            FIELD fQca_isoalSduNoBuf;
+            FIELD fQca_isoalGenSdu                          (Fixed 2 Bytes)         (Decimal)                                 "Generate SDU"
+            FIELD fQca_isoalPdu                             (Fixed 2 Bytes)         (Decimal)                                 "PDU"
+            FIELD fQca_isoalFreeSduAtStop;
+            FIELD fQca_isoalSduFreeAsToUp                   (Fixed 2 Bytes)         (Decimal)                                 "Free SDU As To Up"
+            FIELD fQca_isoalErrPdu                          (Fixed 2 Bytes)         (Decimal)                                 "Error PDU"
+            FIELD fQca_isoalSduFreeAsErrLLID                (Fixed 2 Bytes)         (Decimal)                                 "Free SDU As Error LLID"
+            FIELD fQca_isoalSduFreeAsTooLarge               (Fixed 2 Bytes)         (Decimal)                                 "Free SDU As Too Large"
+            FIELD fQca_isoalSduMissFirstSeg                 (Fixed 2 Bytes)         (Decimal)                                 "First Segmentation Miss"
+            FIELD fQca_isoalSduMissNonFirstSeg              (Fixed 2 Bytes)         (Decimal)                                 "Non-first Segmentation Miss"
+            FIELD fQca_isoalSduMissSync                     (Fixed 2 Bytes)         (Decimal)                                 "SDU Miss Sync"
+            FIELD fQca_isoalSduToHost                       (Fixed 2 Bytes)         (Decimal)                                 "Route Count"
+            FIELD fQca_isoalSduToHostNoBuf                  (Fixed 2 Bytes)         (Decimal)                                 "Route No Buffer"
+            FIELD fQca_isoalSduCheckFail                    (Fixed 2 Bytes)         (Decimal)                                 "SDU Check Fail"
+        }
+        FIELD fQca_isoalErrCnt1                             (Fixed 2 Bytes)         (Decimal)                                 "Error Count 1"
+        FIELD fQca_isoalErrCnt2                             (Fixed 2 Bytes)         (Decimal)                                 "Error Count 2"
+    }
+}
+
+GROUP gQca_LLM_l2capTxflow "L2CAP Tx stop"
+{
+    FIELD fQca_l2capTxflowHandle            (Fixed 4 Bytes)        (Decimal)          "Connection handle"
+    FIELD fQca_l2capTxflowSet               (Fixed 4 Bytes)        (TABLE tQca_l2cap_flow_ctrl)         "L2CAP Tx Control"
+    FIELD l2capTxflowReason                 (Fixed 4 Bytes)        (TABLE tQca_l2cap_flow_reason)       "L2CAP Tx Control current reason"
+    FIELD l2capTxflowBit                    (Fixed 2 Bytes)        (Hex)              "L2CAP Tx Control current status"
+    RESERVED (Fixed 2 Bytes)
+}
+
+GROUP gQca_LLM_PConv_SetBasic "PConv_SetBasic"
+{
+    FIELD fQca_IsoInterval         (Fixed 4 Bytes)      (Decimal) ALSO (Constant "us")  "ISO Interval"
+    FIELD fQca_ViolationMask       (Fixed 1 Bytes)      (Hex)                           "Violation Mask"
+}
+
+GROUP gQca_LLM_PConv_TuneFt "PConv_TuneFT"
+{
+    FIELD fQca_PConv_TuneFt_Meet       (Fixed 1 Byte)          (Hex) "MeetRtn"
+    FIELD fQca_PConv_TuneFt_FT_M2S     (Fixed 1 Byte)          (Hex) "maxFT_M2S "
+    FIELD fQca_PConv_TuneFt_FT_S2M     (Fixed 1 Byte)          (Hex) "maxFT_S2M "
+    FIELD fQca_PConv_TuneFt_BIG_PT     (Fixed 1 Byte)          (Hex) "PT (BIG only)"
+}
+
+GROUP gQca_LLM_PConv_TuneNse "PConv_TuneNSE"
+{
+    FIELD fQca_PConv_TuneNse_iter   (Fixed 4 Byte)          (Hex) "Iter"
+    FIELD fQca_PConv_TuneNse_hasRetrans  (Fixed 4 Byte)     (Hex) "HasRetrans"
+}
+
+GROUP gQca_LLM_PConv_BetterSet "PConv_isBetterSet"
+{
+    FIELD fQca_PConv_BetterSet          (Fixed 1 Byte)          (Decimal) "Better"
+    RESERVED                            (Fixed 1 Byte)
+
+    GROUP gQca_LLM_PConv_OldSet "Old Set"
+    {
+        FIELD fQca_PConv_BetterSet_interval   (Fixed 2 Byte)          (Decimal)  "Interval"
+        FIELD fQca_PConv_BetterSet_plMS       (Fixed 2 Byte)          (Decimal)  "Payload M2S"
+        FIELD fQca_PConv_BetterSet_plSM       (Fixed 2 Byte)          (Decimal)  "Payload S2M"
+        FIELD fQca_PConv_BetterSet_ftMS       (Fixed 1 Byte)          (Decimal)  "FT M2S"
+        FIELD fQca_PConv_BetterSet_ftSM       (Fixed 1 Byte)          (Decimal)  "FT S2M"
+        FIELD fQca_PConv_BetterSet_bnMS       (Fixed 1 Byte)          (Decimal)  "BN M2S"
+        FIELD fQca_PConv_BetterSet_bnSM       (Fixed 1 Byte)          (Decimal)  "BN S2M"
+        FIELD fQca_PConv_BetterSet_nse        (Fixed 1 Byte)          (Decimal)  "NSE"
+        RESERVED                              (Fixed 1 Byte)
+        FIELD fQca_PConv_BetterSet_retransMS  (Fixed 2 Byte)          (Decimal)  "Retrans ratio (%) M2S"
+        FIELD fQca_PConv_BetterSet_retransSM  (Fixed 2 Byte)          (Decimal)  "Retrans ratio (%) S2M"
+    }
+
+    GROUP gQca_LLM_PConv_NewSet "New Set"
+    {
+        FIELD fQca_PConv_BetterSet_interval;
+        FIELD fQca_PConv_BetterSet_plMS;
+        FIELD fQca_PConv_BetterSet_plSM;
+        FIELD fQca_PConv_BetterSet_ftMS;
+        FIELD fQca_PConv_BetterSet_ftSM;
+        FIELD fQca_PConv_BetterSet_bnMS;
+        FIELD fQca_PConv_BetterSet_bnSM;
+        FIELD fQca_PConv_BetterSet_nse;
+        RESERVED                              (Fixed 1 Byte)
+        FIELD fQca_PConv_BetterSet_retransMS;
+        FIELD fQca_PConv_BetterSet_retransSM;
+    }
+}
+
+GROUP gQca_LLM_PConv_Save "PConv_Save"
+{
+    FIELD fQca_PConv_Save_IsoInt   (Fixed 2 Byte)   (Hex) "Iso Interval (in frame)"
+    FIELD fQca_PConv_Save_StrId    (Fixed 1 Byte)   (Hex) "Stream ID"
+    FIELD fQca_PConv_Save_NSE      (Fixed 1 Byte)   (Hex) "NSE"
+    FIELD fQca_PConv_Save_TxBN     (Fixed 1 Byte)   (Hex) "Tx BN"
+    FIELD fQca_PConv_Save_RxBN     (Fixed 1 Byte)   (Hex) "Rx BN"
+    FIELD fQca_PConv_Save_TxFT     (Fixed 1 Byte)   (Hex) "Tx FT"
+    FIELD fQca_PConv_Save_RxFT     (Fixed 1 Byte)   (Hex) "Rx FT"
+    FIELD fQca_PConv_Save_TxPL     (Fixed 2 Byte)   (Hex) "Tx PL"
+    FIELD fQca_PConv_Save_RxPL     (Fixed 2 Byte)   (Hex) "Rx PL"
+    FIELD fQca_PConv_Save_PTO      (Fixed 1 Byte)   (Hex) "PTO (BIG only)"
+    FIELD fQca_PConv_Save_IRC      (Fixed 1 Byte)   (Hex) "IRC (BIG only)"
+    FIELD fQca_PConv_Save_PT       (Fixed 1 Byte)   (Hex) "PT (BIG only)"
+}
+
+GROUP gQca_LLM_PConv_Restore "PConv_Restore"
+{
+    FIELD fQca_PConv_Restore_IsoInt   (Fixed 2 Byte)   (Hex) "Iso Interval (in frame)"
+    FIELD fQca_PConv_Restore_StrId    (Fixed 1 Byte)   (Hex) "Stream ID"
+    FIELD fQca_PConv_Restore_NSE      (Fixed 1 Byte)   (Hex) "NSE"
+    FIELD fQca_PConv_Restore_TxBN     (Fixed 1 Byte)   (Hex) "Tx BN"
+    FIELD fQca_PConv_Restore_RxBN     (Fixed 1 Byte)   (Hex) "Rx BN"
+    FIELD fQca_PConv_Restore_TxFT     (Fixed 1 Byte)   (Hex) "Tx FT"
+    FIELD fQca_PConv_Restore_RxFT     (Fixed 1 Byte)   (Hex) "Rx FT"
+    FIELD fQca_PConv_Restore_TxPL     (Fixed 2 Byte)   (Hex) "Tx PL"
+    FIELD fQca_PConv_Restore_RxPL     (Fixed 2 Byte)   (Hex) "Rx PL"
+    FIELD fQca_PConv_Restore_PTO      (Fixed 1 Byte)   (Hex) "PTO (BIG only)"
+    FIELD fQca_PConv_Restore_IRC      (Fixed 1 Byte)   (Hex) "IRC (BIG only)"
+    FIELD fQca_PConv_Restore_PT       (Fixed 1 Byte)   (Hex) "PT (BIG only)"
+}
+
+GROUP gQca_LLM_PConv_Done "PConv_Done"
+{
+    FIELD fQca_PConv_Done       (Fixed 4 Byte)   (Hex) "bOk"
+    FIELD fQca_PConv_IsoInt     (Fixed 4 Byte)   (Hex) "Iso Interval (in frame)"
+    FIELD fQca_PConv_VioMask    (Fixed 4 Byte)   (Hex) "Violation Mask"
+}
+ 
+/* LLM Link Manager State Machine States */
+TABLE tQca_LLM_LinkMngrStates
+    { 0x00 "LMsRESET_PND"}
+    { 0x01 "LMsREADY"}
+    { 0x02 "LMsLC_PAGE"}
+    { 0x03 "LMsLC_PAGE_CANCEL"}
+    { 0x04 "LMsMASTER_LINK_KEY_W4_KEY_SIZE_MASK_REQ"}
+    { 0x05 "LMMAXSTATES"}
+    {Default "Invalid" }
+ENDTABLE
+
+/* LLM Link Manager State Machine Events */
+TABLE tQca_LLM_LinkMngrEvents
+    { 0x00 "LMeHCI_INQUIRY"}
+    { 0x01 "LMeHCI_INQUIRY_CANCEL"}
+    { 0x02 "LMeHCI_CREATE_CONNECTION"}
+    { 0x03 "LMeHCI_CREATE_CONNECTION_CANCEL"}
+    { 0x04 "LMeCONNECTION_REQUEST_AUTO_ACCEPT"}
+    { 0x05 "LMeCONNECTION_COMPLETE"}
+    { 0x06 "LMeCONNECTION_TERMINATED"}
+    { 0x07 "LMePERIODIC_INQUIRY"}
+    { 0x08 "LMeHOST_TO"}
+    { 0x09 "LMeRMC_INQUIRY_RESULT"}
+    { 0x0a "LMeRMC_INQUIRY_COMPLETE"}
+    { 0x0b "LMeRMC_PAGE_COMPLETE"}
+    { 0x0c "LMeRMC_TOKEN_LMs_RETURN"}
+    { 0x0d "LMeHCI_MASTER_LINK_KEY"}
+    { 0x0e "LMeKEY_SIZE_MASK_RES"}
+    { 0x0f "LMeNOT_ACCEPTED_KEY_SIZE_MASK_REQ"}
+    { 0x10 "LMeKEY_SIZE_MASK_RES_TO"}
+    { 0x11 "LMeLM_TIMEOUT_PAGE"}
+    { 0x12 "LMeHCI_INQUIRY_TIMEOUT"}
+    { 0x13 "LMePAGESCAN_CONNECTION_COLLISION"}
+    { 0x14 "LMePOWER_MEASURE"}
+    { 0x15 "LMePAGE_CONNECTION_COLLISION"}
+    { 0x16 "LMeNULL"}
+    { 0x17 "LMMAXEVENTS"}
+    {Default "Invalid" }
+ENDTABLE
+
+/* LLM Connection Manager State Machine States */
+TABLE tQca_LLM_ConnMngrStates
+    { 0x00 "CMsIDLE"}
+    { 0x01 "CMsW4_LMS_DISCONNECT"}
+    { 0x02 "CMsCONNTERM"}
+    { 0x03 "CMsM_LM_SETUP"}
+    { 0x04 "CMsM_CONNSETUP"}
+    { 0x05 "CMsS_LM_SETUP"}
+    { 0x06 "CMsS_CONNSETUP"}
+    { 0x07 "CMsCONN_ACTIVE"}
+    { 0x08 "CMsCONN_HOLD"}
+    { 0x09 "CMsCONN_HOLD_EXIT_DISCONNECT_PEND"}
+    { 0x0A "CMsCONN_SNIFF"}
+    { 0x0B "CMsCONN_SNIFF_EXIT_DISCONNECT_PEND"}
+    { 0x0C "CMMAXSTATES"}
+    {Default "Invalid" }
+ENDTABLE
+
+/* LLM Connection Manager State Machine Events */
+TABLE tQca_LLM_ConnMngrEvents
+    { 0x00 "CMePAGE_SUCESS"}
+    { 0x01 "CMePAGESCAN_SUCESS"}
+    { 0x02 "CMeHOST_CONN_ACCEPT"}
+    { 0x03 "CMeHOST_CONN_REJECT"}
+    { 0x04 "CMeHOST_DISCONNECT"}
+    { 0x05 "CMeAUTHENTICATION_COMPLETE"}
+    { 0x06 "CMePAIRING_COMPLETE"}
+    { 0x07 "CMeAUTHENTION_FAILURE"}
+    { 0x08 "CMeENCRYPTION_COMPLETE"}
+    { 0x09 "CMeENCRYPTION_SETUP_FAILURE"}
+    { 0x0a "CMeKEY_CHANGE_FAILURE"}
+    { 0x0b "CMeLMS_LMP_ACK"}
+    { 0x0c "CMeLMS_DISCONNECT_COMPLETE"}
+    { 0x0d "CMeROLE_CHANGE_COMPLETE"}
+    { 0x0e "CMeHOST_INITIATE_HOLD"}
+    { 0x0f "CMeENTER_HOLD"}
+    { 0x10 "CMeEXIT_HOLD"}
+    { 0x11 "CMeHOST_INITIATE_SNIFF"}
+    { 0x12 "CMeENTER_SNIFF"}
+    { 0x13 "CMeEXIT_SNIFF"}
+    { 0x14 "CMeEXIT_SNIFF_TO"}
+    { 0x15 "CMeHOST_CHANGE_PACKET_TYPE"}
+    { 0x16 "CMeHOST_SET_CONN_ENCRYPTION"}
+    { 0x17 "CMeHOST_CHANGE_CONN_LINK_KEY"}
+    { 0x18 "CMeLMP_NAME_REQ"}
+    { 0x19 "CMeLMP_NAME_REQ_NOT_ACCEPTED"}
+    { 0x1a "CMeLMP_NAME_RES"}
+    { 0x1b "CMeLMP_ACCEPTED"}
+    { 0x1c "CMeLMP_NOT_ACCEPTED"}
+    { 0x1d "CMeLMP_CLKOFFSET_REQ"}
+    { 0x1e "CMeLMP_CLKOFFSET_RES"}
+    { 0x1f "CMeLMP_DETACH"}
+    { 0x20 "CMeLMP_IN_RAND"}
+    { 0x21 "CMeLMP_COMB_KEY"}
+    { 0x22 "CMeLMP_UNIT_KEY"}
+    { 0x23 "CMeLMP_AU_RAND"}
+    { 0x24 "CMeLMP_SRES"}
+    { 0x25 "CMeLMP_TEMP_RAND"}
+    { 0x26 "CMeLMP_TEMP_KEY"}
+    { 0x27 "CMeLMP_ENCRYPTION_MODE_REQ "}
+    { 0x28 "CMeLMP_ENCRYPTION_KEY_SIZE_REQ"}
+    { 0x29 "CMeLMP_SWITCH_REQ "}
+    { 0x2a "CMeLMP_SNIFF_REQ"}
+    { 0x2b "CMeLMP_AUTO_RATE "}
+    { 0x2c "CMeLMP_PREFERRED_RATE"}
+    { 0x2d "CMeLMP_VERSION_REQ"}
+    { 0x2e "CMeLMP_VERSION_RES"}
+    { 0x2f "CMeLMP_FEATURES_REQ"}
+    { 0x30 "CMeLMP_FEATURES_RES"}
+    { 0x31 "CMeLMP_QUALITY_OF_SERVICE "}
+    { 0x32 "CMeLMP_QUALITY_OF_SERVICE_REQ"}
+    { 0x33 "CMeLMP_MAX_SLOT"}
+    { 0x34 "CMeLMP_MAX_SLOT_REQ"}
+    { 0x35 "CMeLMP_SETUP_COMPLETE"}
+    { 0x36 "CMeLMP_USE_SEMI_PERMANENT_KEY"}
+    { 0x37 "CMeLMP_HOST_CONNECTION_REQ "}
+    { 0x38 "CMeLMP_SLOT_OFFSET"}
+    { 0x39 "CMeLMP_PAGE_SCAN_MODE_REQ"}
+    { 0x3a "CMeLMP_SUPERVISION_TIMEOUT "}
+    { 0x3b "CMeLMP_PAGE_SCAN_MODE_REQ_ACCEPTED"}
+    { 0x3c "CMeLMP_PAGE_MODE_REQ_ACCEPTED"}
+    { 0x3d "CMeLMP_PAGE_SCAN_MODE_REQ_NOT_ACCEPTED"}
+    { 0x3e "CMeHCI_WRITE_PAGE_SCAN_MODE"}
+    { 0x3f "CMeABORT_CONNECTION"}
+    { 0x40 "CMeLMP_QUALITY_OF_SERVICE_REQ_ACCEPTED"}
+    { 0x41 "CMeLMP_QUALITY_OF_SERVICE_REQ_NOT_ACCEPTED"}
+    { 0x42 "CMeLMP_ACCEPTED_TEST_ACTIVATE"}
+    { 0x43 "CMeLMP_ACCEPTED_TEST_CONTROL"}
+    { 0x44 "CMeLMP_NOT_ACCEPTED_TEST_ACTIVATE"}
+    { 0x45 "CMeLMP_NOT_ACCEPTED_TEST_CONTROL"}
+    { 0x46 "CMeLMP_FEATURES_EXT_PAGE_1"}
+    { 0x47 "CMeLMP_FEATURES_EXT_PAGE_2"}
+    { 0x6a "CMMAXEVENTS"}
+    { Default "Invalid" }
+ENDTABLE
+
+/* LLM LE Connection Manager State Machine Events */
+TABLE tQca_LLM_LE_ConnMngrEvents
+    /* LE events */
+    { 0x00 "CMeLE_CONNECT_REQ"}
+    { 0x01 "CMeLE_CONNECTION_ESTABLISHED"}
+    { 0x02 "CMeLE_TERMINATE_CONNECTION_LOCAL"}
+    { 0x82 "CMeLE_TERMINATE_CONNECTION_REMOTE"}
+    { 0x03 "CMeLE_CONTROL_PDU_ACK"}
+    { 0x04 "CMeLE_CHANNEL_MAP_UPDATE_LOCAL"}
+    { 0x84 "CMeLE_CHANNEL_MAP_UPDATE_REMOTE"}
+    { 0x05 "CMeLE_UPDATE_COMPLETE_EVENT"}
+    { 0x06 "CMeLE_CONN_UPDATE_LOCAL"}
+    { 0x86 "CMeLE_CONN_UPDATE_REMOTE"}
+    { 0x07 "CMeLE_CONN_UPDATE_INSTANT_EVENT"}
+    { 0x08 "CMeLE_CTRL_SEQ_TX_INDICATION"}
+    { 0x09 "CMeLE_CTRL_SEQ_TIMEOUT"}
+    { 0x0A "CMeLE_ENCR_EVENT_START_ENCRYPTION"}
+    { 0x8B "CMeLE_ENCR_EVENT_RX_ENC_REQ"}
+    { 0x8C "CMeLE_ENCR_EVENT_RX_ENC_RSP"}
+    { 0x8D "CMeLE_ENCR_EVENT_RX_START_ENC_REQ"}
+    { 0x8E "CMeLE_ENCR_EVENT_RX_START_ENC_RSP"}
+    { 0x90 "CMeLE_ENCR_EVENT_RX_LTK"}
+    { 0x11 "CMeLE_ENCR_EVENT_TIMEOUT"}
+    { 0x92 "CMeLE_ENCR_EVENT_RX_PAUSE_ENC_RSP"}
+    { 0x94 "CMeLE_ENCR_EVENT_RX_PAUSE_ENC_REQ"}
+    { 0x95 "CMeLE_UNKNOWN_RSP_RCVD"}
+    { 0x16 "CMeLE_FEATURE_REQ_LOCAL"}
+    { 0x96 "CMeLE_FEATURE_REQ_REMOTE"}
+    { 0x97 "CMeLE_FEATURE_RSP"}
+    { 0x18 "CMeLE_VERSION_IND_LOCAL"}
+    { 0x98 "CMeLE_VERSION_IND_REMOTE"}
+    { 0x99 "CMeLE_REJECT_IND_RCVD"}
+    { 0x9A "CMeLE_ENCR_EVENT_NO_LTK"}
+    { 0x1C "CMeLE_TERMINATE_LAST_ACK_RCVD"}
+    { 0x1D "CMeLE_TERMINATE_ACK_TX"}
+    { 0x1E "CMeLE_PING_REQ_LOCAL"}
+    { 0x9E "CMeLE_PING_REQ_REMOTE"}
+    { 0x9F "CMeLE_PING_RSP"}
+    { 0x20 "CMeLE_DATA_LENGTH_REQ_LOCAL"}
+    { 0xA0 "CMeLE_DATA_LENGTH_REQ_REMOTE"}
+    { 0xA1 "CMeLE_DATA_LENGTH_RSP"}
+    { 0x22 "CMeLE_CONN_PARAMS_REQ_LOCAL"}
+    { 0xA2 "CMeLE_CONN_PARAMS_REQ_REMOTE"}
+    { 0xA3 "CMeLE_CONN_PARAMS_RSP_REMOTE"}
+    { 0xA4 "CMeLE_CONN_PARAMS_HCI_REPLY"}
+    { 0xA5 "CMeLE_CONN_PARAMS_HCI_NEG_REPLY"}
+    { 0x26 "CMeLE_CONN_PARAMS_EVAL"}
+    { 0xA7 "CMeLE_REJECT_EXT_IND_RCVD"}
+    { 0x28 "CMeLE_PHY_REQ_LOCAL"}
+    { 0xA8 "CMeLE_PHY_REQ_REMOTE"}
+    { 0xA9 "CMeLE_PHY_RSP"}
+    { 0xAA "CMeLE_PHY_UPDATE_REQ"}
+    { 0x2B "CMeLE_SUPPLEMENTAL_REQ_LOCAL"}
+    { 0xAB "CMeLE_SUPPLEMENTAL_REQ_REMOTE"}
+    { 0xAC "CMeLE_SUPPLEMENTAL_RSP"}
+    { 0x2F "CMeLE_MIN_USED_CHANNELS_IND_LOCAL"}
+    { 0xAF "CMeLE_MIN_USED_CHANNELS_IND_REMOTE"}
+    { 0x30 "CMeLE_LMS_DISCONNECT_COMPLETE"}
+    { 0x31 "CMeLE_ABORT_CONNECTION"}
+    { 0x32 "CMeLE_POWER_CONTROL_REQ_LOCAL"}
+    { 0xB2 "CMeLE_POWER_CONTROL_REQ_REMOTE"}
+    { 0xB3 "CMeLE_POWER_CONTROL_RSP_REMOTE"}
+    { 0x34 "CMeLE_CIS_REQ_LOCAL"}
+    { 0xB4 "CMeLE_CIS_REQ_REMOTE"}
+    { 0xB5 "CMeLE_CIS_REQ_REMOTE_HCI_ACCEPT"}
+    { 0xB6 "CMeLE_CIS_REQ_REMOTE_HCI_REJECT"}
+    { 0xB7 "CMeLE_CIS_RSP"}
+    { 0xB8 "CMeLE_CIS_IND_REMOTE"}
+    { 0x39 "CMeLE_CIS_TX_TERMINATE_IND"}
+    { 0x3A "CMeLE_CIS_TERMINATE_LOCAL"}
+    { 0xBA "CMeLE_CIS_TERMINATE_REMOTE"}
+    { 0x3B "CMeLE_CIS_ALL_STREAMS_DETACHED"}
+    { 0x3C "CMeLE_PAST_IND_LOCAL"}
+    { 0xBC "CMeLE_PAST_IND_REMOTE"}
+    { 0x3D "CMeLE_CLOCK_ACCURACY_REQ_LOCAL"}
+    { 0xBD "CMeLE_CLOCK_ACCURACY_REQ_REMOTE"}
+    { 0xBE "CMeLE_CLOCK_ACCURACY_RSP"}
+    { 0x4E "CMeLE_CONN_UPDATE_AUTO"}
+    { 0x4F "CMeLE_POWER_CHANGE_IND_LOCAL"}
+    { 0xCF "CMeLE_POWER_CHANGE_IND_REMOTE"}
+    { 0x50 "CMeLE_CONN_SUBRATE_UPDATE_LOCAL"}
+    { 0xD0 "CMeLE_CONN_SUBRATE_UPDATE_IND"}
+    { 0xD1 "CMeLE_CONN_SUBRATE_PARAM_REQ"}
+    { 0x52 "CMeLE_CONN_PARAMS_UPDATE_AUTO"}
+    { 0x53 "CMeLE_CONN_PARAMS_UPDATE_LOCAL"}
+    { 0x54 "CMeLE_HOST_TIMEOUT"}
+    { 0x55 "CMeLE_CHANNEL_REPORTING_IND_LOCAL"}
+    { 0xD5 "CMeLE_CHANNEL_REPORTING_IND_REMOTE"}
+    { 0x56 "CMeLE_CHANNEL_STATUS_IND_LOCAL"}
+    { 0xD6 "CMeLE_CHANNEL_STATUS_IND_REMOTE"}
+    { 0x57 "CMeLE_INACTIVE_CIS_TERMINATE_LOCAL"}
+    { 0x58 "CMeLE_TERMINATE_MIRRORED_LINK_FOR_HANDOVER"}
+    { 0x59 "CMeLE_SPLIT_CIG_POWER_CONTROL_REQ_LOCAL"}
+    { 0x5A "CMeLE_CS_READ_REM_SUPPORTED_CAP_LOCAL"}
+    { 0x5B "CMeLE_CS_SET_SECURITY_EN_LOCAL"}
+    { 0x5C "CMeLE_CS_READ_REM_FAE_LOCAL"}
+    { 0x5D "CMeLE_CS_CREATE_CONFIG_LOCAL"}
+    { 0x5E "CMeLE_CS_REMOVE_CONFIG_LOCAL"}
+    { 0x5F "CMeLE_CS_SET_AFH_LOCAL"}
+    { 0x60 "CMeLE_CS_SET_PPROCEDURE_ENABLE_LOCAL"}
+    { 0xE1 "CMeLE_CS_MUX_REMOTE"}
+ENDTABLE
+
+TABLE tQca_LLM_SeqEvents
+    { 0x00      "LMP_PROCeNONE"}
+    { 0x01      "LMP_PROCeSTART_AUTH_NEW_CONN"}
+    { 0x02      "LMP_PROCeSTART_AUTHENTICATION"}
+    { 0x03      "LMP_PROCeSTART_KEY_CHANGE"}
+    { 0x04      "LMP_PROCeLMP_IN_RAND"}
+    { 0x05      "LMP_PROCeLMP_ACCEPT_IN_RAND"}
+    { 0x06      "LMP_PROCeLMP_NOT_ACCEPT_IN_RAND"}
+    { 0x07      "LMP_PROCeLMP_AU_RAND"}
+    { 0x08      "LMP_PROCeLMP_ACCEPT_AU_RAND"}
+    { 0x09      "LMP_PROCeLMP_NOT_ACCEPT_AU_RAND"}
+    { 0x0A      "LMP_PROCeLMP_SRES"}
+    { 0x0B      "LMP_PROCeLMP_UNIT_KEY"}
+    { 0x0C      "LMP_PROCeLMP_COMB_KEY"}
+    { 0x0D      "LMP_PROCeSECURITY_SEQ_TIMER"}
+    { 0x0E      "LMP_PROCeLMP_DETACH"}
+    { 0x0F      "LMP_PROCeDETACH_TI_EXPIRE"}
+    { 0x10      "LMP_PROCeINITIATE_LMP_DETACH"}
+    { 0x11      "LMP_PROCeLMS_LMP_DETACH_ACK"}
+
+    { 0x12      "LMP_PROCeHCI_PIN_RESPONSE"}
+    { 0x13      "LMP_PROCeHCI_NO_PIN"}
+    { 0x14      "LMP_PROCeHCI_HOST_RESPONSE_TO"}
+    { 0x15      "LMP_PROCeHCI_NO_LINK_KEY"}
+    { 0x16      "LMP_PROCeHCI_VALID_LINK_KEY"}
+
+    { 0x17      "LMP_PROCeHCI_ADD_SCO_CONNECTION"}
+    { 0x18      "LMP_PROCeHCI_ACCEPT_CONNECTION_REQUEST"}
+    { 0x19      "LMP_PROCeHCI_REJECT_CONNECTION_REQUEST"}
+    { 0x1A      "LMP_PROCeHCI_CHANGE_SCO_PACKET_TYPE"}
+
+    { 0x1B      "LMP_PROCeHCI_ENHANCED_SETUP_SYNCHRONOUS_CONNECTION"}
+    { 0x1C      "LMP_PROCeHCI_ENHANCED_SETUP_SYNCHRONOUS_CONNECTION_CHANGE"}
+    { 0x1D      "LMP_PROCeHCI_ENHANCED_ACCEPT_SYNCHRONOUS_CONNECTION_REQ"}
+
+    { 0x1E      "LMP_PROCeHCI_SETUP_SYNCHRONOUS_CONNECTION"}
+    { 0x1F      "LMP_PROCeHCI_SETUP_SYNCHRONOUS_CONNECTION_CHANGE"}
+
+    { 0x20      "LMP_PROCeHCI_ACCEPT_SYNCHRONOUS_CONNECTION_REQ"}
+    { 0x21      "LMP_PROCeHCI_REJECT_SYNCHRONOUS_CONNECTION_REQ"}
+
+    { 0x22      "LMP_PROCeLMP_eSCO_LINK_REQ"}
+    { 0x23      "LMP_PROCeLMP_ACCEPT_eSCO_LINK_REQ"}
+    { 0x24      "LMP_PROCeLMP_NOT_ACCEPT_eSCO_LINK_REQ"}
+
+    { 0x25      "LMP_PROCeSTART_ENCRYPTION"}
+    { 0x26      "LMP_PROCeRESTART_ENCRYPTION"}
+    { 0x27      "LMP_PROCeLMP_ENCRYPTION_MODE_REQ"}
+    { 0x28      "LMP_PROCeLMP_ACCEPT_ENCRYPTION_MODE"}
+    { 0x29      "LMP_PROCeLMP_NOT_ACCEPT_ENCRYPTION_MODE"}
+    { 0x2A      "LMP_PROCeLMP_ENCRYPTION_KEY_SIZE_REQ"}
+    { 0x2B      "LMP_PROCeLMP_ACCEPT_ENCRYPTION_KEY_SIZE"}
+    { 0x2C      "LMP_PROCeLMP_NOT_ACCEPT_ENCRYPTION_KEY_SIZE"}
+    { 0x2D      "LMP_PROCeLMP_START_ENCRYPTION_REQ"}
+    { 0x2E      "LMP_PROCeLMP_ACCEPT_START_ENCRYPTION"}
+    { 0x2F      "LMP_PROCeLMP_NOT_ACCEPT_START_ENCRYPTION"}
+    { 0x30      "LMP_PROCeLMP_STOP_ENCRYPTION_REQ"}
+    { 0x31      "LMP_PROCeSTOP_ENCRYPTION"}
+    { 0x32      "LMP_PROCeLMP_ACCEPT_STOP_ENCRYPTION"}
+    { 0x33      "LMP_PROCeLMP_NOT_ACCEPT_STOP_ENCRYPTION"}
+
+    { 0x34      "LMP_PROCeLMP_ENCRYPTION_KEY_SIZE_MASK_RES"}
+    { 0x35      "LMP_PROCeLMP_NOT_ACCEPT_ENCRYPTION_KEY_SIZE_MASK_REQ"}
+
+    { 0x36      "LMP_PROCeLMP_NOT_ACCEPT_UNIT_KEY"}
+    { 0x37      "LMP_PROCeLMP_NOT_ACCEPT_COMB_KEY"}
+
+    { 0x38      "LMP_PROCeO_ROLE_SWITCH"}
+    { 0x39      "LMP_PROCeR_NC_ROLE_SWITCH"}
+    { 0x3A      "LMP_PROCeLMP_NOT_ACCEPT_SLOT_OFFSET"}
+    { 0x3B      "LMP_PROCeLMP_SWITCH_REQ"}
+    { 0x3C      "LMP_PROCeLMP_ACCEPT_SWITCH_REQ"}
+    { 0x3D      "LMP_PROCeLMP_NOT_ACCEPT_SWITCH_REQ"}
+    { 0x3E      "LMP_PROCeLMS_LMP_ACK"}
+    { 0x3F      "LMP_PROCeLMS_RX_FAILURE_DETECT"}
+    { 0x40      "LMP_PROCe_LC_ROLE_SWITCH_READY"}
+
+    { 0x41      "LMP_PROCeLMS_PICONET_SWITCH_COMPLETE"}
+
+    { 0x42      "LMP_PROCeINITIATE_HOLD"}
+    { 0x43      "LMP_PROCeLMP_HOLD"}
+    { 0x44      "LMP_PROCeLMP_HOLD_REQ"}
+    { 0x45      "LMP_PROCeLMP_ACCEPT_HOLD_REQ"}
+    { 0x46      "LMP_PROCeLMP_NOT_ACCEPT_HOLD"}
+
+    { 0x47      "LMP_PROCeINITIATE_SNIFF"}
+    { 0x48      "LMP_PROCeLMP_SNIFF_REQ"}
+    { 0x49      "LMP_PROCeLMP_ACCEPT_SNIFF_REQ"}
+    { 0x4A      "LMP_PROCeLMP_NOT_ACCEPT_SNIFF"}
+
+    { 0x4B      "LMP_PROCeHOST_TERMINATE_SNIFF"}
+    { 0x4C      "LMP_PROCeLMP_UNSNIFF_REQ"}
+    { 0x4D      "LMP_PROCeLMP_ACCEPT_UNSNIFF_REQ"}
+    { 0x4E      "LMP_PROCeLMP_UNSNIFF_REQ_ACK"}
+    { 0x4F      "LMP_PROCeLMP_ACCEPT_UNSNIFF_REQ_ACK"}
+    { 0x50      "LMP_PROCeEXIT_SNIFF_TO"}
+
+    { 0x51      "LMP_PROCeHOST_NEWCONNECTION"}
+    { 0x52      "LMP_PROCeHOST_CHANGE_PACKET_TYPE"}
+    { 0x53      "LMP_PROCeLMP_EVAL_MAX_SLOTS"}
+    { 0x54      "LMP_PROCeLMP_MAX_SLOT"}
+    { 0x55      "LMP_PROCeLMP_ACCEPT_SLOT_REQ"}
+    { 0x56      "LMP_PROCeLMP_NOT_ACCEPT_SLOT_REQ"}
+
+
+    { 0x57      "LMP_PROCeLMP_TESTCONTROL_SETUP"}
+
+    { 0x58      "LMP_PROCeLMP_ACCEPT_SCO_LINK_REQ"}
+    { 0x59      "LMP_PROCeLMP_NOT_ACCEPT_SCO_LINK_REQ"}
+
+    { 0x5A      "LMP_PROCeLMP_SCO_LINK_REQ"}
+
+    { 0x5B      "LMP_PROCeLMP_USE_SEMI_PERMANENT_KEY_ACCEPTED"}
+    { 0x5C      "LMP_PROCeLMP_USE_SEMI_PERMANENT_KEY_NOT_ACCEPTED"}
+
+    { 0x5D      "LMP_PROCeSEMI_PERMANENT_KEY"}
+    { 0x5E      "LMP_PROCeR_SEMI_PERMANENT_KEY"}
+    { 0x5F      "LMP_PROCeMASTER_LINK_KEY"}
+    { 0x60      "LMP_PROCeR_MASTER_LINK_KEY"}
+    { 0x61      "LMP_PROCeINITIATE_QUALITY_OF_SERVICE_REQ"}
+    { 0x62      "LMP_PROCeLMP_ACCEPT_QUALITY_OF_SERVICE_REQ"}
+    { 0x63      "LMP_PROCeLMP_NOT_ACCEPT_QUALITY_OF_SERVICE_REQ"}
+    { 0x64      "LMP_PROCeLMP_NOT_ACCEPT_CREATE_CONNECTION_REQ"}
+
+    { 0x65      "LMP_PROCe_EDR_CNTRL_ENABLE_1_M"}
+    { 0x66      "LMP_PROCe_EDR_CNTRL_ENABLE_2_3_M"}
+    { 0x67      "LMP_PROCeLMP_PACKET_TABLE_REQ"}
+    { 0x68      "LMP_PROCeLMP_ACCEPT_LMP_PACKET_TABLE_REQ"}
+    { 0x69      "LMP_PROCeLMP_ACCEPT_LMP_PACKET_TABLE_REQ_ACK"}
+    { 0x6A      "LMP_PROCeLMP_NOT_ACCEPT_LMP_PACKET_TABLE_REQ"}
+
+    { 0x6B      "LMP_PROCePAUSE_ENCRYPTION_STOP_ACL_U"}
+    { 0x6C      "LMP_PROCeLMP_PAUSE_ENCRYPTION_REQ"}
+    { 0x6D      "LMP_PROCeLMP_RESUME_ENCRYPTION_REQ"}
+    { 0x6E      "LMP_PROCeLMP_NOT_ACCEPT_PAUSE_ENCRYPTION_REQ"}
+
+    { 0x6F      "LMP_PROCeRESUME_ENCRYPTION_START_ACL_U"}
+
+    { 0x70      "LMP_PROCeLMP_SNIFF_SUB_RATE_REQ"}
+    { 0x71      "LMP_PROCeLMP_SNIFF_SUB_RATE_RES"}
+    { 0x72      "LMP_PROCeLMP_NOT_ACCEPT_SNIFF_SUBRATE_REQ"}
+    { 0x73      "LMP_PROCeHOST_SNIFF_SUBRATE_PARAMS"}
+
+    { 0x74      "LMP_PROCeLMP_SRES_TX_NOTIFY"}
+    { 0x75      "LMP_PROCeEDR_ESCO_CQDDR_CHANGE"}
+
+    { 0x76      "LMP_PROCeLMP_ENCAP_PDU_TX_COMPLETE"}
+    { 0x77      "LMP_PROCeLMP_ENCAP_PDU_TX_FAILURE"}
+
+    { 0x78      "LMP_PROCeINITIATE_LMP_ENCAP_PDU"}
+    { 0x79      "LMP_PROCeLMP_ACCEPTED_ENCAP_HEADER"}
+    { 0x7A      "LMP_PROCeLMP_NOT_ACCEPTED_ENCAP_HEADER"}
+    { 0x7B      "LMP_PROCeLMP_ENCAPSULATED_HEADER"}
+    { 0x7C      "LMP_PROCeLMP_ACCEPTED_ENCAP_PAYLOAD"}
+    { 0x7D      "LMP_PROCeLMP_NOT_ACCEPTED_ENCAP_PAYLOAD"}
+    { 0x7E      "LMP_PROCeLMP_ENCAPSULATED_PAYLOAD"}
+    { 0x7F      "LMP_PROCeLMP_RX_ENCAP_SEQ_TIMEOUT"}
+    
+    { 0x80      "LMP_PROCeCALCULATE_PUBLIC_KEY_DONE"}
+    { 0x81      "LMP_PROCeCALCULATE_DHKEY_DONE"}
+    { 0x82      "LMP_PROCeCALCULATE_DHKEY_BUSY"}
+    { 0x83      "LMP_PROCeCALCULATE_DHKEY_IDLE"}
+
+    { 0x84      "LMP_PROCeHCI_IO_CAPABILITY_RESPONSE"}
+    { 0x85      "LMP_PROCeLMP_IO_CAPABILITY_REQ"}
+    { 0x86      "LMP_PROCeLMP_NOT_ACCEPT_IO_CAPABILITY_REQ"}
+    { 0x87      "LMP_PROCeLMP_IO_CAPABILITY_RES"}
+    { 0x88      "LMP_PROCeLMP_ENCAP_PUBLIC_KEY"}
+
+    { 0x89      "LMP_PROCeSPAIRING_AUTHEN_S1_INIT"}
+
+    { 0x8A      "LMP_PROCeLMP_SIMPLE_PAIRING_CONFIRM"}
+    { 0x8B      "LMP_PROCeLMP_SIMPLE_PAIRING_NUMBER"}
+    { 0x8C      "LMP_PROCeLMP_ACCEPTED_SIMPLE_PAIRING_NUMBER"}
+    { 0x8D      "LMP_PROCeLMP_NOT_ACCEPTED_SIMPLE_PAIRING_NUMBER"}
+
+    { 0x8E      "LMP_PROCeHCI_CONFIRM_REQUEST_REPLY"}
+    { 0x8F      "LMP_PROCeHCI_CONFIRM_REQUEST_NEGATIVE_REPLY"}
+
+    { 0x90      "LMP_PROCeLMP_DHKEY_CHECK"}
+    { 0x91      "LMP_PROCeLMP_ACCEPTED_DHKEY_CHECK"}
+    { 0x92      "LMP_PROCeLMP_NOT_ACCEPTED_DHKEY_CHECK"}
+
+    { 0x93      "LMP_PROCeLMP_NUMERIC_COMPARISON_FAILED"}
+
+    { 0x94      "LMP_PROCeHCI_USER_PASSKEY_REQUEST_REPLY"}
+    { 0x95      "LMP_PROCeHCI_USER_PASSKEY_REQUEST_NEGATIVE_REPLY"}
+
+    { 0x96      "LMP_PROCeLMP_PASSKEY_ENTRY_FAILED"}
+
+    { 0x97      "LMP_PROCeHCI_REMOTE_OOB_DATA_REQUEST_REPLY"}
+
+    { 0x98      "LMP_PROCeLMP_OOB_FAILED"}
+    { 0x99      "LMP_PROCeHCI_REMOTE_OOB_DATA_REQUEST_NEGATIVE_REPLY"}
+
+    { 0x9A      "LMP_PROCeHCI_SEND_KEYPRESS_NOTIFICATION"}
+    { 0x9B      "LMP_PROCeLMP_KEYPRESS_NOTIFICATION"}
+
+    { 0x9C      "LMP_PROCeENCRYPTION_KEY_REFRESH"}
+
+    { 0x9D      "LMP_PROCeHCI_IO_CAPABILITY_REQUEST_NEGATIVE_REPLY"}
+
+    { 0x9E      "LMP_PROCeHCI_WRITE_LINK_SUPERVISION_TIMEOUT"}
+    { 0x9F      "LMP_PROCeEVAL_SSR_STATUS"}
+
+    { 0xA0      "LMP_PROCeENCRYPTION_RESUME_TIMEOUT"}
+    { 0xA1      "LMP_PROCeLMP_PAUSE_ENCRYPTION_AES_REQ"}
+    { 0xA2      "LMP_PROCeHCI_REMOTE_OOB_EXTENDED_DATA_REQUEST_REPLY"}
+
+    { 0xA3      "LMP_PROCeAFH_ACTION_MASTER"}
+
+    { 0xA4      "LMP_PROCeVOICE_RESOURCE_OBTAINED"}
+    { 0xA5      "LMP_PROCeVOICE_RESOURCE_FAILED"}
+
+    { 0xB7      "LMP_PROCe_xSCO_LMS_LMP_MAX_SLOT_ACK" }
+    { 0xB8      "LMP_PROCe_xSCO_LMS_LMP_MAX_SLOT_ACK_TIMEOUT" }
+    { 0xBC      "LMP_PROCeLMP_NOT_ACCEPT_UNSNIFF_REQ"    }
+    { 0xC3      "LMP_PROCeINVALID_EVENT"}
+ENDTABLE
+
+TABLE   tQca_LLM_SeqStates
+    { 0x00    "LMP_PROCsIDLE"}
+    { 0x01    "LMP_PROCsAUTHEN_W4_HOST_LINK_KEY"}
+    { 0x02    "LMP_PROCsAUTHEN_W4_SRES"}
+
+    { 0x03    "LMP_PROCsPAIRING_W4_PIN"}
+    { 0x04    "LMP_PROCsPAIRING_W4_INIT_KEY_RESP"}
+    { 0x05    "LMP_PROCsPAIRING_W4_NEW_KEY"}
+    { 0x06    "LMP_PROCsPAIRING_W4_MUTUAL_AUTH_REQ"}
+
+    { 0x07    "LMP_PROCsENCRYPTION_W4_MODE"}
+    { 0x08    "LMP_PROCsENCRYPTION_W4_MASK_REQ"}
+    { 0x09    "LMP_PROCsENCRYPTION_KEY_SIZE_NEGOTIATION"}
+    { 0x0A    "LMP_PROCsENCRYPTION_W4_START_ENCRYPTION"}
+    { 0x0B    "LMP_PROCsENCRYPTION_STOP_W4_STOP"}
+    { 0x0C    "LMP_PROCsENCRYPTION_STOP_W4_MODE"}
+
+    { 0x0D    "LMP_PROCsKEY_CHANGE_W4_KEY_TYPE"}
+    { 0x0E    "LMP_PROCsKEY_CHANGE_W4_C_NEW_KEY_AUTH_REQ"}
+
+    { 0x0F    "LMP_PROCsROLE_SWITCH_W4_LC_ROLE_SWITCH"}
+
+    { 0x10    "LMP_PROCsHOLD_W4_NEGOTIATION_OR_SYNC"}
+
+    { 0x11    "LMP_PROCsSNIFF_W4_NEGOTIATION"}
+    { 0x12    "LMP_PROCsSNIFF_W4_LMS_ACK"}
+
+    { 0x13    "LMP_PROCsUNSNIFF_INITIATE_W4_ACCEPT_ACK"}
+    { 0x14    "LMP_PROCsUNSNIFF_REQ_W4_ACK"}
+
+    { 0x15    "LMP_PROCsTESTCONTROL_SETUP"}
+
+    { 0x16    "LMP_PROCsSCO_PARAM_CHANGE_W4_RESP"}
+    { 0x17    "LMP_PROCsADD_SCO"}
+
+    { 0x18    "LMP_PROCs_eSCO_PARAM_CHANGE_W4_RESP"}
+    { 0x19    "LMP_PROCsADD_eSCO"}
+
+    { 0x1A    "LMP_PROCsLINK_KEY_TYPE_CHANGE"}
+    { 0x1B    "LMP_PROCs_rxDETACH_W4_TIMER"}
+    { 0x1C    "LMP_PROCs_txDETACH"}
+
+    { 0x1D    "LMP_PROCsQOS_W4_RES"}
+
+    { 0x1E    "LMP_PROCsEDR_W4_CNTRL"}
+
+    { 0x1F    "LMP_PROCsENCRYPTION_W4_PAUSE_REQ_I"}
+    { 0x20    "LMP_PROCsENCRYPTION_W4_PAUSE_REQ_RI"}
+
+    { 0x21    "LMP_PROCsSNIFF_W4_SUB_RATE_NEGOTIATION"}
+    { 0x22    "LMP_PROCsSNIFF_W4_SUB_RATE_RES_TX_CONFIRMATION"}
+
+    { 0x23    "LMP_PROCs_eSCO_CQDDR_PARAM_CHANGE_W4_RESP"}
+
+    { 0x24    "LMP_PROCsTxENCAP_LMP_HDR_PEND"}
+    { 0x25    "LMP_PROCsTxENCAP_LMP_PYLD_PEND"}
+    { 0x26    "LMP_PROCsRxENCAP_LMP_PEND"}
+
+    { 0x27    "LMP_PROCsSPAIRING_INIT_W4_HCI_IO_CAPABILITIES"}
+    { 0x28    "LMP_PROCsSPAIRING_W4_HCI_IO_CAPABILITIES"}
+
+    { 0x29    "LMP_PROCsSPAIRING_W4_LMP_IO_CAPABILITIES"}
+
+    { 0x2A    "LMP_PROCsSPAIRING_INITIATE_PUBLIC_KEY"}
+    { 0x2B    "LMP_PROCsSPAIRING_W4_PUBLIC_KEY"}
+
+    { 0x2C    "LMP_PROCsSPAIRING_AUTHEN_STAGE1"}
+    { 0x2D    "LMP_PROCsSPAIRING_W4_CONFIRM"}
+    { 0x2E    "LMP_PROCsSPAIRING_W4_NONCE"}
+    { 0x2F    "LMP_PROCsSPAIRING_W4_HCI_CONFIRM"}
+
+    { 0x30    "LMP_PROCsSPAIRING_DHKEY_W4_STATUS"}
+    { 0x31    "LMP_PROCsSPAIRING_DHKEY_W4_DHKEY_CHECK"}
+
+    { 0x32    "LMP_PROCsSPAIRING_W4_HCI_PASSKEY"} //stage 1
+    { 0x33    "LMP_PROCsSPAIRING_W4_HCI_REMOTE_OOB_DATA"} //stage 1
+    { 0x34    "LMP_PROCsSPAIRING_W4_NONCE_ERROR"}
+
+    { 0x35    "LMP_PROCsEDR_W4_TX_ACK"}
+
+    { 0x36    "LMP_PROCsLSTO_CHANGE_PND"}
+    { 0x37    "LMP_PROCsAUTHEN_SECURE_W4_AU_RAND"}
+    { 0x38    "LMP_PROCsAUTHEN_SECURE_W4_SRES"}
+
+    { 0x39    "LMP_PROCsROLE_SWITCH_W4_ENCR_RESTART"}
+
+
+ENDTABLE
+
+TABLE tQca_LE_LLSeqStates
+    { 0x00  "CMs_LE_CTRL_PROCsIDLE"}
+    { 0x01  "CMs_LE_CTRL_PROCsW4_ACK"}
+    { 0x02  "CMs_LE_CTRL_PROCsW4_CONN_EVENT"}
+
+    { 0x03  "CMs_LE_CTRL_PROCsW4_FEATURE_RSP"}
+    { 0x04  "CMs_LE_CTRL_PROCsW4_VERSION_IND"}
+    { 0x05  "CMs_LE_CTRL_PROCsW4_PING_RSP"}
+    { 0x06  "CMs_LE_CTRL_PROCsW4_PARAM_RSP"}
+    { 0x07  "CMs_LE_CTRL_PROCsW4_HOST_REPLY"}
+
+    { 0x08  "CMs_LE_CTRL_MAXSTATES"}
+ENDTABLE
+
+TABLE tQca_LE_LLCPStates
+    { 0x00 "LLCP_NONE" }
+    { 0x81 "LLCP_CONNECTION_UPDATE" }
+    { 0x82 "LLCP_CHANNEL_MAP_UPDATE" }
+    { 0x03 "LLCP_ENCRYPTION" }
+    { 0x04 "LLCP_FEATURE_EXCHANGE" }
+    { 0x05 "LLCP_VERSION_EXCHANGE" }
+    { 0x06 "LLCP_TERMINATION" }
+    { 0x87 "LLCP_CONNECTION_PARMS" }
+    { 0x08 "LLCP_PING" }
+    { 0x09 "LLCP_DATA_LENGTH" }
+    { 0x8A "LLCP_PHY_UPDATE" }
+    { 0x0B "LLCP_AoA_REQ" }
+    { 0x0C "LLCP_POWER_CONTROL"}
+    { 0x8D "LLCP_CIS_ENABLE"}
+    { 0x0E "LLCP_SCA_UPDATE"}
+    { 0x0F "LLCP_QLL_FEATURE_EXCHANGE"}
+    { 0x90 "LLCP_QLL_PHY_UPDATE"}
+    { 0x91 "LLCP_QLL_ACO_SWITCH"}
+    { 0x92 "LLCP_SUBRATE_UPDATE"}
+    { 0x93 "LLCP_SUBRATE_REQUEST"}
+    { 0x14 "LLCP_CS_CAP_REQ"}
+    { 0x15 "LLCP_CS_SEC_REQ"}
+    { 0x16 "LLCP_CS_FAE_REQ"}
+    { 0x17 "LLCP_CS_CONFIG_REQ"}
+    { 0x18 "LLCP_CS_ENABLE"}
+ENDTABLE
+
+TABLE tQca_LE_ConnMngrStates
+    { 0x00  "LLM_LE_CMs_IDLE"}
+    { 0x01  "LLM_LE_CMs_W4_LMS_DISCONNECT"}
+    { 0x02  "LLM_LE_CMs_CONNTERM"}
+    { 0x03  "LLM_LE_CMs_CONN_ACTIVE"}
+    { 0x04  "LLM_LE_CMs_CONN_SYNC_ACTIVE"}
+    { 0x05  "LLM_LE_CMs_W4_ISO_DISABLE"}
+    { 0x06  "LLM_LE_CMs_MAXSTATES"}
+ENDTABLE
+
+TABLE tQca_LE_EncrSeqStates
+    { 0x00  "CMs_LE_ENCR_IDLE"}
+    { 0x01  "CMs_LE_ENCR_W4_ENC_RSP"}
+    { 0x82  "CMs_LE_ENCR_W4_START_ENC_REQ"}
+    { 0x83  "CMs_LE_ENCR_W4_START_ENC_RSP_I"}  //Encryption Initiator
+    { 0x84  "CMs_LE_ENCR_W4_START_ENC_RSP_NI"} // Encryption Non-Initiator
+    { 0x05  "CMs_LE_ENCR_W4_LTK"}
+    { 0x06  "CMs_LE_ENCR_PAUSE"}
+    { 0x07  "CMs_LE_ENCR_W4_PAUSE_ENC_RSP_I"}
+    { 0x08  "CMs_LE_ENCR_W4_TX_PAUSE_ENC_RSP_ACK"}
+    { 0x89  "CMs_LE_ENCR_W4_PAUSE_ENC_RSP_NI"}
+    { 0x0a  "CMs_LE_ENCR_W4_REJECT_IND_ACK"}
+    { 0x0b  "CMs_LE_ENCR_W4_ENC_RSP_RESUME"}
+    { 0x8c  "CMs_LE_ENCR_W4_START_ENC_REQ_RESUME"}
+    { 0x8d  "CMs_LE_ENCR_W4_START_ENC_RSP_I_RESUME"}
+    { 0x8e  "CMs_LE_ENCR_W4_START_ENC_RSP_NI_RESUME"}
+    { 0x0f  "CMs_LE_ENCR_W4_LTK_RESUME"}
+    { 0x10  "CMs_LE_ENCR_W4_START_ENC_RSP_ACK_NI"}
+    { 0x11  "CMs_LE_ENCR_W4_ENC_RSP_ACK"}
+    { 0x12  "CMs_LE_ENCR_W4_LTK_AND_ENC_RSP_ACK"}
+ENDTABLE
+
+TABLE tQca_LE_EncrEnableStates
+    { 0x00  "Encr RxOff_TxOff"}
+    { 0x01  "Encr RxOff_TxOn"}
+    { 0x02  "Encr RxOn_TxOff"}
+    { 0x03  "Encr RxOn_TxOn"}
+ENDTABLE
+
+TABLE tQca_LE_PhySelStates
+    { 0x00 NONE }
+    { 0x01 1M }
+    { 0x02 2M }
+    { 0x03 CODED }
+    { 0x04 1M_PENDING }
+    { 0x05 2M_PENDING }
+ENDTABLE
+
+TABLE tQca_LE_PhySel_LenStates
+    { 0x00 NONE }
+    { 0x01 MAX_LEN }
+    { 0x02 HALF_MAX_LEN }
+ENDTABLE
+
+TABLE tQca_LE_PhySel_Direction
+    { 0x00 RX }
+    { 0x01 TX }
+ENDTABLE
+
+TABLE tQca_LE_PhySelStatus
+    { 0x00 NO_CHANGE }
+    { 0x01 PKT_LEN_CHANGE }
+    { 0x02 PHY_CHANGE }
+ENDTABLE
+
+TABLE tQca_LE_PhyRate
+    { 0x00 1M }
+    { 0x01 2M }
+    { 0x02 CODED_125K }
+    { 0x03 CODED_500K }
+    { 0x05 LEHS_2P }
+    { 0x06 LEHS_3P }
+    { 0x07 LEHS_4P }
+    { 0x08 LEHS_5P }
+    { 0x09 LEHS_6P }
+ENDTABLE
+
+TABLE tQca_LE_PhySelStateMachineEvt
+    { 0x00  RSSI_NC_PER_NC     }
+    { 0x01  RSSI_NC_PER_UP     }
+    { 0x02  RSSI_NC_PER_DOWN   }
+    { 0x04  RSSI_UP_PER_NC     }
+    { 0x05  RSSI_UP_PER_UP     }
+    { 0x06  RSSI_UP_PER_DOWN   }
+    { 0x08  RSSI_DOWN_PER_NC   }
+    { 0x09  RSSI_DOWN_PER_UP   }
+    { 0x0A  RSSI_DOWN_PER_DOWN }
+    { 0x10  PHY_UPDATE_1M      }
+    { 0x20  PHY_UPDATE_2M      }
+    { 0x30  PHY_UPDATE_CODED   }
+ENDTABLE
+
+TABLE tQca_PHY
+    { 0x00 "Invalid" }
+    { 0x01 "1M Only" }
+    { 0x02 "2M Only" }
+    { 0x03 "1M or 2M" }
+    { 0x05 "1M Coded" }     
+    { 0x06 "2M Coded" }
+    { 0x07 "1M or 2M Coded" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LE_ISO_Packing
+    { 0x00 "Sequential" }
+    { 0x01 "Interleaved" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LE_ISO_Framing
+    { 0x00 "Unframed" }
+    { 0x01 "Framed" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LE_ISO_CigState
+    { 0x00 "IDLE" }
+    { 0x01 "CONFIGURED" }
+    { 0x02 "ACTIVE" }
+    { 0x03 "INACTIVE" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_l2cap_flow_ctrl
+    { 0x00 "Disable L2CAP" }
+    { 0x01 "Enable L2CAP" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_l2cap_flow_reason
+    { 0x01  "Connection setup"}
+    { 0x02  "Connection termination"}
+    { 0x04  "Role switch"}
+    { 0x08  "Packet table type request"}
+    { 0x10  "Encryption"}
+    { 0x20  "AFH ack pending"}
+    { 0x40  "Hold mode"}
+    {default "Reserved"}
+ENDTABLE
+
+TABLE tQca_LE_BIG_Role
+    { 0x02 "Broadcaster" }
+    { 0x03 "Receiver" }
+    { Default "Invalid" }
+ENDTABLE
+
+GROUP gQca_LLM_AfhActionInfo "AFH Action Info"
+{
+    FIELD gQca_LLM_AfhActionInfoConnHandle          (Fixed 2 Bytes)   (Hex)                     "Connection Handle"
+    FIELD gQca_LLM_AfhActionInfoState               (Fixed 1 Bytes)   (TABLE tQca_AFH_State)    "State"
+    FIELD gQca_LLM_AfhActionInfoCurrMode            (Fixed 1 Bytes)   (TABLE tQca_AFH_Mode)     "currMode"
+    FIELD gQca_LLM_AfhActionInfoNewMode             (Fixed 1 Bytes)   (TABLE tQca_AFH_Mode)     "newMode"
+    FIELD gQca_LLM_AfhActionInfoAction              (Fixed 1 Bytes)   (TABLE tQca_AFH_Action)   "Action"
+    FIELD gQca_LLM_AfhActionInfoPendingAction       (Fixed 1 Bytes)   (TABLE tQca_AFH_Action)   "Pending Action"
+}
+
+GROUP gQca_LLM_LepCtrlInfo "LE PWR CTRL Info"
+{
+    FIELD gQca_LLM_LepCtrlInfoConnHandle          (Fixed 2 Bytes)   (Hex)                                                "Connection Handle"
+    FIELD gQca_LLM_LepCtrlInfolepCtrlPdu          (Fixed 1 Bytes)   (TABLE tQca_LEP_Pdu)                                 "lepCtrlPdu"
+    FIELD gQca_LLM_LepCtrlInfophyrate             (Fixed 1 Bytes)   (TABLE tQca_LE_PhyRate)                              "PDU phyrate"
+    FIELD gQca_LLM_LepCtrlInfoPduLimits           (Fixed 1 Bytes)   (TABLE tQca_Limits)                                  "PDU limits"
+    FIELD gQca_LLM_LepCtrlInfoPduDelta            (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "PDU delta"
+    GROUP gQca_LLM_LepCtrlInfopwrCtrlStatus "pwrCtrlStatus"    
+    {
+        reserved (fixed 1 bits)
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_POWER_ISO_TX_MANANGED            (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "POWER_ISO_TX_MANANGED"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_REMOTE_UNMANANGED                (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "REMOTE_UNMANANGED"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_NO_DELTA_RESPONSE                (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "NO_DELTA_RESPONSE"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_POWER_IND_NEEDED                 (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "POWER_IND_NEEDED"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_REMOTE_POWER_REPORTING_STATUS    (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "REMOTE_POWER_REPORTING_STATUS"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_REMOTE_MIN_POWER                 (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "REMOTE_MIN_POWER"
+        FIELD gQca_LLM_LepCtrlInfopwrCtrlStatus_REMOTE_MAX_POWER                 (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "REMOTE_MAX_POWER"
+    }
+    FIELD gQca_LLM_LepCtrlInfoavgLeRssiDbm        (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "avgLeRssiDbm"
+    FIELD gQca_LLM_LepCtrlInfoavgLeRssiDdmAcc     (Fixed 2 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "avgLeRssiDdmAcc"
+    FIELD gQca_LLM_LepCtrlInfotransmitPowerLevel  (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "transmitPowerLevel"
+    FIELD gQca_LLM_LepCtrlInfotransmitPowerdBm    (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "transmitPowerdBm"
+    FIELD gQca_LLM_LepCtrlInforemoteTxPwrDbm      (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "remoteTxPwrDbm"
+    FIELD gQca_LLM_LepCtrlInfolocalPwrReq         (Fixed 1 Bytes)   (TABLE tQca_localPwrReq)                             "localPwrReq"
+    FIELD gQca_LLM_LepCtrlInfodelta               (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "delta"
+    FIELD gQca_LLM_LepCtrlInfodeltaPwrReq         (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "deltaPwrReq"
+    FIELD gQca_LLM_LepCtrlInfoapr                 (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "apr"
+    FIELD gQca_LLM_LepCtrlInfotxPowerUpCnt        (Fixed 1 Bytes)   (Hex)                                                "txPowerUpCnt"
+    FIELD gQca_LLM_LepCtrlInfotxPowerDownCnt      (Fixed 1 Bytes)   (Hex)                                                "txPowerDownCnt"
+    FIELD gQca_LLM_orgPwrIdx                      (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "orgPwrIdx"
+    FIELD gQca_LLM_reqPwrIdx                      (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "reqPwrIdx"
+    FIELD gQca_LLM_LepCtrlInfogrUlLimit           (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "grUlLimit"
+    FIELD gQca_LLM_LepCtrlInfogrLlLimit           (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "grLlLimit"
+    FIELD gQca_LLM_LepCtrlInfogrLLMargin          (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "grLLMargin"
+    FIELD gQca_LLM_LepCtrlInfogrULMargin          (Fixed 1 Bytes)   RETRIEVE (SignExtension 8) (Decimal)                 "grULMargin"
+}
+
+GROUP gQca_LLM_AfhStateChangeInfo "AFH State Change Info"
+{
+    FIELD gQca_LLM_AfhStateChangeInfoConnHandle     (Fixed 2 Bytes)   (Hex)                     "Connection Handle"
+    FIELD gQca_LLM_AfhStateChangeInfoCurrState      (Fixed 1 Bytes)   (TABLE tQca_AFH_State)    "currState"
+    FIELD gQca_LLM_AfhStateChangeInfoNewState       (Fixed 1 Bytes)   (TABLE tQca_AFH_State)    "newState"
+    FIELD gQca_LLM_AfhStateChangeInfoMode           (Fixed 1 Bytes)   (TABLE tQca_AFH_Mode)     "Mode"
+    FIELD gQca_LLM_AfhStateChangeInfoContext        (Fixed 1 Bytes)   (TABLE tQca_AFH_Context)  "Context"
+}
+
+GROUP gQca_LLM_AfhEventInfo "AFH Event Info"
+{
+    FIELD gQca_LLM_AfhEventInfoConnHandle     (Fixed 4 Bytes)   (Hex)                     "Connection Handle"
+    FIELD gQca_LLM_AfhEventInfoState          (Fixed 4 Bytes)   (TABLE tQca_AFH_State)    "State"
+    FIELD gQca_LLM_AfhEventInfoMode           (Fixed 4 Bytes)   (TABLE tQca_AFH_Mode)     "Mode"
+    FIELD gQca_LLM_AfhEventInfoContext        (Fixed 4 Bytes)   (TABLE tQca_AFH_Context)  "Context"
+}
+
+TABLE tQca_AFH_State
+    { 0x00 "SDB_AFH_STATE_Idle" }
+    { 0x01 "SDB_AFH_STATE_WaitAck" }
+    { 0x02 "SDB_AFH_STATE_WaitInstant" }
+    { 0x03 "SDB_AFH_STATE_Recovery" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_AFH_Mode
+    { 0x00 "SDB_AFH_MODE_Idle" }
+    { 0x01 "SDB_AFH_MODE_Enabling" }
+    { 0x02 "SDB_AFH_MODE_Enabled" }
+    { 0x03 "SDB_AFH_MODE_Disabling" }
+    { 0x04 "SDB_AFH_MODE_ChangingAHS" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_AFH_Action
+    { 0x00 "SDB_AFH_ACTION_None" }
+    { 0x01 "SDB_AFH_ACTION_Enable" }
+    { 0x02 "SDB_AFH_ACTION_Disable" }
+    { 0x03 "SDB_AFH_ACTION_Done" }
+    { 0xFF "NOT_APPLICABLE" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_AFH_Context
+    { 0x01 "AFH_LOG_REASON_LMP_HANDLE_SET_AFH_EVENT" }
+    { 0x02 "AFH_LOG_REASON_SET_AFH_ACK_EVENT" }     
+    { 0x03 "AFH_LOG_REASON_SET_INSTANT_MASTER_EVENT" }
+    { 0x04 "AFH_LOG_REASON_SET_INSTANT_SLAVE_EVENT" }
+    { 0x05 "AFH_LOG_REASON_HANDLE_INSTANT_EVENT" }
+    { 0x06 "AFH_LOG_REASON_INIT_ACTIVE_CONN_EVENT" }
+    { 0x07 "AFH_LOG_REASON_ACTION_SLAVE_EVENT" }
+    { 0x08 "AFH_LOG_REASON_ACTION_MASTER_EVENT" }     
+    { 0x09 "AFH_LOG_REASON_EXIT_RECOVERY_EVENT" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_localPwrReq
+    { 0x0 "REQ_DECREASE_ONE_LEVEL_RSP_CHANGE_MIN_PWR" }
+    { 0x1 "REQ_INCREASE_ONE_LEVEL_RSP_CHANGE_ONE_N_STEP" }
+    { 0x2 "REQ_INCREASE_TO_MAX_RSP_CHANGE_MAX_PWR" }
+    { 0x3 "REQ_NOT_DEFINED_RSP_NO_CHANGE" }
+    { 0x4 "REQ_NO_CHANGE_RSP_FIXED_PWR" }
+    { 0x5 "REQ_CHANGE_N_STEP" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_Limits
+    { 0x0 "LE_PWR_CTRL_LIMITS_NONE" }
+    { 0x1 "LE_PWR_CTRL_LIMITS_MIN" }
+    { 0x2 "LE_PWR_CTRL_LIMITS_MAX" }
+    { 0x3 "LE_PWR_CTRL_LIMITS_FIXED" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LEP_Pdu
+    { 0x23 "LE_LL_PWR_CTRL_REQ_Rx_RSP_Tx" }
+    { 0x24 "LE_LL_PWR_CTRL_REQ_Tx_RSP_Rx" }
+    { 0x25 "LE_LL_PWR_CHANGE_IND" }
+    { 0x26 "LE_LL_PWR_CTRL_REQ_GEN_RSSI_EVAL" }
+    { Default "Invalid" }
+ENDTABLE
+
+TABLE tQca_LE_AFH_LogID
+    {0x00 "SDB_LOG_LE_CHAN_ASSESS_INFO"     "SDB_LOG_LE_CHAN_ASSESS_INFO"       0 gQca_LLM_LE_ChannAssessInfo }
+    {0x01 "SDB_LOG_LE_CHAN_CLASSIFICATION"  "SDB_LOG_LE_CHAN_CLASSIFICATION"    0 gQca_LLM_LE_ChannClassificaiton }
+ENDTABLE
+
+GROUP gQca_LLM_LE_AFHEvalInfo "LE AFH Eval Info"
+{
+    FIELD fQca_leccLogID                (Fixed 1 Bytes)      (TABLE tQca_LE_AFH_LogID)  "LE Channel Assessment Log ID"
+    BRANCH (FromTable   tQca_LE_AFH_LogID   fQca_leccLogID)        
+}
+
+GROUP gQca_LLM_LE_ChannAssessInfo "LE Channel Assessment Info"
+{
+    FIELD fQca_leHostChannMap           (Fixed 5 Bytes)      (Hex)          "LE HOST Channel Map"         NETWORK_DATA_ORDER
+    FIELD fQca_leLocalChannMap          (Fixed 5 Bytes)      (Hex)          "LE Local Channel Map"        NETWORK_DATA_ORDER
+    FIELD fQca_leSlaveChannMap          (Fixed 5 Bytes)      (Hex)          "LE Slave Channel Map"        NETWORK_DATA_ORDER
+    FIELD fQca_leWlanChannMap           (Fixed 5 Bytes)      (Hex)          "LE Wlan Channel Map"         NETWORK_DATA_ORDER
+    FIELD fQca_leLTEChannMap            (Fixed 5 Bytes)      (Hex)          "LE LTE Channel Map"          NETWORK_DATA_ORDER
+    FIELD fQca_leWlanGuardChammMap      (Fixed 5 Bytes)      (Hex)          "LE Wlan Guard Channel Map"   NETWORK_DATA_ORDER
+    FIELD fQca_leFinalChannMap          (Fixed 5 Bytes)      (Hex)          "LE Final Channel Map"        NETWORK_DATA_ORDER
+}
+
+TABLE tQca_LE_CC_Info
+    {0x00, "Unknown"}
+    {0x01, "Good"}
+    {0x02, "Reserved for future use"}
+    {0x03, "Bad"}
+ENDTABLE
+
+
+GROUP gQca_LLM_LE_ChannClassificaiton "LE Channel Classification"
+{
+    FIELD fQca_leChannClassData    (Fixed 10 Bytes) (Hex)          "LE Final Channel Map"   NETWORK_DATA_ORDER
+    FIELD fQca_leChann00 START_BIT (Move -74 Bits)  (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  0"
+    FIELD fQca_leChann01 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  1"
+    FIELD fQca_leChann02 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  2"
+    FIELD fQca_leChann03 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  3"
+    
+    FIELD fQca_leChann04 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  4"
+    FIELD fQca_leChann05 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  5"
+    FIELD fQca_leChann06 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  6"
+    FIELD fQca_leChann07 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  7"
+    
+    FIELD fQca_leChann08 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  8"
+    FIELD fQca_leChann09 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel  9"
+    FIELD fQca_leChann10 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 10"
+    FIELD fQca_leChann11 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 11"
+    
+    FIELD fQca_leChann12 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 12"
+    FIELD fQca_leChann13 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 13"
+    FIELD fQca_leChann14 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 14"
+    FIELD fQca_leChann15 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 15"
+    
+    FIELD fQca_leChann16 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 16"
+    FIELD fQca_leChann17 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 17"
+    FIELD fQca_leChann18 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 18"
+    FIELD fQca_leChann19 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 19"
+    
+    FIELD fQca_leChann20 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 20"
+    FIELD fQca_leChann21 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 21"
+    FIELD fQca_leChann22 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 22"
+    FIELD fQca_leChann23 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 23"
+    
+    FIELD fQca_leChann24 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 24"
+    FIELD fQca_leChann25 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 25"
+    FIELD fQca_leChann26 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 26"
+    FIELD fQca_leChann27 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 27"
+    
+    FIELD fQca_leChann28 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 28"
+    FIELD fQca_leChann29 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 29"
+    FIELD fQca_leChann30 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 30"
+    FIELD fQca_leChann31 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 31"
+    
+    FIELD fQca_leChann32 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 32"
+    FIELD fQca_leChann33 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 33"
+    FIELD fQca_leChann34 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 34"
+    FIELD fQca_leChann35 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 35"
+    
+    FIELD fQca_leChann36 START_BIT (Move 12 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 36"
+    FIELD fQca_leChann37 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 37"
+    FIELD fQca_leChann38 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 38"
+    FIELD fQca_leChann39 START_BIT (Move -4 Bits)   (Fixed 2 Bits) (TABLE tQca_LE_CC_Info) "LE Channel 39"
+}
+
+TABLE tQca_PAST_handleSource
+    {0x00, "Invalid"}
+    {0x01, "SyncConn"}
+    {0x02, "LocalAdv"}
+ENDTABLE
+
+GROUP gQca_LLM_LE_PAST_invalidHandle "Invalid PAST handle"
+{
+    FIELD fQca_PAST_handleSource 		(Fixed 1 Byte)	(TABLE tQca_PAST_handleSource) "PAST source"
+    FIELD fQca_PAST_invalidSyncHandle	(Fixed 1 Byte)	IF (FieldIs EqualTo 1 fQca_PAST_handleSource)	(Hex)	"Sync Handle"
+	FIELD fQca_PAST_invalidAdvHandle	(Fixed 1 Byte)	IF (FieldIs EqualTo 2 fQca_PAST_handleSource)	(Hex)	"Adv Handle"
+}
+
+GROUP gQca_LLM_PowerControlInfo "Power Control Info"
+{
+    FIELD fQca_LLM_PowerControlInfoConnHandle       (Fixed 2 Bytes)     (Decimal) "Connection Handle"
+    FIELD fQca_LLM_PowerControlInfoSource           (Fixed 1 Byte)      (TABLE tQca_PLChangeSource) "Source of the Power change"
+    GROUP gQca_LLM_PowerControlInfoFlags "Power Control Flags"
+    {
+        RESERVED    (Fixed 4 Bits)
+        FIELD fQca_LLM_PowerControlSupport          (Fixed 1 Bit) (TABLE tQca_Power_Status)     "Power Control Support "
+        FIELD fQca_LLM_EnhPowerControlSupport       (Fixed 1 Bit) (TABLE tQca_Power_Status)     "Enhanced Power Control Support "
+        FIELD fQca_LLM_ConstPowerLevelCheck         (Fixed 1 Bit) (TABLE tQca_Power_Status)     "Constant Power Support"
+        FIELD fQca_LLM_LPAPCSupport                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "LPAPC Support "
+    }
+    FIELD fQca_LLM_PowerControlInfoMinPL            (Fixed 1 Byte)      (Decimal) "Minimum PL Index"
+    FIELD fQca_LLM_PowerControlInfoMaxPL            (Fixed 1 Byte)      (Decimal) "Maximum PL Index"
+    FIELD fQca_LLM_PowerControlInfoiPAMaxPL         (Fixed 1 Byte)      (Decimal) "iPA Max PL Index"
+    FIELD fQca_LLM_PowerControlInfoCurrTxPL         (Fixed 1 Byte)      (Decimal) "Current Transmit PL"
+    FIELD fQca_LLM_PowerControlInfoCurrTxdBm_BR     (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "Current BR Transmit Power in 0.25 dBm"
+    FIELD fQca_LLM_PowerControlInfoCurrTxdBm_EDR    (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "Current EDR Transmit Power in 0.25 dBm"
+    FIELD fQca_LLM_PowerControlInfoSAR_BR_LimitdBm  (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "BR SAR Limit in 0.25 dBm"
+    FIELD fQca_LLM_PowerControlInfoSAR_EDR_LimitdBm (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "EDR SAR Limit in 0.25 dBm"
+    FIELD fQca_LLM_PowerControlInfoAvgRSSIdBm       (Fixed 1 Byte) RETRIEVE (SignExtension 8) (Decimal) "Average RSSI dBm"
+}
+
+GROUP gQca_LLM_PclConnStats "Power Control Connection Stats"
+{
+    FIELD fQca_LLM_PclConnStatsConnHandle       (Fixed 2 Bytes)     (Decimal) "Connection Handle"
+    GROUP gQca_LLM_PclConnStatsActPhy "PCL Active Connection PHYs"
+    {
+        RESERVED    (Fixed 4 Bits)
+        FIELD fQca_LLM_PclConnStatsPhyCoded500k          (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 500k"
+        FIELD fQca_LLM_PclConnStatsPhyCoded125k          (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 125k"
+        FIELD fQca_LLM_PclConnStatsPhy2M                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 2M"
+        FIELD fQca_LLM_PclConnStatsPhy1M                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 1M"
+    }
+    GROUP gQca_LLM_PclConnStatsPendReq "PCL Pending Req PHYs"
+    {
+        RESERVED    (Fixed 4 Bits)
+        FIELD fQca_LLM_PclConnStatsPendReqCoded500k          (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 500k"
+        FIELD fQca_LLM_PclConnStatsPendReq125k               (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 125k"
+        FIELD fQca_LLM_PclConnStatsPendReq2M                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 2M"
+        FIELD fQca_LLM_PclConnStatsPendReq1M                 (Fixed 1 Bit) (TABLE tQca_Power_Status)     "PHY 1M"
+    }
+}
+
+TABLE tQca_PLChangeSource
+    {0x00 "Remote"}
+    {0x80 "Local"}
+    {0x81 "Local Conn Init`"}
+    {0x82 "Local Dynamic Control"}
+    {0x83 "Local HPA Reset"}
+    {0x84 "Local HPA Eval"}
+    {0x85 "Local LPA Eval"}
+    {0x86 "Local Set to COnstant PL"}
+    {0x87 "Local LPA Reset"}
+    {0x8A "Local XSCO Connection Minctrl"}
+    {0x8B "Local XSCO Conn"}
+    {0x8D "Local A2DP Start"}
+    {0x8E "Local A2DP Stop"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_Power_Status
+    {0x00, "False" }
+    {0x01, "True" }
+ENDTABLE
+
+TABLE tQca_SlotViolation_Status
+    {0x00, "no violation" }
+    {0x01, "2nd retrans slot violation" }
+    {0x02, "1st retrans slot violation" }
+    {0x03, "reserved slot violation" }
+ENDTABLE
+
+GROUP gQca_LLM_ESCO_Nego "eSCO Param Negotiation"
+{
+    FIELD gQca_LLM_ESCO_Nego_handle                 (Fixed 1 Bytes)   (Decimal) "handle"
+    FIELD gQca_LLM_ESCO_Nego_rxT                    (Fixed 1 Bytes)   (Decimal) "rxT"
+    FIELD gQca_LLM_ESCO_Nego_rxW                    (Fixed 1 Bytes)   (Decimal) "rxW"
+    FIELD gQca_LLM_ESCO_Nego_rxD                    (Fixed 1 Bytes)   (Decimal) "rxD"
+
+    FIELD gQca_LLM_ESCO_Nego_rxLatency              (Fixed 1 Bytes)   (Decimal) "rxLatency"
+    FIELD gQca_LLM_ESCO_Nego_rxTimingCntrlFlags     (Fixed 1 Bytes)   (Decimal) "rxTimingCntrlFlags"
+    FIELD gQca_LLM_ESCO_Nego_rxNegoState            (Fixed 1 Bytes)   (Decimal) "rxNegoState"
+    FIELD gQca_LLM_ESCO_Nego_rxCombinationIndex     (Fixed 1 Bytes)   (Decimal) "rxCombinationIndex"
+    FIELD gQca_LLM_ESCO_Nego_temp_rxCombinationIndex (Fixed 1 Bytes)   (Decimal) "temp_rxCombinationIndex"
+    FIELD gQca_LLM_ESCO_Nego_negoCounter            (Fixed 1 Bytes)   (Decimal) "negoCounter"
+    FIELD gQca_LLM_ESCO_Nego_rxPacketTypes          (Fixed 1 Bytes)   (hex) "rxPacketTypes"
+    GROUP gQca_LLM_ESCO_Nego_Status "flag"
+    {
+        reserved (fixed 6 bits)
+        FIELD gQca_LLM_ESCO_Nego_Flag_USED_COMBI          (Fixed 1 bits)   (Decimal) "used combination"
+        FIELD gQca_LLM_ESCO_Nego_Flag_LTADDR_PENDING_TX   (Fixed 1 bits)    PRINT_IF (FieldIs NotEqualTo 0) (Decimal) "ltAddr Pending Tx"
+    }
+    FIELD gQca_LLM_ESCO_Nego_packetTypesPermitted   (Fixed 2 Bytes)   (hex) "packetTypesPermitted"
+
+    FIELD gQca_LLM_ESCO_Nego_latencyStatus          (Fixed 1 Bytes)   (Decimal) "latencyStatus"
+    FIELD gQca_LLM_ESCO_Nego_reservedSlotHardClash  (Fixed 1 Bytes)   (Decimal) "reservedSlotHardClash"
+    FIELD gQca_LLM_ESCO_Nego_reservedSlotStatus     (Fixed 1 Bytes)   (TABLE tQca_SlotViolation_Status) "slotViolation"
+    reserved (fixed 3 bytes)
+}
+
+TABLE tQca_BufTypeReq
+    { 0 "Enable Background Buffer"}
+    { 1 "Enable Dedicated Buffer"}
+    { 2 "Disable Background Buffer"}
+    { 3 "Disable Dedicated Buffer"}
+    {default "Invalid"}
+ENDTABLE
+
+GROUP gQca_LLM_RtscBuffStatus  "RTSC Buffer Stats"
+{
+    FIELD Qca_LLM_RtscBuffStatus_rtscFlags           (Fixed 4 Bytes)  (Hex)                    "RTSC Flags"
+    FIELD Qca_LLM_RtscBuffStatus_hciHandle           (Fixed 2 Bytes)  (Decimal)                "Hci Handle"
+    FIELD Qca_LLM_RtscBuffStatus_curbufOffset        (Fixed 1 Bytes)  (Decimal)                "Current Buffer Offset"
+    FIELD Qca_LLM_RtscBuffStatus_bkgdRtscOffset      (Fixed 1 Bytes)  (Decimal)                "Background Buffer Offset"
+    FIELD Qca_LLM_RtscBuffStatus_BufTypeReq          (Fixed 1 Bytes)  (TABLE tQca_BufTypeReq)  "Buffer Type Requested"
+    RESERVED                                         (Fixed 3 Bytes)
+}
+
+GROUP gQca_le_rpa_resolve_fail "Resolution Failed Address"
+{
+    FIELD fQca_le_rpa_resolve_fail (Fixed 6 Bytes) (Hex) "Resolution Failed Address"
+}
+
+TABLE tQca_LLM_VoiceAllocStaus
+    {1 "fail"}
+    {0 "success"}
+ENDTABLE
+
+GROUP gQca_LLM_VoiceAlloc "LLM eSCO Voice Allocation Status"
+{
+    FIELD fQca_Voice_SampleBUF_Alloc              (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "SampleBuf Alloc" //BIT7
+    FIELD fQca_Voice_RateAdapt_Alloc              (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "RateAdapt Alloc" //BIT6
+    FIELD fQca_Voice_PLC_Alloc                    (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "PLC Alloc"       //BIT5
+    FIELD fQca_Voice_Codec_Alloc                  (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Codec Alloc"     //BIT4
+    FIELD fQca_Voice_Timer_Alloc                  (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Timer Alloc"     //BIT3
+    FIELD fQca_Voice_Stream_Alloc                 (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Stream Alloc"    //BIT2
+    FIELD fQca_Voice_Audio_MEMMGR_LOWER_Alloc     (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "AudioMemmgr lower alloc" //BIT1
+    FIELD fQca_Voice_Audio_MEMMGR_UPPER_Alloc     (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "AudioMemmgr upper alloc" //BIT0
+    
+    RESERVED                                      (Fixed 1 Bit) //BIT15
+    FIELD fQca_Voice_streamSDUSize_Alloc          (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Stream SDUSize zero" //BIT14
+    FIELD fQca_Voice_GROUP_Alloc                  (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Group alloc"         //BIT13
+    FIELD fQca_Voice_LBCodec_Alloc                (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "LoopbackCodec alloc" //BIT12
+    FIELD fQca_Voice_LBOTA_Alloc                  (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "LoopbackOTA alloc"   //BIT11 
+    FIELD fQca_Voice_Mute_Alloc                   (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "Mute Alloc"   //BIT10
+    FIELD fQca_Voice_EDP_Alloc                    (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "EDP Alloc"    //BIT9
+    FIELD fQca_Voice_OTABUF_Alloc                 (Fixed 1 Bit)     (TABLE tQca_LLM_VoiceAllocStaus)   "OTABuf Alloc" //BIT8   
+}
+
+TABLE tQca_LLM_advFilterAllocStatus
+    {0 "FAIL"}
+    {1 "SUCCESS"}
+    {0xFF "NA"}
+ENDTABLE
+
+GROUP gQca_le_adv_filter_alloc_status "ADV Filter Alloc Status"
+{
+    FIELD fQca_le_adv_filter_mem_alloc_res (Fixed 4 Bytes) (TABLE tQca_LLM_advFilterAllocStatus) "Alloc Status"
+    FIELD fQca_le_adv_filter_mem_used (Fixed 4 Bytes) (Hex) "Adv Filter Memory Used"
+}
+
+GROUP gQca_LLM_LE_Rssi "LE Rssi Data"
+{
+    FIELD fQca_LEChannelCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE LEChannelCntr
+
+    GROUP gQca_LERawRssi REPEAT COUNT (Fixed 40 Times) "LE Raw RSSI Data"
+    {
+        GROUP gQca_LERawRssiType
+        {
+            FIELD fQca_LERawRssiByte          (Fixed 1 Bytes)   RETRIEVE (SignExtension 8)   (DecimalWithFieldLabel LEChannelCntr)      "LE Channel"
+        }
+        FIELD fQca_LERawChannelIncr (Fixed 0) RETRIEVE (StoreField LEChannelCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE LEChannelCntr
+    }
+}
+
+TABLE  tQca_LLM_LUT_Tbl_Type
+    {0x00 "RAM"}
+    {0x01 "ROM"}
+ENDTABLE
+
+
+GROUP gQca_LE_LLM_LUT_Result "LE ISO LUT Result"
+{
+    FIELD fQca_LLM_LE_LUT_Result_Table_Type       (Fixed 2 Bytes)     (TABLE tQca_LLM_LUT_Tbl_Type) "Table"
+    FIELD fQca_LLM_LE_LUT_Result_Table_Index      (Fixed 2 Bytes)     (Decimal) "Entry Index"
+    FIELD fQca_LLM_LE_LUT_Result_LatencyDeltaMS   (Fixed 2 Bytes) (Decimal) "Latency Delta(M2S) ms"
+    FIELD fQca_LLM_LE_LUT_Result_LatencyDeltaSM   (Fixed 2 Bytes) (Decimal) "Latency Delta(S2M) ms"
+}
+
+TABLE tQca_BCS_ModeParam
+    {0x00    "MODE0"    "MODE0"    0   gQca_BCS_Mode0Params}
+    {0x01    "MODE1"    "MODE1"    0   gQca_BCS_Mode1Params}
+    {0x02    "MODE2"    "MODE2"    0   gQca_BCS_Mode2Params}
+    {0x03    "MODE3"    "MODE3"    0   gQca_BCS_Mode3Params}
+ENDTABLE 
+
+TABLE tQca_BCS_Mode1_syncPayload
+    {0x01    "SoundingSeq32"   "SoundingSeq32"  0   gQca_BCS_Mode1_syncPayload_soundingSeq}
+    {0x02    "SoundingSeq96"   "SoundingSeq96"  0   gQca_BCS_Mode1_syncPayload_soundingSeq}
+    {0x03    "RandomSeq32"   "RandomSeq32"  0   gQca_BCS_Mode1_syncPayload_randomseq}
+    {0x04    "RandomSeq64"   "RandomSeq64"  0   gQca_BCS_Mode1_syncPayload_randomseq}
+    {0x05    "RandomSeq96"   "RandomSeq96"  0   gQca_BCS_Mode1_syncPayload_randomseq}
+    {0x06    "RandomSeq128"   "RandomSeq128"  0   gQca_BCS_Mode1_syncPayload_randomseq}
+ENDTABLE
+
+GROUP gQca_BCS_Mode1_syncPayload_randomseq
+{
+    FIELD fQca_BCS_Mode1_syncPayload_randombitseq      (FIXED 16 Bytes)    (Hex)   "RandomBitSeq"
+}
+
+GROUP gQca_BCS_Mode1_syncPayload_soundingSeq
+{
+    FIELD fQca_BCS_Mode1_syncPayload_soundingSeqbits     (FIXED 12 Bytes)    (Hex)   "SoundingBitSeq"
+    FIELD fQca_BCS_Mode1_syncPayload_initiatorMarkerpos1     (FIXED 1 Bytes)    (Hex)   "InitiatorMarkerpos1"
+    FIELD fQca_BCS_Mode1_syncPayload_reflectorMarkerpos1     (FIXED 1 Bytes)    (Hex)   "ReflectorMarkerpos1"
+    FIELD fQca_BCS_Mode1_syncPayload_initiatorssMarkerpos2     (FIXED 1 Bytes)    (Hex)   "InitiatorMarkerpos2"
+    FIELD fQca_BCS_Mode1_syncPayload_reflectorssMarkerpos2     (FIXED 1 Bytes)    (Hex)   "ReflectorMarkerpos2"
+    FIELD fQca_BCS_Mode1_syncPayload_ssMarkerSigSel     (FIXED 1 Bytes)    (Hex)   "ssMarkerSigSel"
+    RESERVED   (FIXED 1 Bytes)
+}
+
+GROUP gQca_BCS_Mode0Params   "MODE 0 Params"
+{
+    FIELD fQca_BCS_Mode0_accessAddrItoR         (FIXED 4 Bytes)    (Hex)     "AccessAddrItoR"
+    FIELD fQca_BCS_Mode0_accessAddrRtoI         (FIXED 4 Bytes)    (Hex)     "AccessAddrRtoI"
+}
+
+GROUP gQca_BCS_Mode1Params   "MODE 1 Params"
+{
+    FIELD fQca_BCS_Mode1_accessAddrItoR         (FIXED 4 Bytes)    (Hex)     "AccessAddrItoR"
+    FIELD fQca_BCS_Mode1_accessAddrRtoI         (FIXED 4 Bytes)    (Hex)     "AccessAddrRtoI"
+    FIELD fQca_BCS_Mode1_syncPayloadLen         (FIXED 1 Bytes)    (Hex)     "SyncPayloadLen"
+    FIELD fQca_BCS_Mode1_syncPayloadType        (FIXED 1 Bytes)    (Hex)     "SyncPayloadType"
+    BRANCH (FromTable   tQca_BCS_Mode1_syncPayload     fQca_BCS_Mode1_syncPayloadType)
+}
+
+GROUP gQca_BCS_Mode2Params   "MODE 2 Params"
+{
+    FIELD fQca_BCS_Mode2_toneExtSlot         (FIXED 1 Bytes)    (Hex)     "toneExtSlot"
+    FIELD fQca_BCS_Mode2_antPermIndex        (FIXED 1 Bytes)    (Hex)     "antPermIndex"
+}
+
+
+GROUP gQca_BCS_Mode3Params   "MODE 3 Params"
+{
+    GROUP gQca_BCS_Mode1Params;
+    GROUP gQca_BCS_Mode2Params;
+}
+
+
+
+GROUP gQca_LE_LLM_BCS_StepData "LE BCS Step Data"
+{
+    FIELD fQca_LLM_LE_BCS_ModeType       (Fixed 1 Bytes)     (Decimal) "ModeType"
+    FIELD fQca_LLM_LE_BCS_Channel_Index      (Fixed 1 Bytes)     (Decimal) "Channel"
+    FIELD fQca_LLM_LE_BCS_StepIndex   (Fixed 1 Bytes) (Decimal) "StepIndex"
+    RESERVED (Fixed 1 Bytes)
+    BRANCH (FromTable   tQca_BCS_ModeParam     fQca_LLM_LE_BCS_ModeType)
+    RESERVED            (ToEndOfLayer)
+}
+
+GROUP gQca_LE_LLM_BCS_EventData "LE BCS Event Data"
+{
+    FIELD fQca_LLM_LE_BCS_EventIndex       (Fixed 4 Bytes)     (Decimal) "EventIndex"
+    FIELD fQca_LLM_LE_BCS_EventStepCount      (Fixed 4 Bytes)     (Decimal) "StepCount"
+    FIELD fQca_LLM_LE_BCS_GivenEventLen   (Fixed 4 Bytes) (Decimal) "EventLen"
+    FIELD fQca_LLM_LE_BCS_ActualEventLen   (Fixed 4 Bytes) (Decimal) "ActualEventLen"
+}
+
+GROUP gQca_LE_LLM_BCS_StepTimings "LE BCS Step Timings"
+{
+    FIELD fQca_LLM_LE_BCS_Mode0time      (Fixed 4 Bytes)     (Decimal) "Mode0time"
+    FIELD fQca_LLM_LE_BCS_Mode1time      (Fixed 4 Bytes)     (Decimal) "Mode1time"
+    FIELD fQca_LLM_LE_BCS_Mode2time      (Fixed 4 Bytes)     (Decimal) "Mode2time"
+    FIELD fQca_LLM_LE_BCS_Mode3time      (Fixed 4 Bytes)     (Decimal) "Mode3time"
+}
+
+GROUP gQca_LE_LLM_BCS_ProcInfo "LE BCS Procedure Info"
+{
+    FIELD fQca_LLM_LE_BCS_ProcStatus      (Fixed 4 Bytes)     (Decimal) "Proc Status"
+    FIELD fQca_LLM_LE_BCS_ProcIndex       (Fixed 4 Bytes)     (Decimal) "Proc Index" 
+    FIELD fQca_LLM_LE_BCS_ProcTime        (Fixed 4 Bytes)     (Decimal) "Proc Build Time"
+    FIELD fQca_LLM_LE_BCS_ProcPL          (Fixed 4 Bytes)     (Decimal) "Proc Power Level"
+}
+
+GROUP gQca_LE_LLM_BCS_FILTERED_CH_MAP  " BCS Proc Channel Maps"
+{
+    FIELD fQca_LE_BCS_Curr_ChannMap           (Fixed 10 Bytes)      (Hex)          "BCS Local Channel Map"    NETWORK_DATA_ORDER
+    FIELD fQca_LE_BCS_Remote_ChannMap           (Fixed 10 Bytes)      (Hex)          "BCS Remote Channel Map"    NETWORK_DATA_ORDER
+    FIELD fQca_LE_BCS_lstEval_ChannMap         (Fixed 10 Bytes)      (Hex)          "BCS lastEval Channel Map"  NETWORK_DATA_ORDER
+    FIELD fQca_LE_BCS_Filtered_ChannMap          (Fixed 10 Bytes)      (Hex)          "BCS filtered Channel Map"    NETWORK_DATA_ORDER
+	FIELD fQca_LE_BCS_Pend_ChannMap          (Fixed 10 Bytes)      (Hex)          "BCS pend Channel Map"    NETWORK_DATA_ORDER
+}
+
+
+
+GROUP gQca_LOG_ID_LLM_BCS_CONFIG_CH_MAP  " BCS Config CH Map"
+{
+    FIELD fQca_LE_BCS_ChannMap                (Fixed 10 Bytes)      (Hex)          "BCS Channel Map"    NETWORK_DATA_ORDER
+}
+
+GROUP gQca_LE_LLM_BCS_CHAN_MAP_INFO  " BCS Chan Map Info"
+{
+    FIELD fQca_LE_BCS_ChannMap;
+    FIELD fQca_LE_BCS_ChanMapInstant          (Fixed 2 Bytes)       (Hex)          "BCS Channel Map Instant"
+}
+
+
+GROUP gQca_GenericShuffledMapParams
+{
+    FIELD fQca_ArgCntrst  (Fixed 0)   RETRIEVE (StoreInteger 1)   (Hex)   SUPPRESS_DETAIL STORE ArgCntrst
+    GROUP gQca_ArgLoopst  REPEAT SIZE (FromField Bytes fQca_Pkt_Len) 
+    {
+        GROUP gQca_ArgValst LABEL(LabelCount "#P"ArgCntrst)
+        {
+            FIELD fQca_ArgValst         (Fixed 1 Byte)      (Hex) "Val"
+        }
+        /* Increment the Counter */
+        FIELD fQca_ArgCntrIncrst (Fixed 0) RETRIEVE (StoreField ArgCntrst) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE ArgCntrst
+    }
+}
+
+GROUP gQca_LE_LLM_BCS_TX_POWERDebug
+{
+    FIELD fQca_LE_LLM_BCS_TX_POWERDebug_PowerDelta     (Fixed 4 Bytes)  (Hex)   "PowerDelta"
+    FIELD fQca_LE_LLM_BCS_TX_POWERDebug_GoldendBm     (Fixed 4 Bytes)  (Hex)   "GoldendBm"
+    FIELD fQca_LE_LLM_BCS_TX_POWERDebug_Rssi     (Fixed 4 Bytes)  (Hex)   "Rssi"
+}
+
+GROUP gQca_LE_LLM_BCS_SECURITY_DRBG_DATA  "DRBG Structure"
+{
+    FIELD fQca_LE_LLM_BCS_SECURITY_DRBG_VectorK     (Fixed 16 Bytes)  (Hex)     "K"
+    FIELD fQca_LE_LLM_BCS_SECURITY_DRBG_VectorV     (Fixed 16 Bytes)  (Hex)     "V"
+    FIELD fQca_LE_LLM_BCS_DRBG_IV                   (Fixed 16 Bytes)  (Hex)     "IV"
+    FIELD fQca_LE_LLM_BCS_DRBG_IN     (Fixed 8 Bytes)     (Hex) "IN" 
+    FIELD fQca_LE_LLM_BCS_DRBG_PV     (Fixed 16 Bytes)     (Hex) "PV"
+    FIELD fQca_LE_LLM_BCS_SECURITY_DRBG_StepCount     (Fixed 2 Bytes)  (Decimal)     "StepCount"
+    FIELD fQca_LE_LLM_BCS_SECURITY_DRBG_Initialised    (Fixed 1 Byte)   (Hex)   "intializedKV"
+    RESERVED    (ToEndOfLayer)
+}
+
+GROUP gQca_LLM_BCS_DRBG_SECURITY_DATA_HR1 "HR1 data"
+{
+    FIELD fQca_LLM_BCS_DRBG_SECURITY_DATA_TID      (Fixed 4 Bytes)     (Decimal) "TID"
+    FIELD fQca_LLM_BCS_DRBG_SECURITY_DATA_Range      (Fixed 4 Bytes)     (Decimal) "Range"
+    FIELD fQca_LLM_BCS_DRBG_SECURITY_DATA_DRBGBits      (Fixed 4 Bytes)     (Decimal) "DRBG Data"
+    FIELD fQca_LLM_BCS_DRBG_SECURITY_DATA_RandomNumber      (Fixed 4 Bytes)     (Decimal) "RandomNumber"
+}
+
+GROUP gQca_LLM_LE_BCS_PROC_OFFSETS_DEBUG  "SyncLink D Offsets"
+{
+    FIELD fQca_LLM_LE_BCS_PROC_OFFSETS_MIN_DOFFSET     (Fixed 4 Bytes)     (Decimal) "MinDOffset"  
+    FIELD fQca_LLM_LE_BCS_PROC_OFFSETS_MAX_DOFFSET     (Fixed 4 Bytes)     (Decimal) "MaxDOffset"
+    FIELD fQca_LLM_LE_BCS_PROC_OFFSETS_ConnEventCount     (Fixed 4 Bytes)     (Decimal) "ConnEventCount"
+}
+
+GROUP gQca_LLM_LE_BCS_PROC_SUBEVENTLEN_DEBUG  "SyncLink Subevent Lengths"
+{
+    FIELD fQca_LLM_LE_BCS_PROC_SUBEVENTLEN_MIN     (Fixed 4 Bytes)     (Decimal) "MinSubeventLen"  
+    FIELD fQca_LLM_LE_BCS_PROC_SUBEVENTLEN_MAX     (Fixed 4 Bytes)     (Decimal) "MaxSubeventLen"
+}
+
+GROUP gQca_LLM_LE_BCS_PROC_SYNCLINK_ERR  " Synclink Errors "
+{
+    RESERVED    (ToEndOfLayer)
+}
+GROUP gQca_LLM_LE_BCS_PROC_ENABLE_ERR  " Procedure Enable Errors "
+{
+    RESERVED    (ToEndOfLayer)
+}
+
+GROUP gQca_LLM_LE_BCS_PROC_PARAMS  " Procedure Params "
+{
+	FIELD fQca_LLM_LE_BCS_PROC_OFFSET_MIN     (Fixed 4 Bytes)     (Decimal) "MinOffSet"  
+    FIELD fQca_LLM_LE_BCS_PROC_OFFSET_MAX     (Fixed 4 Bytes)     (Decimal) "MaxOffSet"  
+	FIELD fQca_LLM_LE_BCS_PROC_OFFSET     (Fixed 4 Bytes)     (Decimal) "Negotiated OffSet"
+	FIELD fQca_LLM_LE_BCS_PROC_SUBEVENTLEN     (Fixed 4 Bytes)     (Decimal) "SubEventLength"
+	FIELD fQca_LLM_LE_BCS_PROC_SUBEVENTINTERVAL     (Fixed 2 Bytes)     (Decimal) "SubEventInterval"
+	FIELD fQca_LLM_LE_BCS_PROC_LE_CONN_EVENT_COUNTER     (Fixed 2 Bytes)     (Decimal) "LeConnEventCounter"
+	FIELD fQca_LLM_LE_BCS_PROC_EVENT_INTERVAL     (Fixed 2 Bytes)     (Decimal) "EventInterval"
+	FIELD fQca_LLM_LE_BCS_PROC_MAX_LEN     (Fixed 2 Bytes)     (Decimal) "MaxProcedureDuration"	
+	FIELD fQca_LLM_LE_BCS_PROC_INTERVAL     (Fixed 2 Bytes)     (Decimal) "ProcedureInterval"	
+	FIELD fQca_LLM_LE_BCS_PROC_COUNT     (Fixed 2 Bytes)     (Decimal) "ProcedureCount"	
+	FIELD fQca_LLM_LE_BCS_PROC_SUBEVENTS_PER_EVENT     (Fixed 1 Bytes)     (Decimal) "SubEventsPerEvent"	
+	FIELD fQca_LLM_LE_BCS_PROC_CONFIG_ID     (Fixed 1 Bytes)     (Decimal) "ConfigID"	
+	FIELD fQca_LLM_LE_BCS_PROC_ACI     (Fixed 1 Bytes)     (Decimal) "ACI"	
+	FIELD fQca_LLM_LE_BCS_PROC_PREF_PEER_ANT     (Fixed 1 Bytes)     (Decimal) "PreferredPeerAntenna"	
+	FIELD fQca_LLM_LE_BCS_PROC_PHY     (Fixed 1 Bytes)     (Decimal) "PHY"	
+	FIELD fQca_LLM_LE_BCS_PROC_POWER_DELTA     (Fixed 1 Bytes)     (Decimal) "PowerDelta"	
+}
+GROUP gQca_LLM_LE_BCS_PROC_INTERVAL_ERR  " Procedure Interval ERR "
+{
+	FIELD fQca_LLM_LE_BCS_PROCEDURE_INTERVAL     (Fixed 2 Bytes)     (Decimal) "Procedure Interval"	
+}
+
+GROUP gQca_LLM_LE_BCS_TERMINATE_PROC_COUNTER_ERR  " Terminate Proc Counter Error "
+{
+	FIELD fQca_LLM_LE_BCS_TERMINATE_PROCEDURE_COUNTER     (Fixed 2 Bytes)     (Decimal) "Terminate Proc Counter Error"	
+	FIELD fQca_LLM_LE_BCS_PROC_COUNTER     (Fixed 2 Bytes)     (Decimal) " Proc Counter "	
+}
+
+GROUP gQca_LOG_ID_LLM_LE_BCS_QBCE_STEP_DATA_EVENT "BCS_QLE_STEPDATA_EVENT"
+{
+    FIELD fBCS_STEP_INDEX_POS_PATCH        (Fixed 1 Bytes) (Decimal)    "BCS_STEP_INDEX_POS_PATCH  "
+    FIELD fBCS_EVENT_INDEX_POS_PATCH       (Fixed 1 Bytes) (Decimal)    "BCS_EVENT_INDEX_POS_PATCH "
+    FIELD fBCS_PROC_INDEX_POS_PATCH        (Fixed 2 Bytes) (Decimal)    "BCS_PROC_INDEX_POS_PATCH  "
+    FIELD fBCS_STEP_MODE_POS_PATCH         (Fixed 1 Bytes) (Decimal)    "BCS_STEP_MODE_POS_PATCH   "
+    FIELD fBCS_CS_SYNC_PHY_POS_PATCH       (Fixed 1 Bytes) (Decimal)    "BCS_CS_SYNC_PHY_POS_PATCH "
+    FIELD fBCS_RTT_TYPE_POS_PATCH          (Fixed 1 Bytes) (Decimal)    "BCS_RTT_TYPE_POS_PATCH  "
+    RESERVED (Fixed 5 Bytes)
+    FIELD fBcs_freqOffsetMHz (Fixed 1 Bytes) (Decimal) "freqOffsetMHz"
+    FIELD fBcs_freqOffsetKHz (Fixed 2 Bytes) (Decimal) "freqOffsetKHz"
+    FIELD fBcs_agcIndex (Fixed 1 Bytes) (Decimal) "agcIndex"
+    FIELD fBcs_dvgaIndex (Fixed 1 Bytes) (Decimal) "dvgaIndex"
+    FIELD fBcs_rssidBm (Fixed 1 Bytes) (Decimal) "rssidBm"
+    FIELD fBcs_aci (Fixed 1 Bytes) (Decimal) "aci"
+    FIELD fBCS_DATA_START_RX_SOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "RX_SOF_TIME_USEC "
+    FIELD fBCS_DATA_START_RX_SOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "RX_SOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_RX_TOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "RX_TOF_TIME_USEC "
+    FIELD fBCS_DATA_START_RX_TOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "RX_TOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_RX_AOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "RX_AOF_TIME_USEC "
+    FIELD fBCS_DATA_START_RX_AOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "RX_AOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_RX_EOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "RX_EOF_TIME_USEC "
+    FIELD fBCS_DATA_START_RX_EOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "RX_EOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_TX_SOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "TX_SOF_TIME_USEC "
+    FIELD fBCS_DATA_START_TX_SOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "TX_SOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_TX_TOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "TX_TOF_TIME_USEC "
+    FIELD fBCS_DATA_START_TX_TOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "TX_TOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_TX_EOF_TIME_USEC  (Fixed 4 Bytes)   (Decimal) "TX_EOF_TIME_USEC "
+    FIELD fBCS_DATA_START_TX_EOF_TIME_FRAC  (Fixed 1 Bytes)   (Decimal) "TX_EOF_TIME_FRAC "
+    FIELD fBCS_DATA_START_RX_ACQ_MF_EARLY   (Fixed 4 Bytes)   (Decimal) "RX_ACQ_MF_EARLY  "
+    FIELD fBCS_DATA_START_RX_ACQ_MF_ONTIME  (Fixed 4 Bytes)   (Decimal) "RX_ACQ_MF_ONTIME "
+    FIELD fBCS_DATA_START_RX_ACQ_MF_LATE    (Fixed 4 Bytes)   (Decimal) "RX_ACQ_MF_LATE   "
+    FIELD fBCS_DATA_START_STEP_CH           (Fixed 2 Bytes)   (Decimal) "Step Channel   "
+    FIELD fBCS_DATA_START_STEP_SINR         (Fixed 4 Bytes)   (Decimal) "Step SINR   "
+    RESERVED (Fixed 1 Bytes)
+
+    FIELD fBCS_DATA_START_STEP_DCIQ_LEN     (Fixed 1 Bytes)   (Decimal) "Step DCIQ LEN   "
+    GROUP gBCS_Data_Step_DCIQ_Samples       IF (FieldIs NotEqualTo 0 fBCS_DATA_START_STEP_DCIQ_LEN) "DCIQ Samples"
+    {
+        FIELD fBCS_DATA_START_STEP_DCIQ_DATA  (FromField Bytes fBCS_DATA_START_STEP_DCIQ_LEN) (StringOfHex)       "HexDump"
+    }
+
+    FIELD fBCS_DATA_START_STEP_TONEIQ_LEN     (Fixed 2 Bytes)   (Decimal) "Step TONEIQ LEN   "
+    GROUP gBCS_Data_Step_ToneIQ_Samples       IF (FieldIs NotEqualTo 0 fBCS_DATA_START_STEP_TONEIQ_LEN) "TONE IQ Samples"
+    {
+        FIELD fBCS_DATA_START_STEP_TONEIQ_DATA  (FromField Bytes fBCS_DATA_START_STEP_TONEIQ_LEN) (StringOfHex)       "HexDump"
+    }
+
+    FIELD fBCS_DATA_START_STEP_SPIQ_LEN     (Fixed 2 Bytes)   (Decimal) "Step SPIQ LEN   "
+    GROUP gBCS_Data_Step_SpIQ_Samples       IF (FieldIs NotEqualTo 0 fBCS_DATA_START_STEP_SPIQ_LEN) "SP IQ Samples"
+    {
+        FIELD fBCS_DATA_START_STEP_SPIQ_DATA  (FromField Bytes fBCS_DATA_START_STEP_SPIQ_LEN) (StringOfHex)       "HexDump"
+    }
+
+    FIELD fBCS_DATA_START_STEP_REGDATA_LEN     (Fixed 2 Bytes)   (Decimal) "Step REGDATA LEN   "
+    FIELD fQca_RegCntr  (Fixed 0)   RETRIEVE (StoreInteger 0)   (Hex)   SUPPRESS_DETAIL STORE RegCntr
+    GROUP gBCS_Data_Step_REGDATA_values       IF (FieldIs NotEqualTo 0 fBCS_DATA_START_STEP_REGDATA_LEN) REPEAT SIZE (FromField Bytes fBCS_DATA_START_STEP_REGDATA_LEN) "RegValues"
+    {
+        GROUP gQca_RegInfo LABEL(LabelCount "Reg #" RegCntr)
+        {
+            // FIELD fBCS_DATA_START_STEP_REGDATA_DATA  (FromField Bytes fBCS_DATA_START_STEP_REGDATA_LEN) (StringOfHex)       "HexDump"
+            FIELD fBCS_DATA_START_STEP_REGDATA_DATA (Fixed 4 Bytes)   (Hex) "Reg Value   "
+        }
+
+        FIELD fQca_RegCntrIncr (Fixed 0) RETRIEVE (StoreField RegCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE RegCntr
+    }
+
+    FIELD fBCS_DATA_START_STEP_MODE1_DATA_LEN     (Fixed 2 Bytes)   (Decimal) "Step MODE1 DATA LEN   "
+    GROUP gBCS_Data_Step_MODE1_DATA_values       IF (FieldIs NotEqualTo 0 fBCS_DATA_START_STEP_MODE1_DATA_LEN) "MODE1 DATA"
+    {
+        //FIELD fBCS_DATA_START_STEP_MODE1DATA_DATA  (FromField Bytes fBCS_DATA_START_STEP_MODE1_DATA_LEN) (StringOfHex)       "HexDump"
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_fractionalTime (Fixed 4 Bytes)   (Hex)     "RTT : fractionalTime   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_binHalf (Fixed 6 Bytes)   (Hex)     "RTT : binHalf[3]   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_binfull     (Fixed 6 Bytes)   (Hex)     "RTT : binFull[3]   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_binCount    (Fixed 6 Bytes)   (Hex)     "RTT : binCount[3]   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_initialDecimationPhase  (Fixed 1 Bytes)   (Hex)     "RTT : initialDecimationPhase   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_globalStepIndex  (Fixed 1 Bytes)   (Hex)     "RTT : globalStepIndex   "
+        //RESERVED (FIXED 2 BYTES)
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_normalization (Fixed 4 Bytes)   (Hex)     "RTT NADM: normalization   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_phaseDiff (Fixed 4 Bytes)   (Hex)     "RTT NADM: phaseDiff   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_regBinCount0Value (Fixed 4 Bytes)   (Hex)     "RTT NADM: regBinCount0Value   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_regBinCount1Value (Fixed 4 Bytes)   (Hex)     "RTT NADM: regBinCount1Value   "
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_regBin_mBq (Fixed 128 Bytes)   (Hex)     "RTT NADM: mBQ"
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_regBin_rBq (Fixed 128 Bytes)   (Hex)     "RTT NADM: rBQ"
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_phaseStraight (Fixed 4 Bytes)   RETRIEVE (SignExtension 32)      (Decimal)     "RTT NADM: phaseStraight   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_phaseCurve (Fixed 4 Bytes)    RETRIEVE (SignExtension 32)     (Decimal)     "RTT NADM: phaseCurve   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_phaseStraight_1 (Fixed 4 Bytes)   RETRIEVE (SignExtension 32)      (Decimal)     "RTT NADM: phaseStraight 1  "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_phaseStraight_2 (Fixed 4 Bytes)   RETRIEVE (SignExtension 32)      (Decimal)     "RTT NADM: phaseStraight 2  "
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_cntStraight (Fixed 2 Bytes)   (Hex)     "RTT NADM: cntStraight   "
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_cntCurve (Fixed 2 Bytes)   (Hex)     "RTT NADM: cntCurve   "
+
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_b4DemodCorrNADM (Fixed 1 Bytes)   (Hex)     "RTT NADM: b4DemodCorrNADM   "
+        FIELD fBCS_DATA_START_STEP_MODE1DATA_finalNADM (Fixed 1 Bytes)   (Hex)     "RTT NADM: finalNADM   "
+    }
+	
+    FIELD fBCS_DATA_START_STEP_REGDATA_LEN;
+    FIELD fQca_RegCntr;
+    GROUP gBCS_Data_Step_REGDATA_values;
+		
+}
+
+GROUP gQca_LOG_ID_LLM_LE_BCS_IGNORE_REMOTE_CHAN_MAP_UPDATE_ERR  " Remote BCS Channel Map Update Error"
+{
+    RESERVED    (ToEndOfLayer)
+}
+
+TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_ip_Index
+    {0x00 "10us"}
+    {0x01 "20us"}
+    {0x02 "30us"}
+    {0x03 "40us"}
+    {0x04 "50us"}
+    {0x05 "60us"}
+    {0x06 "80us"}
+    {0x07 "145us"}
+ENDTABLE
+
+TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_fcs_Index 
+    {0x00 "15us"}
+    {0x01 "20us"}
+    {0x02 "30us"}
+    {0x03 "40us"}
+    {0x04 "50us"}
+    {0x05 "60us"}
+    {0x06 "80us"}
+    {0x07 "100us"}
+    {0x08 "120us"}
+    {0x09 "150us"}
+ENDTABLE
+
+TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_pm_Index
+    {0x00 "10us"}
+    {0x01 "20us"}
+    {0x02 "40us"}
+ENDTABLE
+
+TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_csSyncPhy
+    {0x01 "1M Phy"}
+    {0x02 "2M Phy"}
+ENDTABLE
+
+GROUP gQca_LE_LLM_BCS_TXPowerUpdate "TX Power update"
+{
+    FIELD fQca_LLM_LE_BCS_previous_PL       (Fixed 4 Bytes)     (Decimal) "OldTXPower"
+    FIELD fQca_LLM_LE_BCS_Present_PL      (Fixed 4 Bytes)     (Decimal) "NewTxPower"
+    FIELD fQca_LLM_LE_BCS_PHY_PowerDelta   (Fixed 4 Bytes) (Decimal) "PHY Rate"
+    FIELD fQca_LLM_LE_BCS_PowerDelta   (Fixed 4 Bytes) (Decimal) "Power Delta"
+}
+
+TABLE  tQca_LOG_ID_LLM_BCS_CURRENT_STATE
+    {0x00 "BCS_STATE_IDLE"}
+    {0x01 "BCS_STATE_CAP_EX_INPROGRESS"}
+    {0x02 "BCS_STATE_SECURITY_INPROGRESS"}
+    {0x03 "BCS_STATE_CONFIG_INPROGRESS"}
+    {0x04 "BCS_STATE_FAE_INPROGRESS"}
+    {0x05 "BCS_STATE_PROC_INPROGRESS"}
+ENDTABLE
+
+TABLE  tQca_LOG_ID_LLM_CONN_UPDATE_REASON
+    {0x00 "LLM_LE_UPDATE_PARAM_REASON_LOCAL"}
+    {0x01 "LLM_LE_UPDATE_PARAM_REASON_REMOTE"}
+    {0x02 "LLM_LE_UPDATE_PARAM_REASON_NEGO"}
+    {0x03 "LLM_LE_UPDATE_PARAM_REASON_HCI_REPLY"}
+    {0x04 "LLM_LE_UPDATE_PARAM_REASON_FALLBACK"}
+    {0x05 "LLM_LE_UPDATE_PARAM_REASON_AUTO"}
+    {0x06 "LLM_LE_UPDATE_PARAM_REASON_ADAPTIVE_CONN_LATENCY"}
+ENDTABLE
+
+GROUP gQca_LE_LLM_BCS_ConnUpdateSkip " Connection Update Skipped"
+{
+    FIELD fQca_LOG_ID_LLM_BCS_CURRENT_STATE            (Fixed 4 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CURRENT_STATE)    "CurrState"
+    FIELD fQca_LOG_ID_LLM_BCS_CONN_UPDATE_REASON       (Fixed 4 Bytes)     (TABLE  tQca_LOG_ID_LLM_CONN_UPDATE_REASON)    "UpdateReason"
+}
+
+GROUP gQca_HCI_LE_BCS_PROC_EN_PARAMS    "HCI Proc Params"
+{
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_minSubEventLen        (Fixed 4 Bytes)     (Decimal)    "minSubEventLen"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_maxSubEventLen        (Fixed 4 Bytes)     (Decimal)    "maxSubEventLen"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_maxDuration           (Fixed 2 Bytes)     (Decimal)    "maxDuration"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_minPeriod             (Fixed 2 Bytes)     (Decimal)    "minPeriod"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_maxPeriod             (Fixed 2 Bytes)     (Decimal)    "maxPeriod"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_maxNumProc            (Fixed 2 Bytes)     (Decimal)    "maxNumProc"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_configID              (Fixed 1 Bytes)     (Decimal)    "configID"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_toneAntConfig         (Fixed 1 Bytes)     (Decimal)    "toneAntConfig"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_phy                   (Fixed 1 Bytes)     (Decimal)    "phy"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_txPwrDelta            (Fixed 1 Bytes)     (Decimal)    "txPwrDelta"
+    FIELD fQca_HCI_LE_BCS_PROC_EN_PARAMS_isSet                 (Fixed 1 Bytes)     (Decimal)    "isSet" 
+    RESERVED   (FIXED 3 Bytes) 
+}
+
+GROUP gQca_LOG_ID_LLM_LE_BCS_PROC_CONFIG_LOG  "LE BCS Config Debug"
+{
+    GROUP gQca_HCI_LE_BCS_PROC_EN_PARAMS;
+    GROUP gQca_LOG_ID_LLM_BCS_CONFIG_CH_MAP;
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_role                 (Fixed 1 Bytes)     (Hex)    "role"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_mainModeType         (Fixed 1 Bytes)     (Hex)    "mainModeType"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_subModeType          (Fixed 1 Bytes)     (Hex)    "subModeType"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_configID             (Fixed 1 Bytes)     (Hex)    "ConfigID"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_configState          (Fixed 1 Bytes)     (Hex)    "configState"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_mainModeMinSteps     (Fixed 1 Bytes)     (Hex)    "mainModeMinSteps"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_mainModeMaxSteps     (Fixed 1 Bytes)     (Hex)    "mainModeMaxSteps"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_mainModeRep          (Fixed 1 Bytes)     (Hex)    "mainModeRep"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_mode0Steps           (Fixed 1 Bytes)     (Hex)    "mode0Steps"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_rttType              (Fixed 1 Bytes)     (Hex)    "rttType"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_csSyncPhy            (Fixed 1 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_csSyncPhy)    "csSyncPhy"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_ip1_Index            (Fixed 1 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_ip_Index)    "ip1_Index"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_ip2_Index            (Fixed 1 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_ip_Index)    "ip2_Index"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_fcs_Index            (Fixed 1 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_fcs_Index)    "fcs_Index"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_pm_Index             (Fixed 1 Bytes)     (TABLE  tQca_LOG_ID_LLM_BCS_CONFIG_pm_Index)    "pm_Index"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_chanMapRep           (Fixed 1 Bytes)     (Hex)    "chanMapRep"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_chanSel              (Fixed 1 Bytes)     (Hex)    "chanSel"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_ch3cShape            (Fixed 1 Bytes)     (Hex)    "ch3cShape"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_ch3cJump             (Fixed 1 Bytes)     (Hex)    "ch3cJump"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_rttAntSel            (Fixed 1 Bytes)     (Hex)    "rttAntSel"
+    FIELD fQca_LOG_ID_LLM_BCS_CONFIG_companionSignalEn    (Fixed 1 Bytes)     (Hex)    "companionSignalEn"
+    RESERVED   (FIXED 1 Bytes) 
+
+}
+
+GROUP gQca_LE_LLM_PowerControlInfo "LE Power Control Info"
+{
+    FIELD fQca_LLM_LE_PowerControlInfoConnHandle       (Fixed 2 Bytes)     (Decimal) "Connection Handle"
+    FIELD fQca_LLM_LE_PowerControlInfoSource           (Fixed 1 Byte)      (TABLE tQca_LE_PLChangeSource) "Source of the LE Power change"
+    FIELD fQca_LLM_LE_TxPHY            (Fixed 1 Byte)      (TABLE tQca_LE_TxPHY) "TxPHY"
+    GROUP gQca_LLM_LE_PowerControlInfoFlags "Power Control Flags"
+    {
+        RESERVED    (Fixed 4 Bits)
+        FIELD fQca_LLM_LE_LPAC                     (Fixed 1 Bit) (TABLE tQca_Power_Status)     "LPAC"
+        FIELD fQca_LLM_LE_LimitMaxPLOnPhy_tag83    (Fixed 1 Bit) (TABLE tQca_Power_Status)     "Limit Max PL On Phy in tag83 "
+        FIELD fQca_LLM_LE_powerControlSupport      (Fixed 1 Bit) (TABLE tQca_Power_Status)     "LE Power Control Support"
+        FIELD fQca_LLM_LE_ISOOnTXPHy               (Fixed 1 Bit) (TABLE tQca_Power_Status)     "ISO On TX PHy "
+    }
+    FIELD fQca_LLM_LE_MinPL     			(Fixed 1 Byte)                                (Decimal) "Min PL forLE"
+    FIELD fQca_LLM_LE_MaxPL     			(Fixed 1 Byte)                                (Decimal) "Max PL forLE"
+    FIELD fQca_LLM_LE_MaxPLOnTxPHYtag83     (Fixed 1 Byte)                                (Decimal) "Max PL On TxPHY in tag83"
+    FIELD fQca_LLM_LE_CurrPLOnTxPHY    	    (Fixed 1 Byte)                                (Decimal) "Current PL TxPHY"
+    FIELD fQca_LLM_LE_CurrPwrDbm            (Fixed 1 Byte)  RETRIEVE (SignExtension 8)    (Decimal) "Current Tx power(0.25dBm)"
+    FIELD fQca_LLM_LE_SARPwrDbm             (Fixed 1 Byte)  RETRIEVE (SignExtension 8)    (Decimal) "SAR max(0.25dBm)"
+	
+}
+
+TABLE  tQca_LE_TxPHY
+    {0x00 "1M"}
+    {0x01 "2M"}
+    {0x02 "S8(125K)"}
+    {0x03 "S2(500K)"}
+    {0x04 "LEHS(Q2Q)"}
+    {Default "Invalid"}
+ENDTABLE
+
+TABLE tQca_LE_PLChangeSource
+    {0x00 "Remote"}
+    {0x01 "Phy Updata"}
+    {0x02 "Min Channels Limit"}
+    {0x03 "Coded PHY Sync"}
+    {0x04 "Host VSC"}
+    {0x80 "Local"}
+    {0x81 "Local Acl Conn Init"}
+    {0x82 "Local Iso Conn Init"}
+    {0x83 "LPA Evaluate"}
+    {0x84 "LPA Recover"}
+    {0x85 "Slave Threshold"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_LLM_UtilityTimerTimeout "LLM Utility Timer Timeout"
+{
+    FIELD fQca_LLM_LMPTimeoutTimerType1       (Fixed 1 Byte)                (TABLE tQca_TimerId) "Timer Type"
+    FIELD fQca_LLM_LMPTimeoutTimerIndex       (Fixed 1 Byte)                (Hex) "Timer Index"
+    BRANCH(FromTable    tQca_TimerId    fQca_LLM_LMPTimeoutTimerType1)
+
+}
+
+GROUP gQca_LLM_UtilityTimerAllocFailed "LLM Utility Timer Allocation Failed"
+{
+    FIELD fQca_LLM_LMPTimeoutTimerType        (Fixed 1 Byte)                (TABLE tQca_TimerId) "Timer Type"
+    FIELD fQca_HCIConnHandle                  (Fixed 1 Bytes)               (Hex) "HCI Connection Handle"
+    FIELD fQca_LLM_SeqEvent                   (Fixed 1 Bytes)               (Hex) "LLM seqeunce event"
+    BRANCH(FromTable    tQca_TimerId    fQca_LLM_LMPTimeoutTimerType)
+}
+
+GROUP gQca_TimeoutTimerData
+{
+    FIELD fQca_DefaultTimerData         (Fixed 4 Byte)    (StringOfHex)                      "Timer Data"
+}
+TABLE  tQca_TimerId
+    {0x0A "LLM_UTILITY_TIMER_TYPE_LT_ADDR"                      "LLM_UTILITY_TIMER_TYPE_LT_ADDR"                        0 gQca_TimeoutTimerData}
+    {0x0D "LLM_UTILITY_TIMER_TYPE_REPEATED_ATTEMPTS"            "LLM_UTILITY_TIMER_TYPE_REPEATED_ATTEMPTS"              0 gQca_TimeoutTimerData}
+    {0x0E "LLM_UTILITY_TIMER_TYPE_LINK_KEY_MASK_REQ_TO"         "LLM_UTILITY_TIMER_TYPE_LINK_KEY_MASK_REQ_TO"           0 gQca_TimeoutTimerData}
+    {0x15 "LLM_UTILITY_TIMER_TYPE_LE_DIRECTED_ADV"              "LLM_UTILITY_TIMER_TYPE_LE_DIRECTED_ADV"                0 gQca_TimeoutTimerData}
+    {0x16 "LLM_UTILITY_TIMER_TYPE_INQUIRY_COMPLETE"             "LLM_UTILITY_TIMER_TYPE_INQUIRY_COMPLETE"               0 gQca_TimeoutTimerData}
+    {0x17 "LLM_UTILITY_TIMER_TYPE_CLOCK_ADJUST_DRAG"            "LLM_UTILITY_TIMER_TYPE_CLOCK_ADJUST_DRAG"              0 gQca_TimeoutTimerData}
+    {0x19 "LLM_UTILITY_TIMER_TYPE_ADV_DURATION"                 "LLM_UTILITY_TIMER_TYPE_ADV_DURATION"                   0 gQca_TimeoutTimerData}
+    {0x1A "LLM_UTILITY_TIMER_TYPE_LE_SCAN_DURATION"             "LLM_UTILITY_TIMER_TYPE_LE_SCAN_DURATION"               0 gQca_TimeoutTimerData}
+    {0x1B "LLM_UTILITY_TIMER_TYPE_LE_SCAN_PERIOD"               "LLM_UTILITY_TIMER_TYPE_LE_SCAN_PERIOD"                 0 gQca_TimeoutTimerData}
+    {0x1E "LLM_UTILITY_TIMER_TYPE_ISO_GEN_SDU"                  "LLM_UTILITY_TIMER_TYPE_ISO_GEN_SDU"                    0 gQca_TimeoutTimerData}
+    {0x24 "LLM_UTILITY_TIMER_TYPE_LE_STAT_TX_DUTY_CYCLE"        "LLM_UTILITY_TIMER_TYPE_LE_STAT_TX_DUTY_CYCLE"          0 gQca_TimeoutTimerData}
+    {0x25 "LLM_UTILITY_TIMER_TYPE_SET_RTS_TIMER"                "LLM_UTILITY_TIMER_TYPE_SET_RTS_TIMER"                  0 gQca_TimeoutTimerData}
+    {0x26 "LLM_UTILITY_TIMER_TYPE_LPA_EVALUATE"                 "LLM_UTILITY_TIMER_TYPE_LPA_EVALUATE"                   0 gQca_TimeoutTimerData}
+    {0x27 "LLM_UTILITY_TIMER_TYPE_CH_CLASS_UPDATE"              "LLM_UTILITY_TIMER_TYPE_CH_CLASS_UPDATE"                0 gQca_TimeoutTimerData}
+    {0x29 "LLM_UTILITY_TIMER_TYPE_WAKEUP_HOST_SIG"              "LLM_UTILITY_TIMER_TYPE_WAKEUP_HOST_SIG"                0 gQca_TimeoutTimerData}
+    {0x2A "LLM_UTILITY_TIMER_TYPE_LE_LPA_EVALUATE"              "LLM_UTILITY_TIMER_TYPE_LE_LPA_EVALUATE"                0 gQca_TimeoutTimerData}
+    {0x2B "LLM_UTILITY_TIMER_TYPE_OEM_RESERVED"                 "LLM_UTILITY_TIMER_TYPE_OEM_RESERVED"                   0 gQca_TimeoutTimerData}
+    {0x2F "LLM_UTILITY_TIMER_TYPE_FRESH_ADV_PRIVATE_ID"         "LLM_UTILITY_TIMER_TYPE_FRESH_ADV_PRIVATE_ID"           0 gQca_TimeoutTimerData}
+    {0x42 "LLM_UTILITY_TIMER_TYPE_CONN_SETUP"                   "LLM_UTILITY_TIMER_TYPE_CONN_SETUP"                     0 gQca_TimeoutTimerData}
+    {0x43 "LLM_UTILITY_TIMER_TYPE_SECURITY_SEQ"                 "LLM_UTILITY_TIMER_TYPE_SECURITY_SEQ"                   0 gQca_TimeoutTimerData}
+    {0x44 "LLM_UTILITY_TIMER_TYPE_DETACH"                       "LLM_UTILITY_TIMER_TYPE_DETACH"                         0 gQca_TimeoutTimerData}
+    {0x45 "LLM_UTILITY_TIMER_TYPE_SCO_CONN_ACCEPT"              "LLM_UTILITY_TIMER_TYPE_SCO_CONN_ACCEPT"                0 gQca_TimeoutTimerData}
+    {0x46 "LLM_UTILITY_TIMER_TYPE_LMP_TO"                       "LLM_UTILITY_TIMER_TYPE_LMP_TO"                         0 gQca_LLM_UtilityTImerLMPTo}
+    {0x49 "LLM_UTILITY_TIMER_TYPE_HOST_RESPONSE"                "LLM_UTILITY_TIMER_TYPE_HOST_RESPONSE"                  0 gQca_TimeoutTimerData}
+    {0x4B "LLM_UTILITY_TIMER_TYPE_EXIT_SNIFF_TO"                "LLM_UTILITY_TIMER_TYPE_EXIT_SNIFF_TO"                  0 gQca_TimeoutTimerData}
+    {0x4F "LLM_UTILITY_TIMER_TYPE_INITIATE_PAGE_PENDING"        "LLM_UTILITY_TIMER_TYPE_INITIATE_PAGE_PENDING"          0 gQca_TimeoutTimerData}
+    {0x50 "LLM_UTILITY_TIMER_TYPE_RX_ENCAPSULATED_LMP_PENDING"  "LLM_UTILITY_TIMER_TYPE_RX_ENCAPSULATED_LMP_PENDING"    0 gQca_TimeoutTimerData}
+    {0x51 "LLM_UTILITY_TIMER_TYPE_EVAL_SSR_PENDING"             "LLM_UTILITY_TIMER_TYPE_EVAL_SSR_PENDING"               0 gQca_TimeoutTimerData}
+    {0x52 "LLM_UTILITY_TIMER_TYPE_ENCRYPTION_RESUME_PENDING"    "LLM_UTILITY_TIMER_TYPE_ENCRYPTION_RESUME_PENDING"      0 gQca_TimeoutTimerData}
+    {0x53 "LLM_UTILITY_TIMER_TYPE_LE_CM_CTRL_SEQ"               "LLM_UTILITY_TIMER_TYPE_LE_CM_CTRL_SEQ"                 0 gQca_LLM_LE_SeqTimeOut}
+    {0x54 "LLM_UTILITY_TIMER_TYPE_LE_ENCR_SEQ"                  "LLM_UTILITY_TIMER_TYPE_LE_ENCR_SEQ"                    0 gQca_TimeoutTimerData}
+    {0x55 "LLM_UTILITY_TIMER_TYPE_LE_HOST_TO_SEQ"               "LLM_UTILITY_TIMER_TYPE_LE_HOST_TO_SEQ"                 0 gQca_LLM_LE_SeqTimeOut}
+    {0x56 "LLM_UTILITY_TIMER_TYPE_LE_CTE_REQ_MAX_INTERVAL"      "LLM_UTILITY_TIMER_TYPE_LE_CTE_REQ_MAX_INTERVAL"        0 gQca_TimeoutTimerData}
+    {0x57 "LLM_UTILITY_TIMER_TYPE_LE_BASEBAND_FREEZE"           "LLM_UTILITY_TIMER_TYPE_LE_BASEBAND_FREEZE"             0 gQca_TimeoutTimerData}
+    {0x5D "LLM_UTILITY_TIMER_TYPE_LE_SCA_UPDATE_LOCKED"         "LLM_UTILITY_TIMER_TYPE_LE_SCA_UPDATE_LOCKED"           0 gQca_TimeoutTimerData}
+    {0x5F "LLM_UTILITY_TIMER_TYPE_ACL_BASEBAND_FREEZE"          "LLM_UTILITY_TIMER_TYPE_ACL_BASEBAND_FREEZE"            0 gQca_TimeoutTimerData}
+    {0x60 "LLM_UTILITY_TIMER_TYPE_TWSS_SYNC_ESCO"               "LLM_UTILITY_TIMER_TYPE_TWSS_SYNC_ESCO"                 0 gQca_TimeoutTimerData}
+    {0x61 "LLM_UTILITY_TIMER_TYPE_QHS_PHY_CHG_PND"              "LLM_UTILITY_TIMER_TYPE_QHS_PHY_CHG_PND"                0 gQca_TimeoutTimerData}
+    {0x62 "LLM_UTILITY_TIMER_TYPE_MAX_SLOT_ACK_PND"             "LLM_UTILITY_TIMER_TYPE_MAX_SLOT_ACK_PND"               0 gQca_TimeoutTimerData}
+    {0x63 "LLM_UTILITY_TIMER_TYPE_BACK2BACK_CH_MAP_UP"          "LLM_UTILITY_TIMER_TYPE_BACK2BACK_CH_MAP_UP"            0 gQca_TimeoutTimerData}
+    {0x68 "LLM_UTILITY_TIMER_TYPE_DELAY_EXIT_SNIFF"             "LLM_UTILITY_TIMER_TYPE_DELAY_EXIT_SNIFF"               0 gQca_TimeoutTimerData}
+ENDTABLE
+
+
+GROUP gQca_LLM_UtilityTImerLMPTo "Timer Data LMP Timeout"
+{
+    FIELD fQca_LMPToOpcode        (Fixed 1 Byte)     (TABLE tQca_LMPOpcode) "LMP Opcode"
+    FIELD fQca_LMPToData          (Fixed 3 Byte)     (StringOfHex)          "Timer Data"
+}
+
+GROUP gQca_LLM_LE_SeqTimeOut "Timer Data LE Seq Timeout"
+{
+    FIELD fQca_LE_SeqTimeOutType    (Fixed 1 Byte)    (TABLE tQca_LE_CtrlSeqTimeOutType) "Seq Timeout Type"
+    FIELD fQca_LE_TimerData         (Fixed 3 Byte)    (StringOfHex)                      "Timer Data"
+} 
+
+TABLE tQca_LE_CtrlSeqTimeOutType
+    {0 "LL_ENC_RSP_TIMEOUT"}
+    {1 "LL_START_ENC_RSP_TIMEOUT"}
+    {2 "LL_FEATURE_RSP_TIMEOUT"}
+    {3 "LL_PAUSE_ENC_RSP_TIMEOUT"}
+    {4 "LL_VERSION_IND_TIMEOUT"}
+    {5 "LL_CONNECTION_PARAM_HOST_TIMEOUT"}
+    {6 "LL_CONNECTION_UPDATE_TIMEOUT"}
+    {7 "LL_PING_RSP_TIMEOUT"}
+    {8 "LL_LENGTH_RSP_TIMEOUT"}
+    {9 "LL_PHY_RSP_TIMEOUT"}
+    {10 "LL_CTE_RSP_TIMEOUT"}
+    {11 "LL_POWER_CONTROL_RSP_TIMEOUT"}
+    {12 "LL_CIS_ENABLE_TIMEOUT"}
+    {13 "LL_CIS_HOST_ACCEPT_TIMEOUT"}
+    {14 "LL_SCA_UPDATE_TIMEOUT"}
+    {15 "LL_QLL_FEATURE_RSP_TIMEOUT"}
+    {16 "LL_QLL_ACL_PHY_RSP_TIMEOUT"}
+    {17 "LL_QLL_POWER_CONTROL_TIMEOUT"}
+    {18 "LL_QLL_ACO_SWITCH_TIMEOUT"}
+    {19 "LL_QLL_CIS_ALT_RATE_TIMEOUT"}
+    {20 "LL_CONNECTION_SUBRATE_UPDATE_REQ_TIMEOUT"}
+    {21 "LL_CS_CAPABILITIES_REQ_TIMEOUT"}
+    {22 "LL_CS_SEC_REQ_TIMEOUT"}
+    {23 "LL_CS_FAE_REQ_TIMEOUT"}
+    {24 "LL_CS_CONFIG_REQ_TIMEOUT"}
+    {25 "LL_CS_REQ_TIMEOUT"}
+    {26 "LL_CS_RSP_TIMEOUT"}
+    {27 "LL_QLL_CIS_CONFIG_TIMEOUT"}
+    {28 "LL_QLL_CIS_CONFIG_HOST_ACCPET_TIMEOUT"}
+    {DEFAULT "Unknown Timeout"}
+ENDTABLE
+
+TABLE tQca_DHKEY_STATE
+    {0x00, "CAL_DHKEY_IDLE"}
+    {0x01, "CAL_DHKEY_BUSY"}
+    {0x02, "CAL_DHKEY_DONE"}
+    {Default,  "Invalid"}
+ENDTABLE
+
+GROUP gQca_dhkey_sm "Dhkey_SM"
+{
+    FIELD fQca_dhkeyCurrState     (Fixed 1 Byte)      (TABLE tQca_DHKEY_STATE)             "CurrState"
+    FIELD fQca_dhkeyEvent         (Fixed 1 Byte)      (TABLE tQca_LLM_SeqEvents)           "Event"
+    FIELD fQca_LLMHandle;
+    FIELD fQca_dhkeyNewState      (Fixed 1 Byte)      (TABLE tQca_DHKEY_STATE)             "NewState"
+}
+
+GROUP gQca_mpc_state "MPC State"
+{
+    FIELD fQca_mpcState_mpcGroupId (Fixed 1 Bytes)      (Decimal)      "Group ID"
+    FIELD fQca_mpcState_mpcCount   (Fixed 1 Bytes)      (Decimal)      "MPC Count"
+    FIELD fQca_mpcState_mpcIdx     (Fixed 1 Bytes)      (Decimal)      "MPC Index"
+    FIELD fQca_mpcState_mpcSlotCount    (Fixed 1 Bytes) (Decimal)      "MPC Slot Count"
+    FIELD fQca_mpcState_mpcActiveMask   (Fixed 1 Bytes) (Decimal)      "MPC Active Mask"
+
+    FIELD fQca_mpcState_mpcEventCounter (Fixed 2 Bytes) (Decimal)      "Event Counter"
+    FIELD fQca_mpcState_mpcTxPLCounter  (Fixed 2 Bytes) (Decimal)      "Tx Payload Counter"
+
+    GROUP gQca_mpcState_Slots REPEAT COUNT (FromField Times fQca_mpcState_mpcSlotCount) "Slots"
+    {
+	FIELD fQca_mpcState_mpcSlotNr    (Fixed 1 Bytes)    (Decimal)  "Slot Nr"
+	FIELD fQca_mpcState_mpcHciHandle (Fixed 1 Bytes)    (Decimal)  "HCI Handle"
+	FIELD fQca_mpcState_mpcRxPLCounter  (Fixed 2 Bytes) (Decimal)  "Rx Payload Counter"
+	FIELD fQca_mpcState_mpcTIFS         (Fixed 2 Bytes) (Decimal)  "T_IFS"
+    }
+
+    RESERVED            (ToEndOfLayer)
+}
+
+GROUP gQca_cis_creation_timestamp "CIS Creation Timestamp"
+{
+    FIELD fQca_CIS_DBG_cisHandle (Fixed 1 Byte)    (Hex) "CIS Handle"
+    FIELD fQca_CIS_DBG_aclHandle (Fixed 1 Byte)    (Hex) "ACL Handle"
+    FIELD fQca_CIS_DBG_cisFlags  (Fixed 1 Byte)    (Hex) SUPPRESS_DETAIL
+    FIELD fQca_CIS_DBG_Type      (Fixed 1 Byte)    (Hex) "ISO Type"
+
+    /* BIT0 - first CIS */
+    FIELD fQca_CIS_DBG_firstCIS  (Fixed 0) RETRIEVE (StoreField fQca_CIS_DBG_cisFlags) ALSO (AndMask 0x1) (Table tQca_YesOrNo) "First CIS"
+
+    GROUP fQca_CIS_DBG_overall "Overall" 
+    {
+	FIELD fQca_CIS_DBG_start     (Fixed 4 Byte)    (Hex) "Request: create CIS"
+	FIELD fQca_CIS_DBG_stop      (Fixed 4 Byte)    (Hex) "Request: completed"
+	FIELD fQca_CIS_DBG_creation_time    (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_CIS_DBG_stop  fQca_CIS_DBG_start) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Total CIS Creation time"
+    }
+
+    /* Stage 0 (C only) */
+    GROUP fQca_CIS_DBG_Stage0 IF (FieldIs EqualTo 0 fQca_CIS_DBG_Type) "Prepare CIS Creation" 
+    {
+	FIELD fQca_CIS_stage0_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount  (Fixed 2 Byte)   (Decimal) "LE EventCounter"
+	FIELD fQca_CIS_stage0_local_llcp   (Fixed 1 Byte)    (TABLE tQca_LE_LLCPStates) "In Progress LLCP (LOCAL)"
+	FIELD fQca_CIS_stage0_remote_llcp  (Fixed 1 Byte)    (TABLE tQca_LE_LLCPStates) "In Progress LLCP (REMOTE)"
+
+        FIELD fQca_CIS_DBG_delta0        (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage0_time  fQca_CIS_DBG_start) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+    }
+
+    FIELD fQca_CIS_DBG_Stage0_dummy (Fixed 8 Bytes) IF NOT (FieldIs EqualTo 0 fQca_CIS_DBG_Type) (Hex) SUPPRESS_DETAIL
+
+    /* Stage 1 */
+    GROUP fQca_CIS_DBG_Stage1 "LL_CIS_REQ"
+    {
+	FIELD fQca_CIS_stage1_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount;
+
+	FIELD fQca_CIS_stage1_evtCountRef  (Fixed 2 Byte)    (Decimal) "Ref LE EventCounter (In PDU)"
+
+	FIELD fQca_CIS_stage1_minOffset  (Fixed 4 Byte)    (Decimal) "Min Offset (In PDU)"
+	FIELD fQca_CIS_stage1_maxOffset  (Fixed 4 Byte)    (Decimal) "Max Offset (In PDU)"
+
+        FIELD fQca_CIS_DBG_delta1_C      (Fixed 0) IF (FieldIs EqualTo 0 fQca_CIS_DBG_Type) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage1_time fQca_CIS_stage0_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+        FIELD fQca_CIS_DBG_delta1_P      (Fixed 0) IF NOT (FieldIs EqualTo 0 fQca_CIS_DBG_Type) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage1_time fQca_CIS_DBG_start) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+    }
+
+    /* Stage 2 */
+    GROUP fQca_CIS_DBG_Stage2 "LL_CIS_RSP"
+    {
+	FIELD fQca_CIS_stage2_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount;
+
+	FIELD fQca_CIS_stage1_evtCountRef;
+
+	FIELD fQca_CIS_stage1_minOffset;
+	FIELD fQca_CIS_stage1_maxOffset;
+
+        FIELD fQca_CIS_DBG_delta2        (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage2_time fQca_CIS_stage1_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+    }
+
+    /* Stage 3 */
+    GROUP fQca_CIS_DBG_Stage3 "LL_CIS_IND"
+    {
+	FIELD fQca_CIS_stage3_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount;
+
+	FIELD fQca_CIS_stage1_evtCountRef;
+
+	FIELD fQca_CIS_stage3_offset  (Fixed 4 Byte)    (Decimal) "Final Offset (In PDU)"
+
+        FIELD fQca_CIS_DBG_delta3        (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage3_time fQca_CIS_stage2_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+    }
+
+    /* Stage 4 (C only) */
+    GROUP fQca_CIS_DBG_Stage4 IF (FieldIs EqualTo 0 fQca_CIS_DBG_Type) "ACK of LL_CIS_IND" 
+    {
+	FIELD fQca_CIS_stage4_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount;
+	RESERVED    (Fixed 2 Bytes)
+
+        FIELD fQca_CIS_DBG_delta4        (Fixed 0) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage4_time fQca_CIS_stage3_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+
+    }
+    FIELD fQca_CIS_DBG_Stage4_dummy (Fixed 8 Bytes) IF NOT (FieldIs EqualTo 0 fQca_CIS_DBG_Type) (Hex) SUPPRESS_DETAIL
+
+    /* Stage 5 */
+    GROUP fQca_CIS_DBG_Stage5 "LLCP completed"
+    {
+	FIELD fQca_CIS_stage5_time      (Fixed 4 Byte)   (Hex) "Timestamp"
+	FIELD fQca_CIS_stage0_evtCount;
+	FIELD fQca_CIS_stage5_reason  (Fixed 1 Byte)    (Hex) "Reason"
+	RESERVED    (Fixed 1 Bytes)
+
+        FIELD fQca_CIS_DBG_delta5_C (Fixed 0) IF (FieldIs EqualTo 0 fQca_CIS_DBG_Type) RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage5_time fQca_CIS_stage4_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+        FIELD fQca_CIS_DBG_delta5_P (Fixed 0) IF NOT (FieldIs EqualTo 0
+						      fQca_CIS_DBG_Type)
+	RETRIEVE (SubtractFieldMinusField  fQca_CIS_stage5_time fQca_CIS_stage3_time) ALSO (AndMask 0xFFFFFFF)  (Decimal) ALSO (Constant "us") "Time since last stage"
+    }
+
+    RESERVED            (ToEndOfLayer)
+} 
+
+TABLE tQca_CIS_IsoType
+    {0 "CIS Master"}
+    {1 "CIS Slave"}
+    {default "Invalid"}
+ENDTABLE
+
+TABLE tQca_YesOrNo
+    {0 "No"}
+    {default "Yes"}
+ENDTABLE
+
+TABLE tQca_companyID
+    {0x000A "Qualcomm Technologies International, LTD. (QTIL)"}
+    {0x001D "Qualcomm"}
+    {0x00B8 "Qualcomm Innovation Centre, Inc. (QuIC)"}
+    {0x00D7 "Qualcomm Technologies, Inc."}
+    {0x00D8 "Qualcomm Connected Experiences, Inc."}
+    {0x011A "Qualcomm Labs, Inc."}
+    {0x03E3 "Qualcomm Life Inc"}
+    {DEFAULT "Refer Assigned Numbers Document Chapter 7 : Company Identifiers"}
+ENDTABLE
+
+TABLE tQca_sampleFrequency
+    {0x01  "8000 Hz"}
+    {0x02  "11,025 Hz"}
+    {0x03  "16,000 Hz"}
+    {0x04  "22,050 Hz"}
+    {0x05  "24,000 Hz"}
+    {0x06  "32,000 Hz"}
+    {0x07  "44,100 Hz"}
+    {0x08  "48,000 Hz"}
+    {0x09  "88,200 Hz"}
+    {0x0A  "96,000 Hz"}
+    {0x0B  "176,400 Hz"}
+    {0x0C  "192,000 Hz"}
+    {0x0D  "384,000 Hz"}
+    {DEFAULT  "Undefined"}
+ENDTABLE
+
+TABLE tQca_UseCaseID
+    {0x00 "HQ audio"}
+    {0x01 "Gaming with no voice back channel"}
+    {0x02 "Gaming with voice back channel"}
+    {0x03 "Voice"}
+    {0x04 "Stereo recording"}
+    {0x05 "Broadcast"}
+    {DEFAULT "Undefined"}
+ENDTABLE
+
+TABLE tQca_QHSrate
+    {0x00  "QHS2"}
+    {0x01  "QHS3"}
+    {0x02  "QHS4"}
+    {0x03  "QHS5"}
+    {0x04  "QHS6"}
+    {DEFAULT  "Undefined"}
+ENDTABLE
+
+TABLE tQca_TransportDataFormat
+    {0x00 "PCM"}
+    {0x01 "COP"}
+    {DEFAULT  "Undefined"}
+ENDTABLE
+
+TABLE tQca_CodecFormat
+    {0x00 "u-law log"}
+    {0x01 "A-law log"}
+    {0x02 "CVSD"}
+    {0x03 "Transparent"}
+    {0x04 "Linear PCM"}
+    {0x05 "mSBC"}
+    {0x06 "LC3"}
+    {0x07 "G.729A"}
+    {0xFF "Vendor Specific Coding Format"}
+ENDTABLE
+
+TABLE tQca_VendorCodecID
+    {0x1   "aptX(TM) adaptive R3"}
+    {0x1AD "aptX(TM) adaptive R4"}
+    {DEFAULT "Undefined"}
+ENDTABLE
+
+TABLE tQca_MPCInfoVersion
+    {0x0 "Ver 0: Host sets up a CIS (Left, Right etc.) and the Bluetooth Controller creates a Multi-Peripheral CIS with one Tx slot (Left + Right + ...) and CIS_Count Rx slots.Ignored if CIS_Count = 0x01."}
+    {DEFAULT "Undefined"}
+ENDTABLE
+
+TABLE tQca_Enabled
+    { 0 "Disabled"}
+    { 1 "Enabled"}
+ENDTABLE
+
+TABLE tQca_Valid
+    { 0 "Invalid"}
+    { 1 "Valid"}
+ENDTABLE
+
+TABLE tQca_slimbusTransportRate
+    { 0 "96KHz"}
+    { 1 "192KHz"}
+    { DEFAULT "Reserved"}
+ENDTABLE
+
+GROUP gQca_ConfigDataPathVendorInfo "Config Data Path Vendor Info"
+{
+    GROUP gQca_bitMapOfVendorDataFields "Bitmap of Valid fields"
+    {
+        FIELD fQca_bitMapOfVendorFields_byte0_bit7 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit7 : Codec ID"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit6 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit6 : HCI connection handle"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit5 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit5 : Slimbus Transport Rate"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit4 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit4 : Preferred RX QHS Phy"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit3 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit3 : Preferred TX QHS Phy"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit2 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit2 : Use case Identifier"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit1 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit1 : Sampling frequency"
+        FIELD fQca_bitMapOfVendorFields_byte0_bit0 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte0 Bit0 : Codec version"
+
+        FIELD fQca_bitMapOfVendorFields_byte1_bit7 (Fixed 1 Bit) (Hex)              "Byte1 Bit7 : Reserved"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit6 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit6 : Minimum FT"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit5 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit5 : Maximum FT"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit4 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit4 : CIS Relay info"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit3 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit3 : MPC Info"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit2 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit2 : Transport Sample Width"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit1 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit1 : Controller delay in microseconds"
+        FIELD fQca_bitMapOfVendorFields_byte1_bit0 (Fixed 1 Bit) (TABLE tQca_Valid) "Byte1 Bit0 : Transport Data Format"
+
+        FIELD fQca_bitMapOfVendorFields_resbytes (Fixed 6 Bytes) (Hex) "Reserved"
+    }
+    FIELD fQca_rsvd                     (Fixed 4 Bytes) (Hex) "Reserved"
+    FIELD fQca_controllerDelayInUs      (Fixed 4 Bytes) (Decimal) "Controller delay in microseconds"
+    FIELD fQca_companyId                (Fixed 2 Bytes) (TABLE tQca_companyID) "Company ID"
+    FIELD fQca_vendorCodecId            (Fixed 2 Bytes) (TABLE tQca_VendorCodecID) "Vendor Codec ID"
+    FIELD fQca_hci_ConnHandle           (Fixed 2 Bytes) (Hex) "HCI connection handle"
+    FIELD fQca_codingFormat             (Fixed 1 Byte)  (TABLE tQca_CodecFormat) "Coding Format"
+    FIELD fQca_codecVersion             (Fixed 1 Byte)  (Decimal) "Codec Version"
+    FIELD fQca_sampling_Frequency       (Fixed 1 Byte)  (TABLE tQca_sampleFrequency) "Sampling frequency"
+    FIELD fQca_usecaseID                (Fixed 1 Byte)  (TABLE tQca_UseCaseID) "Use case Identifier"
+    FIELD fQca_prefTxQHSPhy             (Fixed 1 Byte)  (TABLE tQca_QHSrate) "Preferred TX QHS Phy"
+    FIELD fQca_prefRxQHSPhy             (Fixed 1 Byte)  (TABLE tQca_QHSrate) "Preferred RX QHS Phy"
+    FIELD fQca_mpcInfo_version          (Fixed 1 Byte)  (Hex) "MPC Info Version"
+    FIELD fQca_mpcInfo_cigId            (Fixed 1 Byte)  (Hex) "MPC Info CIG ID"
+    GROUP gQca_cisRelayInfo "CIS Relay Info" 
+    {
+        FIELD fQca_cisRelayInfo_bit7  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit6  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit5  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit4  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit3  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit2  (Fixed 1 Bit) (Hex) "Reserved"
+        FIELD fQca_cisRelayInfo_bit1  (Fixed 1 Bit) (TABLE tQca_Enabled) "Bit1 : CIS ownership has to be transferred to new Connected Peripheral during a Primary-Secondary switch"
+        FIELD fQca_cisRelayInfo_bit0  (Fixed 1 Bit) (TABLE tQca_Enabled) "Bit0 : CIS Will be relayed"
+    }
+    FIELD fQca_transportDataFormat      (Fixed 1 Byte) (TABLE tQca_TransportDataFormat) "Transport Data Format"
+    FIELD fQca_transportSampleWidth     (Fixed 1 Byte) (Decimal) "Transport Sample Width"
+    FIELD fQca_maxFT                    (Fixed 1 Byte) (Decimal) "Maximum FT"
+    FIELD fQca_minFT                    (Fixed 1 Byte) (Decimal) "Minimum FT"
+    FIELD fQca_slimbusTransportRate     (Fixed 1 Byte) (TABLE tQca_slimbusTransportRate) "Slimbus Transport Rate"
+}
+
+TABLE tQca_LLM_LE_CTRL_PDU_VALIDATION_ERR_CODE
+    {0 "ERR_NONE"}
+    {1 "INVALID_BCS_TXPWR_REFL_PHY"}
+    {2 "INVALID_BCS_TX_POWER"}
+    {3 "INVALID_BCS_PEER_ANTENNA"}
+    {4 "INVALID_BCS_ACI"}
+    {5 "INVALID_BCS_SNR_INIT"}
+    {6 "INVALID_BCS_SNR_REFL"}
+    {7 "INVALID_BCS_CONFIG"}
+    {8 "REMOVED_BCS_CONFIG"}
+    {9 "INVALID_BCS_PROCCOUNT"}
+    {10 "INVALID_BCS_OFFSET"}
+    {11 "INVALID_BCS_SUBEVENT_LEN"}
+    {12 "INVALID_BCS_EVENT_INTERVAL"}
+    {13 "INVALID_BCS_SUBEVENT_PER_EVENT"}
+    {14 "INVALID_BCS_SUBEVENT_INTERVAL"}
+    {15 "INVALID_BCS_ANT_NUMPATHS"}
+    {16 "INVALID_BCS_LE_ACL_EC"}
+ENDTABLE
+
+GROUP gQca_LLM_LE_PDUValidationFail "LL LE CTRL PDU Validation Fail"
+{
+    FIELD fQca_LLM_LE_controlPDUOpcode              (Fixed 4 Bytes)   (Hex)        "Opcode"
+    FIELD fQca_LL_LE_PDUValidationFailReasonCode    (Fixed 4 Bytes)   (TABLE tQca_LLM_LE_CTRL_PDU_VALIDATION_ERR_CODE)   "Reason"
+}
+
+TABLE tQca_LLM_BREDR_CTRL_PDU_VALIDATION_ERR_CODE
+    {0 "ERR_NONE"}
+ENDTABLE
+
+GROUP gQca_LLM_BREDR_PDUValidationFail "LL BREDR CTRL PDU Validation Fail"
+{
+    FIELD fQca_LLM_BREDR_controlPDUOpcode               (Fixed 4 Bytes)   (Hex)        "Opcode"
+    FIELD fQca_LLM_BREDR_PDUValidationFailReasonCode    (Fixed 4 Byte)   (TABLE tQca_LLM_BREDR_CTRL_PDU_VALIDATION_ERR_CODE)   "Reason"
+}

@@ -1,0 +1,63 @@
+/************************************************
+ * File: QCA_Memdump.dec
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2022 Qualcomm Technologies, Inc.
+ * Copyright (c) 2015-2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved. 
+ * Qualcomm Atheros Confidential and Proprietary.
+************************************************/
+
+
+"QCA Memdump Logs" 0x1f000006 HOST_DATA_ORDER
+PAYLOAD_IS_BYTE_STREAM
+
+SUMMARY_COLUMNS
+{
+    "Seq Num"   100
+    "Length"    100
+	"Msg Type"  100
+	"Crash Reason"  100
+}
+
+/*
+** This identifies the next protocol.
+*/
+//NEXT_PROTOCOL (FromField sQca_Proto)
+
+/*
+** The length for the next protocol. 
+*/
+//NEXT_PROTOCOL_SIZE (ThisLayerLength fQca_ProtoLen)
+
+/*
+** Start of Decoding the Protocol
+*/
+DECODE
+
+GROUP gQCA_MemdumpLog
+{
+	GROUP gQca_MemdumpLogHeader;
+}
+
+END_MAIN_PATH
+
+GROUP gQca_MemdumpLogHeader "Memdump Log Header"
+{
+    FIELD fQca_MemdumpHdr_LogHdl        (Fixed 2 Bytes)        (Hex)                                   "Log Handle"
+    FIELD fQca_MemdumpHdr_LogLen        (Fixed 2 Bytes)        (Decimal)                                   "ACL Length"
+    FIELD fQca_MemdumpHdr_Code          (Fixed 1 Byte)     	    (TABLE tMemdumpEventType)                "Event Code"
+    FIELD fQca_MemdumpHdr_Len           (Fixed 1 Byte)     	    (Decimal)                               "Log Length"
+    FIELD fQca_MemdumpHdr_LogCode       (Fixed 1 Byte)     	    (TABLE tMemdumpEventCode)                "Vendor Event Class"	
+    FIELD fQca_MemdumpHdr_MsgType       (Fixed 1 Byte)     	    (Hex)                                   IN_SUMMARY "Msg Type"                            "Msg Type"
+	FIELD fQca_MemdumpHdr_SeqNum        (Fixed 2 Byte)         (Decimal)                               IN_SUMMARY "Seq Num"    	"Seq Num"
+	FIELD fQca_MemDump		            (ToEndofLayer)		    (StringofHex)			                "Mem Dump"
+}
+
+TABLE tMemdumpEventType
+    { 0xFF    "Vendor Specific Event"    	"Vendor Specific Event"   }
+ENDTABLE
+
+TABLE tMemdumpEventCode
+    { 0x01    "Data Log"    				"Data Log"   }
+ENDTABLE

@@ -1,0 +1,406 @@
+From b7dd12afa84793259fdbad698a91f8f154780c75 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Tue, 31 Dec 2024 10:34:23 +0800
+Subject: [PATCH] Btdiag: Support QUTS connection mode
+
+Support QUTS connection mode.
+
+Signed-off-by: Zijun Hu <zijuhu@qti.qualcomm.com>
+---
+ Btdiag.c         |  9 ++++---
+ connection.c     |  5 +++-
+ connection.h     | 10 ++++++++
+ global.h         |  9 ++++---
+ hciattach_rome.c |  9 ++++---
+ hciattach_rome.h |  4 ++++
+ privateMembers.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++--------
+ privateMembers.h | 10 +++++++-
+ uart.h           |  6 +++++
+ 9 files changed, 110 insertions(+), 23 deletions(-)
+
+diff --git a/Btdiag.c b/Btdiag.c
+index 156c7568a8cf..c0416788456a 100755
+--- a/Btdiag.c
++++ b/Btdiag.c
+@@ -39,9 +39,12 @@ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+ #endif
++#include "privateMembers.h"
+ 
+ #define BTDIAG_VERSION "3.0.0.4"
+ 
++#include "uart.h"
++
+ int sock;
+ int client_sock;
+ bool legacyMode = 1;
+@@ -122,7 +125,7 @@ int Diag_Read_Uart(void)
+ 			if(diagPacketReceived) {
+ 
+ 				diagPacketReceived = 0;
+-				if(processDiagPacket(incomingDataBytes)) {
++				if(processDiagPacket(incomingDataBytes, nread)) {
+ #ifdef PLATFORM_ANDROID
+ 					fprintf(stderr, "\n--processDiagPacket-succeed------ Wait For Next Diag Packet ----------------\n\n");
+ #else
+@@ -784,7 +787,7 @@ int main(int argc , char *argv[])
+ 	            int lengthOfStream;
+ 	            while ((lengthOfStream = recv(sock, rxbuf, TCP_BUF_LENGTH, 0)) != 0)
+ 	            {
+-	                processDiagPacket(rxbuf);
++	                processDiagPacket(rxbuf, lengthOfStream);
+ 
+ 	                //initiate buf
+ 	                memset(rxbuf, 0, TCP_BUF_LENGTH);
+@@ -1183,7 +1186,7 @@ int main(int argc , char *argv[])
+ 	        while ((lengthOfStream = recv(client_sock, incomingDataBytes, TCP_BUF_LENGTH, 0)) != 0)
+ 	        {
+ 	            if (lengthOfStream > 0)
+-	            processDiagPacket(incomingDataBytes);
++	            processDiagPacket(incomingDataBytes, lengthOfStream);
+ 
+ 	            //initiate incomingDataBytes buf
+ 	            memset(incomingDataBytes, 0, TCP_BUF_LENGTH);
+diff --git a/connection.c b/connection.c
+index 6d55652fb0b7..433f4d94da1f 100755
+--- a/connection.c
++++ b/connection.c
+@@ -45,6 +45,8 @@ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <semaphore.h>
++#include "uart.h"
++
+ 
+ #ifdef BLUEDROID_STACK
+ #include <dlfcn.h>
+@@ -124,7 +126,7 @@ struct raw_data raw_data_t;
+ #define HCI_COMMAND_HDR_SIZE 3
+ #define HCI_FILTER 2
+ 
+-struct uart_t {
++struct c_uart_t {
+ 	char *type;
+ 	int  init_speed;
+ 	int  speed;
+@@ -132,6 +134,7 @@ struct uart_t {
+ 	char *bdaddr;
+ 	int  (*init) (int fildes, struct uart_t *u, struct termios *ti);
+ };
++#define uart_t c_uart_t
+ 
+ /*Define signal variable*/
+ sem_t sem;
+diff --git a/connection.h b/connection.h
+index 41c6652503fe..fbd4ef06ef85 100755
+--- a/connection.h
++++ b/connection.h
+@@ -3,6 +3,10 @@ Copyright (c) 2013-2020 Qualcomm Technologies, Inc.
+ All Rights Reserved. 
+ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ */
++
++#ifndef _BTDIAG_CONNECTION_H
++#define _BTDIAG_CONNECTION_H 1
++
+ #include <termios.h>
+ 
+ #define HCI_UART_H4	            0
+@@ -25,6 +29,10 @@ int fluoride_usb_connection(char *dev);
+ int fluoride_send_hci_cmd(int fd, unsigned char *rawbuf, int rawdatalen);
+ int fluoride_read_raw_data(int fd, unsigned char *buf, int size);
+ 
++int SerialConnection(char *dev_path, char *baudrate);
++int USBConnection(char *dev_name);
++int fluoride_disable_controller_log(int fd);
++
+ #ifdef __cplusplus
+ }
+ #endif
+@@ -57,3 +65,5 @@ int fluoride_disable_controller_log(int fd);
+ }
+ #endif
+ #endif
++
++#endif
+diff --git a/global.h b/global.h
+index 000c1f2dd078..f00a968ae05f 100755
+--- a/global.h
++++ b/global.h
+@@ -3,8 +3,10 @@ Copyright (c) 2013-2020 Qualcomm Technologies, Inc.
+ All Rights Reserved. 
+ Confidential and Proprietary - Qualcomm Technologies, Inc. 
+ */
+-#include "uart.h"
+-#define TCP_BUF_LENGTH         256
++#ifndef _BTDIAG_GLOBAL_H
++#define _BTDIAG_GLOBAL_H
++
++#define TCP_BUF_LENGTH         512
+ 
+ #define HCI_MAX_EVENT_SIZE     260
+ #define HCI_CMD_IND            (1)
+@@ -18,4 +20,5 @@ typedef enum
+     USB,
+ 	ETHERNET,
+     INVALID
+-} ConnectionType;
+\ No newline at end of file
++} ConnectionType;
++#endif
+diff --git a/hciattach_rome.c b/hciattach_rome.c
+index f1f3f86c48f8..960bffb9ff17 100755
+--- a/hciattach_rome.c
++++ b/hciattach_rome.c
+@@ -58,10 +58,9 @@
+ #endif
+ #include "hciattach_rome.h"
+ #include "connection.h"
++#include "uart.h"
++#include <errno.h>
+ 
+-#ifdef __cplusplus
+-}
+-#endif
+ 
+ #ifdef USE_VENDOR_LIB
+ #include <dlfcn.h>
+@@ -225,7 +224,7 @@ int userial_vendor_ioctl(int fd, userial_vendor_ioctl_op_t op, int *p_data)
+             fprintf(stderr, "## userial_vendor_ioctl: UART Flow On\n ");
+             ti.c_cflag |= CRTSCTS;
+ 
+-            if (err = tcsetattr(fd, TCSANOW, &ti) < 0) {
++            if ((err = tcsetattr(fd, TCSANOW, &ti)) < 0) {
+                 perror("Can't set port settings");
+                 return -1;
+             }
+@@ -235,7 +234,7 @@ int userial_vendor_ioctl(int fd, userial_vendor_ioctl_op_t op, int *p_data)
+         case USERIAL_OP_FLOW_OFF:
+             fprintf(stderr, "## userial_vendor_ioctl: UART Flow Off\n ");
+             ti.c_cflag &= ~CRTSCTS;
+-            if (err = tcsetattr(fd, TCSANOW, &ti) < 0) {
++            if ((err = tcsetattr(fd, TCSANOW, &ti)) < 0) {
+                 fprintf(stderr, "Can't set port settings");
+                 return -1;
+             }
+diff --git a/hciattach_rome.h b/hciattach_rome.h
+index 93096dd9ec2d..cee78986d281 100755
+--- a/hciattach_rome.h
++++ b/hciattach_rome.h
+@@ -24,6 +24,8 @@
+ #ifndef HW_ROME_H
+ #define HW_ROME_H
+ 
++#include <unistd.h>
++
+ /******************************************************************************
+ **  Constants & Macros
+ ******************************************************************************/
+@@ -392,4 +394,6 @@ enum{
+ int bc_download_fw(void);
+ #endif
+ 
++int read_bd_address(unsigned char *bdaddr);
++
+ #endif /* HW_ROME_H */
+diff --git a/privateMembers.c b/privateMembers.c
+index 12c716c490cf..3d866c4daaa1 100755
+--- a/privateMembers.c
++++ b/privateMembers.c
+@@ -34,6 +34,8 @@ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ #include "hciattach_rome.h"
+ #endif
+ 
++#include "uart.h"
++
+ //#include "global.h"
+ 
+ const BYTE DIAG_TERM_CHAR = 0x7E;
+@@ -276,7 +278,7 @@ void DiagPrintToStream(BYTE response[], int Length, bool check)
+ 		{
+ 			if (client_sock != -1)
+ 	        {
+-	            if( send(client_sock , messageToSend , messageToSend_Length , 0) < 0)
++	            if( send(client_sock , messageToSend , modifiedResponseMsg_Length + 1 , 0) < 0)
+ 	            {
+ 	                puts("Send failed");
+ 	                return;
+@@ -292,10 +294,13 @@ void DiagPrintToStream(BYTE response[], int Length, bool check)
+ 	}
+ }
+ 
+-int processDiagPacket(BYTE inputDIAGMsg[])
++int processDiagPacket(BYTE inputDIAGMsg[], int x_len)
+ {	
+     int i=0;
+-	
++
++	BYTE modifiedInputMsg[1024];
++	int lengthofmodifiedInputMsg = 0;
++
+     switch (inputDIAGMsg[0])
+     {
+         case 0X73:  //logmask respons
+@@ -308,6 +313,11 @@ int processDiagPacket(BYTE inputDIAGMsg[])
+             {
+                 DiagPrintToStream(logMaskResponseSecondMsg, sizeof(logMaskResponseSecondMsg), false);
+             }
++			else if (inputDIAGMsg[4] == 3)
++			{
++                DiagPrintToStream(logMaskResponseFirstMsg, sizeof(logMaskResponseFirstMsg), false);
++			}
++
+             return 1;
+         case 0X0:  //verResponseMsg
+             printf("echo for version \n");
+@@ -333,27 +343,60 @@ int processDiagPacket(BYTE inputDIAGMsg[])
+             printf("\n>SubsystemDispatch Diag packet received of type 0x%02x\n", inputDIAGMsg[0]);                    
+             printf("\n");
+ 
+-            DiagPrintToStream(inputDIAGMsg, TCP_BUF_LENGTH, false);
++			//4B 12 29 00 31 32 33 00 1A 9C 7E, this command is added for QUTS to avoid the  modem ready failures, it requires 8 byte time stamp before 0x31,0x32,0x33
++			if (inputDIAGMsg[0] == 0x4B && inputDIAGMsg[1]== 0x12 && inputDIAGMsg[2] == 0x29 && inputDIAGMsg[3]==00 && inputDIAGMsg[4]==0x31 && inputDIAGMsg[5] ==0x32
++				&& inputDIAGMsg[6]==0x33 && inputDIAGMsg[7]==00 && inputDIAGMsg[8] ==0x1A && inputDIAGMsg[9] == 0x9C && inputDIAGMsg[10] ==0x7E)
++			{
++				 BYTE res[] = { 0x4B, 0x12, 0x29, 0x00, 0xD7, 0x45, 0xBF, 0x70, 0xBB, 0x1F, 0x00, 0x00, 0x31, 0x32, 0x33, 0x00, 0x00 };
++				// ntwStream.Write(res, 0, res.Length);
++				DiagPrintToStream(res, sizeof(res), true);
++				return 1;
++			}
++
++            DiagPrintToStream(inputDIAGMsg, x_len, true);
++
++			for (int i = 0; i < (x_len - 1); i++)
++			 {
++				 if ((inputDIAGMsg[i] == 0x7D) && inputDIAGMsg[i + 1] == 0x5E)
++				 {
++					 modifiedInputMsg[lengthofmodifiedInputMsg] = 0x7e;
++					 i++;
++				 }
++				 else if ((inputDIAGMsg[i] == 0x7D) && inputDIAGMsg[i + 1] == 0x5D)
++				 {
++					 modifiedInputMsg[lengthofmodifiedInputMsg] = 0x7D;
++					 i++;
++				 }
++				 else
++				 {
++					 modifiedInputMsg[lengthofmodifiedInputMsg] = inputDIAGMsg[i];
++				 }
++				 lengthofmodifiedInputMsg++;
++			 }
++
++
+             //check for BT 4B packet and type Bluetooth
+-            if ((inputDIAGMsg[10] == 1) && (inputDIAGMsg[1] == 11) && (inputDIAGMsg[2] == 4) && (inputDIAGMsg[3] == 0))//check 4B packet           
++            if ((modifiedInputMsg[10] == 1) && (modifiedInputMsg[1] == 11) && (modifiedInputMsg[2] == 4) && (modifiedInputMsg[3] == 0))//check 4B packet           
+             {
+                 //check for length from 6th byte and copy payload from 10th byte
+-                int lengthOfPayload = inputDIAGMsg[6];
+-                BYTE msgToDUT[lengthOfPayload];
++                int lengthOfPayload = modifiedInputMsg[6];
++                BYTE msgToDUT[1024];
+ 
+                 //check if 7E was replaced                        
+                 int index = 0;
+ 				int payloadIndex = 10;
+                 for (payloadIndex = 10; payloadIndex < (10 + lengthOfPayload); payloadIndex++)
+                 {
+-                    if ((inputDIAGMsg[payloadIndex] == 0x7D) || (inputDIAGMsg[payloadIndex + 1] == 0x5E))
++#if 0
++					if ((inputDIAGMsg[payloadIndex] == 0x7D) || (inputDIAGMsg[payloadIndex + 1] == 0x5E))
+                     {
+                         msgToDUT[index] = 0x7e;
+                         payloadIndex++;
+                     }
+                     else
++#endif
+                     {
+-                        msgToDUT[index] = inputDIAGMsg[payloadIndex];
++                        msgToDUT[index] = modifiedInputMsg[payloadIndex];
+                     }
+                     index++;
+                 }
+@@ -403,7 +446,7 @@ int processDiagPacket(BYTE inputDIAGMsg[])
+             //look for 7E to calculate length
+             int indexOf7E = 0;
+ 
+-            for (i = 0; i < TCP_BUF_LENGTH; i++)
++            for (i = 0; i < x_len; i++)
+             {
+                 if (inputDIAGMsg[i] == 0x7E)
+                 {
+@@ -440,8 +483,16 @@ int processDiagPacket(BYTE inputDIAGMsg[])
+             printf("echo for extendedBuildID\n");
+             DiagPrintToStream(extendedBuildIDRespMsg, sizeof(extendedBuildIDRespMsg), false);
+             return 1; 
++        case 0x7E:  //PacketForNonHDLC
++			send(client_sock , inputDIAGMsg , x_len , 0);
++		    return 1;
++
+         default:
+             printf("In default\n");
++			lengthofmodifiedInputMsg = x_len + 1;
++            modifiedInputMsg[0] = 0x13;
++            memcpy(&modifiedInputMsg[1], inputDIAGMsg, x_len);
++            DiagPrintToStream(modifiedInputMsg, lengthofmodifiedInputMsg, true);
+             return 1;
+     }
+ }
+diff --git a/privateMembers.h b/privateMembers.h
+index 51d349695dc1..4b9fd826c6da 100755
+--- a/privateMembers.h
++++ b/privateMembers.h
+@@ -4,6 +4,9 @@ All Rights Reserved.
+ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ */
+ 
++#ifndef _BTDIAG_PRIVATE_MEMBER_H
++#define _BTDIAG_PRIVATE_MEMBER_H
++
+ #include "global.h"
+ 
+ enum CmdCode
+@@ -113,7 +116,7 @@ static BYTE phoneStateResponseMsg[] = {
+                 0x0,0x0                         //EVENT_COUNT
+                                       };
+ 
+-BYTE featureQueryRespMsg[] = {
++static BYTE featureQueryRespMsg[] = {
+                       0x51,  //(BYTE)CmdCode.featureQuery, 
+                       0,0,
+                       0
+@@ -130,3 +133,8 @@ static BYTE extendedBuildIDRespMsg[] = {
+                         0x42,0x52,0x49,0x44,0x47,0x45, //BRIDGE
+                         0x0                // Model string (BT.DIAG.BRIDGE)
+                                        };
++
++int processDiagPacket(BYTE inputDIAGMsg[], int x_len);
++void DiagPrintToStream(BYTE response[], int Length, bool check);
++
++#endif
+diff --git a/uart.h b/uart.h
+index 82348b67e8a7..17cb01e6ddea 100755
+--- a/uart.h
++++ b/uart.h
+@@ -20,6 +20,10 @@ Confidential and Proprietary - Qualcomm Technologies, Inc.
+ #include <limits.h>     //PATH_MAX
+ #include <time.h>
+ #include <string.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include "global.h"
++
+ 
+ #define NO_BLOCK_MODE		O_NONBLOCK
+ #define BLOCK_MODE		(!O_NONBLOCK)
+@@ -69,4 +73,6 @@ int InitUartPort(const struct uart_t *u);
+ int UartRead(struct uart_t* pUartInfo, char *buf, int len);
+ int UartWrite(struct uart_t* pUartInfo, const char *buf, int len);
+ 
++int Diag_Write_Uart(BYTE *buffer, int length);
++int usb_send_hci_cmd(char *dev_name, unsigned char *rawbuf, int rawdatalen);
+ #endif //_Qcmbr_H_
+-- 
+2.7.4
+

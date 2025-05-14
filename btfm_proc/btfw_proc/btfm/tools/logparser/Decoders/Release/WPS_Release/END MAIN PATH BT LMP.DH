@@ -1,0 +1,18 @@
+/************************************************
+ * File: END MAIN PATH BT LMP.DH
+ * QCA Bluetooth Firmware Logging Parser.  
+ * 
+ * Copyright (c) 2015,2022 Qualcomm Technologies, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * Notifications and licenses are retained for attribution purposes only
+************************************************/
+
+// Decode LMP
+GROUP gProcessLmp_QCA IF (IntraframeStaticExists QCA_LMP_FLAG)
+{
+    // This group is defined Teledyne's Wireless Protocol Suite decoders
+    GROUP gDecodeLMP;
+}
+
+FIELD fQca_EnqTS (Fixed 4 Bytes) IF(MoreBytes) (Hex) "EnQ TimeStamp"

@@ -1,0 +1,121 @@
+#!/bin/bash
+# Add cgn-f20 specific patches
+
+# subverion
+BRD_TYPE_VER=cgn-f10
+
+GIT_SERVER_CLO=https://git.codelinaro.org/clo
+GIT_SERVER=git://git.quicinc.com
+GIT_REVIEW_SERVER=ssh://review-android.quicinc.com:29418
+
+#
+# For each board type,
+# determine which components should be downloaded.
+# The settings here will overwrite the default in aio_gen_bit.sh.
+#
+# ONLY add/enable those components need download.
+#
+# 1. patch files
+DOWNLOAD_PATCH=y
+
+# 2. kernel
+DOWNLOAD_KERNEL_BACKPORT_3_12=n
+
+# 3. WLAN/BT host drivers
+DOWNLOAD_DRIVER_WLAN_HOST=n
+
+# 4. APPs
+DOWNLOAD_APP_WLAN_WPA_SUPPLICANT_8=y
+DOWNLOAD_APP_WLAN_LIBNL_3_2_25=n
+CUTOFF_ID_HOSTAP=4d6ad78d07856bd5787c975043829d044df21d40
+declare -a REVERT_ID_HOSTAP=(
+)
+
+DOWNLOAD_SIGMA_DUT=y
+SIGMA_DUT_GIT_PATH_CLO=${GIT_SERVER_CLO}/la/platform/vendor/qcom-opensource/wlan/utils/sigma-dut.git
+SIGMA_DUT_BRANCH_CLO="github-qca/master"
+CUTOFF_ID_SIGMA_DUT=bfff5b3a0dfea8d21eaceb997450bf32a7505048
+
+OLD_DIR=`pwd`
+
+# 5. CLD3.2
+DOWNLOAD_DRIVER_WLAN_HOST_CLD3_2=y
+CLD3_GIT_PATH_CLO=${GIT_SERVER_CLO}/external-wlan/qcacld-3.0.git
+CMN_GIT_PATH_CLO=${GIT_SERVER_CLO}/external-wlan/qca-wifi-host-cmn.git
+FWAPI_GIT_PATH_CLO=${GIT_SERVER_CLO}/external-wlan/fw-api.git
+CLD3_BRANCH_CLO=caf_migration/wlan-cld3.driver.lnx.2.8
+CLD3_BRANCH=wlan-cld3.driver.lnx.2.8
+CMN_BRANCH_CLO=caf_migration/wlan-cmn.driver.lnx.2.8
+CMN_BRANCH=wlan-cmn.driver.lnx.2.8
+FWAPI_BRANCH_CLO=caf_migration/wlan-api.lnx.1.0
+FWAPI_BRANCH=wlan-api.lnx.1.0
+CUTOFF_ID_CLD3_CLO=6bc7940e298f9a0dc07053988630663961eaada4
+CUTOFF_ID_CLD3=672b3db8cb9555adc442cecfc4b9a4a4a4a977db
+CUTOFF_ID_CMN_CLO=5e26f70dd1de14c2bf171f1da98613d8651e758d
+CUTOFF_ID_CMN=1ee194e0a9191fabdec9cfe1cca76b0d50b122a9
+CUTOFF_ID_FWAPI_CLO=ad027435bd1a6a393b6197baca92078b0d2d64c8
+CUTOFF_ID_FWAPI=b5649d57b9823cb43d5d02f6fa9899e196c41e0a
+
+declare -a CLD3_GERRITS_LIST=(
+)
+
+declare -a CLD3_EMULATION_PATCHES=(
+77/4589177/5
+)
+
+declare -a CLD3_GERRITS_LIST_CLO=(
+ed1836c05f3fc32ae9c11657970a8cb36acfd090
+)
+
+declare -a CMN_GERRITS_LIST=(
+79/5757679/2
+)
+
+declare -a CMN_EMULATION_PATCHES=(
+32/4697832/5
+42/4589242/3
+68/5498068/1
+08/5340008/3
+)
+
+declare -a CMN_GERRITS_LIST_CLO=(
+)
+
+declare -a FWAPI_GERRITS_LIST=(
+)
+
+# 6. Core tech modules
+DOWNLOAD_CORE_TECH_MODULES=y
+CORE_TECH_GIT_PATH_CLO=${GIT_SERVER_CLO}/external-wlan/wlan-cnss-core.git
+CORE_TECH_GIT_PATH=${GIT_SERVER}/platform/vendor/qcom-opensource/wlan-cnss-core.git
+CORE_TECH_BRANCH_CLO=caf_migration/connectivity_platform.2.0
+CORE_TECH_BRANCH=connectivity_platform.wlan.2.0
+CUTOFF_ID_CORE_TECH_CLO=073cd691e6ac238e8dcefa7ceade9528e43cfad5
+CUTOFF_ID_CORE_TECH=5d3a7b4d3aef05006bc0be6ff0fadedd0cf790eb
+declare -a CORE_TECH_GERRITS_LIST=(
+)
+
+declare -a CORE_TECH_EMULATION_PATCHES=(
+59/5678659/7
+)
+
+##echo "========================================================"
+##echo " Downloading patches ..."
+##echo "========================================================"
+PATCH_PATH=
+BOARD_TYPE_PREFIX=
+declare -a custom_aio_patch_arr=(
+)
+BOARD_TYPE_AIO_PATCH_CLO=
+
+DOWNLOAD_WLAN_PATCH_PROJECT=y
+WLAN_PATCH_GIT_PATH=${GIT_SERVER_CLO}/sba-patches/wlan_patches.git
+WLAN_PATCH_BRANCH=caf_migration/master
+CUTOFF_ID_WLAN_PATCH_CLO=911ab6f945f220b759c6bc3a6cf03fbc8fc07aa5
+CUTOFF_ID_WLAN_PATCH=68a939637a3b1b30b9ed226ffad4ae70d31fb330
+
+#Tools
+CUTOFF_ID_TOOLS=c3845fd04532cd5773d36843f97019daeac76c10
+
+cd ${OLD_DIR}
+

@@ -1,0 +1,41 @@
+#
+# Please modify KERNELPATH, KERNELARCH and TOOLPREFIX to meet your environment
+#
+export KERNELPATH=/lib/modules/${shell uname -r}/build
+#export TOOLCHAIN=/home/haotian/work/project/rtk/rtk_qca6390/RTK_SDK_0421/rtk_linuxSDK/output-a32hf/host/bin
+export WLAN_PLATFORM_INC=${ATH_TOPDIR}/drivers/core_tech_modules/inc
+
+export KERNELARCH=x86_64
+#export CROSS_COMPILE=${TOOLCHAIN}/arm-linux-gnueabihf-
+#export TOOLPREFIX=${CROSS_COMPILE}
+#export BTPATH=<set the bt path>
+
+# for backports
+export CONFIG_NO_USE_BACKPORTS=y
+export CONFIG_CFG80211_DEPEND_ON_KERNEL=y
+
+export KLIB=${KERNELPATH}
+export KLIB_BUILD=${KERNELPATH}
+
+# Use local libnl library or not
+export BUILD_LIBNL=y
+export INCLUDE_LIBNL32_HEADER=${ATH_TOPDIR}/apps/libnl-3.2.25/include
+export INCLUDE_LIBNL32_LIB=-lm ${ATH_TOPDIR}/apps/libnl-3.2.25/lib/.libs/libnl-3.a
+export INCLUDE_LIBNL32_GENL_LIB =-lm ${ATH_TOPDIR}/apps/libnl-3.2.25/lib/.libs/libnl-genl-3.a
+
+# Put one copy of firmware to local PC or not. Need root privilege.
+export BUILD_DRIVERFW_TOLOCAL=y
+export CONFIG_CFG80211_INTERNAL_REGDB=y
+export CONFIG_QCACLD_3_2=y
+export CONFIG_CORE_TECH_DEPEND=y
+export CONFIG_QCACLD_2_0=n
+export BUILD_APP_WLAN_WPA_SUPPLICANT_8=y
+
+export ENABLE_MULTI_PCIE_CARD=n
+export PCIE_CARD_SSID=0x0108
+
+export CORE_TECH_KBUILD_EXTRA=ARCH=${KERNELARCH} KERNEL_SRC=${KERNELPATH} unified_driver=1 interface_type=pcie CONFIG_ONE_MSI_VECTOR=y
+
+export CLD3_2_KBUILD_EXTRA=ARCH=${KERNELARCH} KERNEL_SRC=${KERNELPATH} WLAN_PROFILE=lea_qcc2072_debug CONFIG_DUMP_LOG_BUF_CNT=128 CONFIG_QCA_DMA_PADDR_CHECK=y CONFIG_DIRECT_BUF_RX_ENABLE=n CONFIG_WMI_DBR_SUPPORT=n CONFIG_DBR_HOLD_LARGE_MEM=n CONFIG_DP_FEATURE_RX_BUFFER_RECYCLE=n
+
+export CLD3_2_KBUILD_EXTRA_PERF=ARCH=${KERNELARCH} KERNEL_SRC=${KERNELPATH} WLAN_PROFILE=lea_qcc2072_perf CONFIG_DUMP_LOG_BUF_CNT=128 CONFIG_QCA_DMA_PADDR_CHECK=y CONFIG_DIRECT_BUF_RX_ENABLE=n CONFIG_WMI_DBR_SUPPORT=n CONFIG_DBR_HOLD_LARGE_MEM=n CONFIG_DP_FEATURE_RX_BUFFER_RECYCLE=n

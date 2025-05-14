@@ -1,0 +1,1161 @@
+/************************************************
+ * File: QCA_Debug_PFALLog.dh
+ * QCA Bluetooth Firmware Logging Parser.
+ *
+ * Copyright (c) 2015-2017, 2021, 2023-2024 Qualcomm Technologies, Inc.
+ *               2015-2016 Qualcomm Atheros, Inc.
+ * All Rights Reserved.
+ * Confidential and Proprietary - Qualcomm Technologies, Inc
+************************************************/
+
+
+TABLE tQca_LLMLogID APPENDS_ONLY tQca_EnhLogID
+    {0x0700 "LOG_ID_PFAL_BUILD_INFO"        "LOG_ID_PFAL_BUILD_INFO"        0   gQca_PFAL_BuildInfo}
+    {0x0701 "LOG_ID_PFAL_ASSERT_INFO"       "LOG_ID_PFAL_ASSERT_INFO"       0   }
+    {0x0702 "LOG_ID_PFAL_COREDUMP_INFO"     "LOG_ID_PFAL_COREDUMP_INFO"     0   gQca_PFAL_CoreDumpInfo}
+    {0x0703 "LOG_ID_PFAL_TRC_TRIG"          "LOG_ID_PFAL_TRC_TRIG"          0   gQca_PFAL_Trc_Trig}
+    {0x0704 "LOG_ID_PFAL_TRC_DATA"          "LOG_ID_PFAL_TRC_DATA"          0   gQca_PFAL_Trc_Data}
+    {0x0705 "LOG_ID_PFAL_TRC_STOP"          "LOG_ID_PFAL_TRC_STOP"          0   gQca_PFAL_Trc_Stop}
+
+    {0x0708 "LOG_ID_PFAL_SLEEP_DEBUG"       "LOG_ID_PFAL_SLEEP_DEBUG"       0   gQca_PFAL_SleepDebug}
+    {0x0709 "LOG_ID_PFAL_UART_DEBUG"        "LOG_ID_PFAL_UART_DEBUG"        0   }
+    {0x070A "LOG_ID_PFAL_CPU_BANDWIDTH"     "LOG_ID_PFAL_CPU_BANDWIDTH"     0   gQca_PFAL_CPUBandwidth}
+    {0x070B "LOG_ID_PFAL_LOWER_HEAP_STATS"  "LOG_ID_PFAL_LOWER_HEAP_STATS"  0   gQca_PFAL_LowerHeapStats}
+    {0x070C "LOG_ID_PFAL_UPPER_HEAP_STATS"  "LOG_ID_PFAL_UPPER_HEAP_STATS"  0   gQca_PFAL_UpperHeapStats}
+    {0x070D "LOG_ID_PFAL_STACK_WARN"        "LOG_ID_PFAL_STACK_WARN"        0   gQca_PFAL_StackWarn}
+
+    {0x070F "LOG_ID_PFAL_UART_CTS_ON"       "LOG_ID_PFAL_UART_CTS_ON"       0   }
+
+    {0x0713 "LOG_ID_PFAL_TEMP_CHANGE"       "LOG_ID_PFAL_TEMP_CHANGE"       0   gQca_PFAL_TempChange}
+    {0x0714 "LOG_ID_PFAL_INIT_CAL_RESULT"   "LOG_ID_PFAL_INIT_CAL_RESULT"   0   gQca_PFAL_InitCalResult}
+    {0x0715 "LOG_ID_PFAL_ACI_REG_DUMP"      "LOG_ID_PFAL_ACI_REG_DUMP"      0   gQca_PFAL_AciRegDump}
+    {0x0716 "LOG_ID_PFAL_RM_HW_CAL_STATUS"  "LOG_ID_PFAL_RM_HW_CAL_STATUS"  0   gQca_PFAL_CalStatus}
+    {0x0717 "LOG_ID_PFAL_RM_TXDC_CAL_RES"   "LOG_ID_PFAL_RM_TXDC_CAL_RES"   0   gQca_PFAL_DCCal_Result}
+    {0x0718 "LOG_ID_PFAL_ACI_SINK_CONTEXT_DUMP"     "LOG_ID_PFAL_ACI_SINK_CONTEXT_DUMP" 0   gQca_PFAL_AciSinkContextDump}
+
+    {0x0720 "LOG_ID_PFAL_STATS_A2DP_SRC_MCL" "LOG_ID_PFAL_STATS_A2DP_SRC_MCL" 0 gQca_STAT_A2dpSrcMclPeriodicStats}
+
+    {0x0721 "LOG_ID_PFAL_SENSUART_TX_SIG_RETRY_ERR" "LOG_ID_PFAL_SENSUART_TX_SIG_RETRY_ERR"     0   gQca_PFAL_SensUartTxSigRetryErr}
+    {0x0722 "LOG_ID_PFAL_SENSUART_RX_SIG_REV_ERR"   "LOG_ID_PFAL_SENSUART_RX_SIG_REV_ERR"       0   gQca_PFAL_SensUartRxSigRevErr}
+    {0x0723 "LOG_ID_PFAL_SENSUART_TX_BUF_EXHAUST_ERR" "LOG_ID_PFAL_SENSUART_TX_BUF_EXHAUST_ERR" 0   gQca_PFAL_SensUartTxBufExhanustErr}
+    {0x0724 "LOG_ID_PFAL_SENSCORE_REPORT_ADVEVT"    "LOG_ID_PFAL_SENSCORE_REPORT_ADVEVT"        0   gQca_PFAL_SensCoreReportAdvevt}
+    {0x0725 "LOG_ID_PFAL_ASD_INFO"                  "LOG_ID_PFAL_ASD_INFO"        0   gQca_PFAL_AsdInfo}
+    {0x0726 "LOG_ID_PFAL_RTSC_ACL_CORR_PKT"  "LOG_ID_PFAL_RTSC_ACL_CORR_PKT"            0 gQca_PFAL_Rtsc_AclCorrPktInfo}
+    {0x0727 "LOG_ID_PFAL_QBM_PKT_ERR_INFO"   "LOG_ID_PFAL_QBM_PKT_ERR_INFO"             0 gQca_PFAL_Rtsc_EscoPktErrInfo}
+    {0x0728 "LOG_ID_PFAL_LE_FATAL_ABORT"     "LOG_ID_PFAL_LE_FATAL_ABORT"               0 gQca_PFAL_LE_FatalAbort}
+    {0x0729 "LOG_ID_PFAL_BTC_FATAL_ABORT"    "LOG_ID_PFAL_BTC_FATAL_ABORT"              0 gQca_PFAL_BTC_FatalAbort}
+    {0x0730 "LOG_ID_PFAL_RM_RRI_ERR_INFO"    "LOG_ID_PFAL_RM_RRI_ERR_INFO"              0 gQca_PFAL_RM_RRI_ERR}
+    {0x0732 "LOG_ID_PFAL_MRC_STATS"          "LOG_ID_PFAL_MRC_STATS"                0 gQca_PFAL_Rtsc_MrcStats}
+    {0x0733 "LOG_ID_PFAL_MEM_POOL_ALLOC_FAIL"    "LOG_ID_PFAL_MEM_POOL_ALLOC_FAIL"        0 gQca_PFAL_MemPoolAllocFail}
+    {0x0734 "LOG_ID_PFAL_IBF_STATS"          "LOG_ID_PFAL_IBF_STATS"                0 gQca_PFAL_iBFstats}
+    {0x0736 "LOG_ID_PFAL_STX_MAX_POWER"             "LOG_ID_PFAL_STX_MAX_POWER"            0   	gQca_PFAL_STX_Max_Power}
+    {0x0737 "LOG_ID_PFAL_STX_SAR_INFO"              "LOG_ID_PFAL_STX_SAR_INFO"	   	   0   	gQCA_PFAL_STX_SAR_INFO}
+    {0x0738 "LOG_ID_PFAL_STX_NORM_EXP_REPORT_INFO"  "LOG_ID_PFAL_STX_NORM_EXP_REPORT_INFO" 0   	gQCA_PFAL_STX_NOR_EXP_INFO}
+    {0x739 "LOG_ID_PFAL_STX_DBG_POWER_REPORT" "LOG_ID_PFAL_STX_DBG_POWER_REPORT" 0 gQca_PFAL_STX_DBG_POWER_REPORT}
+    {0x73A "LOG_ID_PFAL_STX_SKIP_TX"	"LOG_ID_PFAL_STX_SKIP_TX" 0 gQca_line_number}
+    {0x073B "LOG_ID_PFAL_CSI_INVALID"          "LOG_ID_PFAL_CSI_INVALID"                0 gQca_PFAL_invalidCsiSinr}
+    {0x073C "LOG_ID_PFAL_STX_BT_STATE"              "LOG_ID_PFAL_STX_BT_STATE"                  0   gQCA_PFAL_STX_BT_STATE_INFO}
+    {0x073D "LOG_ID_PFAL_STX_FEATUERS_SUPPORT"      "LOG_ID_PFAL_STX_FEATUERS_SUPPORT"          0   gQCA_PFAL_STX_BT_FEATURES_SUPPORT}
+    {0x073F "LOG_ID_PFAL_RX_RSB_FAIL_DEBUG"    "LOG_ID_PFAL_RX_RSB_FAIL_DEBUG"          0 gQca_PFAL_rxRsbCalFailDbg}
+    {0x0740 "LOG_ID_PFAL_IBF_CAL_FAIL_DEBUG"   "LOG_ID_PFAL_IBF_CAL_FAIL_DEBUG"         0 gQca_PFAL_iBFcalFailDbg}
+    {0x0741 "LOG_ID_PFAL_MRC_SELECTION_ALGO"        "LOG_ID_PFAL_MRC_SELECTION_ALGO"       0    gQCA_PFAL_MRC_SELECTION_ALGO}
+	{0x0743 "LOG_ID_PFAL_ACI_PCM_SINK_CONTEXT_DUMP"    "LOG_ID_PFAL_ACI_PCM_SINK_CONTEXT_DUMP"       0    gQca_PFAL_AciPCMSinkContextDump}
+    {0x0744 "LOG_ID_PFAL_HW_CFG_ERROR"   "LOG_ID_PFAL_HW_CFG_ERROR"         0 gQca_PFAL_hwCfgError}
+	{0x0746 "LOG_ID_PFAL_HEAP_MEMORY_STATS"   "LOG_ID_PFAL_HEAP_MEMORY_STATS"         0 gQca_PFAL_HeapMemStats}
+    {0x0747 "LOG_ID_PFAL_DYNAMIC_LOGGING_CONFIG"    "LOG_ID_PFAL_DYNAMIC_LOGGING_CONFIG"        0   gQCA_PFAL_Dynamic_Logging_Config}
+    {0x07FF "PFAL End"}
+ENDTABLE
+
+GROUP gQca_PFAL_BuildInfo   "Build Info"
+{
+    FIELD fQca_BuildInfoLen      (Fixed 1 Byte)   (Hex)            SUPPRESS_DETAIL
+    FIELD fQca_BuildInfo         (FromField Bytes fQca_BuildInfoLen)     (StringOfAscii)      "Build Label"
+    FIELD fQca_BuildInfoNvm      (ToEndOfLayer)                          (StringOfAscii)      "Build Label in NVM"
+}
+
+GROUP gQca_PFAL_CoreDumpInfo    "Core Dump Info"
+{
+    FIELD fQca_CoreDumpFileName     (Fixed 4 Bytes)             (Hex)  SUPPRESS_DETAIL
+    FIELD fQca_CoreDumpLineNo       (Fixed 4 Bytes)             (Decimal)                "Line #"
+    FIELD fQca_CoreDumpPCAddr       (Fixed 4 Bytes)             (Hex)                    "PC Addr"
+    FIELD fQca_CoreDumpReason       (Fixed 4 Bytes)             (Hex)                    "Reset Reason"
+    FIELD fQca_CoreDumpBuildVer     (Fixed 4 Bytes)             (Hex)                    "Build Version"
+    FIELD fQca_CoreDumpBuildLbl     (Fixed 4 Bytes)             (Hex)  SUPPRESS_DETAIL
+    RESERVED                        (Fixed 4 Bytes)
+    FIELD fQca_CoreDumpAssertCnt    (Fixed 2 Bytes)             (Decimal)                "Assert Count"
+    RESERVED                        (Fixed 2 Bytes)
+}
+
+GROUP gQca_ReservedData
+{
+    FIELD qQca_ReservedData     (ToEndOfLayer)              (StringOfHex)    SUPPRESS_DETAIL   
+}
+
+TABLE tQCA_SleepModes
+
+    {0x00 "PFAL_SLEEP_NO_SLEEP_NO_NAP"  "PFAL_SLEEP_NO_SLEEP_NO_NAP"        0   }
+    {0x01 "PFAL_SLEEP_ENTER_NAP"        "PFAL_SLEEP_ENTER_NAP"              0   }
+    {0x02 "PFAL_SLEEP_ENTER_SLEEP"      "PFAL_SLEEP_ENTER_SLEEP"            0   }
+ENDTABLE
+
+GROUP gQca_PFAL_SleepWakeIrq  IF (FieldIs EqualTo 0x02 fQca_SleepMode) "Sleep Wake IRQ Info"
+{
+    FIELD fQca_SleepIRQPend     (Fixed 4 Bytes)             (Hex)   "NVIC_IRQ_PEND"
+    FIELD fQca_SleepIRQBcstCnt  (Fixed 4 Bytes)             (Hex)   "BCST Count"
+    FIELD fQca_SleepIRQWake     (Fixed 2 Bytes)             (Hex)   "WAKE IRQ"
+    FIELD fQca_SleepIRQCoex     (Fixed 2 Bytes)             (Hex)   "COEX IRQ"
+    FIELD fQca_SleepWakeLvl     (Fixed 2 Bytes)             (Hex)   "WAKE LVL"
+    FIELD fQca_SleepIRQBcst     (Fixed 1 Byte)              (Hex)   "BCST IRQ"
+    FIELD fQca_SleepIRQCmpr     (Fixed 1 Byte)              (Hex)   "CMPR IRQ"
+}
+
+GROUP gQca_PFAL_SleepLcMask   IF (FieldIs EqualTo 0x80000000 fQca_SleepStateFlags) "Sleep LC Int Mask"
+{
+    FIELD fQca_SleepLcIntMask   (Fixed 4 Bytes)             (Hex)   "LC Interrupt Mask"
+}
+
+GROUP gQca_PFAL_WakeVoterMask IF (FieldIs EqualTo 0x04000000 fQca_SleepStateFlags) "Power Manager Wake Voters"
+{
+    FIELD fQca_WakeVoteMask     (Fixed 4 Bytes)             (Hex)   "Wake Vote Mask"
+}
+
+GROUP gQca_PFAL_SleepDebug "Sleep Debug Info"
+{
+    FIELD fQca_SleepStateFlags  (Fixed 4 Bytes)             (Hex)   "Sleep State Flags"
+    FIELD fQca_SleepEnterTs     (Fixed 4 Bytes)             (Hex)   "Sleep Enter Timestamp"
+    FIELD fQca_SleepSuccess     (Fixed 4 Bytes)             (Hex)   "Sleep Success Count"
+    FIELD fQca_SleepFailure     (Fixed 4 Bytes)             (Hex)   "Sleep Failure Count"
+    FIELD fQca_RepeatedFailure  (Fixed 2 Bytes)             (Hex)   "Repeated Failure Count"
+    FIELD fQca_SleepMode        (Fixed 1 Bytes)             (Table tQCA_SleepModes)   "Sleep Mode"
+    RESERVED                    (Fixed 1 Bytes)
+    GROUP gQca_PFAL_SleepWakeIrq;
+    GROUP gQca_PFAL_SleepLcMask;
+    GROUP gQca_PFAL_WakeVoterMask;
+    GROUP gQca_ReservedData;
+}
+
+GROUP gQca_PFAL_CPUBandwidth "CPU profiling Info"
+{
+    FIELD fQca_LCInt0MaxDuty                  (Fixed 4 Bytes)             (Decimal)   "LC Int0 Max Duty Cycle(units of 62.5 ns)"
+    FIELD fQca_CPUBandwidth                   (Fixed 1 Byte)              (Decimal)   "CPU Bandwidth Available(Percentage)"
+    FIELD fQca_LCInt0Usage                    (Fixed 1 Byte)              (Decimal)   "LC INT0 usage(Percentage)"
+    FIELD fQca_DispatchElementOpcodeAtEntryMaxDutyLCInt0    (Fixed 1 Byte)  (TABLE tQca_DispatchOpCode)   "Dispatch Element at Entry of Max Duty LC Int0"
+    FIELD fQca_DispatchElementOpcodeAtExitMaxDutyLCInt0     (Fixed 1 Byte)  (TABLE tQca_DispatchOpCode)   "Dispatch Element at Exit of Max Duty LC Int0"
+}
+
+GROUP gQca_PFAL_LowerHeapStats "Lower Heap Stats"
+{
+    FIELD fQca_LowerHeapTop                 (Fixed 4 Bytes)                 (Hex)   "Lower Heap Top"
+    FIELD fQca_LowerHeapBottom              (Fixed 4 Bytes)                 (Hex)   "Lower Heap Bottom"
+    FIELD fQca_LowerHeapSize                (Fixed 4 Bytes)                 (Hex)   "Lower Heap Size Left"
+}
+
+GROUP gQca_PFAL_UpperHeapStats "Upper Heap Stats"
+{
+    FIELD fQca_UpperHeapSize                (Fixed 4 Bytes)                 (Hex)   "Upper Heap Size Left"
+    FIELD fQca_UpperHeapMaxSize             (Fixed 4 Bytes)                 (Hex)   "Upper Heap Max Alloc Size"
+    FIELD fQca_UpperHeapPeak                (Fixed 4 Bytes)                 (Hex)   "Upper Heap Peak Usage"
+    FIELD fQca_UpperHeapBlocks              (Fixed 4 Bytes)                 (Hex)   "Upper Heap Block Count "
+
+}
+
+GROUP gQca_PFAL_StackWarn "Stack Warn Mask"
+{
+    FIELD fQca_StackWarnMask                (Fixed 4 Bytes)                 (Hex)   "Stack Warn Mask"
+}
+
+TABLE tQca_PFAL_Trc_DataType
+    {0 "Tracer"}
+    {1 "Event"}
+ENDTABLE
+
+TABLE tQca_PFAL_Trc_Timeunit
+    {0 "1 cycle"}
+    {1 "128 cycles"}
+    {2 "128^2 cycles"}
+    {3 "128^3 cycles"}
+ENDTABLE
+
+TABLE tQca_PFAL_Trc_BlockID
+    {0 "SW defined" "SW defined" 0 gQca_Evt_SWdefined}
+    {1 "BT island" "BT island" 0 gQca_Evt_Common}
+    {2 "BT Core" "BT Core" 0 gQca_Evt_BTCore}
+    {3 "Coex" "Coex" 0 gQca_Evt_Common}
+ENDTABLE
+
+TABLE tQca_Evt_SWmodID
+    {0 "ACL"}
+    {1 "HCI"}
+    {2 "SW Event"}
+    {3 "AON 1P1"}
+ENDTABLE
+
+TABLE tQca_Evt_BTCoremodID
+    {0 "LC"}
+    {1 "MCI"}
+    {2 "Modem"}
+    {3 "TOP"}
+ENDTABLE
+
+TABLE tQca_Evt_LC
+    {0 "LC ERROR Event"}
+    {1 "LC State Change"}
+    {2 "LC TestMux Change"}
+    {Default "Undefined Event"}
+ENDTABLE
+
+TABLE tQca_Evt_MCI
+    {0 "MCI ERROR Event"}
+    {1 "MCI_MSG"}
+    {2 "MCI_HTM_TX"}
+    {3 "MCI_STATUS_CHANGE"}
+    {4 "MCI_CL_CPU_INT"}
+    {5 "MCI_TMX_CHANGE"}
+    {Default "Undefined Event"}
+ENDTABLE
+
+TABLE tQca_Evt_Modem
+    {0 "Modem ERROR Event"}
+    {Default "Undefined Event"}
+ENDTABLE
+
+TABLE tQca_Evt_TOP
+    {0 "TOP ERROR Event"}
+    {Default "Undefined Event"}
+ENDTABLE
+
+
+GROUP  gQca_Evt_Common
+{
+    FIELD  fQca_Evt_ModuleID   (Fixed 2 Bits)     (Hex)     "Module ID"    NETWORK_DATA_ORDER
+    FIELD  fQca_Evt_EvtID        (Fixed 5 Bits)     (Hex)     "Event ID"    NETWORK_DATA_ORDER
+    FIELD  fQca_Evt_Data         (Fixed 16 Bits)    (Hex)    "Event Data"    NETWORK_DATA_ORDER
+}
+
+GROUP  gQca_Evt_SWdefined
+{
+    FIELD  fQca_Evt_SWModID   (Fixed 2 Bits)     (TABLE tQca_Evt_SWmodID)    "Module ID"    NETWORK_DATA_ORDER
+    FIELD  fQca_Evt_SWEvtID    (Fixed 5 Bits)     (Hex)      "Event ID"       NETWORK_DATA_ORDER
+    FIELD  fQca_Evt_SWData     (Fixed 16 Bits)    (Hex)     "Event Data"    NETWORK_DATA_ORDER
+}
+
+GROUP  gQca_Evt_BTCore
+{
+    FIELD  fQca_Evt_BTCoreModID     (Fixed 2 Bits)   (TABLE tQca_Evt_BTCoremodID)    "Module ID"    NETWORK_DATA_ORDER
+    FIELD  gQca_Evt_BtCore_LC        (Fixed 5 Bits)    IF(FieldIs EqualTo 0 fQca_Evt_BTCoreModID)     (TABLE tQca_Evt_LC)        "Event ID"    NETWORK_DATA_ORDER
+    FIELD  gQca_Evt_BtCore_MCI      (Fixed 5 Bits)    IF(FieldIs EqualTo 1 fQca_Evt_BTCoreModID)     (TABLE tQca_Evt_MCI)      "Event ID"    NETWORK_DATA_ORDER
+    FIELD  gQca_Evt_BtCore_Modem  (Fixed 5 Bits)   IF(FieldIs EqualTo 2 fQca_Evt_BTCoreModID)     (TABLE tQca_Evt_Modem)  "Event ID"    NETWORK_DATA_ORDER
+    FIELD  gQca_Evt_BtCore_TOP      (Fixed 5 Bits)    IF(FieldIs EqualTo 3 fQca_Evt_BTCoreModID)     (TABLE tQca_Evt_TOP)      "Event ID"    NETWORK_DATA_ORDER
+    FIELD  fQca_Evt_BTCoreData       (Fixed 16 Bits)      (Hex)    "Event Data"    NETWORK_DATA_ORDER
+}
+
+GROUP gQca_Trc_TrcSampleDetails
+{
+    FIELD    fQca_Trc_TrcFlag0          (Fixed 1 Bits)      (Hex)      SUPPRESS_DETAIL
+    FIELD    fQca_Trc_TrcRawData     (Fixed 16 Bits)    IF(FieldIs EqualTo 0 fQca_Trc_TrcFlag0)    (Hex)   "Tracer Raw Data"    NETWORK_DATA_ORDER
+    GROUP  gQca_Trc_TrcTimeStamp  IF(FieldIs EqualTo 1 fQca_Trc_TrcFlag0)
+    {
+        FIELD    fQca_Trc_TrcFlag1            (Fixed 1 Bits)     (Hex)    SUPPRESS_DETAIL
+        FIELD    fQca_Trc_TrcTimeStamp   (Fixed 15 Bits)    IF(FieldIs EqualTo 0 fQca_Trc_TrcFlag1)     (Hex)   "Tracer Time Stamp"   NETWORK_DATA_ORDER
+        GROUP  gQca_Trc_TrcDeltaStamp  IF(FieldIs EqualTo 1 fQca_Trc_TrcFlag1)
+        {
+            FIELD  fQca_Trc_TrcDeltaStamp    (Fixed 11 Bits) (Hex)        "Delta Time Stamp"  NETWORK_DATA_ORDER
+            FIELD  fQca_Trc_TrcIndexChange  (Fixed 4 Bits)  (Decimal)  "Bit Change Index"
+        }
+    }
+}
+
+GROUP gQca_PFAL_Trc_Sample
+{
+    FIELD fQca_Trc_SampleType         (Fixed 1 Bits)          (TABLE tQca_PFAL_Trc_DataType)         "Sample Type"
+    RESERVED                          (Fixed 5 Bits)
+    GROUP gQca_Trc_SampleDataTrc      IF(FieldIs EqualTo 0 fQca_Trc_SampleType)           "Trace Data"
+    {
+        GROUP gQca_Trc_TrcSamples    REPEAT SIZE(Fixed 34 Bits)
+        {
+            GROUP gQca_Trc_TrcSampleDetails;
+        }
+    }
+    GROUP gQca_Trc_SampleDataEvt     IF(FieldIs EqualTo 1 fQca_Trc_SampleType)    "Event Data"
+    {
+        FIELD  fQca_Evt_Timeunit        (Fixed 2 Bits)       (TABLE tQca_PFAL_Trc_Timeunit)       "Time Unit"        NETWORK_DATA_ORDER
+        FIELD  fQca_Evt_Timedelta      (Fixed 7 Bits)       (Hex)         "Time Delta"      NETWORK_DATA_ORDER
+        FIELD  fQca_Evt_CoreID          (Fixed 2 Bits)      (TABLE tQca_PFAL_Trc_BlockID)         "Block ID"        NETWORK_DATA_ORDER
+        BRANCH (FromTable tQca_PFAL_Trc_BlockID fQca_Evt_CoreID)
+    }
+}
+
+TABLE tQca_PFAL_Trc_TrigEvent
+    {0 "State Idle"}
+    {1 "State WFT"}
+    {2 "State TS1"}
+    {3 "State TS2"}
+    {4 "State TS3"}
+    {5 "State TS4"}
+    {6 "State TS5"}
+    {7 "State Wrap Up"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_PFAL_Trc_Trig   "Tracer Trigger Event"
+{
+    FIELD fQca_Trc_TrigAddr0         (Fixed 4 Bytes)     (Hex)     "Trigger Sample[0] Address"
+    FIELD fQca_Trc_TrigAddr1         (Fixed 4 Bytes)     (Hex)     "Trigger Sample[1] Address"
+    FIELD fQca_Trc_TrigAddr2         (Fixed 4 Bytes)     (Hex)     "Trigger Sample[2] Address"
+    FIELD fQca_Trc_TrigAddr3         (Fixed 4 Bytes)     (Hex)     "Trigger Sample[3] Address"
+    GROUP gQca_PFAL_TrigSamples    REPEAT SIZE(Fixed 20 Bytes)   "Tracer Trigger Samples 0~3"
+    {
+        GROUP gQca_PFAL_Trc_Sample;
+    }
+    FIELD fQca_Trc_TrigState         (Fixed 4 Bits)     (TABLE tQca_PFAL_Trc_TrigEvent)     "Trigger State"
+    RESERVED                         (Fixed 4 Bits)
+}
+
+GROUP gQca_PFAL_Trc_Data   "Tracer Data Event"
+{
+    FIELD fQca_Trc_PktCntr  (Fixed 0)   RETRIEVE (StoreInteger 0)   (Hex)   SUPPRESS_DETAIL STORE PktCntr
+    /* Loop through the end of the frame to capture all the Log Packets in the Frame */
+    GROUP gQca_TrcLogPktLoop  REPEAT SIZE (ToEndOfLayer)  "Tracer Samples"
+    {
+        /* Parse the Packet Header and Data */
+        GROUP gQca_PFAL_SampleIndex LABEL(LabelCount "Sample #" PktCntr)
+        {
+            GROUP gQca_PFAL_Trc_Sample;
+        }
+        /* Increment the Counter */
+        FIELD fQca_TrcPktCntrIncr (Fixed 0) RETRIEVE (StoreField PktCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE PktCntr
+    }
+}
+
+TABLE tQca_PFAL_Trc_StopReason
+    {0 "Wrap Up"}
+    {1 "Buffer Full"}
+    {2 "Hci Stop Command"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP gQca_PFAL_Trc_Stop   "Tracer Stop Event"
+{
+    FIELD fQca_Trc_StopReason         (Fixed 1 Bytes)     (TABLE tQca_PFAL_Trc_StopReason)     "Trigger Stop Reason"
+}
+
+GROUP gQca_PFAL_RM_RRI_ERR   "RM RRI Error"
+{
+    FIELD fQCA_FailCount              (Fixed 2 Bytes)     (HEX)     "RRI fail count"
+    FIELD fQCA_TriggerId              (Fixed 1 Bytes)     (HEX)     "RRI Trigger Id"
+    FIELD fQca_Status                 (Fixed 1 Bytes)     (HEX)     "RRI Error Status"
+}
+
+GROUP gQca_PFAL_TempChange "Temperature Change"
+{
+    FIELD fQca_NewTempIndex     (Fixed 1 Byte)      (Hex)   "New_Temp_Index"
+    FIELD fQca_OldTempIndex     (Fixed 1 Byte)      (Hex)   "Old_Temp_Index"
+    FIELD fQca_RawTempCode      (Fixed 2 Byte)      (Hex)   "Raw_Temp_Code"
+}
+
+GROUP gQca_PFAL_InitCalResult "Init Cal Result"
+{
+    FIELD fQca_TXDCCalStatus    (Fixed 24 Byte)     (Hex)   "TXDC_Cal_Status"
+    FIELD fQca_TXRSB_Cal        (Fixed 6 Byte)      (Hex)   "TX_RSB_Cal"
+    FIELD fQca_RXRSB_Cal        (Fixed 4 Byte)      (Hex)   "RX_RSB_Cal"
+    FIELD fQca_AGC_Cal          (Fixed 4 Byte)      (Hex)   "AGC_Cal"
+}
+
+GROUP gQca_STAT_A2dpSrcMclPeriodicStats "A2DP SRC MCL Periodic Stats"
+{
+    FIELD fQca_A2dpSrcMclPeriodicAudioFramesRx            (Fixed 4 Bytes)     (Decimal)       "Audio Frames Rx Count"
+    FIELD fQca_A2dpSrcMclPeriodicL2capPktsTx              (Fixed 4 Bytes)     (Decimal)       "L2CAP Frames Tx Count"
+    FIELD fQca_A2dpSrcMclPeriodicAudioFrameSize           (Fixed 2 Bytes)     (Decimal)       "Audio Frame Size"
+    RESERVED                                        (Fixed 2 Bytes)
+}
+
+GROUP gQca_PFAL_Rtsc_AclCorrPktInfo "RTSC ACL Corrected Pkt Info"
+{
+    FIELD gQca_RTSC_pktCorrReport_clkn          (Fixed 4 Bytes)                                    (Decimal)    "CLKN"
+    FIELD fQca_RTSC_nConseqErrs                 (Fixed 4 Bytes)                                    (Decimal)    "Consequitive Errs"
+    FIELD fQca_RTSC_nCumBitErr0                 (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)    "Cumulative Bit Err0"
+    FIELD fQca_RTSC_nCumBitErr1                 (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)    "Cumulative Bit Err1"
+    FIELD fQca_RTSC_nCumBitErr2                 (Fixed 4 Bytes) PRINT_IF (FieldIs NotEqualTo 0)    (Decimal)    "Cumulative Bit Err2"
+    FIELD gQca_RTSC_pktCorrReport_AveRssi       (Fixed 2 Bytes) RETRIEVE (SignExtension 16)        (Decimal)    "Ave Rssi"
+    FIELD gQca_RTSC_pktCorrReport_PayloadLen    (Fixed 2 Bytes)                                    (Decimal)    "Payload Length"
+    FIELD gQca_RTSC_pktCorrReport_PacketType    (Fixed 1 Byte)                                     (Decimal)    "Packet Type"
+    FIELD gQca_RTSC_pktCorrReport_HciHandle     (Fixed 1 Byte)                                     (Decimal)    "Hci Handle"
+}
+
+GROUP gQca_PFAL_Rtsc_EscoPktErrInfo "RTSC eSCO Pkt Err Info"
+{
+    FIELD fQca_RTSC_bitErrsAxrB                 (Fixed 1 Byte)     (Decimal)                           "Bit Errs among A and B"
+    FIELD fQca_RTSC_bitErrsBxrC                 (Fixed 1 Byte)     (Decimal)                           "Bit Errs among B and C"
+    FIELD fQca_RTSC_bitErrsAxrC                 (Fixed 1 Byte)     (Decimal)                           "Bit Errs among A and C"
+    FIELD fQca_RTSC_bitErrsAxrBxrC              (Fixed 1 Byte)     (Decimal)                           "Bit Errs among A and B and C"
+    FIELD fQca_RTSC_clk                         (Fixed 4 Bytes)    (Hex)                               "CLK"
+}
+
+GROUP  gQca_PFAL_SensUartTxSigRetryErr "SensUARTTxState"
+{
+    FIELD gQca_PFAL_SensUartTxState                            (Fixed 1 Byte)   (Hex)   "SensUARTTxState"
+}
+
+GROUP  gQca_PFAL_SensUartRxSigRevErr "SensUARTRxErr"
+{
+    FIELD gQca_PFAL_SensUartRxErrData                          (Fixed 1 Byte)   (Hex)   "SensUARTRxErrData"
+}
+
+GROUP  gQca_PFAL_SensUartTxBufExhanustErr "SensUARTRxErr"
+{
+    FIELD gQca_PFAL_SensUartRxState                           (Fixed 1 Byte)   (Hex)   "SensUARTRxState"
+}
+
+GROUP  gQca_PFAL_SensCoreReportAdvevt "SensCoreReportAdv"
+{
+    FIELD gQca_PFAL_SensCoreReportAdv                         (ToEndofLayer)    IF(MoreBytes)(StringofHex) "AdvRawData"
+}
+
+GROUP gQca_PFAL_AciRegDump  "ACI Register Dump"
+{
+    FIELD fQca_PFAL_AciIntrtimeStamp            (Fixed 4 Bytes)  (Hex)   "AciIntrTimeStamp"
+    FIELD fQca_PFAL_AciRegDumpPC                (Fixed 4 Bytes)  (Hex)   "AciIopPC"
+    FIELD fQca_PFAL_AciRegDumpBase              (Fixed 4 Bytes)  (Hex)   "AciIopBase"
+    FIELD fQca_PFAL_AciRegDumpStatusRead        (Fixed 4 Bytes)  (Hex)   "AciIopStatusRead"
+    FIELD fQca_PFAL_AciRegDumpSensitivityRead   (Fixed 4 Bytes)  (Hex)   "AciIopSensitivityRead"
+    FIELD fQca_PFAL_AciRegDumpConfig            (Fixed 4 Bytes)  (Hex)   "AciIopConfig"
+}
+
+GROUP gQca_PFAL_AciSinkContextDump  "ACI Sink Context Dump"
+{
+    FIELD fQca_PFAL_AciSinkDumpPC               (Fixed 4 Bytes)  (Hex)   "ACI IOP PC"
+    FIELD fQca_PFAL_AciSinkDumpBase             (Fixed 4 Bytes)  (Hex)   "ACI IOP Base"
+    FIELD fQca_PFAL_AciSinkDumpStatusRead       (Fixed 4 Bytes)  (Hex)   "ACI IOP StatusRead"
+    FIELD fQca_PFAL_AciSinkDumpSensitivityRead  (Fixed 4 Bytes)  (Hex)   "ACI IOP SensitivityRead"
+    FIELD fQca_PFAL_AciSinkDumpConfig           (Fixed 4 Bytes)  (Hex)   "ACI IOP Config"
+
+    FIELD fQca_PFAL_AciSinkDumpDataBuf          (Fixed 2 Bytes)  (Hex)   "Data Buffer"
+    FIELD fQca_PFAL_AciSinkDumpDataLen          (Fixed 2 Bytes)  (Hex)   "Data Length"
+    FIELD fQca_PFAL_AciSinkDumpTTP              (Fixed 2 Bytes)  (Hex)   "Pointer to TTP Value"
+    FIELD fQca_PFAL_AciSinkDumpTTPLow           (Fixed 2 Bytes)  (Hex)   "TTP Low"
+    FIELD fQca_PFAL_AciSinkDumpTTPHigh          (Fixed 2 Bytes)  (Hex)   "TTP High"
+    FIELD fQca_PFAL_AciSinkDumpCeTimerLow       (Fixed 2 Bytes)  (Hex)   "CETimer Low"
+    FIELD fQca_PFAL_AciSinkDumpCeTimerHigh      (Fixed 2 Bytes)  (Hex)   "CETimer High"
+    FIELD fQca_PFAL_AciSinkDumpSampleCount      (Fixed 2 Bytes)  (Hex)   "Sample Count"
+    FIELD fQca_PFAL_AciSinkDumpTxInProgress     (Fixed 1 Bytes)  (Hex)   "IOP Tx in Progress"
+    FIELD fQca_PFAL_AciSinkDumpReserved         (Fixed 1 Bytes)  (Hex)   "Reserved"
+}
+
+TABLE tQca_PFAL_CalStatus
+    {0 "CAL_SUCCESS"}
+    {1 "CAL_FAILURE"}
+ENDTABLE
+
+TABLE tQca_PFAL_CalStateFlag
+    {0 "DISABLE"}
+    {1 "DISABLE"}
+    {2 "FAILURE"}
+    {3 "SUCCESS"}
+ENDTABLE
+
+TABLE tQca_PFAL_CalDataReused
+    {0, "NOT_REUSED"}
+    {1, "REUSED_BACKUP_CAL_DATA"}
+ENDTABLE
+
+TABLE tQca_PFAL_Cals
+    {0, "RADIO_CALS_PROCESS_CORNER_DISCOVERY"}
+    {1, "RADIO_TX_RADIO_CALS"}
+    {2, "RADIO_RX_RADIO_CALS"}
+    {3, "RADIO_DAC_CALS"}
+    {4, "RADIO_PKDET_CALS"}
+    {5, "RADIO_TX_DC_CALS"}
+    {6, "RADIO_TX_RSB_CALS"}
+    {7, "RADIO_RX_DC_CALS"}
+    {8, "RADIO_RX_RSB_CALS"}
+    {9, "RADIO_AGC_CALS"}
+    {10, "RADIO_TX_CHANNEL_CALS"}
+    {11, "RADIO_DPD_DC_IQ_CALS"}
+    {12, "RADIO_TPC_OTP_CALS"}
+    {13, "RADIO_TPC_DC_CALS"}
+    {14, "RADIO_CLPC_PROBE"}
+    {15, "RADIO_DPD_LB_CALS"}
+    {16, "RADIO_IBF_CALS"}
+    {17, "RADIO_CALS_NONE"}
+ENDTABLE
+
+GROUP gQca_PFAL_CalStatus "Calibration Status"
+{
+    FIELD fQca_CalStatus                    (Fixed 1 Byte)      (TABLE tQca_PFAL_CalStatus)    "Calibration Status"
+
+    FIELD fQca_CalGrantFail                 (Fixed 1 Byte)      (Decimal)                       "NO Cal Grant"
+
+    FIELD fQca_CalInterruptCount            (Fixed 1 Byte)      (Decimal)                       "CAL Interrupt Count"
+
+    FIELD fQca_CalTimedOut                  (Fixed 1 Bytes)     (Decimal)                       "Cal Timedout"
+
+    /* Cal State Flags from MSB to LSB */
+    FIELD fQca_Cal_RxRadioCal               (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Rx Radio Cal"
+    FIELD fQca_Cal_TxRadioCal               (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Tx Radio Cal"
+    FIELD fQca_Cal_AGCCal                   (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "AGC Cal"
+    FIELD fQca_Cal_ProcessCorner            (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Process Corner Cal"
+
+    FIELD fQca_Cal_DACCal                   (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "DAC Cal"
+    FIELD fQca_Cal_RxRSBCal                 (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Rx RSB Cal"
+    FIELD fQca_Cal_TxRSBCal                 (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Tx RSB Cal"
+    FIELD fQca_Cal_ModemTxDcCal             (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Modem Tx DC Cal"
+
+    FIELD fQca_Cal_TPCOTPCal                (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "TPC OTP Cal"
+    FIELD fQca_Cal_TPCDCCal                 (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "TPC DC Cal"
+    FIELD fQca_Cal_PDETGainCal              (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "PDET Gain Cal"
+    FIELD fQca_Cal_RxDCCal                  (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "Rx DC Cal"
+
+    RESERVED                                (Fixed 2 Bit)       /*dummy*/
+    FIELD fQca_Cal_IBFLoopbackCal           (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "IBF Loopback Cal"
+    FIELD fQca_Cal_DPDLoopbackCal           (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "DPD Loopback Cal"
+    FIELD fQca_Cal_DPDCombDCIQCal           (Fixed 2 Bit)       (TABLE tQca_PFAL_CalStateFlag)  "DPD COMB DC IQ Cal"
+    
+    FIELD fQCA_CalDataReused                (Fixed 1 Byte)      (TABLE tQca_PFAL_CalDataReused) "Cal Backup Reused"
+    FIELD fQCA_failedCal                    (Fixed 1 Byte)      (TABLE tQca_PFAL_Cals)          "Failed cal that triggered backup usage"
+}
+
+GROUP gQca_PFAL_DCCal_PLType
+{
+    FIELD fQca_TXDCCAL_Status       (Fixed 1 Bytes)  (TABLE tQCA_TXDC_CAL_STATUS)   "calStatus"
+    RESERVED                        (Fixed 1 Bytes) /*dummy*/
+    FIELD fQca_TXDCCAL_i            (Fixed 1 Bytes)  (Hex)   "i"
+    FIELD fQca_TXDCCAL_q            (Fixed 1 Bytes)  (Hex)   "q"
+
+    GROUP gBadStatus IF (FieldIs GreaterThan 1 fQca_TXDCCAL_Status)
+    {
+        FIELD fQca_badCntrInc (Fixed 0) RETRIEVE (StoreField badCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE badCntr
+    }
+}
+
+GROUP gQca_PFAL_DCCal_Result  "PFAL TXDC Cal Result"
+{
+    FIELD fQca_GainCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE GainCntr
+    GROUP gQca_PFAL_DCCal_DALow REPEAT COUNT (Fixed 2 Times)
+    {
+        FIELD fQca_IdxCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE IdxCntr
+
+        GROUP gQca_TXDCCalType LABEL(LabelCount "DAGain #" GainCntr )
+        {
+            FIELD fQca_badCntrInit (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE badCntr
+            GROUP gQca_PFAL_DCCal_PL REPEAT COUNT(Fixed 8 times)
+            {
+                GROUP gQca_PFAL_DCCal_PLType1 LABEL(LabelCount "PL #" IdxCntr )
+                {
+                    GROUP gQca_PFAL_DCCal_PLType;
+                }
+                FIELD fQca_IdxCntrIncr (Fixed 0) RETRIEVE (StoreField IdxCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE IdxCntr
+            }
+
+            GROUP gdummy  IF (FieldIs EqualTo 0 GainCntr) "PL8~10 Not applicable for Low Gain"
+            {
+                RESERVED (Fixed 12 Bytes)
+            }
+
+            GROUP gQca_PFAL_DCCal_PLhigh  IF (FieldIs NotEqualTo 0 GainCntr)
+            {
+                GROUP gQca_PFAL_DCCal_PLhigh1  REPEAT COUNT(Fixed 3 times)
+                {
+                GROUP gQca_PFAL_DCCal_PLType11 LABEL(LabelCount "PL #" IdxCntr )
+                {
+                    GROUP gQca_PFAL_DCCal_PLType;
+                }
+                FIELD fQca_IdxCntrIncr11 (Fixed 0) RETRIEVE (StoreField IdxCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE IdxCntr
+                }
+            }
+            FIELD fQca_GainCtrIncr (Fixed 0) RETRIEVE (StoreField GainCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE GainCntr
+        }
+
+    }
+
+    GROUP g_BadSummary IF (FieldIs NotEqualTo 0 badCntr)
+    {
+        FIELD fQca_showBadCnt   (Fixed 0) RETRIEVE (StoreField badCntr) (Decimal) "TXDC CAL SUMMARY: BAD. Count"
+    }
+
+    GROUP _GoodSummary IF (FieldIs EqualTo 0 badCntr) "TXDC CAL SUMMARY: ALL GOOD."
+    {
+    }
+}
+
+TABLE tQCA_TXDC_CAL_STATUS
+    {0 "TXDC_NOT_TESTED"}
+    {1 "GOOD-TXDC_VALID"}
+    {2 "BAD-TXDC_INVALID"}
+    {3 "BAD-TXDC_VALID_2ND"}
+    {4 "BAD-TXDC_INVALID_2ND"}
+    {5 "BAD-TXDC_WRONG_INDEX"}
+ENDTABLE
+
+TABLE tQca_PFAL_AsdInfo_Status
+    {0 "ASD STOP"}
+    {1 "ASD START"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP  gQca_PFAL_AsdInfo "ASDInfo"
+{
+    FIELD fQca_PFAL_AsdInfo_asdStatus    (Fixed 1 Byte)   (TABLE tQca_PFAL_AsdInfo_Status)   "ASD Status"
+    FIELD fQca_PFAL_AsdInfo_connHandle   (Fixed 1 Byte)   (Hex)   "Conn Handle"
+    FIELD fQca_PFAL_AsdInfo_slope0       (Fixed 2 Bytes)  (Decimal)         "skewSlope0"
+    FIELD fQca_PFAL_AsdInfo_slope0t      (Fixed 0 Byte)    RETRIEVE (MultiplyFieldByInteger fQca_PFAL_AsdInfo_slope0 100)(Decimal) SUPPRESS_DETAIL
+    FIELD fQca_PFAL_AsdInfo_slope0f      (Fixed 0 Byte)    RETRIEVE (DivideFieldByInteger fQca_PFAL_AsdInfo_slope0t 16384) (Decimal)   "skewSlope0(*100)"
+    FIELD fQca_PFAL_AsdInfo_slope1       (Fixed 2 Bytes)  (Decimal)         "skewSlope1"
+    FIELD fQca_PFAL_AsdInfo_slope1t      (Fixed 0 Byte)    RETRIEVE (MultiplyFieldByInteger fQca_PFAL_AsdInfo_slope1 100)(Decimal) SUPPRESS_DETAIL
+    FIELD fQca_PFAL_AsdInfo_slope1f      (Fixed 0 Byte)    RETRIEVE (DivideFieldByInteger fQca_PFAL_AsdInfo_slope1t 16384) (Decimal)   "skewSlope1(*100)"
+    FIELD fQca_PFAL_AsdInfo_slope2       (Fixed 2 Bytes)  (Decimal)         "skewSlope2"
+    FIELD fQca_PFAL_AsdInfo_slope2t      (Fixed 0 Byte)    RETRIEVE (MultiplyFieldByInteger fQca_PFAL_AsdInfo_slope2 100)(Decimal) SUPPRESS_DETAIL
+    FIELD fQca_PFAL_AsdInfo_slope2f      (Fixed 0 Byte)    RETRIEVE (DivideFieldByInteger fQca_PFAL_AsdInfo_slope2t 16384) (Decimal)   "skewSlope2(*100)"
+    FIELD fQca_PFAL_AsdInfo_skewInit     (Fixed 1 Byte)   (Hex)   "skewInitiated"
+    RESERVED                             (Fixed 1 Bytes)
+}
+
+GROUP gQca_PFAL_LE_FatalAbort "LE LC Fatal Abort"
+{
+    FIELD fQca_PFAL_LE_FatalAbort_DbgStatus0                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[0]"
+    FIELD fQca_PFAL_LE_FatalAbort_DbgStatus1                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[1]"
+    FIELD fQca_PFAL_LE_FatalAbort_DbgStatus2                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[2]"
+    FIELD fQca_PFAL_LE_FatalAbort_DbgStatus3                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[3]"
+    FIELD fQca_PFAL_LE_FatalAbort_DbgStatus4                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[4]"
+    FIELD fQca_PFAL_LE_FatalAbort_LcState                        (Fixed 4 Byte)  (Hex)  "LC State"
+    FIELD fQca_PFAL_LE_FatalAbort_IntRaw0                        (Fixed 4 Byte)  (Hex)  "Raw Int Status 0"
+    FIELD fQca_PFAL_LE_FatalAbort_IntRaw1                        (Fixed 4 Byte)  (Hex)  "Raw Int Status 1"
+
+}
+
+GROUP gQca_PFAL_BTC_FatalAbort "BTC LC Fatal Abort"
+{
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus0                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[0]"
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus1                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[1]"
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus2                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[2]"
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus3                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[3]"
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus4                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[4]"
+    FIELD fQca_PFAL_BTC_FatalAbort_DbgStatus5                     (Fixed 4 Byte)  (Hex)  "ABORT_STATUS[5]"
+    FIELD fQca_PFAL_BTC_FatalAbort_LcState                        (Fixed 4 Byte)  (Hex)  "LC State"
+    FIELD fQca_PFAL_BTC_FatalAbort_IntRaw0                        (Fixed 4 Byte)  (Hex)  "Raw Int Status 0"
+    FIELD fQca_PFAL_BTC_FatalAbort_IntRaw1                        (Fixed 4 Byte)  (Hex)  "Raw Int Status 1"
+}
+
+TABLE tQca_PFAL_MrcInfo_Status
+    {0 "MRC Disable"}
+    {1 "MRC Enable"}
+    {Default "Invalid"}
+ENDTABLE
+
+GROUP  gQca_PFAL_Rtsc_MrcStats "MrcInfo"
+{
+    FIELD fQca_PFAL_mdmRxDiversityReg                            (Fixed 4 Bytes)  (Hex)         "MdmRxDiversityReg"
+    FIELD fQca_PFAL_mrcInfo_status                               (Fixed 1 Byte)   (TABLE tQca_PFAL_MrcInfo_Status)   "Status"
+    FIELD fQca_PFAL_mrcInfo_rxchain0InUse                        (Fixed 1 Byte)   (Hex)         "Rx Chain0 in use"
+    FIELD fQca_PFAL_mrcInfo_rxchain1InUse                        (Fixed 1 Byte)   (Hex)         "Rx Chain1 in use"
+    FIELD fQca_PFAL_mrcInfo_prevStatus                           (Fixed 1 Byte)   (Hex)         "prevStatus"
+    FIELD fQca_PFAL_mrcInfo_connHandle                           (Fixed 1 Byte)  (Decimal)      "connHandle"
+    GROUP gQCA_PFAL_MRC_SELECTION_ALGO;
+}
+
+TABLE tQca_Pool_Section
+    {0 "low heap"}
+    {1 "Upper heap"}
+    {2 "NVM section"}
+    {Default "Undefined Section"}
+ENDTABLE
+
+GROUP gQca_PFAL_MemPoolAllocFail "FMB Pool Alloc Fail"
+{
+    FIELD fQca_PFAL_POOL_ID             (Fixed 4 Bytes)      (Hex)                              "current pool"
+    FIELD fQca_PFAL_POOL_returnAddress  (Fixed 4 Bytes)      (Hex)                              "return address"
+    FIELD fQca_PFAL_POOL_SECTION        (Fixed 2 Bytes)      (TABLE tQca_Pool_Section)          "pool section"
+    FIELD fQca_PFAL_POOL_COUNT          (Fixed 2 Bytes)  PRINT_IF (FieldIs NotEqualTo 0)    (Hex)       "pool count"
+
+    GROUP gQCA_FmbPoolDbgINFO IF (FieldIs NotEqualTo 0 fQca_PFAL_POOL_COUNT)
+    {
+        /* Init the Counter to 0 */
+        FIELD fQca_PFAL_PoolCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE PoolCntr
+
+        /* Loop through the end of the frame to capture all the generic pool info Packets in the Frame */
+        GROUP gQCA_GMENPoolInfos IF (FieldIs EqualTo 1 fQca_PFAL_POOL_SECTION)
+        {
+            /* Init the Counter to 0 */
+            FIELD fQca_PFAL_GmenPoolCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE GmenPoolCntr
+
+            GROUP gQCA_PFAL_GmenPoolInfo REPEAT COUNT (Fixed 16 times)
+            {
+                GROUP gQCA_PFAL_GMENPool LABEL(LabelCount "Genric Pool #" GmenPoolCntr )
+                {
+                    FIELD fQca_PFAL_GMENPOOL_nFree          (Fixed 1 Byte)      (Hex)            "nFree"
+                    FIELD fQca_PFAL_GMENPOOL_nReserved      (Fixed 1 Byte)      (Hex)            "nReserved"
+                    FIELD fQca_PFAL_GMENPOOL_nFailed        (Fixed 1 Byte)      (Hex)            "nFailed"
+                    FIELD fQca_PFAL_GMENPOOL_nWatermark     (Fixed 1 Byte)      (Hex)            "nWatermark"
+                }
+                /* Increment the Counter */
+                FIELD fQca_PFAL_GmenPoolCntrIncr (Fixed 0) RETRIEVE (StoreField GmenPoolCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE GmenPoolCntr
+            }
+}
+
+        GROUP gQCA_PFAL_PoolInfos REPEAT SIZE (ToEndOfLayer)
+        {
+            GROUP gQCA_PoolInfo LABEL(LabelCount "Static Pool #" poolCntr )
+            {
+                FIELD fQca_PFAL_POOL_nFree          (Fixed 1 Byte)      (Hex)            "nFree"
+                FIELD fQca_PFAL_POOL_nReserved      (Fixed 1 Byte)      (Hex)            "nReserved"
+                FIELD fQca_PFAL_POOL_nFailed        (Fixed 1 Byte)      (Hex)            "nFailed"
+                FIELD fQca_PFAL_POOL_nWatermark     (Fixed 1 Byte)      (Hex)            "nWatermark"
+            }
+            /* Increment the Counter */
+            FIELD fQca_PFAL_PoolCntrIncr (Fixed 0) RETRIEVE (StoreField PoolCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE PoolCntr
+        }
+    }
+}
+
+GROUP gQca_PFAL_iBFstats "iBF Power allocation"
+{
+    FIELD fQca_PFAL_cid            (Fixed 1 Byte)  (Decimal)  "Connection ID"
+    FIELD fQca_PFAL_CH0_PL         (Fixed 1 Byte)  (Decimal)  "Chain0 PL"
+    FIELD fQca_PFAL_CH0_backoff    (Fixed 1 Byte)  (Decimal)  "Chain0 backoff"
+    FIELD fQca_PFAL_CH1_PL         (Fixed 1 Byte)  (Decimal)  "Chain1 PL"
+    FIELD fQca_PFAL_CH1_backoff    (Fixed 1 Byte)  (Decimal)  "Chain1 backoff"
+    FIELD fQca_PFAL_rel_gain       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Relative gain"
+    FIELD fQca_PFAL_tx_chains      (Fixed 1 Byte)  (Hex)  "Tx chains in use"
+    FIELD fQca_PFAL_RFU            (Fixed 1 Byte)  (Hex)  "RFU"
+    FIELD fQca_PFAL_iBF_phase      (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "iBF Phase"
+    FIELD fQca_PFAL_Rx_phase       (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "Rx Phase"
+    FIELD fQca_PFAL_CH0_phase      (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "Chain0 phase"
+    FIELD fQca_PFAL_CH1_phase      (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "Chain1 phase"
+    FIELD fQca_PFAL_ch0_rssi       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain0 RSSI"
+    FIELD fQca_PFAL_ch1_rssi       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain1 RSSI"
+    FIELD fQca_PFAL_ch0_sinr       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain0 SINR"
+    FIELD fQca_PFAL_ch1_sinr       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain1 SINR"
+}
+
+GROUP gQca_PFAL_invalidCsiSinr "Invalid CSI SINR"
+{
+    FIELD fQca_PFAL_sinr_Ch0       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain0 SINR"
+    FIELD fQca_PFAL_sinr_Ch1       (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "Chain1 SINR"
+}
+
+GROUP gQca_PFAL_rxRsbCalFailDbg "Rx RSB Calibration Failure Debug Data"
+{
+    FIELD fQca_PFAL_tx_chain         (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "Chain Index"
+    FIELD fQca_PFAL_synth_type       (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "Synth Index"
+    FIELD fQca_PFAL_power_I          (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Power I"
+    FIELD fQca_PFAL_cross_IQ         (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Cross IQ"
+    FIELD fQca_PFAL_power_Q          (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Power Q"
+    FIELD fQca_PFAL_power_I2         (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Power I2"
+    FIELD fQca_PFAL_cross_IQ2        (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Cross IQ2"
+    FIELD fQca_PFAL_power_Q2         (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "Power Q2"
+    FIELD fQca_PFAL_R1               (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "R1"
+    FIELD fQca_PFAL_R2               (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "R2"
+    FIELD fQca_PFAL_R3               (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "R3"
+    FIELD fQca_PFAL_R4               (Fixed 4 Byte)  RETRIEVE (SignExtension 32) (Decimal)  "R4"
+    FIELD fQca_PFAL_dcValueI         (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC value I"
+    FIELD fQca_PFAL_dcAvgIPos        (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg I Pos"
+    FIELD fQca_PFAL_dcAvgQPos        (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg Q Pos"
+    FIELD fQca_PFAL_dcAvgINeg        (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg I Neg"
+    FIELD fQca_PFAL_dcAvgQNeg        (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg Q Neg"
+    FIELD fQca_PFAL_dcAvgIPosTilda   (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg I Pos2"
+    FIELD fQca_PFAL_dcAvgQPosTilda   (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg Q Pos2"
+    FIELD fQca_PFAL_dcAvgINegTilda   (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg I Neg2"
+    FIELD fQca_PFAL_dcAvgQNegTilda   (Fixed 2 Byte)  RETRIEVE (SignExtension 16) (Decimal)  "DC Avg Q Neg2"
+}
+
+TABLE tQca_iBF_Cal_Fail_Reason
+    {0 "CAL_SUCCESS"}
+    {1 "MEM_ALLOCATION_FAILURE"}
+    {2 "CSI_FAILURE"}
+    {3 "COEX_GRANT_FAILURE"}
+    {Default "INVALID_REASON"}
+ENDTABLE
+
+GROUP gQca_PFAL_iBFcalFailDbg "iBF Calibration Failure Debug Data"
+{
+    FIELD fQca_PFAL_reason           (Fixed 1 Byte)  (TABLE tQca_iBF_Cal_Fail_Reason)      "Fail reason"
+    FIELD fQca_PFAL_attempt_cnt      (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)                    "Attempt count"
+    FIELD fQca_PFAL_cfg_idx          (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)                    "Cfg Idx"
+    FIELD fQca_PFAL_channel          (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)                    "Channel"
+    FIELD fQca_PFAL_sinr             (Fixed 1 Byte)  RETRIEVE (SignExtension 8) (Decimal)  "SINR"
+}
+
+GROUP gQca_PFAL_STX_Max_Power "STX MAX POWER Report"
+{
+    FIELD fQca_PFAL_STXActiveAntGrp		    (Fixed 1 Byte)    (HEX)	   "Active Antenna Mask"
+    RESERVED  					    (Fixed 3 Bytes)
+
+    GROUP gQca_PFAL_STXMaxPower	"Max POWER"
+    {
+	FIELD fQca_PFAL_STX_Max_power_enteries	     (Fixed 4 Bytes)	(Decimal)       "Number of tx_pwr_max_dbm10 entries"
+
+	FIELD fQca_PowerCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE PowerCntr
+
+	GROUP gQca_MAX_POWER REPEAT COUNT (FIXED 8 Times) "Max Power(dBM)"
+	{
+		GROUP gQca_StxMaxPower
+		{
+			FIELD fQca_MaxPower	     (Fixed 4 Bytes)   RETRIEVE (SignExtension 32) (DecimalWithFieldLabel PowerCntr)  "Antenna"
+		}
+		FIELD fQca_PowerCntrIncr (Fixed 0) RETRIEVE (StoreField PowerCntr) ALSO (AddInteger 1) (Hex) SUPPRESS_DETAIL STORE PowerCntr
+	}
+    }
+
+}
+Table tQca_STX_ReportType
+        {0x00 QMI_NE_REPORT}
+        {0x01 HCI_NE_REPORT}
+ENDTABLE
+
+TABLE tQca_PFAL_STX_ILMode
+        {0x00 STX_DISABLE_MODE}
+        {0x01 STX_ACTIVE_MODE}
+        {0x02 STX_FLYWHEEL_MODE}
+        {0x03 STX_AIRPLANE_MODE}
+        {0x04 STX_INACTIVE_MODE}
+ENDTABLE
+
+TABLE tQca_PFAL_STX_WLANState
+        {0x00 STX_WLAN_DISABLE}
+        {0x01 STX_WLAN_ENABLE}
+ENDTABLE
+
+TABLE tQca_PFAL_STX_BTState
+        {0x00 STX_BT_RF_OFF}
+        {0x01 STX_BT_RF_ON}
+ENDTABLE
+
+TABLE tQca_PFAL_STX_FavorMode
+        {0x00 STX_FAVOR_MODE_GEN1_V01}
+        {0x01 STX_FAVOR_MODE_GEN2_MMW_V01}
+        {0x02 STX_FAVOR_MODE_GEN2_SUB6_V01}
+ENDTABLE
+
+GROUP gQCA_PFAL_STX_SAR_INFO "STX SAR Info"
+{
+	FIELD fQca_PFAL_STX_MultiTxQ16		        (Fixed 4 Byte)		(HEX)	"Multi Tx Q16"
+	FIELD fQca_PFAL_STX_Dsi				(Fixed 1 Byte)		(HEX)	"DSI"
+	FIELD fQca_PFAL_STX_Mode			(FIXED 1 Byte)		(TABLE tQca_PFAL_STX_ILMode)	"IL Mode"
+	FIELD fQca_PFAL_STX_WlanState			(FIXED 1 Byte)		(TABLE tQca_PFAL_STX_WLANState) "Wlan State"
+	FIELD fQca_PFAL_STX_ACTIVE_AG_MASK		(Fixed 1 Byte)		(HEX)	"Active AG Mask"
+
+	FIELD fQca_PLimitCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE PLimitCntr
+
+	GROUP gQCA_STX_PLIMIT  REPEAT COUNT (FIXED 2 TIMES)	"PLimit(dBM)"
+	{
+		GROUP gQca_StxPlimit
+		{
+			FIELD fQca_PLimit 	(FIXED 2 Bytes) RETRIEVE (SignExtension 8)	(DecimalWithFieldLabel PLimitCntr) "Antenna"
+		}
+		FIELD fQca_PLimitCntrIncr (Fixed 0) RETRIEVE (StoreField PLimitCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE PLimitCntr
+	}
+
+	FIELD fQca_expLimitCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE expLimitCntr
+
+	GROUP gQCA_PFAL_STX_ExpLIMIT  REPEAT COUNT (FIXED 2 TIMES)	"Exposure Limit"
+	{
+		GROUP gQca_StxExplimit
+		{
+			//FIELD fQca_ExpLimit 	(FIXED 4 Bytes) RETRIEVE (SignExtension 8)	 (DecimalWithFieldLabel expLimitCntr) "Antenna"
+			FIELD fQca_ExpLimit 	(FIXED 4 Bytes) (Float) "Antenna"
+		}
+		FIELD fQca_expLimitCntrIncr (Fixed 0) RETRIEVE (StoreField expLimitCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE expLimitCntr
+	}
+
+	FIELD fQca_PmaxCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE PmaxCntr
+
+	GROUP gQCA_PFAL_STX_PMax  REPEAT COUNT (FIXED 2 TIMES)	"Max Power (dBm)"
+	{
+		GROUP gQca_StxPmax
+		{
+			FIELD fQca_Pmax 	(FIXED 4 Bytes)	(float) "Antenna"
+		}
+		FIELD fQca_PmaxCntrIncr (Fixed 0) RETRIEVE (StoreField PmaxCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE PmaxCntr
+	}
+
+
+    FIELD fQca_PFAL_STX_FavorMode		(FIXED 4 Byte)		(TABLE tQca_PFAL_STX_FavorMode) "favor_mode"
+    FIELD fQca_expLimitTlogTCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE expLimitTlogTCntr
+
+    GROUP gQCA_PFAL_STX_ExpLIMITTLOGT  REPEAT COUNT (FIXED 2 TIMES) "Exposure Limit TlogT"
+    {
+        GROUP gQca_StxExplimitTlogT
+        {
+            FIELD fQca_ExpLimitTlogT    (FIXED 4 Bytes) (Float) "Exposure Limit Antenna TlogT"
+        }
+        FIELD fQca_expLimitTlogTCntrIncr (Fixed 0) RETRIEVE (StoreField expLimitTlogTCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE expLimitTlogTCntr
+    }
+    FIELD fQca_PFAL_STX_BtState         (FIXED 1 Byte)      (TABLE tQca_PFAL_STX_BTState) "BT State"
+    FIELD fQca_PFAL_STX_chain0Map       (FIXED 1 Byte)      (HEX) "Chain0 Antenna map"
+    FIELD fQca_PFAL_STX_chain1Map       (FIXED 1 Byte)      (HEX) "Chain1 Antenna map"
+}
+
+GROUP gQCA_PFAL_STX_NOR_EXP_INFO "STX Normalized Exposure"
+{
+	FIELD fQca_PFAL_STX_ReportType			(FIXED 1 BYTE)		(TABLE tQca_STX_ReportType)	"Report"
+    FIELD fQca_PFAL_STX_activeAGMask        (FIXED 1 BYTE)      (HEX)                       "Active AG Mask"
+    FIELD fQca_PFAL_STX_seqNum              (FIXED 2 Bytes)     (Decimal)   "Report Seq Number"
+    FIELD fQca_PFAL_STX_AccTimeMs           (Fixed 4 Bytes)     (Decimal)                   "Accumulation Time(msecs)"
+
+    FIELD fQca_avPowerCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE avPowerCntr
+
+    GROUP gQCA_PFAL_STXAvPower  REPEAT COUNT (FIXED 2 TIMES)	"Average Power(mWatts)"
+	{
+        GROUP gQca_StxAvPower
+		{
+            //FIELD fQca_AvPower 	(FIXED 4 Bytes) RETRIEVE (SignExtension 8)	(DecimalWithFieldLabel avPowerCntr) "Antenna"
+            FIELD fQca_AvPower 	(FIXED 4 Bytes) (FLOAT)		"Antenna"
+		}       
+        FIELD fQca_avPowerCntrIncr (Fixed 0) RETRIEVE (StoreField avPowerCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE avPowerCntr
+	}
+
+    FIELD fQca_normExpCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE normExpCntr
+
+    GROUP gQCA_PFAL_STX_NORM_EXPOSURE  REPEAT COUNT (FIXED 5 TIMES)	"Normalized Exposure"
+	{
+        GROUP gQca_StxNormExp
+        {
+            FIELD fQca_NormExp 	(FIXED 4 Bytes)	(HEX) "Antenna Group"
+        }
+        FIELD fQca_normExpCntrIncr (Fixed 0) RETRIEVE (StoreField normExpCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE normExpCntr
+    }
+
+    FIELD fQca_PFAL_STX_NeTotalExp      (FIXED 4 BYTES)         (HEX)       "NE Total Exp"
+}
+
+GROUP gQca_PFAL_STX_DBG_POWER_REPORT "Stx Debug Power Report"
+{
+	FIELD fQca_PFAL_STX_Report		(FIXED 1 BYTE)		(TABLE tQca_STX_ReportType)	"Report"
+    FIELD fQca_txPacket_invalid_txOntime (FIXED 1 BYTES)     (DECIMAL)   "Packet Tx with Invalid Tx on Time"
+    FIELD fQca_txPacket_18_20dbM		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 18-20 dBm"
+	FIELD fQca_txPacket_15_17dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 15-17 dBm"
+	FIELD fQca_txPacket_12_14dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 12-14 dBm"
+	FIELD fQca_txPacket_9_11dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 9-11 dBm"
+	FIELD fQca_txPacket_6_8dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 6-8 dBm"
+	FIELD fQca_txPacket_3_5dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 3-5 dBm"
+	FIELD fQca_txPacket_0_2dBm		(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w 0-2 dBm"
+	FIELD fQca_txPacket_less_than_0dBm	(FIXED 2 BYTES)		(DECIMAL)	"Packets TX b/w <0 dBm"
+	RESERVED 				(FIXED 2 BYTES)
+	FIELD fQca_txTime			(FIXED 4 BYTES)		(DECIMAL)	"Total Tx time(uSecs)"
+	FIELD fQca_totalTxPackets		(FIXED 4 BYTES)		(DECIMAL)	"Total TX Packets"
+	FIELD fQca_1SLOT_PACKET_TX		(FIXED 4 BYTES)		(DECIMAL)	"1 SLOT Packet TX'd"
+	FIELD fQca_3SLOT_PACKET_TX		(FIXED 4 BYTES)		(DECIMAL)	"3 SLOT Packet TX'd"
+	FIELD fQca_5SLOT_PACKET_TX		(FIXED 4 BYTES)		(DECIMAL)	"5 SLOT Packet TX'd"
+	FIELD fQca_LE_PHY_1M			(FIXED 2 BYTES)		(DECIMAL)	"LE PHY 1M TX'd"
+	FIELD fQca_LE_PHY_2M			(FIXED 2 BYTES)		(DECIMAL)	"LE PHY 2M TX'd"
+	FIELD fQca_LE_PHY_CODED_125k		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY Coded 125K TX'd"
+	FIELD fQca_LE_PHY_CODED_500k		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY Coded 500K TX'd"
+	FIELD fQca_LE_PHY_CODED_SIMUL		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY Coded SIMUL"
+	FIELD fQca_LE_PHY_LEHS_2P		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY LEHS 2P"
+	FIELD fQca_LE_PHY_LEHS_3P		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY LEHS 3P"
+	FIELD fQca_LE_PHY_LEHS_4P		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY LEHS 4P"
+	FIELD fQca_LE_PHY_LEHS_5P		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY LEHS 5P"
+	FIELD fQca_LE_PHY_LEHS_6P		(FIXED 2 BYTES)		(DECIMAL)	"LE PHY LEHS 6P"
+}
+
+GROUP gQCA_PFAL_MRC_SELECTION_ALGO "MRC Selection Algorithm"
+{
+    GROUP gQca_MRC_FLAGS;
+    FIELD fQca_PFAL_MRC_SEL_ALGO_EVM_MAX           (Fixed 1 Byte)       RETRIEVE (SignExtension  8) (Decimal)                  "EVM Max"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_SINR_CH0          (Fixed 1 Byte)       RETRIEVE (SignExtension  8) (Decimal)                  "SINR Ch0"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_SINR_CH1          (Fixed 1 Byte)       RETRIEVE (SignExtension  8) (Decimal)                  "SINR Ch1"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_PIN_CH0           (Fixed 1 Byte)       RETRIEVE (SignExtension  8) (Decimal)                  "PIN Ch0"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_PIN_CH1           (Fixed 1 Byte)       RETRIEVE (SignExtension  8) (Decimal)                  "PIN Ch1"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_EVM_FILTER        (Fixed 4 Byte)       RETRIEVE (SignExtension 32) (Decimal)                  "EVM Filter"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_SINR0_FILTER      (Fixed 4 Byte)       RETRIEVE (SignExtension 32) (Decimal)                  "SINR0 Filter"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_SINR1_FILTER      (Fixed 4 Byte)       RETRIEVE (SignExtension 32) (Decimal)                  "SINR1 Filter"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_PIN0_FILTER       (Fixed 4 Byte)       RETRIEVE (SignExtension 32) (Decimal)                  "PIN0 Filter"
+    FIELD fQca_PFAL_MRC_SEL_ALGO_PIN1_FILTER       (Fixed 4 Byte)       RETRIEVE (SignExtension 32) (Decimal)                  "PIN1 Filter"
+}
+
+GROUP gQca_MRC_FLAGS "Flags"
+{
+    FIELD fQca_MRC_LOG_reserved1                  (Fixed 1  Bit)  (Decimal)   "Reserved"
+    FIELD fQca_MRC_LOG_HEC_TOUT                   (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "HEC_TOUT"
+    FIELD fQca_MRC_LOG_WBER_FST_GREATER           (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "WBER_FST_GREATER"
+    FIELD fQca_MRC_LOG_EVM_FLTR_GREATER           (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "EVM_FLTR_GREATER"
+    FIELD fQca_MRC_LOG_RX_FAIL_DETECT             (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "RX_FAIL_DETECT"
+    FIELD fQca_MRC_LOG_TIME_ELAPSE                (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "TIME_ELAPSE"
+    FIELD fQca_MRC_LOG_IBF_REQ                    (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "IBF_REQ"
+    FIELD fQca_MRC_LOG_MRC_ENABLE                 (Fixed 1  Bit)  (Table tQca_MRC_FLAGS_DECODE)   "MRC_ENABLE"
+    FIELD fQca_MRC_LOG_reserved                   (Fixed 24 Bits)  (Decimal)   "Reserved"
+}
+
+TABLE tQca_MRC_FLAGS_DECODE
+    {0 "No"}
+    {1 "Yes"}
+ENDTABLE
+
+GROUP gQCA_PFAL_STX_BT_STATE_INFO "STX BT State Info"
+{
+        FIELD fQca_PFAL_STX_YnQ16                       (Fixed 4 Byte)          (Hex)                           "YnQ16"
+        FIELD fQca_PFAL_STX_XnQ16                       (Fixed 4 Byte)          (Hex)                           "XnQ16"
+        FIELD fQca_PFAL_STX_Ynminus1Q16	                (Fixed 4 Byte)          (Hex)                           "Ynminus1Q16"
+        FIELD fQca_PFAL_STX_BtOnThreshold               (FIXED 2 Byte)          (Hex)                           "BT ON threshold" 
+        FIELD fQca_PFAL_STX_BtOffThreshold              (FIXED 2 Byte)          (Hex)                           "BT OFF threshold"
+        FIELD fQca_PFAL_STX_BtStateInfo	                (FIXED 4 Byte)          (TABLE tQca_PFAL_STX_BTState)   "BT State" 
+
+        FIELD fQca_PFAL_STX_estDcfnQ16_dTotal           (Fixed 4 Byte)          (Decimal)                       "estDcfnQ16_dTotal"
+        FIELD fQca_PFAL_STX_estDcQ16_dTotal             (Fixed 4 Byte)          (Decimal)                       "estDcQ16_dTotal"
+        FIELD fQca_PFAL_STX_estDcfnMinus1Q16_dTotal     (Fixed 4 Byte)          (Decimal)                       "estDcfnMinus1Q16_dTotal"
+        FIELD fQca_PFAL_STX_pDcDbm_dTotal               (Fixed 4 Byte)          (Float)                         "pDcDbm_dTotal"
+        
+        FIELD fQca_estDcFnQ16Cntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE estDcFnQ16Cntr
+        GROUP gQCA_PFAL_STX_EST_DCFN_Q16  REPEAT COUNT (FIXED 5 TIMES)	"EST DC Fn Q16"
+        {
+                GROUP gQca_StxEstDcFnQ16
+                {
+                        FIELD fQca_estDcFnQ16 	(FIXED 4 Bytes) (Decimal) "DC Fn Q16"
+                }
+                FIELD fQca_estDcFnQ16CntrIncr (Fixed 0) RETRIEVE (StoreField estDcFnQ16Cntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE estDcFnQ16Cntr
+        }
+        
+        FIELD fQca_estDcQ16Cntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE estDcQ16Cntr
+        GROUP gQCA_PFAL_STX_EST_DC_Q16  REPEAT COUNT (FIXED 5 TIMES)	"EST DC Q16"
+        {
+                GROUP gQca_StxEstDcQ16
+                {
+                        FIELD fQca_estDcQ16     (FIXED 4 Bytes) (Decimal) "DC Q16"
+                }
+                FIELD fQca_estDcQ16CntrIncr (Fixed 0) RETRIEVE (StoreField estDcQ16Cntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE estDcQ16Cntr
+        }
+        
+        FIELD fQca_estDcFnm1Q16Cntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE estDcFnm1Q16Cntr
+        GROUP gQCA_PFAL_STX_EST_DCFNM1_Q16  REPEAT COUNT (FIXED 5 TIMES)     "EST DC Fnminus1 Q16"
+        {
+                GROUP gQca_StxEstDcFnm1Q16
+                {
+                         FIELD fQca_estDcFnm1Q16        (FIXED 4 Bytes) (Decimal)  "DC Fnminus1 Q16"
+                }
+                FIELD fQca_estDcFnm1Q16CntrIncr (Fixed 0) RETRIEVE (StoreField estDcFnm1Q16Cntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE estDcFnm1Q16Cntr
+        }
+        
+        FIELD fQca_dcDbmCntr (Fixed 0) RETRIEVE (StoreInteger 0) (hex) SUPPRESS_DETAIL STORE dcDbmCntr
+        GROUP gQCA_PFAL_STX_DC_DBM  REPEAT COUNT (FIXED 5 TIMES)       "DC DBM"
+        {
+                GROUP gQca_StxDcDbm
+                {
+                        FIELD fQca_dcDbm       (FIXED 4 Bytes)  (Float)   "DC DBM (dBM)"
+                }
+                FIELD fQca_dcDbmCntrIncr (Fixed 0) RETRIEVE (StoreField dcDbmCntr) ALSO (AddInteger 1) (Decimal) SUPPRESS_DETAIL STORE dcDbmCntr
+        }
+}
+
+GROUP gQCA_PFAL_STX_BT_FEATURES_SUPPORT "STX BT Features Support"
+{
+        FIELD fQca_PFAL_STX_QmsSupportedFeatures        (FIXED 1 Byte)  (Hex)   "STX Qms Supported Features"
+        FIELD fQca_PFAL_STX_stxLocalSupportedFeatures   (FIXED 1 Byte)  (Hex)   "STX Local Supported Features" 
+        FIELD fQca_PFAL_STX_ActiveSupportedFeatures     (FIXED 1 Byte)  (Hex)   "STX Active/enforced Supported Features"
+}
+
+GROUP gQca_PFAL_AciPCMSinkContextDump  "ACI PCM Sink Context Dump"
+{
+    FIELD fQca_PFAL_Aci_PCMSinkDumpPC               (Fixed 2 Bytes)  (Hex)   "ACI IOP PC"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpBase             (Fixed 2 Bytes)  (Hex)   "ACI IOP Base"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpStatusRead       (Fixed 2 Bytes)  (Hex)   "ACI IOP StatusRead"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpSensitivityRead  (Fixed 2 Bytes)  (Hex)   "ACI IOP SensitivityRead"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpConfigAB         (Fixed 2 Bytes)  (Hex)   "ACI IOP ConfigAB"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpConfigCD         (Fixed 2 Bytes)  (Hex)   "ACI IOP ConfigCD"
+
+    FIELD fQca_PFAL_Aci_PCMSinkDumpPcmTxStart       (Fixed 2 Bytes)  (Hex)   "PCM Tx Start"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpDataLen          (Fixed 2 Bytes)  (Hex)   "Data Length"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpStuffSampleCount (Fixed 2 Bytes)  (Hex)   "Stuff sample count"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpRingStart        (Fixed 2 Bytes)  (Hex)   "Ring start"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpRingEnd          (Fixed 2 Bytes)  (Hex)   "Ring end"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpRingHead       	(Fixed 2 Bytes)  (Hex)   "Ring Head"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpRingTail     	(Fixed 2 Bytes)  (Hex)   "Ring Tail"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpSampleCount      (Fixed 2 Bytes)  (Hex)   "Sample Count"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpFlag     		(Fixed 2 Bytes)  (Hex)   "IOP status flag"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpCurrentSlot      (Fixed 2 Bytes)  (Hex)   "Current slot"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpControlReg      	(Fixed 2 Bytes)  (Hex)   "Control Reg"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpDataWidth     	(Fixed 2 Bytes)  (Hex)   "Data width"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpSlotWidth      	(Fixed 2 Bytes)  (Hex)   "Slot Width"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpSenseSelect      (Fixed 2 Bytes)  (Hex)   "Sense select"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpFrameCount      	(Fixed 2 Bytes)  (Hex)   "Frame count"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpSlotSynclostCount(Fixed 2 Bytes)  (Hex)   "Sync Lost Count"
+    FIELD fQca_PFAL_Aci_PCMSinkDumpMemFullCount	    (Fixed 2 Bytes)  (Hex)   "MemFull Count"
+}
+
+TABLE tQCA_HW_CFG_ERROR_CODE
+
+    {0x00 "RESERVED"       "RESERVED"         0   }
+    {0x01 "FEM_INIT_ERROR"        "FEM_INIT_ERROR"          0   }
+ENDTABLE
+
+GROUP gQca_PFAL_hwCfgError "HW config Error"
+{
+    FIELD fQca_errCode        (Fixed 1 Bytes)             (Table tQCA_HW_CFG_ERROR_CODE)   "Error Code"
+}
+
+GROUP gQca_PFAL_HeapMemStats "Heap Memory Stats"
+{
+	GROUP gQca_PFAL_UpperHeapMemStats "Upper Heap Memory Stats"
+	{
+		GROUP gQca_PFAL_UpperHeapStaticPoolMem "Static Pools Stats"
+		{
+			FIELD fQca_PFAL_UpperHeapStaticPoolTotalMem				(Fixed 4 Bytes)	(Decimal)	"Total Static Pool Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapConnPoolMem					(Fixed 4 Bytes)	(Decimal)	"Connection Pool Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapSCOConnPoolMem					(Fixed 4 Bytes)	(Decimal)	"SCO Connection Pool Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapPiconetPoolMem					(Fixed 4 Bytes)	(Decimal)	"Piconet Pool Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapDbgLogPoolsMem					(Fixed 4 Bytes)	(Decimal)	"Debug Log Pools Memory Consumed"
+		}
+		
+		GROUP gQca_PFAL_UpperHeapGenericPoolMem "Generic Pools Stats"
+		{
+			FIELD fQca_PFAL_UpperHeapGenericPoolTotalMem			(Fixed 4 Bytes)	(Decimal)	"Total Generic Pool Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapAdvMem							(Fixed 4 Bytes)	(Decimal)	"Adv Data Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapAPCFMem						(Fixed 4 Bytes)	(Decimal)	"APCF Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapLEDevListMem					(Fixed 4 Bytes)	(Decimal)	"LE Device Lists Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapLEISOStreamMem					(Fixed 4 Bytes)	(Decimal)	"LE ISO Stream Memory Consumed"	
+		}
+		
+		GROUP gQca_PFAL_UpperHeapDirectAllocMem "Direct Memory Allocation Stats"
+		{
+			FIELD fQca_PFAL_UpperHeapBatchScanMem					(Fixed 2 Bytes)	(Decimal)	"LE Batch Scan Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapAdvInstancesMem				(Fixed 2 Bytes)	(Decimal)	"Adv Instances Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapADVMMem						(Fixed 2 Bytes)	(Decimal)	"ADVM Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapLEPrivacyMem					(Fixed 2 Bytes)	(Decimal)	"LE Privacy Memory Consumed"
+			FIELD fQca_PFAL_UpperHeapLEISOGroupMem					(Fixed 2 Bytes)	(Decimal)	"LE ISO Groups Memory Consumed"
+			RESERVED												(Fixed 2 Bytes)
+		}
+		
+		FIELD fQca_PFAL_UpperHeapAudioPoolsMem						(Fixed 4 Bytes)	(Decimal)	"Audio Pools Memory Consumed"
+		FIELD fQca_PFAL_UpperHeapFreeMem							(Fixed 4 Bytes)	(Decimal)	"Free Memory Remaining"
+	}
+	
+	GROUP gQca_PFAL_LowerHeapMemStats "Lower Heap Memory Stats"
+	{
+		GROUP gQca_PFAL_LowerHeapStaticPoolMem "Static Pools Stats"
+		{
+			FIELD fQca_PFAL_LowerHeapStaticPoolTotalMem				(Fixed 4 Bytes)	(Decimal)	"Total Static Pool Memory Consumed"
+			FIELD fQca_PFAL_LowerHeapDbgLogPoolsMem					(Fixed 4 Bytes)	(Decimal)	"Debug Log Pools Memory Consumed"
+			FIELD fQca_PFAL_LowerHeapHCIPoolsMem					(Fixed 4 Bytes)	(Decimal)	"HCI Data Pools Memory Consumed"
+			FIELD fQca_PFAL_LowerHeapLMPPoolsMem					(Fixed 4 Bytes)	(Decimal)	"LMP Pools Memory Consumed"
+			FIELD fQca_PFAL_LowerHeapA2dpSinkPoolMem				(Fixed 4 Bytes)	(Decimal)	"A2DP Sink Media Pool Memory Consumed"
+		}
+		
+		GROUP gQca_PFAL_LowerHeapGenericPoolMem "Generic Pools Stats"
+		{
+			FIELD fQca_PFAL_LowerHeapGenericPoolTotalMem			(Fixed 4 Bytes)	(Decimal)	"Total Generic Pool Memory Consumed"
+		}
+		
+		GROUP gQca_PFAL_LowerHeapDirectAllocMem "Direct Memory Allocation Stats"
+		{
+			FIELD fQca_PFAL_LowerHeapDbgUartRingBufMem				(Fixed 2 Bytes)	(Decimal)	"UART Debug Ringbuffer Memory Consumed"
+			RESERVED												(Fixed 2 Bytes)
+		}
+		
+		FIELD fQca_PFAL_LowerHeapAudioPoolsMem						(Fixed 4 Bytes)	(Decimal)	"Audio Pools Memory Consumed"
+		FIELD fQca_PFAL_LowerHeapFreeMem							(Fixed 4 Bytes)	(Decimal)	"Free Memory Remaining"
+	}
+	
+	FIELD fQca_PFAL_MemRequested									(Fixed 4 Bytes)	(Decimal)	"Number of Bytes of Memory Requested"
+	FIELD fQca_PFAL_RetAddr											(Fixed 4 Bytes)	(Hex)		"Return Address"
+}
+
+GROUP gQCA_PFAL_Dynamic_Logging_Config "Dynamic Logging Config"
+{
+    FIELD fQca_SLC_Dynamic_Log_Enable  (Fixed 1 bits) (Binary)  "SLC Dynamic Log Enabled"
+    FIELD fQca_Audio_Dump_Log_Enable  (Fixed 1 bits) (Binary)   "Audio Dump Log Enabled"
+    FIELD fQca_Calc_Rom_CRC         (Fixed 1 bits) (Binary)     SUPPRESS_DETAIL
+    FIELD fQca_TXP_Assert_Fatal     (Fixed 1 bits) (Binary)     SUPPRESS_DETAIL
+    FIELD fQca_Is_Expect_Fatal      (Fixed 1 bits) (Binary)     SUPPRESS_DETAIL
+    FIELD fQca_Dynamic_Log_Enable   (Fixed 1 bits) (Binary)     "Dynamic Log Enabled"
+    FIELD fQca_Overwrite_Prev_Logs  (Fixed 1 bits) (Binary)     SUPPRESS_DETAIL
+    FIELD fQca_Enhanced_Log_Enable  (Fixed 1 bits) (Binary)     "Enhanced Log Enabled"
+    FIELD fQca_Enhanced_Log_Flags  (Fixed 1 Bytes) (Binary)     SUPPRESS_DETAIL
+}

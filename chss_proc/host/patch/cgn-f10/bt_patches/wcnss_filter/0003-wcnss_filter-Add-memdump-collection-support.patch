@@ -1,0 +1,405 @@
+From a0a96f1e16f185fe41ab5d649b80ee7c82ce36c9 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+Date: Fri, 25 Feb 2022 16:01:58 +0800
+Subject: [PATCH] wcnss_filter: Add memdump collection support
+
+Add memdump collection support.
+
+diff --git a/inc/bt_qxdmlog.h b/inc/bt_qxdmlog.h
+index 91345abaef5c..1b94571b5475 100644
+--- a/inc/bt_qxdmlog.h
++++ b/inc/bt_qxdmlog.h
+@@ -127,11 +127,11 @@ typedef PACKED struct
+ } bt_log_pkt;
+ 
+ 
+-bool qxdm_property_init(void);
+ bool diag_init(void);
+ void diag_deinit(void);
+ void send_btlog_pkt(uint8 *pBtPaktBuf, int packet_len, int direction);
+ #endif// DIAG_ENABLED
++bool qxdm_property_init(void);
+ int is_snoop_log_enabled(void);
+ void bt_kernel_panic(void);
+ void  dump_uart_ipc_logs(int inx);
+diff --git a/inc/main.h b/inc/main.h
+index 496eb2b42571..612d0fa126bd 100644
+--- a/inc/main.h
++++ b/inc/main.h
+@@ -57,7 +57,11 @@ bool is_debug_force_special_bytes(void);
+ bool soc_crash_wait_timer_stop(void);
+ void update_ring_buffer (RING_BUF *rb, unsigned char* buf, int len, RING_BUF *swapb,  bool is_in_buf);
+ bool is_diag_enabled(void);
+-static void cleanup_and_suicide(void);
+ int init_hci_transport(void);
++#ifndef ANDROID
++int property_get_bt(const char *key, char *value, const char *default_value);
++int property_set_bt(const char *key, const char *value);
++#endif
++
+ 
+ #endif//__MAIN_H__
+diff --git a/inc/uart_utils.h b/inc/uart_utils.h
+index 55fca4259dc5..b5eefd89b6a5 100644
+--- a/inc/uart_utils.h
++++ b/inc/uart_utils.h
+@@ -28,6 +28,7 @@
+ #define _UART_UTILS_H_
+ 
+ #include <stdint.h>
++#include <unistd.h>
+ #include "hw_cherokee.h"
+ 
+ #define TRUE           1
+diff --git a/src/bt_qxdmlog.c b/src/bt_qxdmlog.c
+index f719889629de..4a06e7304d7c 100644
+--- a/src/bt_qxdmlog.c
++++ b/src/bt_qxdmlog.c
+@@ -104,7 +104,7 @@ static void format_lmp(uint8_t *dst, uint8_t *src, int32_t pktLen);
+ static void send_log(uint8_t *Buf, int length, int type);
+ void *ssr_bt_handle(void *req_pkt, uint16_t pkt_len);
+ static int dump_UART_logs(char* spath, char* dpath, int buffer_size, int water_mark);
+-int bt_ssr_level ();
++int bt_ssr_level(void);
+ extern int fd_transport;
+ #ifdef PANIC_ON_SOC_CRASH
+ extern int fd_sysrq;
+@@ -739,14 +739,14 @@ char * psSECevent[] = {
+    "LMP_PROCeINVALID_EVENT"
+ };
+ 
+-#ifdef DIAG_ENABLED
+-#ifdef LOG_BT_ENABLE
+ 
+ bool qxdm_property_init()
+ {
+     int ret =0;
+     char value[PROPERTY_VALUE_MAX] = {'\0'};
+ 
++    (void)ret;
++#ifndef CSP_BUILD
+     property_get_bt("wc_transport.force_hcidump", value, "false");
+     enable_force_hcidump = (strncasecmp(value, "true",strlen("true")) ==0) ? TRUE : FALSE;
+     ALOGV("%s: wc_transport.force_hcidump: %s, enabled: %d ",
+@@ -760,52 +760,30 @@ bool qxdm_property_init()
+     enable_snoop_log = (strncasecmp(value, "true",strlen("true")) ==0) ? TRUE : FALSE;
+     ALOGV("%s: persist.service.bdroid.snooplog: %s, enabled: %d ",
+             __func__, value, enable_snoop_log);
++#endif
+     //crash dump enable by default
+     property_get_bt("wc_transport.crashdump", value, NULL);
+-    enable_crashdump = (strncasecmp(value, "false",strlen("false")) ==0) ? FALSE : TRUE;
++    enable_crashdump = (strncasecmp(value, "false",strlen("false")) ==0) ? false : true;
+     ALOGV("%s: wc_transport.crashdump: %s, enabled: %d ",
+-            __func__, value, enable_crashdump);
++            __func__, value, (int)enable_crashdump);
+ 
+     return 1;
+ }
+ 
+-bool diag_init()
+-{
+-  bool status;
+-  ALOGI("Init diag for BT log packets");
+-
+-  status = Diag_LSM_Init(NULL);
+-
+-  if(!status)
+-  {
+-    ALOGE("Failed to init diag");
+-    return 0;
+-  }
+-
+-  /* Register callback for QXDM input data */
+-  DIAGPKT_DISPATCH_TABLE_REGISTER(DIAG_SUBSYS_BT, ssr_bt_tbl);
+-
+-  return 1;
+-}
+-
+-bool is_force_hcidump_enabled() {
+-    return enable_force_hcidump;
+-}
+-
+-void diag_deinit()
+-{
+-   Diag_LSM_DeInit();
+-}
+-
+-void send_btlog_pkt(uint8 *pBtPaktBuf, int packet_len, int direction)
++void send_btlog_pkt(uint8_t *pBtPaktBuf, int packet_len, int direction)
+ {
+   short int log_type = 0;
+-  uint8 *logBuf;
++  uint8_t *logBuf;
+ 
+   if (pBtPaktBuf == NULL || packet_len <= 0)
+     return;
+ 
+   logBuf = pBtPaktBuf;
++#ifdef CSP_BUILD
++	(void)log_type;
++	if (logBuf[0] == LOG_BT_EVT_PACKET_TYPE)
++		handle_event(logBuf, packet_len);
++#else
+   switch(logBuf[0])
+   {
+      case LOG_BT_CMD_PACKET_TYPE:
+@@ -846,6 +824,37 @@ void send_btlog_pkt(uint8 *pBtPaktBuf, int packet_len, int direction)
+   }
+ 
+   send_log(&logBuf[1], packet_len-1, log_type);
++#endif
++}
++
++#ifdef DIAG_ENABLED
++#ifdef LOG_BT_ENABLE
++bool diag_init()
++{
++  bool status;
++  ALOGI("Init diag for BT log packets");
++
++  status = Diag_LSM_Init(NULL);
++
++  if(!status)
++  {
++    ALOGE("Failed to init diag");
++    return 0;
++  }
++
++  /* Register callback for QXDM input data */
++  DIAGPKT_DISPATCH_TABLE_REGISTER(DIAG_SUBSYS_BT, ssr_bt_tbl);
++
++  return 1;
++}
++
++bool is_force_hcidump_enabled() {
++    return enable_force_hcidump;
++}
++
++void diag_deinit()
++{
++   Diag_LSM_DeInit();
+ }
+ 
+ static void get_log_type(int type, char* type_str) {
+@@ -1158,7 +1167,15 @@ void bt_kernel_panic(void)
+ }
+ #endif //PANIC_ON_SOC_CRASH
+ 
+-static void handle_event(uint8 *eventBuf, int length)
++#endif
++#endif//DIAG_ENABLED
++
++bool is_crashdump_enabled(void)
++{
++    return enable_crashdump;
++}
++
++static void handle_event(uint8_t *eventBuf, int length)
+ {
+   static int dumpFd = -1;
+   static unsigned char inx_scan;
+@@ -1166,6 +1183,7 @@ static void handle_event(uint8 *eventBuf, int length)
+   static char path[CRASH_DUMP_PATH_BUF_SIZE];
+   int ssrlevel;
+ 
++  (void)ssrlevel;
+   if (eventBuf[1] == LOG_BT_EVT_VENDOR_SPECIFIC)
+   {
+     // It is a VS event for logs. Check if it is a controller log packet
+@@ -1173,9 +1191,11 @@ static void handle_event(uint8 *eventBuf, int length)
+     {
+       switch(eventBuf[4])
+       {
++#ifndef CSP_BUILD
+          case LOG_BT_MESSAGE_TYPE_VSTR:
+            send_str_log(eventBuf);
+          break;
++#endif
+ 
+          case LOG_BT_MESSAGE_TYPE_MEM_DUMP:
+          {
+@@ -1189,7 +1209,7 @@ static void handle_event(uint8 *eventBuf, int length)
+ 
+             param_len = eventBuf[2];
+             dump_ptr = &eventBuf[8];
+-            seq_num = eventBuf[5] | (eventBuf[6] << 8);
++            seq_num = eventBuf[5] | ((uint16_t)eventBuf[6] << 8);
+ 
+             ALOGV("%s: LOG_BT_MESSAGE_TYPE_MEM_DUMP (%d) ", __func__, seq_num);
+ 
+@@ -1221,6 +1241,9 @@ static void handle_event(uint8 *eventBuf, int length)
+ #endif
+ 
+                 inx_scan = get_dump_index();
++                ALOGI("%s: index of the dumps = %d", __func__, inx_scan);
++
++#ifndef CSP_BUILD
+                 if (was_active)
+                 {   /* Ring Buffer already collected, index should correspond to it */
+                     if(!inx_scan)
+@@ -1228,18 +1251,18 @@ static void handle_event(uint8 *eventBuf, int length)
+                     else
+                         inx_scan = inx_scan - 1;
+                 }
+-                ALOGD("%s: index of the dumps = %d", __func__, inx_scan);
+ 
+                 if (!was_active)
+                 {
+                     dump_uart_ipc_logs(inx_scan);// Don't collect UART IPC logs again
+                     uart_dump_collected = true;
+                 }
++#endif
+ 
+                 if (seq_num == 0x0000)
+                 {
+                     dump_size = (unsigned int)
+-                        (eventBuf[8]|(eventBuf[9]<<8)|(eventBuf[10]<<16)|(eventBuf[11]<<24));
++                        ((uint32_t)eventBuf[8] | ((uint32_t)eventBuf[9]<<8) | ((uint32_t)eventBuf[10]<<16) | ((uint32_t)eventBuf[11]<<24));
+                     dump_ptr = &eventBuf[12];
+                     /* first pack has total ram dump size (4 bytes) */
+                     param_len -= 4;
+@@ -1249,7 +1272,7 @@ static void handle_event(uint8 *eventBuf, int length)
+ 
+                 total_size = seq_num_cnt = 0;
+                 memset(path, 0, CRASH_DUMP_PATH_BUF_SIZE);
+-                ALOGD("%s: Crash Dump Start - total Size: %d ", __func__, dump_size);
++                ALOGI("%s: Crash Dump Start - total Size: %d assumption size: %d", __func__, dump_size, MAX_CRASH_DUMP_SIZE);
+ 
+                 p = temp_buf = (unsigned char *) malloc(dump_size);
+                 if (p != NULL) {
+@@ -1356,16 +1379,14 @@ skip_crashdump:
+                    ALOGI("%s: Write crashdump successfully : \n"
+                                         "\t\tFile: %s\n\t\tdump_size: %d\n\t\twritten_size: %d",
+                                 __func__, path, dump_size, total_size );
+-                   struct stat stbuf;
+                    int cntr = 0;
+                    size_t readsize;
+                    unsigned char *dumpinfo, *tempptr;
+-                   uint32  ucFilename;
+-                   uint32 uLinenum;
+-                   uint32 uPCAddr;
+-                   uint32 uResetReason;
+-                   uint32 uBuildVersion;
+-                   uint32 uReserved;
++                   uint32_t  ucFilename;
++                   uint32_t uLinenum;
++                   uint32_t uPCAddr;
++                   uint32_t uResetReason;
++                   uint32_t uBuildVersion;
+                    dumpFd = -1;
+                    int i = 0;
+                    char filenameBuf [CRASH_SOURCE_FILE_PATH_LEN];
+@@ -1426,15 +1447,18 @@ skip_crashdump:
+          }
+          break;
+ 
++#ifndef CSP_BUILD
+          case LOG_BT_MESSAGE_TYPE_PACKET:
+            send_cntlr_log(eventBuf, length);
+          break;
++#endif
+ 
+          default:
+            ALOGI("%s: Unexpected message type - %#x", __func__, eventBuf[4]);
+          break;
+       }
+     }
++#ifndef CSP_BUILD
+     else
+     {
+       //Event for regular vendor specific command
+@@ -1446,9 +1470,13 @@ skip_crashdump:
+     //Event for HCI command.
+     //Packet type is not required. Ignoring 1st byte.
+     send_log(&eventBuf[1], length-1, LOG_BT_HCI_EV_C);
++#endif
+   }
+ }
+ 
++#ifdef DIAG_ENABLED
++#ifdef LOG_BT_ENABLE
++
+ static void send_str_log(uint8 *strBuf)
+ {
+   switch(strBuf[8])
+@@ -1694,11 +1722,8 @@ void *ssr_bt_handle(void *req_pkt, uint16 pkt_len)
+     }
+     return rsp;
+ }
+-
+-bool is_crashdump_enabled(void)
+-{
+-    return enable_crashdump;
+-}
++#endif
++#endif//DIAG_ENABLED
+ 
+ static char *get_reset_reason_str(Reset_reason_e reason)
+ {
+@@ -1708,13 +1733,13 @@ static char *get_reset_reason_str(Reset_reason_e reason)
+             return reset_reason[i].reasonStr;
+     return NULL;
+ }
+-#endif
+-#endif//DIAG_ENABLED
+ 
+-int bt_ssr_level ()
++int bt_ssr_level(void)
+ {
+    char value[PROPERTY_VALUE_MAX] = {'\0'};
+    int soc_type = get_bt_soc_type();
++
++   (void)soc_type;
+ #ifdef ENABLE_DBG_FLAGS
+    char* default_value = (soc_type == BT_SOC_CHEROKEE) ? "1" : "3";
+ #else
+@@ -1737,8 +1762,13 @@ int get_dump_index()
+     /* Scan for present crash dump file */
+     for (inx_scan= 0; inx_scan<MAX_CRASH_DUMP_COUNT;inx_scan++)
+     {
++#ifdef CSP_BUILD
++        snprintf(path, RING_BUF_PATH_BUF_SIZE, "%s/%.02d-bt_fw_crashdump.bin",
++                        RING_BUF_LOG_PATH,inx_scan);
++#else
+         snprintf(path, RING_BUF_PATH_BUF_SIZE, "%s/%.02d-in_ringbuf_logs.txt",
+                         RING_BUF_LOG_PATH,inx_scan);
++#endif
+         ALOGV("%s: try to open file : %s", __func__, path);
+         dumpFd = open(path, O_RDONLY);
+         if(dumpFd < 0 && (errno == ENOENT) ) {
+diff --git a/src/main.c b/src/main.c
+index def920444488..9b8c4fce84b6 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1636,6 +1636,9 @@ int copy_bt_data_to_channel(int src_fd, int dest_fd, unsigned char protocol_byte
+             update_ring_buffer (&g_in_ringbuf, buf, acl_len, &g_in_ringbuf_swap, IN_RING_BUF);
+         }
+ 
++	if (is_crashdump_enabled() && (buf[4] == LOG_BT_MESSAGE_TYPE_MEM_DUMP))
++	    send_btlog_pkt(buf, acl_len, direction);
++
+         if (!g_fwsnoop) {
+             // Log event from controller. Should not be sent to the stack. Free it here.
+             free(buf);
+diff --git a/src/utils.c b/src/utils.c
+index e9c7aa858675..700e4498fbb8 100644
+--- a/src/utils.c
++++ b/src/utils.c
+@@ -16,10 +16,13 @@ Description
+ #include "osi/include/properties.h"
+ #endif
+ #include <strings.h>
++#include "main.h"
+ #include "utils.h"
+ #include "wcnss_ibs.h"
+ 
++#ifndef LOG_TAG
+ #define LOG_TAG "WCNSS_FILTER/utils.c"
++#endif
+ 
+ /** Get Bluetooth SoC type from system setting */
+ int get_bt_soc_type()
+-- 
+2.7.4
+

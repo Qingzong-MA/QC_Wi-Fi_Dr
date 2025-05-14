@@ -1,0 +1,10 @@
+<config>
+  <image_tree>
+    <name>CHSS.LEA_COL.1.0</name>
+    <build_id>CHSS.LEA_COL.1.0-00012-QCALEACOLZ-2</build_id>
+    <branch_point_revision/>
+    <revision>00012</revision>
+    <spin>2</spin>
+    <client>QCALEACOLZ</client>
+  </image_tree>
+</config>

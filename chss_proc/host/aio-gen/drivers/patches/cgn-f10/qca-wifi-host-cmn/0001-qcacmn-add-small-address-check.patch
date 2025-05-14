@@ -1,0 +1,143 @@
+From 6b27385fdf142bf25f7973dcd04ba298266b2669 Mon Sep 17 00:00:00 2001
+From: Shi Hong <quic_hongsh@quicinc.com>
+Date: Tue, 16 Apr 2024 14:15:30 +0800
+Subject: [PATCH] qcacmn: add small address check
+
+HW doesn't not allow dma address<0x2000. Add physical address check for
+skb and dma memory.
+
+Signed-off-by: Hong Shi <quic_hongsh@quicinc.com>
+---
+ qdf/inc/qdf_nbuf.h       |  4 ++++
+ qdf/linux/src/qdf_nbuf.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
+
+diff --git a/qdf/inc/qdf_nbuf.h b/qdf/inc/qdf_nbuf.h
+index 6bdfa05..3eb8ca1 100644
+--- a/qdf/inc/qdf_nbuf.h
++++ b/qdf/inc/qdf_nbuf.h
+@@ -1302,6 +1302,10 @@ qdf_nbuf_set_send_complete_flag(qdf_nbuf_t buf, bool flag)
+ 	__qdf_nbuf_set_send_complete_flag(buf, flag);
+ }
+ 
++void qdf_nbuf_invalid_nbuf_queue_init(void);
++void qdf_nbuf_invalid_nbuf_queue_deinit(void);
++void qdf_nbuf_invalid_nbuf_queue_add(qdf_nbuf_t buf);
++
+ #define QDF_NBUF_QUEUE_WALK_SAFE(queue, var, tvar)	\
+ 		__qdf_nbuf_queue_walk_safe(queue, var, tvar)
+ 
+diff --git a/qdf/linux/src/qdf_nbuf.c b/qdf/linux/src/qdf_nbuf.c
+index 44ea418..377becc 100644
+--- a/qdf/linux/src/qdf_nbuf.c
++++ b/qdf/linux/src/qdf_nbuf.c
+@@ -118,6 +118,7 @@ struct qdf_track_timer {
+ };
+ 
+ static struct qdf_track_timer alloc_track_timer;
++static qdf_nbuf_queue_t invalid_nbuf_queue;
+ 
+ #define QDF_NBUF_ALLOC_EXPIRE_TIMER_MS  5000
+ #define QDF_NBUF_ALLOC_EXPIRE_CNT_THRESHOLD  50
+@@ -275,6 +276,27 @@ void qdf_nbuf_set_state(qdf_nbuf_t nbuf, uint8_t current_state)
+ }
+ qdf_export_symbol(qdf_nbuf_set_state);
+ 
++void qdf_nbuf_invalid_nbuf_queue_init(void)
++{
++       qdf_nbuf_queue_init(&invalid_nbuf_queue);
++}
++
++void qdf_nbuf_invalid_nbuf_queue_deinit(void)
++{
++       qdf_nbuf_t buf = NULL;
++
++       qdf_err("invalid nbuf to free:%u", qdf_nbuf_queue_len(&invalid_nbuf_queue));
++       while ((buf = qdf_nbuf_queue_remove(&invalid_nbuf_queue)) != NULL) {
++               if (qdf_likely(buf))
++                       dev_kfree_skb_any(buf);
++       }
++}
++
++void qdf_nbuf_invalid_nbuf_queue_add(struct sk_buff *skb)
++{
++       qdf_nbuf_queue_add(&invalid_nbuf_queue, skb);
++}
++
+ #ifdef FEATURE_NBUFF_REPLENISH_TIMER
+ /**
+  * __qdf_nbuf_start_replenish_timer() - Start alloc fail replenish timer
+@@ -577,6 +599,7 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
+ {
+ 	struct sk_buff *skb;
+ 	int flags = GFP_KERNEL;
++	uint32_t lowmem_alloc_tries = 0;
+ 
+ 	if (align)
+ 		size += (align - 1);
+@@ -584,6 +607,7 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
+ 	if (in_interrupt() || irqs_disabled() || in_atomic())
+ 		flags = GFP_ATOMIC;
+ 
++realloc:
+ 	skb =  alloc_skb(size, flags);
+ 
+ 	if (skb)
+@@ -601,6 +625,18 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
+ 	__qdf_nbuf_stop_replenish_timer();
+ 
+ skb_alloc:
++        if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
++                lowmem_alloc_tries++;
++               qdf_nofl_err("small address allocated, realloc");
++               qdf_nbuf_invalid_nbuf_queue_add(skb);
++                if (lowmem_alloc_tries > 100) {
++                        qdf_nofl_err("NBUF alloc failed %zuB @ %s:%d",
++                                     size, func, line);
++                        return NULL;
++                } else {
++                        goto realloc;
++                }
++        }
+ 	qdf_nbuf_set_defaults(skb, align, reserve);
+ 
+ 	return skb;
+@@ -617,6 +653,7 @@ struct sk_buff *__qdf_nbuf_frag_alloc(qdf_device_t osdev, size_t size,
+ 	struct sk_buff *skb;
+ 	int flags = GFP_KERNEL & ~__GFP_DIRECT_RECLAIM;
+ 	bool atomic = false;
++	uint32_t lowmem_alloc_tries = 0;
+ 
+ 	if (align)
+ 		size += (align - 1);
+@@ -635,6 +672,7 @@ struct sk_buff *__qdf_nbuf_frag_alloc(qdf_device_t osdev, size_t size,
+ #endif
+ 	}
+ 
++realloc:
+ 	skb = __netdev_alloc_skb(NULL, size, flags);
+ 	if (skb)
+ 		goto skb_alloc;
+@@ -659,6 +697,19 @@ struct sk_buff *__qdf_nbuf_frag_alloc(qdf_device_t osdev, size_t size,
+ 	__qdf_nbuf_stop_replenish_timer();
+ 
+ skb_alloc:
++        if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
++                lowmem_alloc_tries++;
++               qdf_nofl_err("small address allocated, realloc");
++               qdf_nbuf_invalid_nbuf_queue_add(skb);
++                if (lowmem_alloc_tries > 100) {
++                        qdf_nofl_err("NBUF alloc failed %zuB @ %s:%d",
++                                     size, func, line);
++                        return NULL;
++                } else {
++                        goto realloc;
++                }
++        }
++
+ 	qdf_nbuf_set_defaults(skb, align, reserve);
+ 
+ 	return skb;
+-- 
+2.7.4
+
