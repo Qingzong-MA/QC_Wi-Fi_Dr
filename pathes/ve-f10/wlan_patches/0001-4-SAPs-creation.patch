@@ -1,0 +1,236 @@
+From b2afd46a9d4cd005dd13a1246dd01bd8ab2c8b64 Mon Sep 17 00:00:00 2001
+From: "nano.wang" <nano.wang@quectel.com>
+Date: Wed, 4 Jun 2025 10:29:28 +0800
+Subject: [PATCH] 4 SAPs creation
+
+Support 4 SAPs, does not create NAN and P2P interface by default,
+and can ONLY be used on modules that support DBS.
+In addition, the following three configurations also need to be added
+to the qcom_cfg.ini file,
+gEnableNanSupport=1
+gNumVdevs=5
+gMaxConcurrentActiveSessions=4
+
+---
+ .../policy_mgr/inc/wlan_policy_mgr_cfg.h      |  4 +--
+ .../inc/wlan_policy_mgr_public_struct.h       |  4 +++
+ .../policy_mgr/src/wlan_policy_mgr_pcl.c      | 28 ++++++++++++++++++-
+ .../src/wlan_policy_mgr_tables_2x2_dbs_i.h    | 11 ++++++++
+ .../qcacld-3.0/configs/default_defconfig      |  5 ++++
+ .../qcacld-3.0/core/hdd/inc/hdd_config.h      |  4 +--
+ .../core/mac/inc/wlan_tgt_def_config.h        |  2 ++
+ .../qcacld-3.0/core/wma/src/wma_main.c        | 15 +++++-----
+ 8 files changed, 61 insertions(+), 12 deletions(-)
+
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_cfg.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_cfg.h
+index 776d3b179..39634268f 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_cfg.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_cfg.h
+@@ -81,7 +81,7 @@
+  * gMaxConcurrentActiveSessions - Maximum number of concurrent connections.
+  * @Min: 1
+  * @Max: 4
+- * @Default: 3
++ * @Default: 4
+  *
+  * This ini is used to configure the maximum number of concurrent connections.
+  *
+@@ -95,7 +95,7 @@
+  */
+ #define CFG_MAX_CONC_CXNS CFG_INI_UINT(\
+ 					"gMaxConcurrentActiveSessions", \
+-					1, 4, 3, \
++					1, 4, 4, \
+ 					CFG_VALUE_OR_DEFAULT, \
+ 					"Config max num allowed connections")
+ 
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_public_struct.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_public_struct.h
+index f272a5c00..75f7a3e85 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_public_struct.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/inc/wlan_policy_mgr_public_struct.h
+@@ -802,6 +802,8 @@ enum policy_mgr_two_connection_mode {
+  * 5ghz DBS
+  * @PM_NDI_NDI_5_NAN_DISC_24_DBS: Both NDI on 5ghz and NAN Disc on 2.4Ghz DBS
+  * @PM_NDI_NDI_NAN_DISC_24_SMM: Both NDI, NAN Disc on 2.4ghz SMM
++ * @PM_SAP_SAP_SCC_24_SAP_5_DBS: Both SAP on 2.4Ghz and another SAP on 5Ghz DBS
++ * @PM_SAP_SAP_SCC_5_SAP_24_DBS: Both SAP on 5Ghz and another SAP on 2.4Ghz DBS
+  */
+ enum policy_mgr_three_connection_mode {
+ 	PM_STA_SAP_SCC_24_SAP_5_DBS,
+@@ -818,6 +820,8 @@ enum policy_mgr_three_connection_mode {
+ 	PM_NAN_DISC_NDI_24_NDI_5_DBS,
+ 	PM_NDI_NDI_5_NAN_DISC_24_DBS,
+ 	PM_NDI_NDI_NAN_DISC_24_SMM,
++	PM_SAP_SAP_SCC_24_SAP_5_DBS,
++	PM_SAP_SAP_SCC_5_SAP_24_DBS,
+ 
+ 	PM_MAX_THREE_CONNECTION_MODE
+ };
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_pcl.c b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_pcl.c
+index c4fc5733a..57f12067d 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_pcl.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_pcl.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2012-2020 The Linux Foundation. All rights reserved.
++ * Copyright (c) 2021 The Linux Foundation. All rights reserved.
+  *
+  * Permission to use, copy, modify, and/or distribute this software for
+  * any purpose with or without fee is hereby granted, provided that the
+@@ -2085,6 +2085,32 @@ enum policy_mgr_three_connection_mode
+ 			pm_conc_connection_list[list_ndi[0]].freq)) {
+ 			index = PM_NDI_NDI_NAN_DISC_24_SMM;
+ 		}
++	} else if (count_sap == 3) {
++		if (WLAN_REG_IS_SAME_BAND_FREQS(
++			pm_conc_connection_list[list_sap[0]].freq,
++			pm_conc_connection_list[list_sap[1]].freq)) {
++			if (WLAN_REG_IS_24GHZ_CH_FREQ(
++				pm_conc_connection_list[list_sap[2]].freq))
++				index = PM_SAP_SAP_SCC_5_SAP_24_DBS;
++			else
++				index = PM_SAP_SAP_SCC_24_SAP_5_DBS;
++		} else if (WLAN_REG_IS_SAME_BAND_FREQS(
++			pm_conc_connection_list[list_sap[0]].freq,
++			pm_conc_connection_list[list_sap[2]].freq)) {
++			if (WLAN_REG_IS_24GHZ_CH_FREQ(
++				pm_conc_connection_list[list_sap[1]].freq))
++				index = PM_SAP_SAP_SCC_5_SAP_24_DBS;
++			else
++				index = PM_SAP_SAP_SCC_24_SAP_5_DBS;
++		} else if (WLAN_REG_IS_SAME_BAND_FREQS(
++			pm_conc_connection_list[list_sap[1]].freq,
++			pm_conc_connection_list[list_sap[2]].freq)) {
++			if (WLAN_REG_IS_24GHZ_CH_FREQ(
++				pm_conc_connection_list[list_sap[0]].freq))
++				index = PM_SAP_SAP_SCC_5_SAP_24_DBS;
++			else
++				index = PM_SAP_SAP_SCC_24_SAP_5_DBS;
++		}
+ 	}
+ 
+ 	policy_mgr_debug(
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_tables_2x2_dbs_i.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_tables_2x2_dbs_i.h
+index 4d1d96469..2d139bb1b 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_tables_2x2_dbs_i.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/components/cmn_services/policy_mgr/src/wlan_policy_mgr_tables_2x2_dbs_i.h
+@@ -1747,6 +1747,7 @@ pm_third_connection_pcl_dbs_2x2_table = {
+ 	},
+ };
+ 
++#define FOUR_SAP_TEST    1
+ #ifdef FEATURE_FOURTH_CONNECTION
+ /**
+  * fourth_connection_pcl_dbs_table - table which provides PCL for
+@@ -1773,6 +1774,16 @@ fourth_connection_pcl_dbs_table
+ 	[PM_SAP_NDI_SCC_5_NAN_DISC_24_DBS] = {
+ 	[PM_SAP_MODE] = { PM_24G, PM_24G, PM_24G } }
+ };
++#elif defined(FOUR_SAP_TEST)
++const enum policy_mgr_pcl_type
++fourth_connection_pcl_dbs_table
++	[PM_MAX_THREE_CONNECTION_MODE][PM_MAX_NUM_OF_MODE]
++	[PM_MAX_CONC_PRIORITY_MODE] = {
++	[PM_SAP_SAP_SCC_24_SAP_5_DBS] = {
++	[PM_SAP_MODE] = { PM_5G, PM_5G, PM_5G } },
++	[PM_SAP_SAP_SCC_5_SAP_24_DBS] = {
++	[PM_SAP_MODE] = { PM_24G, PM_24G, PM_24G } }
++};
+ #else
+ /**
+  * fourth_connection_pcl_dbs_table - table which provides PCL for
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/configs/default_defconfig b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/configs/default_defconfig
+index 81f12d71b..df6d9bbd3 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/configs/default_defconfig
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/configs/default_defconfig
+@@ -367,6 +367,7 @@ endif
+ ifeq ($(CONFIG_ROME_IF),usb)
+ 	CONFIG_LINUX_QCMBR :=y
+ endif
++CONFIG_QCACLD_FEATURE_NAN := n
+ 
+ 
+ CONFIG_FEATURE_EPPING := y
+@@ -708,6 +709,7 @@ CONFIG_QCOM_ESE := y
+ CONFIG_WLAN_OPEN_P2P_INTERFACE := y
+ CONFIG_WLAN_ENABLE_SOCIAL_CHANNELS_5G_ONLY := y
+ endif
++CONFIG_WLAN_OPEN_P2P_INTERFACE := n
+ 
+ #enable 4addr support for QCS40X
+ ifeq ($(CONFIG_ARCH_QCS40X), y)
+@@ -1251,6 +1253,9 @@ CONFIG_DP_RX_BUFFER_POOL_ALLOC_THRES := 5
+ CONFIG_DP_SWLM := y
+ endif
+ 
++#Enable 4SAPs
++CONFIG_BEACON_TX_OFFLOAD_MAX_VDEV := 4
++
+ #Enable Hang Event
+ CONFIG_WLAN_HANG_EVENT := y
+ 
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/hdd_config.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/hdd_config.h
+index e8974e48f..35af9f8a0 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/hdd_config.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/hdd/inc/hdd_config.h
+@@ -682,7 +682,7 @@ struct dhcp_server {
+  * gNumVdevs - max number of VDEVs supported
+  *
+  * @Min: 0x1
+- * @Max: 0x4
++ * @Max: 0x5
+  * @Default: CFG_TGT_NUM_VDEV
+  *
+  * Usage: External
+@@ -692,7 +692,7 @@ struct dhcp_server {
+ #define CFG_NUM_VDEV_ENABLE CFG_INI_UINT( \
+ 		"gNumVdevs", \
+ 		1, \
+-		4, \
++		5, \
+ 		CFG_TGT_NUM_VDEV, \
+ 		CFG_VALUE_OR_DEFAULT, \
+ 		"Number of VDEVs")
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/inc/wlan_tgt_def_config.h b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/inc/wlan_tgt_def_config.h
+index 9061b42ba..1cd69e4a8 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/inc/wlan_tgt_def_config.h
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/mac/inc/wlan_tgt_def_config.h
+@@ -193,7 +193,9 @@
+ /*
+  * Maximum number of VDEV that beacon tx offload will support
+  */
++#ifndef CFG_TGT_DEFAULT_BEACON_TX_OFFLOAD_MAX_VDEV
+ #define CFG_TGT_DEFAULT_BEACON_TX_OFFLOAD_MAX_VDEV 3
++#endif
+ 
+ /*
+  * number of vdevs that can support tdls
+diff --git a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/wma/src/wma_main.c b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/wma/src/wma_main.c
+index ae313baf5..8a17cb7ec 100755
+--- a/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/wma/src/wma_main.c
++++ b/chss_host_LEA/chss_proc/host/AIO/drivers/qcacld-3.0/core/wma/src/wma_main.c
+@@ -6815,13 +6815,14 @@ int wma_rx_service_ready_ext_event(void *handle, uint8_t *event,
+ 	 * indicate 3 vdevs and firmware shall add 1 vdev for NAN. So decrement
+ 	 * the num_vdevs by 1.
+ 	 */
+-
+-	if (ucfg_nan_is_vdev_creation_allowed(wma_handle->psoc) ||
+-	    QDF_GLOBAL_FTM_MODE == cds_get_conparam()) {
+-		wlan_res_cfg->nan_separate_iface_support = true;
+-	} else {
+-		wlan_res_cfg->num_vdevs--;
+-		wma_update_num_peers_tids(wma_handle, wlan_res_cfg);
++	if (wmi_service_enabled(wma_handle->wmi_handle, wmi_service_nan)) {
++		if (ucfg_nan_is_vdev_creation_allowed(wma_handle->psoc) ||
++			QDF_GLOBAL_FTM_MODE == cds_get_conparam()) {
++			wlan_res_cfg->nan_separate_iface_support = true;
++		} else {
++			wlan_res_cfg->num_vdevs--;
++			wma_update_num_peers_tids(wma_handle, wlan_res_cfg);
++		}
+ 	}
+ 
+ 	if ((ucfg_pkt_capture_get_mode(wma_handle->psoc) !=
+-- 
+2.17.1
+
