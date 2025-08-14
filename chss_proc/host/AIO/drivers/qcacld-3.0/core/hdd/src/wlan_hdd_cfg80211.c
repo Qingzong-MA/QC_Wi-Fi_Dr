@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -14899,6 +14899,10 @@ __wlan_hdd_cfg80211_wifi_configuration_set(struct wiphy *wiphy,
 			return -EINVAL;
 		}
 		link_info = hdd_get_link_info_by_link_id(adapter, link_id);
+		if (!link_info) {
+			hdd_err("invalid link_info");
+			return -EINVAL;
+		}
 	}
 
 	ret = hdd_set_independent_configuration(link_info, tb);
@@ -16644,7 +16648,9 @@ static int __wlan_hdd_cfg80211_wifi_logger_get_ring_data(struct wiphy *wiphy,
 			return -EINVAL;
 		}
 
-		wlan_set_chipset_stats_bit();
+		wlan_set_chipset_stats_bit(
+				hdd_ctx->is_drv_dump_in_progress_valid,
+				hdd_ctx->dump_in_progress);
 
 		status = wlan_logging_wait_for_flush_log_completion();
 		if (!QDF_IS_STATUS_SUCCESS(status)) {
@@ -25214,7 +25220,17 @@ static void wlan_hdd_update_iface_combination(struct hdd_context *hdd_ctx,
 		    wlan_hdd_is_sap_sta_nan_concurrency_present(i))
 			continue;
 
-		if (sap_sta_nan_concurrency) {
+		/**
+		 * Enabling sap_sta_nan_concurrency will remove existing
+		 * STA + NAN and SAP + NAN configurations.
+		 * For non-DBS cases, it will not add STA + SAP + NAN
+		 * as the interface count exceeds two.
+		 * However, it will still remove STA + NAN and SAP + NAN.
+		 * Below check is to prevent removing STA + NAN and SAP + NAN
+		 * if non-DBS is present.
+		 */
+		if (sap_sta_nan_concurrency &&
+		    ucfg_policy_mgr_is_fw_supports_dbs(psoc)) {
 			/* remove STA NAN concurrency */
 			if (wlan_hdd_is_sta_nan_concurrency_present(
 					wlan_hdd_iface_combination, i))
@@ -25720,6 +25736,10 @@ static int __wlan_hdd_cfg80211_change_bss(struct wiphy *wiphy,
 	link_id = hdd_nb_get_link_id_from_params(params, NB_CHANGE_BSS);
 
 	link_info = hdd_get_link_info_by_link_id(adapter, link_id);
+	if (!link_info) {
+		hdd_err("invalid link_info");
+		return -EINVAL;
+	}
 
 	if (wlan_hdd_validate_vdev_id(link_info->vdev_id))
 		return -EINVAL;
@@ -26874,7 +26894,7 @@ wlan_hdd_add_vlan(struct wlan_objmgr_vdev *vdev, struct sap_context *sap_ctx,
 #ifdef WLAN_FEATURE_11BE_MLO_ADV_FEATURE
 static void wlan_hdd_mlo_link_add_pairwise_key(struct wlan_objmgr_vdev *vdev,
 					       struct hdd_context *hdd_ctx,
-					       u8 key_index, bool pairwise,
+					       u8 key_index,
 					       struct key_params *params)
 {
 	struct mlo_link_info *mlo_link_info;
@@ -26886,15 +26906,12 @@ static void wlan_hdd_mlo_link_add_pairwise_key(struct wlan_objmgr_vdev *vdev,
 		if (qdf_is_macaddr_zero(&mlo_link_info->ap_link_addr) ||
 		    mlo_link_info->link_id == 0xFF)
 			continue;
-			hdd_debug(" Add pairwise key link id  %d ",
-				  mlo_link_info->link_id);
-			wlan_cfg80211_store_link_key(
-				hdd_ctx->psoc, key_index,
-				(pairwise ? WLAN_CRYPTO_KEY_TYPE_UNICAST :
-				WLAN_CRYPTO_KEY_TYPE_GROUP),
-				(uint8_t *)mlo_link_info->ap_link_addr.bytes,
-				params, &mlo_link_info->link_addr,
-				mlo_link_info->link_id);
+		hdd_debug("Add key link id %d", mlo_link_info->link_id);
+		wlan_cfg80211_store_link_key(hdd_ctx->psoc, key_index,
+					     WLAN_CRYPTO_KEY_TYPE_UNICAST,
+					     (uint8_t *)&mlo_link_info->ap_link_addr,
+					     params, &mlo_link_info->link_addr,
+					     mlo_link_info->link_id);
 	}
 }
 
@@ -26930,7 +26947,7 @@ wlan_hdd_mlo_defer_set_keys(struct hdd_adapter *adapter,
 
 static void wlan_hdd_mlo_link_add_pairwise_key(struct wlan_objmgr_vdev *vdev,
 					       struct hdd_context *hdd_ctx,
-					       u8 key_index, bool pairwise,
+					       u8 key_index,
 					       struct key_params *params)
 {
 }
@@ -26943,6 +26960,52 @@ wlan_hdd_mlo_defer_set_keys(struct hdd_adapter *adapter,
 	return false;
 }
 
+#endif
+
+#ifdef WLAN_FEATURE_11BE_MLO
+static
+bool hdd_mlo_vdev_allow_pairwise_without_peer(struct wlan_objmgr_vdev *vdev,
+					      struct qdf_mac_addr *peer_mac,
+					      enum wlan_peer_type *peer_type)
+{
+	uint8_t link_id;
+	struct mlo_link_info *mlo_info;
+
+	/*
+	 * If peer is not found, then it may be due to either peer is
+	 * deleted or is not yet created.
+	 *
+	 * Peer not found is handled gracefully only for BSS peer type
+	 * of link VDEV. For any other peer types or for assoc VDEV,
+	 * peer needs to be present to proceed for key install.
+	 */
+	if (!wlan_vdev_mlme_is_mlo_link_vdev(vdev))
+		return false;
+
+	link_id = wlan_vdev_get_link_id(vdev);
+	mlo_info = mlo_mgr_get_ap_link_by_link_id(vdev->mlo_dev_ctx, link_id);
+	if (!mlo_info) {
+		hdd_debug("MLO link info not found for link id %d", link_id);
+		return false;
+	} else if (!qdf_is_macaddr_equal(&mlo_info->ap_link_addr, peer_mac)) {
+		hdd_err(QDF_MAC_ADDR_FMT " non BSS peer is not found",
+			QDF_MAC_ADDR_REF(peer_mac->bytes));
+		return false;
+	}
+
+	hdd_debug("UC key install for partner VDEV BSS peer");
+	*peer_type = WLAN_PEER_AP;
+
+	return true;
+}
+#else
+static inline
+bool hdd_mlo_vdev_allow_pairwise_without_peer(struct wlan_objmgr_vdev *vdev,
+					      struct qdf_mac_addr *peer_mac,
+					      enum wlan_peer_type *peer_type)
+{
+	return false;
+}
 #endif
 
 static int wlan_hdd_add_key_vdev(mac_handle_t mac_handle,
@@ -27012,31 +27075,58 @@ static int wlan_hdd_add_key_vdev(mac_handle_t mac_handle,
 				return -EINVAL;
 			}
 			qdf_mem_copy(mac_address.bytes,
-				     wlan_peer_get_macaddr(peer), QDF_MAC_ADDR_SIZE);
+				     wlan_peer_get_macaddr(peer),
+				     QDF_MAC_ADDR_SIZE);
 			wlan_objmgr_peer_release_ref(peer, WLAN_OSIF_ID);
 		}
-	} else {
-		if (mac_addr)
-			qdf_mem_copy(mac_address.bytes,
-				     mac_addr,
-				     QDF_MAC_ADDR_SIZE);
+	} else if (mac_addr) {
+		qdf_mem_copy(mac_address.bytes, mac_addr, QDF_MAC_ADDR_SIZE);
 	}
 
 done:
 	wlan_hdd_mlo_link_free_keys(hdd_ctx->psoc, adapter, vdev, pairwise);
 	if (pairwise && adapter->device_mode == QDF_STA_MODE &&
-	    wlan_vdev_mlme_is_mlo_vdev(vdev) &&
-	    !wlan_vdev_mlme_is_tdls_vdev(vdev)) {
-		wlan_hdd_mlo_link_add_pairwise_key(vdev, hdd_ctx, key_index,
-						   pairwise, params);
+	    wlan_vdev_mlme_is_mlo_vdev(vdev)) {
+		enum wlan_peer_type peer_type;
 
+		peer = wlan_objmgr_get_peer_by_mac(hdd_ctx->psoc,
+						   mac_address.bytes,
+						   WLAN_OSIF_ID);
+		if (peer) {
+			peer_type = wlan_peer_get_peer_type(peer);
+			wlan_objmgr_peer_release_ref(peer, WLAN_OSIF_ID);
+		} else if (!hdd_mlo_vdev_allow_pairwise_without_peer(vdev,
+								     &mac_address,
+								     &peer_type)) {
+			return -EINVAL;
+		}
+
+		hdd_debug("Peer type %d", peer_type);
+		switch (peer_type) {
+		case WLAN_PEER_AP:
+			wlan_hdd_mlo_link_add_pairwise_key(vdev, hdd_ctx,
+							   key_index, params);
+			break;
+		case WLAN_PEER_TDLS:
+			if (!ucfg_tdls_is_key_install_allowed(vdev,
+							      &mac_address)) {
+				hdd_debug("TDLS peer's key install disallowed");
+				return 0;
+			}
+			fallthrough;
+		default:
+			errno = wlan_cfg80211_store_key(vdev, key_index,
+							WLAN_CRYPTO_KEY_TYPE_UNICAST,
+							mac_address.bytes,
+							params);
+			break;
+		}
 	} else {
-		errno = wlan_cfg80211_store_key(
-					vdev, key_index,
-					(pairwise ?
-					WLAN_CRYPTO_KEY_TYPE_UNICAST :
-					WLAN_CRYPTO_KEY_TYPE_GROUP),
-					mac_address.bytes, params);
+		errno = wlan_cfg80211_store_key(vdev, key_index,
+						(pairwise ?
+						 WLAN_CRYPTO_KEY_TYPE_UNICAST :
+						 WLAN_CRYPTO_KEY_TYPE_GROUP),
+						mac_address.bytes, params);
 	}
 
 	if (wlan_hdd_mlo_defer_set_keys(adapter, vdev, &mac_address))
@@ -28693,6 +28783,10 @@ static int __wlan_hdd_set_txq_params(struct wiphy *wiphy,
 
 	link_id = hdd_nb_get_link_id_from_params(params, NB_SET_TXQ);
 	link_info = hdd_get_link_info_by_link_id(adapter, link_id);
+	if (!link_info) {
+		hdd_err("invalid link_info");
+		return -EINVAL;
+	}
 
 	status = sme_update_session_txq_edca_params(mac_handle,
 						    link_info->vdev_id,
@@ -28848,6 +28942,8 @@ QDF_STATUS hdd_softap_deauth_current_sta(struct wlan_hdd_link_info *link_info,
 		hdd_debug("Vdev %d STA removal failed for " QDF_MAC_ADDR_FMT,
 			  link_info->vdev_id,
 			  QDF_MAC_ADDR_REF(sta_info->sta_mac.bytes));
+		if (qdf_status == QDF_STATUS_E_ALREADY)
+			return QDF_STATUS_SUCCESS;
 		return QDF_STATUS_E_NOENT;
 	}
 	return QDF_STATUS_SUCCESS;
@@ -30796,7 +30892,7 @@ int wlan_hdd_change_hw_mode_for_given_chnl(struct hdd_adapter *adapter,
  * Return: 0 success or error code on failure.
  */
 static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
-				       struct cfg80211_chan_def *chandef)
+					  struct cfg80211_chan_def *chandef)
 {
 	struct hdd_context *hdd_ctx = wiphy_priv(wiphy);
 	struct hdd_adapter *adapter;
@@ -30956,7 +31052,23 @@ static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
 	return 0;
 }
 
-/**
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 13, 0))
+/*
+ * wlan_hdd_cfg80211_set_mon_ch() - Set monitor mode capture channel
+ * @wiphy: Handle to struct wiphy to get handle to module context.
+ * @dev: Pointer to network device
+ * @chandef: Contains information about the capture channel to be set.
+ *
+ * This interface is called if and only if monitor mode interface alone is
+ * active.
+ *
+ * Return: 0 success or error code on failure.
+ */
+static int wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
+					struct net_device *dev,
+					struct cfg80211_chan_def *chandef)
+#else
+/*
  * wlan_hdd_cfg80211_set_mon_ch() - Set monitor mode capture channel
  * @wiphy: Handle to struct wiphy to get handle to module context.
  * @chandef: Contains information about the capture channel to be set.
@@ -30967,7 +31079,8 @@ static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
  * Return: 0 success or error code on failure.
  */
 static int wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
-				       struct cfg80211_chan_def *chandef)
+					struct cfg80211_chan_def *chandef)
+#endif
 {
 	struct osif_psoc_sync *psoc_sync;
 	int errno;
@@ -33725,11 +33838,6 @@ static void __wlan_hdd_cfg80211_update_mgmt_frame_registrations(
 
 	hdd_debug("Mode: %d, set mgmt regis update value 0x%x",
 		  adapter->device_mode, upd->interface_stypes);
-
-	if (adapter->device_mode == QDF_P2P_DEVICE_MODE)
-		ucfg_p2p_set_mgmt_frm_registration_update(
-						hdd_ctx->psoc,
-						upd->interface_stypes);
 }
 
 /**

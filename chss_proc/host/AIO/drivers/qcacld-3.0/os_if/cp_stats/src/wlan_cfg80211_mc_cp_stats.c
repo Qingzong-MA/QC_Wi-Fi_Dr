@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1564,22 +1564,28 @@ station_adv_stats_cb_fail:
 }
 
 struct stats_event *
-wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
-					 const uint8_t *mac_addr,
-					 int *errno)
+wlan_cfg80211_mc_cp_stats_get_peer_stats_ext(struct wlan_objmgr_vdev *vdev,
+					     const uint8_t *mac_addr,
+					     int *errno)
 {
 	void *cookie;
 	QDF_STATUS status;
 	struct stats_event *priv, *out;
 	struct osif_request *request;
 	struct request_info info = {0};
+	bool pending;
+	struct wlan_objmgr_psoc *psoc = NULL;
 	static const struct osif_request_params params = {
 		.priv_size = sizeof(*priv),
 		.timeout_ms = 2 * CP_STATS_WAIT_TIME_STAT,
 		.dealloc = wlan_cfg80211_mc_cp_stats_dealloc,
 	};
 
-	osif_debug("Enter");
+	psoc = wlan_vdev_get_psoc(vdev);
+	if (!psoc) {
+		osif_err("Failed to get psoc");
+		return NULL;
+	}
 
 	out = qdf_mem_malloc(sizeof(*out));
 	if (!out) {
@@ -1613,6 +1619,8 @@ wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
 	*errno = osif_request_wait_for_response(request);
 	if (*errno) {
 		osif_err("wait failed or timed out ret: %d", *errno);
+		ucfg_mc_cp_stats_reset_pending_req(psoc, TYPE_PEER_STATS_INFO_EXT,
+						   &info, &pending);
 		goto get_peer_stats_fail;
 	}
 
@@ -1629,6 +1637,36 @@ wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
 	out->peer_stats_info_ext = priv->peer_stats_info_ext;
 	priv->peer_stats_info_ext = NULL;
 	osif_request_put(request);
+	return out;
+
+get_peer_stats_fail:
+	osif_request_put(request);
+	wlan_cfg80211_mc_cp_stats_free_stats_event(out);
+
+	return NULL;
+}
+
+struct stats_event *
+wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
+					 const uint8_t *mac_addr,
+					 int *errno)
+{
+	void *cookie;
+	QDF_STATUS status;
+	struct stats_event *priv, *out;
+	struct osif_request *request;
+	struct request_info info = {0};
+	static const struct osif_request_params params = {
+		.priv_size = sizeof(*priv),
+		.timeout_ms = 2 * CP_STATS_WAIT_TIME_STAT,
+		.dealloc = wlan_cfg80211_mc_cp_stats_dealloc,
+	};
+
+	out = wlan_cfg80211_mc_cp_stats_get_peer_stats_ext(vdev,
+							   mac_addr,
+							   errno);
+	if (*errno)
+		return NULL;
 
 	request = osif_request_alloc(&params);
 	if (!request) {
@@ -1642,6 +1680,7 @@ wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
 	info.cookie = cookie;
 	info.u.get_station_stats_cb = get_station_adv_stats_cb;
 
+	qdf_mem_copy(info.peer_mac_addr, mac_addr, QDF_MAC_ADDR_SIZE);
 	status = ucfg_mc_cp_stats_send_stats_request(vdev, TYPE_STATION_STATS,
 						     &info);
 	if (QDF_IS_STATUS_ERROR(status)) {
@@ -1665,13 +1704,10 @@ wlan_cfg80211_mc_cp_stats_get_peer_stats(struct wlan_objmgr_vdev *vdev,
 	out->peer_adv_stats = priv->peer_adv_stats;
 	priv->peer_adv_stats = NULL;
 	osif_request_put(request);
-	osif_debug("Exit");
 	return out;
 get_peer_stats_fail:
 	osif_request_put(request);
 	wlan_cfg80211_mc_cp_stats_free_stats_event(out);
-
-	osif_debug("Exit");
 
 	return NULL;
 }

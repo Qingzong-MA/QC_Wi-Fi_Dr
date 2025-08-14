@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  * SPDX-License-Identifier: ISC
  */
 
@@ -60,7 +60,8 @@ enum cstats_types {
 
 struct cstats_tx_rx_ops {
 	int (*cstats_send_data_to_usr)(char *buff, unsigned int len,
-				       enum cstats_types type);
+				       enum cstats_types type,
+				       bool is_logging_enable);
 };
 
 struct cstats_node {
@@ -80,10 +81,14 @@ struct chipset_stats {
 	struct cstats_node *ccur_node[CSTATS_MAX_TYPE];
 	unsigned int cstat_drop_cnt[CSTATS_MAX_TYPE];
 
+	size_t chipset_stats_push_rbs_delay_val_ms;
+	size_t chipset_stats_push_rbs_delay_interval;
+
 	/* Dont move filled list nodes to free list after flush to user space */
 	bool cstats_no_flush[CSTATS_MAX_TYPE];
 	struct cstats_tx_rx_ops ops;
 	bool is_cstats_ini_enabled;
+	bool is_cp_stats_debug_logging_enable;
 };
 
 #define wlan_cstats_fw_stats(len, buf) \

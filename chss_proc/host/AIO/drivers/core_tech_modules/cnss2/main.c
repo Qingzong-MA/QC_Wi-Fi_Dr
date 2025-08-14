@@ -342,6 +342,7 @@ void cnss_get_qrtr_info(struct cnss_plat_data *plat_priv)
 
 #endif
 
+#ifndef CONFIG_CNSS2_X86
 void cnss_get_sleep_clk_supported(struct cnss_plat_data *plat_priv)
 {
 	plat_priv->sleep_clk = of_property_read_bool(plat_priv->dev_node,
@@ -349,6 +350,16 @@ void cnss_get_sleep_clk_supported(struct cnss_plat_data *plat_priv)
 	cnss_pr_dbg("qcom,sleep-clk-support is %d\n",
 		    plat_priv->sleep_clk);
 }
+#else
+void cnss_get_sleep_clk_supported(struct cnss_plat_data *plat_priv)
+{
+#ifdef CNSS2_SLEEP_CLK
+	plat_priv->sleep_clk = CNSS2_SLEEP_CLK;
+	cnss_pr_err("qcom,sleep-clk-support is %d\n",
+		    plat_priv->sleep_clk);
+#endif
+}
+#endif
 
 void cnss_get_bwscal_info(struct cnss_plat_data *plat_priv)
 {
@@ -565,6 +576,7 @@ int cnss_get_feature_list(struct cnss_plat_data *plat_priv,
 	return 0;
 }
 
+#ifndef CONFIG_CNSS2_X86
 size_t cnss_get_platform_name(struct cnss_plat_data *plat_priv,
 			      char *buf, const size_t buf_len)
 {
@@ -593,6 +605,23 @@ size_t cnss_get_platform_name(struct cnss_plat_data *plat_priv,
 
 	return 0;
 }
+#else
+size_t cnss_get_platform_name(struct cnss_plat_data *plat_priv,
+			      char *buf, const size_t buf_len)
+{
+	size_t model_len = 0;
+
+	if (unlikely(!buf || !buf_len))
+		return 0;
+
+#ifdef CNSS2_PLATFORM_NAME
+	model_len = strlcpy(buf, CNSS2_PLATFORM_NAME, buf_len);
+	cnss_pr_dbg("Platform name: %s (%zu)\n", buf, model_len);
+#endif
+
+	return model_len;
+}
+#endif
 
 void cnss_pm_stay_awake(struct cnss_plat_data *plat_priv)
 {
@@ -4506,7 +4535,6 @@ static ssize_t recovery_show(struct device *dev,
 	return curr_len;
 }
 
-#ifndef CONFIG_CNSS2_X86
 static ssize_t tme_opt_file_download_show(struct device *dev,
 			     struct device_attribute *attr, char *buf)
 {
@@ -4523,7 +4551,6 @@ static ssize_t tme_opt_file_download_show(struct device *dev,
 	curr_len += buf_written;
 	return curr_len;
 }
-#endif
 
 static ssize_t time_sync_period_show(struct device *dev,
 				     struct device_attribute *attr,
@@ -4782,7 +4809,6 @@ static ssize_t qdss_conf_download_store(struct device *dev,
 	return count;
 }
 
-#ifndef CONFIG_CNSS2_X86
 static ssize_t tme_opt_file_download_store(struct device *dev,
 					struct device_attribute *attr,
 					const char *buf, size_t count)
@@ -4799,7 +4825,8 @@ static ssize_t tme_opt_file_download_store(struct device *dev,
 		return 0;
 	}
 
-	if (plat_priv->device_id == PEACH_DEVICE_ID &&
+	if ((plat_priv->device_id == PEACH_DEVICE_ID ||
+	    plat_priv->device_id == COLOGNE_DEVICE_ID) &&
 	    cnss_bus_runtime_pm_get_sync(plat_priv) < 0)
 		goto runtime_pm_put;
 
@@ -4817,11 +4844,11 @@ static ssize_t tme_opt_file_download_store(struct device *dev,
 	cnss_pr_dbg("Received tme_opt_file_download indication cmd: %s\n", cmd);
 
 runtime_pm_put:
-	if (plat_priv->device_id == PEACH_DEVICE_ID)
+	if (plat_priv->device_id == PEACH_DEVICE_ID ||
+	    plat_priv->device_id == COLOGNE_DEVICE_ID)
 		cnss_bus_runtime_pm_put(plat_priv);
 	return count;
 }
-#endif
 
 static ssize_t hw_trace_override_store(struct device *dev,
 				       struct device_attribute *attr,
@@ -4864,10 +4891,10 @@ static DEVICE_ATTR_WO(qdss_trace_stop);
 static DEVICE_ATTR_WO(qdss_conf_download);
 static DEVICE_ATTR_WO(hw_trace_override);
 static DEVICE_ATTR_RW(time_sync_period);
+static DEVICE_ATTR_RW(tme_opt_file_download);
 #ifndef CONFIG_CNSS2_X86
 static DEVICE_ATTR_WO(shutdown);
 static DEVICE_ATTR_WO(enable_hds);
-static DEVICE_ATTR_RW(tme_opt_file_download);
 static DEVICE_ATTR_WO(charger_mode);
 #endif
 
@@ -4879,10 +4906,10 @@ static struct attribute *cnss_attrs[] = {
 	&dev_attr_qdss_conf_download.attr,
 	&dev_attr_hw_trace_override.attr,
 	&dev_attr_time_sync_period.attr,
+	&dev_attr_tme_opt_file_download.attr,
 #ifndef CONFIG_CNSS2_X86
 	&dev_attr_shutdown.attr,
 	&dev_attr_enable_hds.attr,
-	&dev_attr_tme_opt_file_download.attr,
 	&dev_attr_charger_mode.attr,
 #endif
 	NULL,
@@ -5186,8 +5213,22 @@ static void cnss_sram_dump_init(struct cnss_plat_data *plat_priv)
 static void cnss_sram_dump_init(struct cnss_plat_data *plat_priv)
 {
 	if (plat_priv->device_id == QCA6490_DEVICE_ID &&
-	    cnss_get_host_build_type() == QMI_HOST_BUILD_TYPE_PRIMARY_V01)
-		plat_priv->sram_dump = kcalloc(SRAM_DUMP_SIZE, 1, GFP_KERNEL);
+	    cnss_get_host_build_type() == QMI_HOST_BUILD_TYPE_PRIMARY_V01) {
+		plat_priv->sram_dump_start_addr = SRAM_START;
+		plat_priv->sram_dump_size = SRAM_DUMP_SIZE;
+	} else if (plat_priv->device_id == PEACH_DEVICE_ID) {
+		plat_priv->sram_dump_start_addr = SRAM_START;
+		plat_priv->sram_dump_size = PEACH_SRAM_SIZE;
+	} else if (plat_priv->device_id == COLOGNE_DEVICE_ID) {
+		plat_priv->sram_dump_start_addr = SRAM_START;
+		plat_priv->sram_dump_size = COLOGNE_SRAM_SIZE;
+	}
+
+	/* Postpone sram_dump allocation to when it is required.
+	 *
+	 * Now it is allocated in cnss_pci_dump_sram() for PCI, and only freed
+	 * in cnss_sram_dump_deinit().
+	 */
 }
 #endif
 
@@ -5276,9 +5317,11 @@ static void cnss_sram_dump_deinit(struct cnss_plat_data *plat_priv)
 #else
 static void cnss_sram_dump_deinit(struct cnss_plat_data *plat_priv)
 {
-	if (plat_priv->device_id == QCA6490_DEVICE_ID &&
-	    cnss_get_host_build_type() == QMI_HOST_BUILD_TYPE_PRIMARY_V01)
-		kfree(plat_priv->sram_dump);
+	/* Free sram_dump, if it was allocated */
+	if (plat_priv->sram_dump) {
+		vfree(plat_priv->sram_dump);
+		plat_priv->sram_dump = NULL;
+	}
 }
 #endif
 

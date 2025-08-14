@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1155,6 +1155,13 @@ static void dp_fisa_rx_fst_update(struct dp_rx_fst *fisa_hdl,
 		sw_ft_entry = &(((struct dp_fisa_rx_sw_ft *)
 					fisa_hdl->base)[hashed_flow_idx]);
 		if (!sw_ft_entry->is_populated) {
+			/* Add locking to prevent race condition between FISA
+			 * aggregation and update, which can Lead to NULL
+			 * dp_ctx dereference in dp_add_nbuf_to_fisa_flow.
+			 */
+			qdf_spin_unlock_bh(&fisa_hdl->dp_rx_fst_lock);
+			dp_rx_fisa_acquire_ft_lock(fisa_hdl, elem->reo_id);
+
 			/* Add SW FT entry */
 			dp_rx_fisa_update_sw_ft_entry(sw_ft_entry,
 						      flow_hash, elem->vdev,
@@ -1185,6 +1192,8 @@ static void dp_fisa_rx_fst_update(struct dp_rx_fst *fisa_hdl,
 			sw_ft_entry->add_timestamp = qdf_get_log_timestamp();
 
 			is_fst_updated = true;
+			dp_rx_fisa_release_ft_lock(fisa_hdl, elem->reo_id);
+			qdf_spin_lock_bh(&fisa_hdl->dp_rx_fst_lock);
 			wlan_dp_indicate_rx_flow_add(dp_ctx);
 			fisa_hdl->add_flow_count++;
 			break;
@@ -2184,6 +2193,7 @@ static void dp_rx_fisa_flush_flow(struct dp_vdev *vdev,
  * @hal_aggr_count: current aggregate count from RX PKT TLV
  * @hal_cumulative_ip_len: current cumulative ip length from RX PKT TLV
  * @rx_tlv_hdr: current msdu RX PKT TLV
+ * @nbuf: incoming nbuf
  *
  * Return: true - current flow aggregation should stop,
  *	   false - continue to aggregate.
@@ -2192,7 +2202,7 @@ static bool dp_fisa_aggregation_should_stop(
 				struct dp_fisa_rx_sw_ft *fisa_flow,
 				uint32_t hal_aggr_count,
 				uint16_t hal_cumulative_ip_len,
-				uint8_t *rx_tlv_hdr)
+				uint8_t *rx_tlv_hdr, qdf_nbuf_t nbuf)
 {
 	uint32_t msdu_len =
 		hal_rx_msdu_start_msdu_len_get(fisa_flow->dp_ctx->hal_soc,
@@ -2236,7 +2246,8 @@ static bool dp_fisa_aggregation_should_stop(
 	    hal_cumulative_ip_len <= fisa_flow->hal_cumultive_ip_len ||
 	    cumulative_ip_len_delta > FISA_MAX_SINGLE_CUMULATIVE_IP_LEN ||
 	    (fisa_flow->last_hal_aggr_count + 1) != hal_aggr_count ||
-	    cumulative_ip_len_delta != (msdu_len - l2_l3_hdr_len))
+	    cumulative_ip_len_delta != (msdu_len - l2_l3_hdr_len) ||
+	    msdu_len != QDF_NBUF_CB_RX_PKT_LEN(nbuf))
 		return true;
 
 	return false;
@@ -2338,7 +2349,7 @@ static int dp_add_nbuf_to_fisa_flow(struct dp_rx_fst *fisa_hdl,
 						fisa_flow,
 						hal_aggr_count,
 						hal_cumulative_ip_len,
-						rx_tlv_hdr))) {
+						rx_tlv_hdr, nbuf))) {
 			qdf_assert(0);
 			fisa_flow->do_not_aggregate = true;
 			/*
@@ -2351,7 +2362,7 @@ static int dp_add_nbuf_to_fisa_flow(struct dp_rx_fst *fisa_hdl,
 						fisa_flow,
 						hal_aggr_count,
 						hal_cumulative_ip_len,
-						rx_tlv_hdr))) {
+						rx_tlv_hdr, nbuf))) {
 		qdf_assert(0);
 		/* Either HW cumulative ip length is wrong, or packet is missed
 		 * Flush the flow and do not aggregate until next start new

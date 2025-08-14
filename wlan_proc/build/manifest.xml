@@ -1,9 +1,9 @@
 <config>
   <image_tree>
     <name>WLAN.COL.1.0</name>
-    <build_id>WLAN.COL.1.0-00974-QCACOLSWPL_V1_TO_SILICONZ-1</build_id>
+    <build_id>WLAN.COL.1.0-01381-QCACOLSWPL_V1_TO_SILICONZ-1</build_id>
     <branch_point_revision>None</branch_point_revision>
-    <revision>00974</revision>
+    <revision>01381</revision>
     <spin>1</spin>
     <client>QCACOLSWPL_V1_TO_SILICONZ</client>
   </image_tree>

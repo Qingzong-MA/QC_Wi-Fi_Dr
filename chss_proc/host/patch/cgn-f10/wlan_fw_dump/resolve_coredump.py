@@ -9,6 +9,7 @@ dump_dic = {
     1:"fwsramfull.bin",
     2:"remote.bin",
     3:"fwsramonly.bin",
+    4:"qdss_ddr.bin"
 }
 
 has_rddm_bin = False

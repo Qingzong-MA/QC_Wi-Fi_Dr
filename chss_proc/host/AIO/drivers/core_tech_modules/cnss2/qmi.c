@@ -1114,7 +1114,8 @@ int cnss_wlfw_tme_opt_file_dnld_send_sync(struct cnss_plat_data *plat_priv,
 	char *file_name = NULL;
 	int ret = 0;
 
-	if (plat_priv->device_id != PEACH_DEVICE_ID)
+	if (plat_priv->device_id != PEACH_DEVICE_ID &&
+	    plat_priv->device_id != COLOGNE_DEVICE_ID)
 		return 0;
 
 	cnss_pr_dbg("Sending TME opt file information message, state: 0x%lx\n",
@@ -1132,7 +1133,10 @@ int cnss_wlfw_tme_opt_file_dnld_send_sync(struct cnss_plat_data *plat_priv,
 
 	if (file == WLFW_TME_LITE_OEM_FUSE_FILE_V01) {
 		tme_opt_file_mem = &plat_priv->tme_opt_file_mem[0];
-		file_name = TME_OEM_FUSE_FILE_NAME;
+		if (plat_priv->device_id == COLOGNE_DEVICE_ID)
+			file_name = CGN_TME_OEM_FUSE_FILE_NAME;
+		else
+			file_name = TME_OEM_FUSE_FILE_NAME;
 	} else if (file == WLFW_TME_LITE_RPR_FILE_V01) {
 		tme_opt_file_mem = &plat_priv->tme_opt_file_mem[1];
 		file_name = TME_RPR_FILE_NAME;
@@ -3432,6 +3436,7 @@ static struct qmi_msg_handler qmi_wlfw_msg_handlers[] = {
 		sizeof(struct wlfw_qdss_trace_req_mem_ind_msg_v01),
 		.fn = cnss_wlfw_qdss_trace_req_mem_ind_cb
 	},
+#ifndef CONFIG_CNSS2_X86
 	{
 		.type = QMI_INDICATION,
 		.msg_id = QMI_WLFW_QDSS_TRACE_SAVE_IND_V01,
@@ -3440,6 +3445,7 @@ static struct qmi_msg_handler qmi_wlfw_msg_handlers[] = {
 		sizeof(struct wlfw_qdss_trace_save_ind_msg_v01),
 		.fn = cnss_wlfw_fw_mem_file_save_ind_cb
 	},
+#endif
 	{
 		.type = QMI_INDICATION,
 		.msg_id = QMI_WLFW_QDSS_TRACE_FREE_IND_V01,

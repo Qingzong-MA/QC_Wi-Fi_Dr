@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -440,12 +440,15 @@ update_bw:
 		return;
 
 	if (update_allow) {
-		wlan_cm_sta_update_bw_puncture(vdev, session->bssId,
-					       ori_punc, ori_bw,
-					       ccfs0,
-					       ccfs1,
-					       new_bw);
-		wma_send_peer_phy_mode(session->bssId, session->vdev_id, phy_mode);
+		status = wlan_cm_sta_update_bw_puncture(vdev, session->bssId,
+							ori_punc, ori_bw,
+							ccfs0,
+							ccfs1,
+							new_bw);
+		if (QDF_IS_STATUS_SUCCESS(status))
+			wma_send_peer_phy_mode(session->bssId,
+					       session->vdev_id,
+					       phy_mode);
 	} else {
 		csa_param = qdf_mem_malloc(sizeof(*csa_param));
 		if (!csa_param) {
@@ -484,9 +487,6 @@ void lim_process_beacon_eht(struct mac_context *mac_ctx,
 	des_chan = wlan_vdev_mlme_get_des_chan(vdev);
 	if (!des_chan || !IS_WLAN_PHYMODE_EHT(des_chan->ch_phymode))
 		return;
-
-	if (wlan_cm_is_vdev_connected(vdev))
-		lim_process_beacon_eht_op(session, bcn_ptr);
 
 	if (mlo_is_mld_sta(vdev))
 		/* handle beacon IE for 802.11be mlo case */
@@ -657,6 +657,9 @@ lim_process_beacon_frame(struct mac_context *mac_ctx, uint8_t *rx_pkt_info,
 		lim_check_and_announce_join_success(mac_ctx, bcn_ptr,
 				mac_hdr, session);
 	}
+
+	if (wlan_cm_is_vdev_connected(session->vdev))
+		lim_process_beacon_eht_op(session, bcn_ptr);
 
 	if (cu_flag) {
 		lim_process_beacon_eht(mac_ctx, session, bcn_ptr);

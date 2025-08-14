@@ -1,0 +1,143 @@
+From 0b5f3c5d550837d153503fd97278c70b42a4a80b Mon Sep 17 00:00:00 2001
+From: Hu Wang <huw@qti.qualcomm.com>
+Date: Mon, 26 May 2025 23:39:15 -0700
+Subject: [PATCH] P2P: Add equivalent global operating classes to address iot
+ issues
+
+Commit 195cc3d919 ("Make selection of current opclass more generic
+for 20 MHz UNI-III channels") start encoding the 5 GHz channels
+149-161 in global operating class 125 instead of 124, but p2p
+common channels are determined based on opclass/channel pairs
+instead of channel frequencies.
+
+This makes legacy supplicant and latest supplicant not able to
+negotication a common channel when using channel 149.
+e.g.
+P2P: * Operating Channel: Regulatory Class 125 Channel 149 // latest
+P2P: * Operating Channel: Country XX(0x04) Regulatory Class 124 Channel Number 149// legacy
+P2P: Own reg_classes 1 peer reg_classes 1 intersection reg_classes 0
+P2P: No common channels found
+
+This CL add a new concept of 'equivalent' global operating classes
+to allow e.g. op class 124, 125 both matches with Chnanels 149-161.
+
+Change-Id: Ie7c832c432d71be0257125cfc0a9353ab3723b6c
+---
+ src/p2p/p2p_build.c |  8 +++++--
+ src/p2p/p2p_i.h     |  2 ++
+ src/p2p/p2p_utils.c | 54 ++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 61 insertions(+), 3 deletions(-)
+
+diff --git a/src/p2p/p2p_build.c b/src/p2p/p2p_build.c
+index 343566d8..1f16948a 100644
+--- a/src/p2p/p2p_build.c
++++ b/src/p2p/p2p_build.c
+@@ -169,14 +169,18 @@ void p2p_buf_add_channel_list(struct wpabuf *buf, const char *country,
+ {
+ 	u8 *len;
+ 	size_t i;
++	struct p2p_channels res_chan;
++
++	memset(&res_chan, 0, sizeof(res_chan));
++	p2p_channels_update_equivalent(chan, &res_chan);
+ 
+ 	/* Channel List */
+ 	wpabuf_put_u8(buf, P2P_ATTR_CHANNEL_LIST);
+ 	len = wpabuf_put(buf, 2); /* IE length to be filled */
+ 	wpabuf_put_data(buf, country, 3); /* Country String */
+ 
+-	for (i = 0; i < chan->reg_classes; i++) {
+-		struct p2p_reg_class *c = &chan->reg_class[i];
++	for (i = 0; i < res_chan.reg_classes; i++) {
++		struct p2p_reg_class *c = &res_chan.reg_class[i];
+ 
+ 		if (is_6ghz_op_class(c->reg_class) && !is_6ghz_capab)
+ 			continue;
+diff --git a/src/p2p/p2p_i.h b/src/p2p/p2p_i.h
+index a54e375f..6c61e33c 100644
+--- a/src/p2p/p2p_i.h
++++ b/src/p2p/p2p_i.h
+@@ -846,6 +846,8 @@ struct p2p_group_info {
+ /* p2p_utils.c */
+ int p2p_random(char *buf, size_t len);
+ int p2p_freq_to_channel(unsigned int freq, u8 *op_class, u8 *channel);
++void p2p_channels_update_equivalent(const struct p2p_channels *a,
++				    struct p2p_channels *res);
+ void p2p_channels_intersect(const struct p2p_channels *a,
+ 			    const struct p2p_channels *b,
+ 			    struct p2p_channels *res);
+diff --git a/src/p2p/p2p_utils.c b/src/p2p/p2p_utils.c
+index c1f0084b..c8144caf 100644
+--- a/src/p2p/p2p_utils.c
++++ b/src/p2p/p2p_utils.c
+@@ -97,6 +97,57 @@ static void p2p_reg_class_intersect(const struct p2p_reg_class *a,
+ }
+ 
+ 
++/**
++ * p2p_equivalent_op_class - Check whether two op classes equivalent
++ *
++ * Returns: 1 if op_class is equivalent or 0 if not
++ */
++static int p2p_equivalent_op_class(u8 a, u8 b) {
++	if (a == b)
++		return 1;
++
++	// EU and CN map channels in the range 149 to 161 to opclass 125,
++	// US maps these channels to opclass 124/125,
++	// thus op_class 124/125 are equivalent.
++	if ((a == 124 && b == 125) || (a == 125 && b == 124))
++		return 1;
++
++	return 0;
++}
++
++
++void p2p_channels_update_equivalent(const struct p2p_channels *a,
++				    struct p2p_channels *res)
++{
++	size_t i;
++	int cla = 0;
++
++	memset(res, 0, sizeof(*res));
++
++	// add equivalent channels
++	for (i = 0; i < a->reg_classes; i++) {
++		struct p2p_reg_class *c = &a->reg_class[i];
++
++		if (!c->channels)
++			continue;
++
++		if (c->reg_class == 124 || c->reg_class == 125) {
++			if (c->reg_class == 124)
++				res->reg_class[cla].reg_class = 125;
++			else
++				res->reg_class[cla].reg_class = 124;
++
++			memcpy(res->reg_class[cla].channel, c->channel, c->channels);
++			res->reg_class[cla].channels = c->channels;
++			cla ++;
++		}
++	}
++	res->reg_classes = cla;
++
++	p2p_channels_union_inplace(res, a);
++}
++
++
+ /**
+  * p2p_channels_intersect - Intersection of supported channel lists
+  * @a: First set of supported channels
+@@ -120,7 +171,8 @@ void p2p_channels_intersect(const struct p2p_channels *a,
+ 		const struct p2p_reg_class *a_reg = &a->reg_class[i];
+ 		for (j = 0; j < b->reg_classes; j++) {
+ 			const struct p2p_reg_class *b_reg = &b->reg_class[j];
+-			if (a_reg->reg_class != b_reg->reg_class)
++			if (!p2p_equivalent_op_class(a_reg->reg_class,
++						     b_reg->reg_class))
+ 				continue;
+ 			p2p_reg_class_intersect(
+ 				a_reg, b_reg,
+-- 
+2.17.1
+

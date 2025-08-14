@@ -2227,6 +2227,7 @@ static void hostapd_event_iface_unavailable(struct hostapd_data *hapd)
 		hostapd_switch_channel_fallback(hapd->iface,
 						&hapd->cs_freq_params);
 	}
+	hostapd_disable_iface(hapd->iface);
 }
 
 

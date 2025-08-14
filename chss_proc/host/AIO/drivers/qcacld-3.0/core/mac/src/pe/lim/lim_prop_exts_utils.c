@@ -346,7 +346,8 @@ void lim_update_he_mcs_12_13_map(struct wlan_objmgr_psoc *psoc,
 
 #ifdef WLAN_FEATURE_11BE
 void lim_extract_eht_op(struct pe_session *session,
-			tSirProbeRespBeacon *beacon_struct)
+			tSirProbeRespBeacon *beacon_struct,
+			uint32_t cb_mode)
 {
 	uint32_t max_eht_bw;
 
@@ -383,7 +384,8 @@ void lim_extract_eht_op(struct pe_session *session,
 	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_80) {
 		session->ch_width = CH_WIDTH_80MHZ;
 		session->ch_center_freq_seg1 = 0;
-	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_40) {
+	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_40 &&
+		   cb_mode != WNI_CFG_CHANNEL_BONDING_MODE_DISABLE) {
 		session->ch_width = CH_WIDTH_40MHZ;
 		session->ch_center_freq_seg1 = 0;
 	} else {
@@ -620,6 +622,10 @@ void lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
 	uint8_t sta_prefer_80mhz_over_160mhz;
 	struct mlme_vht_capabilities_info *mlme_vht_cap;
 	QDF_STATUS status;
+	uint32_t cb_mode;
+
+	cb_mode = lim_get_cb_mode_for_freq(mac_ctx, session,
+					   session->curr_op_freq);
 
 	beacon_struct = qdf_mem_malloc(sizeof(tSirProbeRespBeacon));
 	if (!beacon_struct)
@@ -837,7 +843,7 @@ void lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
 	lim_check_is_he_mcs_valid(session, beacon_struct);
 	lim_check_peer_ldpc_and_update(session, beacon_struct);
 	lim_extract_he_op(session, beacon_struct);
-	lim_extract_eht_op(session, beacon_struct);
+	lim_extract_eht_op(session, beacon_struct, cb_mode);
 	if (!mac_ctx->usr_eht_testbed_cfg)
 		lim_update_he_bw_cap_mcs(session, beacon_struct);
 	lim_update_eht_bw_cap_mcs(session, beacon_struct);

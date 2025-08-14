@@ -1,9 +1,9 @@
 <config>
   <image_tree>
     <name>BTFW.COLOGNE.1.0.0</name>
-    <build_id>BTFW.COLOGNE.1.0.0-00025-PATCHZ-1</build_id>
+    <build_id>BTFW.COLOGNE.1.0.0-00040-PATCHZ-1</build_id>
     <branch_point_revision>None</branch_point_revision>
-    <revision>00025</revision>
+    <revision>00040</revision>
     <spin>1</spin>
     <client>PATCHZ</client>
   </image_tree>

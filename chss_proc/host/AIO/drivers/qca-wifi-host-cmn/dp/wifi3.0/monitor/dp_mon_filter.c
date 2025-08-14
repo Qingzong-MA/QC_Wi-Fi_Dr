@@ -1117,7 +1117,9 @@ QDF_STATUS dp_mon_start_local_pkt_capture(struct cdp_soc_t *cdp_soc,
 		filter->fp_subfilter.ctrl_rx_frame_filter;
 	mon_pdev->fp_subfilter.connected_beacon_interval =
 		filter->fp_subfilter.connected_beacon_interval;
+	dp_mon_update_nth_beacon(pdev);
 #endif
+
 	qdf_spin_lock_bh(&mon_mac->mon_lock);
 	dp_mon_filter_setup_tx_mon_mode(pdev);
 	status = dp_tx_mon_filter_update(pdev);
@@ -1229,6 +1231,7 @@ bool dp_mon_is_mgmt_filter_en(struct dp_pdev *pdev,
 	enum dp_mon_mgmt_frame_type frame_type = DP_MON_MGMT_MAX_FILTER;
 	struct dp_mon_subfilter *filter = &pdev->monitor_pdev->fp_subfilter;
 	struct dp_mon_mac *mon_mac =  dp_get_mon_mac(pdev, 0);
+	uint64_t filter_mask;
 
 	if (direction == IEEE80211_FC1_DIR_TODS)
 		mgmt_filter = filter->mgmt_tx_frame_filter;
@@ -1236,8 +1239,13 @@ bool dp_mon_is_mgmt_filter_en(struct dp_pdev *pdev,
 		mgmt_filter = filter->mgmt_rx_frame_filter;
 
 	if (mgmt_filter) {
-		if (mgmt_filter == DP_MON_MGMT_FRAME_TYPE_ALL)
-			return true;
+		if (mgmt_filter == DP_MON_MGMT_FRAME_TYPE_ALL) {
+			if (!filter->connected_beacon_interval)
+				return true;
+			filter_mask = DP_MON_MGMT_MAX_FILTER - 1;
+		} else {
+			filter_mask = mgmt_filter;
+		}
 
 		subtype = dot11hdr->i_fc[0] & QDF_IEEE80211_FC0_SUBTYPE_MASK;
 		connected_bssid = dp_mon_is_connected_bssid(pdev,
@@ -1246,7 +1254,7 @@ bool dp_mon_is_mgmt_filter_en(struct dp_pdev *pdev,
 		if (subtype != QDF_IEEE80211_FC0_SUBTYPE_BEACON) {
 			frame_type = DP_MON_MGMT_CONNECT_NO_BEACON;
 		} else if (subtype == QDF_IEEE80211_FC0_SUBTYPE_BEACON &&
-			connected_bssid) {
+			   connected_bssid) {
 			if (filter->connected_beacon_interval) {
 				if (bcn_cnt >= mon_mac->nth_beacon) {
 					frame_type = DP_MON_MGMT_CONNECT_BEACON;
@@ -1261,7 +1269,7 @@ bool dp_mon_is_mgmt_filter_en(struct dp_pdev *pdev,
 			frame_type = DP_MON_MGMT_CONNECT_SCAN_BEACON;
 		}
 
-		if (frame_type & mgmt_filter)
+		if (filter_mask & frame_type)
 			return true;
 	}
 	return false;

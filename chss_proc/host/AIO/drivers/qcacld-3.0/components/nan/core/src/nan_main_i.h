@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -108,6 +108,7 @@ enum nan_disc_state {
  * @nan_feature_config: Bitmap to enable/disable a particular NAN feature
  *                      configuration in firmware. It's sent to firmware through
  *                      wmi_vdev_param_enable_disable_nan_config_features
+ * @nan_config: NAN config to enable/disable capabilities
  */
 struct nan_cfg_params {
 	uint32_t enable:1;
@@ -126,6 +127,7 @@ struct nan_cfg_params {
 	uint32_t max_ndp_sessions;
 	uint32_t max_ndi;
 	uint32_t nan_feature_config;
+	uint32_t nan_config;
 };
 
 #define MAX_NDP_PEERS 8
@@ -195,6 +197,7 @@ struct nan_psoc_priv_obj {
  * pasn peers
  * @num_peer_migrated: Number of peers migrated
  * @peer_migrated_addr_list: list containing migrated peer mac address
+ * @nan_disable_req_info: NAN disable request info
  */
 struct nan_vdev_priv_obj {
 	qdf_spinlock_t lock;
@@ -212,6 +215,7 @@ struct nan_vdev_priv_obj {
 	bool is_delete_all_pasn_peer_in_progress;
 	uint8_t num_peer_migrated;
 	struct qdf_mac_addr peer_migrated_addr_list[MAX_NAN_MIGRATED_PEERS];
+	uint8_t nan_disable_req_info;
 };
 
 /**
@@ -512,5 +516,27 @@ void nan_clean_up_all_ndp_peers(struct wlan_objmgr_psoc *psoc, uint8_t vdev_id);
  * Return: true if NAN is allowed otherwise false
  */
 bool nan_is_allowed(struct wlan_objmgr_psoc *psoc);
+
+/**
+ * nan_cache_disable_req_info() - This API set NAN disable request parameter
+ * for NB or internal request.
+ * @psoc: pointer to PSOC object
+ * @value: parameter to determine NB or Internal disable request
+ *
+ * Return: QDF status
+ */
+QDF_STATUS nan_cache_disable_req_info(struct wlan_objmgr_psoc *psoc,
+				      uint8_t value);
+
+/**
+ * nan_get_disable_req_info() - This API get NAN disable request parameter
+ * @psoc: pointer to PSOC object
+ * @value: parameter to be updated
+ *
+ * Return: QDF status
+ */
+QDF_STATUS nan_get_disable_req_info(struct wlan_objmgr_psoc *psoc,
+				    uint8_t *value);
+
 #endif /* _WLAN_NAN_MAIN_I_H_ */
 #endif /* WLAN_FEATURE_NAN */

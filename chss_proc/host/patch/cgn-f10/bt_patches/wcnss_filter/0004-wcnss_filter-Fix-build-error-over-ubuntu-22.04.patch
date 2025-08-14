@@ -1,0 +1,26 @@
+From d490754cd2615b7cb0c0506229dd142d960a208e Mon Sep 17 00:00:00 2001
+From: Zijun Hu <zijuhu@qti.qualcomm.com>
+Date: Mon, 17 Mar 2025 00:07:23 -0700
+Subject: [PATCH] wcnss_filter: Fix build error over ubuntu 22.04
+
+Fix build error over ubuntu 22.04.
+---
+ inc/main.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/main.h b/inc/main.h
+index 612d0fa126bd..3a81da9783f0 100644
+--- a/inc/main.h
++++ b/inc/main.h
+@@ -20,7 +20,7 @@ enum {
+    FM,
+    ANT,
+    CTRL
+-} soc_ind;
++};
+ 
+ //Byte written to CTRL_SOCK to cleanup and stop filter
+ #define STOP_WCNSS_FILTER 0xDD
+-- 
+2.34.1
+

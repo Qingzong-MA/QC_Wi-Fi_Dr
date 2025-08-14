@@ -523,6 +523,7 @@ irqreturn_t mhi_irq_handler(int irq_number, void *dev)
 	return IRQ_HANDLED;
 }
 
+extern bool cnss_is_one_msi(struct device *dev);
 irqreturn_t mhi_intvec_threaded_handler(int irq_number, void *priv)
 {
 	struct mhi_controller *mhi_cntrl = priv;
@@ -539,10 +540,12 @@ irqreturn_t mhi_intvec_threaded_handler(int irq_number, void *priv)
 
 	state = mhi_get_mhi_state(mhi_cntrl);
 	ee = mhi_get_exec_env(mhi_cntrl);
-	dev_dbg(dev, "local ee: %s state: %s device ee: %s state: %s\n",
-		TO_MHI_EXEC_STR(mhi_cntrl->ee),
-		TO_MHI_STATE_STR(mhi_cntrl->dev_state),
-		TO_MHI_EXEC_STR(ee), TO_MHI_STATE_STR(state));
+
+	if (!cnss_is_one_msi(dev))
+		dev_dbg(dev, "local ee: %s state: %s device ee: %s state: %s\n",
+			TO_MHI_EXEC_STR(mhi_cntrl->ee),
+			TO_MHI_STATE_STR(mhi_cntrl->dev_state),
+			TO_MHI_EXEC_STR(ee), TO_MHI_STATE_STR(state));
 
 	if (state == MHI_STATE_SYS_ERR) {
 		dev_dbg(dev, "System error detected\n");
@@ -1032,17 +1035,6 @@ int mhi_dump_event_ring(struct mhi_controller *mhi_cntrl)
 	u32 chan, ev_index=mhi_event->er_index;
 	int count = 0;
 	dma_addr_t ptr = er_ctxt->rp;
-
-	/*
-	 * This is a quick check to avoid unnecessary event processing
-	 * in case MHI is already in error state, but it's still possible
-	 * to transition to error state while processing events
-	 */
-	if (unlikely(MHI_EVENT_ACCESS_INVALID(mhi_cntrl->pm_state))) {
-		dev_err(&mhi_cntrl->mhi_dev->dev,
-			"mhi event access invalid\n");
-		return -EIO;
-	}
 
 	if (!is_valid_ring_ptr(ev_ring, ptr)) {
 		dev_err(&mhi_cntrl->mhi_dev->dev,

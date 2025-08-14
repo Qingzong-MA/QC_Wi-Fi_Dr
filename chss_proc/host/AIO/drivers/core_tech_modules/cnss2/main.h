@@ -85,6 +85,7 @@
 #define TME_OEM_FUSE_FILE_NAME		"peach_sec.dat"
 #define TME_RPR_FILE_NAME		"peach_rpr.bin"
 #define TME_DPR_FILE_NAME		"peach_dpr.bin"
+#define CGN_TME_OEM_FUSE_FILE_NAME	"cologne_sec.dat"
 
 enum cnss_dt_type {
 	CNSS_DTT_LEGACY = 0,
@@ -500,6 +501,8 @@ struct mhi_fw_crash_data {
 	size_t ramdump_buf_len;
 	u8 *sram_dump_buf;
 	size_t sram_dump_buf_len;
+	u8 *qdss_dump_buf;
+	size_t qdss_dump_buf_len;
 	enum cnss_recovery_reason reason;
 };
 
@@ -622,6 +625,8 @@ struct cnss_plat_data {
 	char firmware_name[MAX_FIRMWARE_NAME_LEN];
 	char fw_fallback_name[MAX_FIRMWARE_NAME_LEN];
 #ifndef CONFIG_DISABLE_CNSS_SRAM_DUMP
+	u32 sram_dump_start_addr;
+	u32 sram_dump_size;
 	u8 *sram_dump;
 #endif
 	struct completion rddm_complete;

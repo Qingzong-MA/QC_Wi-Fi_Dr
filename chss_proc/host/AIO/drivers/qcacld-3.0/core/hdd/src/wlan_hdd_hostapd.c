@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1128,6 +1128,9 @@ static void hdd_chan_change_notify_update(struct wlan_hdd_link_info *link_info)
 
 	dev = adapter->dev;
 	vdev_id = wlan_vdev_get_id(vdev);
+
+	wlan_twt_concurrency_update(adapter->hdd_ctx);
+
 	if (hdd_adapter_is_link_adapter(adapter)) {
 		hdd_debug("replace link adapter dev with ml adapter dev");
 		assoc_adapter = hdd_adapter_get_mlo_adapter_from_link(adapter);
@@ -1428,6 +1431,74 @@ static int get_max_rate_vht(int nss, int ch_width, int sgi, int vht_mcs_map)
 }
 
 /**
+ * get_max_rate_he() - calculate max rate for HE mode
+ * @nss: num of streams
+ * @ch_width: channel width
+ * @sgi_enable: short gi
+ * @he_mcs_map: he mcs map
+ *
+ * This function calculate max rate for HE mode
+ *
+ * Return: max rate
+ */
+static int get_max_rate_he(int nss, int ch_width, int sgi_enable,
+			   int he_mcs_map)
+{
+	const struct index_he_data_rate_type *supported_he_mcs_rate;
+	enum data_rate_11ax_max_mcs he_max_mcs;
+	int maxrate = 0;
+	int maxidx;
+	int sgi;
+
+	if (nss == 1) {
+		supported_he_mcs_rate = supported_he_mcs_rate_nss1;
+	} else if (nss == 2) {
+		supported_he_mcs_rate = supported_he_mcs_rate_nss2;
+	} else {
+		/* Not Supported */
+		hdd_debug("nss %d not supported", nss);
+		return maxrate;
+	}
+	sgi = sgi_enable ? 0 : 2;
+
+	he_max_mcs =
+		(enum data_rate_11ax_max_mcs)
+		(he_mcs_map & DATA_RATE_11AX_MCS_MASK);
+
+	if (he_max_mcs == DATA_RATE_11AX_MAX_MCS_9) {
+		maxidx = 9;
+	} else if (he_max_mcs == DATA_RATE_11AX_MAX_MCS_10) {
+		maxidx = 10;
+	} else if (he_max_mcs == DATA_RATE_11AX_MAX_MCS_11) {
+		maxidx = 11;
+	} else {
+		hdd_err("HE mcs map %x not supported",
+			he_mcs_map & DATA_RATE_11AX_MCS_MASK);
+		return maxrate;
+	}
+
+	if (ch_width == eHT_CHANNEL_WIDTH_20MHZ) {
+		maxrate =
+		supported_he_mcs_rate[maxidx].supported_HE20_rate[0][sgi];
+	} else if (ch_width == eHT_CHANNEL_WIDTH_40MHZ) {
+		maxrate =
+		supported_he_mcs_rate[maxidx].supported_HE40_rate[0][sgi];
+	} else if (ch_width == eHT_CHANNEL_WIDTH_80MHZ) {
+		maxrate =
+		supported_he_mcs_rate[maxidx].supported_HE80_rate[0][sgi];
+	} else if ((ch_width == eHT_CHANNEL_WIDTH_160MHZ) ||
+			ch_width == eHT_CHANNEL_WIDTH_80P80MHZ) {
+		maxrate =
+		supported_he_mcs_rate[maxidx].supported_HE160_rate[0][sgi];
+	} else {
+		hdd_err("ch_width %d not supported", ch_width);
+		return maxrate;
+	}
+
+	return maxrate;
+}
+
+/**
  * calculate_max_phy_rate() - calculate maximum phy rate (100kbps)
  * @mode: phymode: Legacy, 11a/b/g, HT, VHT
  * @nss: num of stream (maximum num is 2)
@@ -1503,6 +1574,13 @@ static int calculate_max_phy_rate(int mode, int nss, int ch_width,
 		if (maxrate < tmprate)
 			maxrate = tmprate;
 	}
+	if (mode == SIR_SME_PHY_MODE_HE) {
+		/* check for HE Mode */
+		tmprate = get_max_rate_he(nss, ch_width, sgi, vht_mcs_map);
+		if (maxrate < tmprate)
+			maxrate = tmprate;
+	}
+
 
 	return maxrate;
 }
@@ -3832,6 +3910,7 @@ int hdd_softap_set_channel_change(struct wlan_hdd_link_info *link_info,
 	bool capable, is_wps;
 	int32_t keymgmt;
 	enum policy_mgr_con_mode pm_con_mode;
+	qdf_freq_t ll_sap_freq;
 
 	if (!link_info)
 		return -EINVAL;
@@ -3885,6 +3964,19 @@ int hdd_softap_set_channel_change(struct wlan_hdd_link_info *link_info,
 				wlan_vdev_get_id(sap_ctx->vdev),
 				LL_SAP_CSA_CONCURENCY);
 		return ret;
+	}
+
+	ll_sap_freq = policy_mgr_get_ll_lt_sap_freq(hdd_ctx->psoc);
+	pm_con_mode = policy_mgr_qdf_opmode_to_pm_con_mode(hdd_ctx->psoc,
+							   adapter->device_mode,
+							   link_info->vdev_id);
+
+	if (ll_sap_freq && pm_con_mode == PM_SAP_MODE &&
+	    policy_mgr_are_2_freq_on_same_mac(hdd_ctx->psoc, target_chan_freq,
+					      ll_sap_freq)) {
+		hdd_err("ll_sap freq %d and sap freq %d are on same mac",
+			ll_sap_freq, target_chan_freq);
+		return -EINVAL;
 	}
 
 	if (wlan_reg_is_6ghz_chan_freq(target_chan_freq) &&
@@ -4399,9 +4491,9 @@ QDF_STATUS wlan_hdd_get_channel_for_sap_restart(struct wlan_objmgr_psoc *psoc,
 
 	if (policy_mgr_is_vdev_ll_lt_sap(psoc, vdev_id)) {
 		if (!policy_mgr_is_ll_lt_sap_restart_required(psoc)) {
-			wlansap_context_put(sap_context);
 			hdd_debug("vdev %d freq %d, LL LT SAP dont need Channel change",
 				  vdev_id, sap_context->chan_freq);
+			wlansap_context_put(sap_context);
 			return QDF_STATUS_E_FAILURE;
 		}
 		sap_context->csa_reason = CSA_REASON_LL_LT_SAP_EVENT;
@@ -8091,6 +8183,13 @@ static int __wlan_hdd_cfg80211_stop_ap(struct wiphy *wiphy,
 
 	wlan_hdd_cleanup_actionframe(link_info);
 	wlan_hdd_cleanup_remain_on_channel_ctx(link_info);
+
+	/* Restore cfg TWT responder */
+	if (!policy_mgr_is_hw_dbs_capable(hdd_ctx->psoc) &&
+	    adapter->device_mode == QDF_SAP_MODE &&
+	    !policy_mgr_is_vdev_ll_lt_sap(hdd_ctx->psoc, link_info->vdev_id))
+		ucfg_twt_cfg_reset_responder(hdd_ctx->psoc);
+
 	mutex_lock(&hdd_ctx->sap_lock);
 	if (test_bit(SOFTAP_BSS_STARTED, &link_info->link_flags)) {
 		struct hdd_hostapd_state *hostapd_state =
@@ -8585,7 +8684,8 @@ void wlan_hdd_configure_twt_responder(struct hdd_context *hdd_ctx,
 					    twt_responder &&
 					    twt_res_cfg)));
 
-	hdd_debug("cfg80211 TWT responder:%d", twt_responder);
+	hdd_debug("cfg80211 TWT responder: %d, enable twt: %d, twt_res_cfg: %d",
+		  twt_responder, enable_twt, twt_res_cfg);
 	if (enable_twt && twt_responder && twt_res_cfg) {
 		hdd_send_twt_responder_enable_cmd(hdd_ctx, vdev_id);
 	} else {
@@ -8838,11 +8938,14 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 		freq = (qdf_freq_t)chandef->chan->center_freq;
 		channel_width = wlan_hdd_get_channel_bw(chandef->width);
 	}
-
+	intf_pm_mode =
+		policy_mgr_qdf_opmode_to_pm_con_mode(hdd_ctx->psoc,
+						     adapter->device_mode,
+						     adapter->deflink->vdev_id);
 	if (QDF_STATUS_SUCCESS !=
 	    ucfg_policy_mgr_get_sap_mandt_chnl(hdd_ctx->psoc, &mandt_chnl_list))
 		hdd_err("can't get mandatory channel list");
-	if (mandt_chnl_list && adapter->device_mode == QDF_SAP_MODE)
+	if (mandt_chnl_list && intf_pm_mode == PM_SAP_MODE)
 		policy_mgr_init_sap_mandatory_chan(hdd_ctx->psoc,
 						   chandef->chan->center_freq);
 
@@ -8870,10 +8973,6 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 		return -EINVAL;
 	}
 
-	intf_pm_mode =
-		policy_mgr_qdf_opmode_to_pm_con_mode(hdd_ctx->psoc,
-						     adapter->device_mode,
-						     adapter->deflink->vdev_id);
 	status = policy_mgr_is_multi_sap_allowed_on_same_band(
 				hdd_ctx->pdev,
 				intf_pm_mode,

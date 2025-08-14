@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -129,7 +129,6 @@ uint32_t dp_rx_srng_get_num_pending(hal_soc_handle_t hal_soc,
 	return num_pending;
 }
 
-#ifdef RX_DESC_DEBUG_CHECK
 QDF_STATUS dp_rx_desc_nbuf_sanity_check(struct dp_soc *soc,
 					hal_ring_desc_t ring_desc,
 					struct dp_rx_desc *rx_desc)
@@ -144,6 +143,7 @@ QDF_STATUS dp_rx_desc_nbuf_sanity_check(struct dp_soc *soc,
 	return QDF_STATUS_E_FAILURE;
 }
 
+#ifdef RX_DESC_DEBUG_CHECK
 /**
  * dp_rx_desc_nbuf_len_sanity_check - Add sanity check to catch Rx buffer
  *				      out of bound access from H.W
@@ -1313,6 +1313,7 @@ bool dp_rx_intrabss_ucast_fwd(struct dp_soc *soc, struct dp_txrx_peer *ta_peer,
 			      struct cdp_tid_rx_stats *tid_stats,
 			      uint8_t link_id)
 {
+	qdf_dma_addr_t paddr = QDF_NBUF_CB_PADDR(nbuf);
 	uint16_t len;
 
 	len = QDF_NBUF_CB_RX_PKT_LEN(nbuf);
@@ -1340,6 +1341,10 @@ bool dp_rx_intrabss_ucast_fwd(struct dp_soc *soc, struct dp_txrx_peer *ta_peer,
 	}
 
 	qdf_mem_set(nbuf->cb, sizeof(nbuf->cb), 0x0);
+
+	if (qdf_is_pp_nbuf(nbuf))
+		QDF_NBUF_CB_PADDR(nbuf) = paddr;
+
 	dp_classify_critical_pkts(soc, ta_peer->vdev, nbuf);
 
 	/* Don't send packets if tx is paused */
@@ -3837,7 +3842,7 @@ dp_rx_set_req_buff_descs(struct cdp_soc_t *cdp_soc,
 
 	dp_rx_page_pool_resize(soc, pdev_id, req_rx_buff_descs);
 
-	dp_info("Req RX buffer descriptors set to %u", req_rx_buff_descs);
+	dp_info("Req RX buffer descriptors set to %llu", req_rx_buff_descs);
 	return QDF_STATUS_SUCCESS;
 }
 

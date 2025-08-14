@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -895,9 +895,10 @@ static void tgt_mc_cp_stats_extract_vdev_summary_stats(
 		return;
 	}
 
-	if (vdev_id == WLAN_INVALID_VDEV_ID)
+	if (vdev_id >= WLAN_UMAC_PSOC_MAX_VDEVS) {
+		cp_stats_err("invalid vdev id %d", vdev_id);
 		return;
-
+	}
 	vdev = wlan_objmgr_get_vdev_by_id_from_psoc(psoc, vdev_id,
 						    WLAN_CP_STATS_ID);
 	if (!vdev) {
@@ -1157,6 +1158,12 @@ tgt_send_pdev_mc_cp_stats(struct wlan_objmgr_psoc *psoc,
 
 	if (!ev || !last_req)
 		return QDF_STATUS_E_NULL_VALUE;
+
+	if (policy_mgr_vdev_is_force_inactive(psoc, last_req->vdev_id)) {
+		cp_stats_debug("Ignore pdev stats on inactive link vdev %d",
+			       last_req->vdev_id);
+		return QDF_STATUS_SUCCESS;
+	}
 
 	vdev = wlan_objmgr_get_vdev_by_id_from_psoc(psoc, last_req->vdev_id,
 						    WLAN_CP_STATS_ID);

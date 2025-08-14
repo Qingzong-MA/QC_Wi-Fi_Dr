@@ -1,0 +1,3 @@
+#How to build ctrl_app_dut
+Use "make LINUX_WCN=y" for compiling ctrl_app_dut on x86 board.
+binary is ctrlapp_dut

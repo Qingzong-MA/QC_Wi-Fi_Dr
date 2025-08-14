@@ -445,8 +445,8 @@
         <ELEMENTS Name="LELR125 Backoff" Type="INTEGER" Size="1" Min="0x0" Max="0xF" Default="0x0" Signed="false" Description="LE 0.125M fine backoff, 4U.2" />
         <ELEMENTS Name="QRF power adjust" Type="INTEGER" Size="1" Min="0x80" Max="0x8" Default="0x0" Signed="true" Description="RF attenuation, signed number -2 to +1.75dB, 4S.2" />
         <ELEMENTS Name="Static channel cal offset" Type="INTEGER" Size="1" Min="0x0" Max="0xF" Default="0x8" Signed="false" Description="offset that allows channel cal NVM to be signed. The sum of channel cal offset, fine power offset set the expected nominal modem output. 4U.2" />
-        <ELEMENTS Name="Static fine power offset" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x14" Signed="false" Description="offset that allows fine power  5U.2" />
-        <ELEMENTS Name="Reserved1" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
+        <ELEMENTS Name="Static fine power offset ch0" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x14" Signed="false" Description="CH0 offset that allows fine power  5U.2" />
+        <ELEMENTS Name="Static fine power offset ch1" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x14" Signed="false" Description="CH1 offset that allows fine power  5U.2" />
       </ELEMENTS>
     </TAG>
     <TAG Number="36" Name="External Power Configuration">
@@ -2292,7 +2292,7 @@
         </ELEMENTS>
         <ELEMENTS Name="Maximum Length of Antenna Switching Pattern" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x20" Signed="false" Description="Maximum length of Antenna Switching pattern supported by platform" />
         <ELEMENTS Name="FMD_Mode_Chain_Selection" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFF" Signed="false" Description="Used to select dedicated chain for FMD mode, Where 0 will select Chain 0, 1 would be select chain 1, so.on based on system support, 0xFF would be treated as default Tx Chain." />
-        <ELEMENTS Name="FMD Max Power Level Index" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFF" Signed="false" Description="This is used to regulate the highest level of transmission power during FMD advertisement. If it’s set to its default value (0xFF), tag 83 will determine the power level. However, if it’s set to a different value, that value will become the maximum transmission power level." />
+        <ELEMENTS Name="FMD Max Power Level Index" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0xFF" Signed="false" Description="This is used to regulate the highest level of transmission power during FMD advertisement. If its set to its default value (0xFF), tag 83 will determine the power level. However, if its set to a different value, that value will become the maximum transmission power level." />
         <ELEMENTS Name="Reserved6" Type="INTEGER" Size="1" Min="0x0" Max="0xFF" Default="0x0" Signed="false" Description="Padding bytes for alignment" />
       </ELEMENTS>
     </TAG>

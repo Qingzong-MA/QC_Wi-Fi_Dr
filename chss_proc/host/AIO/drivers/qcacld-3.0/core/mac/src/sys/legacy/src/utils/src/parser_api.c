@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1344,6 +1344,7 @@ ePhyChanBondState wlan_get_cb_mode(struct mac_context *mac,
 				   tDot11fBeaconIEs *ie_struct,
 				   struct pe_session *pe_session)
 {
+	struct wlan_crypto_params *crypto_params;
 	ePhyChanBondState cb_mode = PHY_SINGLE_CHANNEL_CENTERED;
 	uint32_t sec_ch_freq = 0;
 	uint32_t self_cb_mode;
@@ -1363,24 +1364,17 @@ ePhyChanBondState wlan_get_cb_mode(struct mac_context *mac,
 		return PHY_SINGLE_CHANNEL_CENTERED;
 	}
 
-	/* In Case WPA2 and TKIP is the only one cipher suite in Pairwise */
-	if ((ie_struct->RSN.present &&
-	    (ie_struct->RSN.pwise_cipher_suite_count == 1) &&
-	    !qdf_mem_cmp(&(ie_struct->RSN.pwise_cipher_suites[0][0]),
-			 "\x00\x0f\xac\x02", 4)) ||
-		/* In Case only WPA1 is supported and TKIP is
-		 * the only one cipher suite in Unicast.
-		 */
-	    (!ie_struct->RSN.present && (ie_struct->WPA.present &&
-	    (ie_struct->WPA.unicast_cipher_count == 1) &&
-	    !qdf_mem_cmp(&(ie_struct->WPA.unicast_ciphers[0][0]),
-			 "\x00\x50\xf2\x02", 4)))) {
-		pe_debug("No channel bonding in TKIP mode");
-		return PHY_SINGLE_CHANNEL_CENTERED;
-	}
-
 	if (!ie_struct->HTInfo.present)
 		return PHY_SINGLE_CHANNEL_CENTERED;
+
+	/* In Case WPA2 and TKIP is the only one cipher suite in Pairwise */
+	crypto_params = wlan_crypto_vdev_get_crypto_params(pe_session->vdev);
+	if (crypto_params && QDF_HAS_PARAM(crypto_params->ucastcipherset,
+					   WLAN_CRYPTO_CIPHER_TKIP)) {
+		pe_debug("No channel bonding in TKIP mode, ucast: %x",
+			 crypto_params->ucastcipherset);
+		return PHY_SINGLE_CHANNEL_CENTERED;
+	}
 
 	pe_debug("ch freq %d scws %u rtws %u sco %u", ch_freq,
 		 ie_struct->HTCaps.supportedChannelWidthSet,
@@ -2138,18 +2132,23 @@ populate_dot11f_power_caps(struct mac_context *mac,
 
 	pCaps->minTxPower = pe_session->min_11h_pwr;
 	pCaps->maxTxPower = pe_session->maxTxPower;
+	pCaps->present = 1;
 
 	/* Use firmware updated max tx power if non zero */
 	mlme_obj = wlan_vdev_mlme_get_cmpt_obj(pe_session->vdev);
-	if (mlme_obj && mlme_obj->mgmt.generic.tx_pwrlimit)
+	if (!mlme_obj) {
+		pe_err("mlme_obj invalid");
+		return;
+	}
+
+	if (mlme_obj->mgmt.generic.tx_pwrlimit)
 		pCaps->maxTxPower = mlme_obj->mgmt.generic.tx_pwrlimit;
 
 	min_power = populate_decimal_min_power(mlme_obj->mgmt.generic.minpower);
 
-	if (mlme_obj && mlme_obj->mgmt.generic.minpower)
+	if (mlme_obj->mgmt.generic.minpower)
 		pCaps->minTxPower = QDF_MIN(pCaps->minTxPower, min_power);
 
-	pCaps->present = 1;
 } /* End populate_dot11f_power_caps. */
 
 QDF_STATUS
@@ -4319,7 +4318,8 @@ sir_convert_assoc_resp_frame2_mlo_struct(struct mac_context *mac,
 					    &partner_info,
 					    WLAN_FC0_STYPE_ASSOC_RESP);
 
-	if (!wlan_vdev_mlme_is_mlo_link_vdev(session_entry->vdev) &&
+	if (p_assoc_rsp->status_code == STATUS_SUCCESS &&
+	    !wlan_vdev_mlme_is_mlo_link_vdev(session_entry->vdev) &&
 	    session_entry->ml_partner_info.num_partner_links &&
 	    !wlan_cm_is_roam_sync_in_progress(mac->psoc,
 					      session_entry->vdev_id)) {
@@ -5595,9 +5595,9 @@ QDF_STATUS sir_parse_beacon_ie(struct mac_context *mac,
 						 pBies->HTInfo.primaryChannel);
 	}
 
-	if (pBies->RSN.present) {
+	if (pBies->RSNOpaque.present) {
 		pBeaconStruct->rsnPresent = 1;
-		convert_rsn(mac, &pBeaconStruct->rsn, &pBies->RSN);
+		convert_rsn_opaque(mac, &pBeaconStruct->rsn, &pBies->RSNOpaque);
 	} else {
 		pe_debug("RSN IE is not present");
 	}
@@ -6135,9 +6135,10 @@ QDF_STATUS sir_convert_beacon_frame2_struct(struct mac_context *mac,
 		pe_debug_rl("In Beacon No Channel info");
 	}
 
-	if (pBeacon->RSN.present) {
+	if (pBeacon->RSNOpaque.present) {
 		pBeaconStruct->rsnPresent = 1;
-		convert_rsn(mac, &pBeaconStruct->rsn, &pBeacon->RSN);
+		convert_rsn_opaque(mac, &pBeaconStruct->rsn,
+				   &pBeacon->RSNOpaque);
 	}
 
 	if (pBeacon->WPA.present) {
@@ -8174,8 +8175,12 @@ populate_dot11f_twt_he_cap(struct mac_context *mac,
 	case QDF_SAP_MODE:
 	case QDF_P2P_GO_MODE:
 		wlan_twt_get_responder_cfg(mac->psoc, &twt_responder);
-		he_cap->twt_responder =
-			twt_responder && twt_get_responder_flag(mac);
+		if (policy_mgr_is_vdev_ll_lt_sap(mac->psoc,
+						 session->vdev_id))
+			he_cap->twt_responder = twt_responder;
+		else
+			he_cap->twt_responder = twt_responder &&
+					twt_get_responder_flag(mac);
 		he_cap->broadcast_twt = bcast_responder;
 		pe_debug("vdev:%d bcast_responder:%d twt_responder:%d",
 			 session->vdev_id, he_cap->broadcast_twt,
@@ -10863,7 +10868,10 @@ populate_dot11f_probe_req_mlo_ie(struct mac_context *mac,
 
 no_sta_prof:
 	mlo_ie->num_sta_profile = num_sta_pro;
-	session->lim_join_req->is_ml_probe_req_sent = true;
+	if (session->limMlmState == eLIM_MLM_WT_JOIN_BEACON_STATE)
+		session->lim_join_req->is_ml_probe_req_sent = true;
+	else
+		session->lim_join_req->is_ml_probe_req_sent = false;
 
 	return QDF_STATUS_SUCCESS;
 }
@@ -12795,7 +12803,11 @@ QDF_STATUS populate_dot11f_twt_extended_caps(struct mac_context *mac_ctx,
 	if (pe_session->opmode == QDF_SAP_MODE ||
 	    pe_session->opmode == QDF_P2P_GO_MODE) {
 		wlan_twt_get_responder_cfg(mac_ctx->psoc, &twt_responder);
-		p_ext_cap->twt_responder_support =
+		if (policy_mgr_is_vdev_ll_lt_sap(mac_ctx->psoc,
+						 pe_session->vdev_id))
+			p_ext_cap->twt_responder_support = twt_responder;
+		else
+			p_ext_cap->twt_responder_support =
 			twt_responder && twt_get_responder_flag(mac_ctx);
 	}
 
@@ -14276,8 +14288,13 @@ QDF_STATUS populate_dot11f_assoc_req_mlo_ie(struct mac_context *mac_ctx,
 		}
 		populate_dot11f_eht_caps_by_band(mac_ctx, is_2g, &eht_caps,
 						 NULL);
-		if (!WLAN_REG_IS_6GHZ_CHAN_FREQ(chan_freq))
+		if (!WLAN_REG_IS_6GHZ_CHAN_FREQ(chan_freq)) {
 			eht_caps.support_320mhz_6ghz = 0;
+			eht_caps.bfee_ss_320mhz = 0;
+		}
+
+		if (!eht_caps.support_320mhz_6ghz || !eht_caps.su_beamformer)
+			eht_caps.num_sounding_dim_320mhz = 0;
 
 		if ((eht_caps.present && frm->eht_cap.present &&
 		     qdf_mem_cmp(&eht_caps, &frm->eht_cap, sizeof(eht_caps))) ||

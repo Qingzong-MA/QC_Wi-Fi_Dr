@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -770,7 +770,7 @@ static void dp_ipa_set_perf_level(struct wlan_dp_psoc_context *dp_ctx,
 				  uint64_t *tx_pkts, uint64_t *rx_pkts,
 				  uint32_t *ipa_tx_pkts, uint32_t *ipa_rx_pkts)
 {
-	if (ucfg_ipa_is_fw_wdi_activated(dp_ctx->pdev)) {
+	if (ucfg_ipa_is_fw_wdi_activated(dp_ctx->psoc)) {
 		ucfg_ipa_uc_stat_query(dp_ctx->pdev, ipa_tx_pkts,
 				       ipa_rx_pkts);
 		*tx_pkts += *ipa_tx_pkts;
@@ -1428,6 +1428,33 @@ bool dp_sap_p2p_update_mid_high_tput(struct wlan_dp_psoc_context *dp_ctx,
 	return false;
 }
 
+static inline void dp_set_tx_irq_affinity(struct wlan_dp_psoc_context *dp_ctx,
+					  enum tput_level tput_level,
+					  enum tput_level prev_tput_level)
+{
+	ol_txrx_soc_handle soc = cds_get_context(QDF_MODULE_ID_SOC);
+	void *hif_ctx = cds_get_context(QDF_MODULE_ID_HIF);
+	struct device *dev = dp_ctx->qdf_dev->dev;
+	uint32_t cpumask = 0;
+
+	if (tput_level >= TPUT_LEVEL_VERY_HIGH &&
+	    prev_tput_level < TPUT_LEVEL_VERY_HIGH) {
+		if (qdf_unlikely(dp_ctx->dp_cfg.dp_irq_affinity_mask))
+			cpumask = dp_ctx->dp_cfg.dp_irq_affinity_mask;
+		else
+			pld_get_cpumask_for_wlan_tx_comp_interrupts(dev,
+								    &cpumask);
+		hif_set_grp_intr_affinity(hif_ctx,
+					  cdp_get_tx_rings_grp_bitmap(soc),
+					  cpumask, true);
+	} else if (tput_level < TPUT_LEVEL_VERY_HIGH &&
+		   prev_tput_level >= TPUT_LEVEL_VERY_HIGH) {
+		hif_set_grp_intr_affinity(hif_ctx,
+					  cdp_get_tx_rings_grp_bitmap(soc),
+					  cpumask, false);
+	}
+}
+
 /**
  * dp_pld_request_bus_bandwidth() - Function to control bus bandwidth
  * @dp_ctx: handle to DP context
@@ -1468,7 +1495,6 @@ static void dp_pld_request_bus_bandwidth(struct wlan_dp_psoc_context *dp_ctx,
 	static enum tput_level prev_tput_level = TPUT_LEVEL_NONE;
 	struct wlan_dp_psoc_callbacks *dp_ops = &dp_ctx->dp_ops;
 	hdd_cb_handle ctx = dp_ops->callback_ctx;
-	uint32_t cpumask = 0;
 
 	if (!soc)
 		return;
@@ -1508,7 +1534,7 @@ static void dp_pld_request_bus_bandwidth(struct wlan_dp_psoc_context *dp_ctx,
 	 * only when TPUT can reach VHT80 KPI and IPA is disabled,
 	 * for other cases, follow general voting logic
 	 */
-	if (!ucfg_ipa_is_fw_wdi_activated(dp_ctx->pdev) &&
+	if (!ucfg_ipa_is_fw_wdi_activated(dp_ctx->psoc) &&
 	    policy_mgr_is_current_hwmode_dbs(dp_ctx->psoc) &&
 	    (total_pkts > dp_ctx->dp_cfg.bus_bw_dbs_threshold) &&
 	    (tput_level < TPUT_LEVEL_SUPER_HIGH)) {
@@ -1533,20 +1559,7 @@ static void dp_pld_request_bus_bandwidth(struct wlan_dp_psoc_context *dp_ctx,
 
 	if (dp_ctx->cur_vote_level != next_vote_level) {
 		/* Set affinity for tx completion grp interrupts */
-		if (tput_level >= TPUT_LEVEL_VERY_HIGH &&
-		    prev_tput_level < TPUT_LEVEL_VERY_HIGH) {
-			pld_get_cpumask_for_wlan_tx_comp_interrupts(dp_ctx->qdf_dev->dev,
-								    &cpumask);
-			hif_set_grp_intr_affinity(hif_ctx,
-				cdp_get_tx_rings_grp_bitmap(soc),
-				cpumask, true);
-		} else if (tput_level < TPUT_LEVEL_VERY_HIGH &&
-			 prev_tput_level >= TPUT_LEVEL_VERY_HIGH) {
-			hif_set_grp_intr_affinity(hif_ctx,
-				cdp_get_tx_rings_grp_bitmap(soc),
-				cpumask, false);
-		}
-
+		dp_set_tx_irq_affinity(dp_ctx, tput_level, prev_tput_level);
 		prev_tput_level = tput_level;
 		dp_ctx->cur_vote_level = next_vote_level;
 		vote_level_change = true;
@@ -1645,7 +1658,7 @@ static void dp_pld_request_bus_bandwidth(struct wlan_dp_psoc_context *dp_ctx,
 	}
 
 	if (vote_level_change || tx_level_change || rx_level_change) {
-		dp_info("tx:%llu[%llu(off)+%llu(no-off)] rx:%llu[%llu(off)+%llu(no-off)] next_level(vote %u rx %u tx %u rtpm %u) pm_qos(rx:%u,%*pb tx:%u,%*pb on_low_tput:%u)",
+		dp_info("tx:%llu[%llu(off)+%llu(no-off)] rx:%llu[%llu(off)+%llu(no-off)] next_level(vote %u rx %u tx %u rtpm %lu) pm_qos(rx:%u,%*pb tx:%u,%*pb on_low_tput:%u)",
 			tx_packets,
 			dp_ctx->prev_tx_offload_pkts,
 			dp_ctx->prev_no_tx_offload_pkts,
@@ -1901,6 +1914,11 @@ static void __dp_bus_bw_work_handler(struct wlan_dp_psoc_context *dp_ctx)
 	curr_time_us = qdf_get_log_timestamp();
 	diff_us = qdf_log_timestamp_to_usecs(
 			curr_time_us - dp_ctx->bw_vote_time);
+	if (!diff_us) {
+		dp_err_rl("diff_us can't be 0 which will be used as divisor");
+		return;
+	}
+
 	dp_ctx->bw_vote_time = curr_time_us;
 
 	dp_for_each_intf_held_safe(dp_ctx, dp_intf, dp_intf_next) {

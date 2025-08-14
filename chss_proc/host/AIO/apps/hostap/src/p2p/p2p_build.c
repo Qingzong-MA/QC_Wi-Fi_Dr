@@ -169,14 +169,18 @@ void p2p_buf_add_channel_list(struct wpabuf *buf, const char *country,
 {
 	u8 *len;
 	size_t i;
+	struct p2p_channels res_chan;
+
+	memset(&res_chan, 0, sizeof(res_chan));
+	p2p_channels_update_equivalent(chan, &res_chan);
 
 	/* Channel List */
 	wpabuf_put_u8(buf, P2P_ATTR_CHANNEL_LIST);
 	len = wpabuf_put(buf, 2); /* IE length to be filled */
 	wpabuf_put_data(buf, country, 3); /* Country String */
 
-	for (i = 0; i < chan->reg_classes; i++) {
-		struct p2p_reg_class *c = &chan->reg_class[i];
+	for (i = 0; i < res_chan.reg_classes; i++) {
+		struct p2p_reg_class *c = &res_chan.reg_class[i];
 
 		if (is_6ghz_op_class(c->reg_class) && !is_6ghz_capab)
 			continue;

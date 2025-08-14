@@ -59,14 +59,19 @@ static inline void osif_update_fils_hlp_data(struct net_device *dev,
 #ifdef CFG80211_SINGLE_NETDEV_MULTI_LINK_SUPPORT
 static
 void osif_copy_roamed_info(struct cfg80211_roam_info *info,
-			   struct cfg80211_bss *bss)
+			   struct cfg80211_bss *bss,
+			   struct wlan_objmgr_vdev *vdev)
 {
+	if (wlan_vdev_mlme_is_mlo_vdev(vdev))
+		return;
+
 	info->links[0].bss = bss;
 }
 #else
 static
 void osif_copy_roamed_info(struct cfg80211_roam_info *info,
-			   struct cfg80211_bss *bss)
+			   struct cfg80211_bss *bss,
+			   struct wlan_objmgr_vdev *vdev)
 {
 	info->bss = bss;
 }
@@ -79,7 +84,6 @@ osif_roam_populate_mlo_info_for_link(struct wlan_objmgr_vdev *roamed_vdev,
 				     uint8_t link_id, struct cfg80211_bss *bss,
 				     uint8_t *self_link_addr, uint8_t *bssid)
 {
-	osif_debug("Link_id :%d", link_id);
 	roam_info->valid_links |=  BIT(link_id);
 	roam_info->links[link_id].bssid = bssid;
 	roam_info->links[link_id].addr = self_link_addr;
@@ -160,6 +164,50 @@ osif_fill_peer_mld_mac_roam_info(struct wlan_objmgr_vdev *vdev,
 	return QDF_STATUS_SUCCESS;
 }
 
+static void
+osif_debug_mlo_roam_duplicate_bss(struct wlan_cm_connect_resp *rsp,
+				  struct cfg80211_bss *bss, uint8_t assoc_link_id,
+				   struct cfg80211_roam_info *conn_rsp)
+{
+	uint8_t link_id, i, j, link_id_cmp;
+	struct mlo_link_info *partner_info, *info;
+
+	/* loop conn_rsp->valid_links and conn_rsp->links[link_id].bss */
+	for (i = 0; i < rsp->ml_parnter_info.num_partner_links; i++) {
+		partner_info = &rsp->ml_parnter_info.partner_link_info[i];
+		link_id = partner_info->link_id;
+
+		if (!conn_rsp->links[link_id].bss)
+			continue;
+
+		if (link_id != assoc_link_id &&
+		    conn_rsp->links[link_id].bss == bss)
+			osif_info("link bss, link_id %d freq %d bssid " QDF_MAC_ADDR_FMT " same as assoc bss, link %d freq %d bssid " QDF_MAC_ADDR_FMT,
+				  link_id, partner_info->chan_freq,
+				  QDF_MAC_ADDR_REF(partner_info->link_addr.bytes),
+				  assoc_link_id, rsp->freq,
+				  QDF_MAC_ADDR_REF(rsp->bssid.bytes));
+
+		for (j = 0; j < rsp->ml_parnter_info.num_partner_links; j++) {
+			if (j <= i)
+				continue;
+			info = &rsp->ml_parnter_info.partner_link_info[j];
+			link_id_cmp = info->link_id;
+
+			if (!conn_rsp->links[link_id].bss)
+				continue;
+
+			if (conn_rsp->links[link_id_cmp].bss ==
+						conn_rsp->links[link_id].bss)
+				osif_info("link bss, link_id %d freq %d bssid " QDF_MAC_ADDR_FMT " same as link bss, link %d freq %d bssid " QDF_MAC_ADDR_FMT,
+					  link_id, partner_info->chan_freq,
+					  QDF_MAC_ADDR_REF(partner_info->link_addr.bytes),
+					  link_id_cmp, info->chan_freq,
+					  QDF_MAC_ADDR_REF(info->link_addr.bytes));
+		}
+	}
+}
+
 static void osif_fill_mlo_roam_params(struct wlan_objmgr_vdev *vdev,
 				      struct wlan_cm_connect_resp *rsp,
 				      struct cfg80211_bss *bss,
@@ -183,8 +231,13 @@ static void osif_fill_mlo_roam_params(struct wlan_objmgr_vdev *vdev,
 					     assoc_link_id, bss,
 					     wlan_vdev_mlme_get_macaddr(vdev),
 					     rsp->bssid.bytes);
+	osif_debug("Vdev %d, Num partner links %d, valid links mask 0x%x Assoc link %u",
+		   rsp->vdev_id, rsp->ml_parnter_info.num_partner_links,
+		   info->valid_links, assoc_link_id);
 
 	osif_populate_partner_links_roam_mlo_params(vdev, rsp, info);
+
+	osif_debug_mlo_roam_duplicate_bss(rsp, bss, assoc_link_id, info);
 }
 #else
 static void osif_fill_mlo_roam_params(struct wlan_objmgr_vdev *vdev,
@@ -216,7 +269,7 @@ static void osif_roamed_ind(struct net_device *dev,
 {
 	struct cfg80211_roam_info info = {0};
 
-	osif_copy_roamed_info(&info, bss);
+	osif_copy_roamed_info(&info, bss, vdev);
 	info.req_ie = req_ie;
 	info.req_ie_len = req_ie_len;
 	info.resp_ie = resp_ie;
@@ -325,7 +378,7 @@ static enum qca_roam_reason osif_get_roam_reason(uint16_t roam_scan_trigger)
 
 #ifdef WLAN_FEATURE_11BE_MLO
 
-static uint8_t *osif_get_bss_mac_addr(struct wlan_objmgr_vdev *vdev)
+uint8_t *osif_get_bss_mac_addr(struct wlan_objmgr_vdev *vdev)
 {
 	struct wlan_objmgr_peer *peer;
 
@@ -451,7 +504,7 @@ osif_send_roam_auth_mlo_links_event(struct sk_buff *skb,
 	return 0;
 }
 #else
-static uint8_t *osif_get_bss_mac_addr(struct wlan_objmgr_vdev *vdev)
+uint8_t *osif_get_bss_mac_addr(struct wlan_objmgr_vdev *vdev)
 {
 	struct wlan_objmgr_peer *peer;
 

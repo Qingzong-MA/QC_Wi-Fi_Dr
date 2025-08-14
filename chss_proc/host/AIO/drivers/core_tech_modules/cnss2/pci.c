@@ -477,11 +477,7 @@ static const struct mhi_channel_config cnss_mhi_channels_genoa[] = {
 	},
 };
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
 static struct mhi_event_config cnss_mhi_events[] = {
-#else
-static const struct mhi_event_config cnss_mhi_events[] = {
-#endif
 	{
 		.num_elements = 32,
 		.irq_moderation_ms = 0,
@@ -1491,6 +1487,7 @@ out:
 	return ret;
 }
 
+#ifndef CONFIG_NOT_SET_PCI_DSTATE
 static int cnss_set_pci_config_space(struct cnss_pci_data *pci_priv, bool save)
 {
 	struct pci_dev *pci_dev = pci_priv->pci_dev;
@@ -1527,6 +1524,12 @@ static int cnss_set_pci_config_space(struct cnss_pci_data *pci_priv, bool save)
 
 	return 0;
 }
+#else
+static int cnss_set_pci_config_space(struct cnss_pci_data *pci_priv, bool save)
+{
+	return 0;
+}
+#endif
 
 static int cnss_update_supported_link_info(struct cnss_pci_data *pci_priv)
 {
@@ -1951,6 +1954,117 @@ int cnss_get_pci_slot(struct device *dev)
 }
 EXPORT_SYMBOL(cnss_get_pci_slot);
 
+#define SBL_LINE_LEN_MAX 81
+#define SBL_CONSECUTIVE_ZEROS_MAX 4
+
+/**
+ * cnss_dump_line_buf - dump logs in the buffer
+ * @line_buf: buffer which holds the logs
+ * @data_len: length of the data to be dumped
+ * @dumpall: indicates whether to dump all of the data
+ *
+ * Return: size of data which have not been dumped
+ */
+static u32 cnss_dump_line_buf(char *line_buf, u32 data_len, bool dumpall)
+{
+	char *ptr, *res;
+	const char *delim = "\n";
+	u32 cur = 0;
+
+	ptr = line_buf;
+	while ((res = strsep(&ptr, delim)) != NULL) {
+		if (ptr) {
+			if (strlen(res))
+				cnss_pr_dbg("%s\n", res);
+			continue;
+		}
+
+		/* no delimiter was found */
+		cur = strlen(res);
+		if (cur) {
+			/**
+			 * If dumpall or less than 4 bytes have been dumped,
+			 * dump the data directly;
+			 * otherwise, pass the data to the next print
+			 */
+			if (dumpall || (res - line_buf < 4))
+				cnss_pr_dbg("%s\n", res);
+			else
+				memmove(line_buf, res, cur);
+		}
+
+		break;
+	}
+
+	memset(line_buf + cur, 0, data_len - cur);
+	return cur;
+}
+
+/**
+ * cnss_pci_dump_reg - read debug log from register and dump
+ * @pci_priv: driver PCI bus context pointer
+ * @start_addr: start address
+ * @size: size(in bytes) of the log
+ *
+ * Example of the output:
+ * Dumping SBL log data(@0x182d000[4096]) start
+ * Format: Log Type - Time(microsec) - Message - Optional Info
+ * Log Type: B - Since Boot(Power On Reset), D - Delta, S - Statistic
+ * B -	     110740 - SBL, Start
+ * B -	     111032 - err code is0x302e
+ * B -	     111039 - line number is0x5d
+ * B -	     111044 - file name is
+ * B -	     111050 - boot_stack.c
+ * Dumping SBL log data(@0x182d000[4096]) has been completed
+ *
+ * Return: 0 on success, negative value otherwise.
+ */
+static int cnss_pci_dump_sbl_log(struct cnss_pci_data *pci_priv,
+				 u32 start_addr, u32 size)
+{
+	char line_buf[SBL_LINE_LEN_MAX] = {0};
+	int i, ret = 0;
+	u32 offset, *val, count, consecutive_zeros = 0, cur = 0;
+
+	cnss_pr_dbg("Dumping SBL log data(@0x%x[%u]) start\n",
+		    start_addr, size);
+
+	count = size / sizeof(u32);
+	for (i = 0; i < count; i++) {
+		offset = start_addr + i * sizeof(u32);
+		val = (u32 *)(&line_buf[cur]);
+		ret = cnss_pci_reg_read(pci_priv, offset, val);
+		if (ret) {
+			cnss_pr_err("Failed to read reg 0x%x, ret: %d\n",
+				    offset, ret);
+			break;
+		}
+
+		if (!(*val)) {
+			/* no more data */
+			if (consecutive_zeros++ >= SBL_CONSECUTIVE_ZEROS_MAX)
+				break;
+
+			continue;
+		} else {
+			consecutive_zeros = 0;
+		}
+
+		cur += sizeof(u32);
+
+		/* no more space to read a new u32 */
+		if (cur > SBL_LINE_LEN_MAX - 5)
+			cur = cnss_dump_line_buf(line_buf, cur, false);
+	}
+
+	if (cur)
+		cnss_dump_line_buf(line_buf, cur, true);
+
+	cnss_pr_dbg("Dumping SBL log data(@0x%x[%u]) ret: %d\n",
+		    start_addr, size, ret);
+	return ret;
+}
+
 /**
  * cnss_pci_dump_bl_sram_mem - Dump WLAN device bootloader debug log
  * @pci_priv: driver PCI bus context pointer
@@ -2008,6 +2122,7 @@ static void cnss_pci_dump_bl_sram_mem(struct cnss_pci_data *pci_priv)
 		pbl_log_sram_start = COLOGNE_DEBUG_PBL_LOG_SRAM_START;
 		pbl_log_max_size = COLOGNE_DEBUG_PBL_LOG_SRAM_MAX_SIZE;
 		sbl_log_max_size = COLOGNE_DEBUG_SBL_LOG_SRAM_MAX_SIZE;
+		sbl_log_def_end = COLOGNE_SRAM_END;
 		break;
 	default:
 		return;
@@ -2057,13 +2172,7 @@ static void cnss_pci_dump_bl_sram_mem(struct cnss_pci_data *pci_priv)
 		return;
 	}
 
-	cnss_pr_dbg("Dumping SBL log data\n");
-	for (i = 0; i < sbl_log_size; i += sizeof(val)) {
-		mem_addr = sbl_log_start + i;
-		if (cnss_pci_reg_read(pci_priv, mem_addr, &val))
-			break;
-		cnss_pr_dbg("SRAM[0x%x] = 0x%x\n", mem_addr, val);
-	}
+	cnss_pci_dump_sbl_log(pci_priv, sbl_log_start, sbl_log_size);
 }
 
 #ifdef CONFIG_DISABLE_CNSS_SRAM_DUMP
@@ -2076,12 +2185,18 @@ static void cnss_pci_dump_sram(struct cnss_pci_data *pci_priv)
 	struct cnss_plat_data *plat_priv;
 	u32 i, mem_addr;
 	u32 *dump_ptr;
+	int ret;
 
 	plat_priv = pci_priv->plat_priv;
-
-	if (plat_priv->device_id != QCA6490_DEVICE_ID ||
-	    cnss_get_host_build_type() != QMI_HOST_BUILD_TYPE_PRIMARY_V01)
+	cnss_pr_dbg("SRAM dump: start addr 0x%x, size 0x%x\n",
+		    plat_priv->sram_dump_start_addr, plat_priv->sram_dump_size);
+	if (!plat_priv->sram_dump_size)
 		return;
+
+	if (plat_priv->sram_dump)
+		memset(plat_priv->sram_dump, 0x00, plat_priv->sram_dump_size);
+	else
+		plat_priv->sram_dump = vzalloc(plat_priv->sram_dump_size);
 
 	if (!plat_priv->sram_dump) {
 		cnss_pr_err("SRAM dump memory is not allocated\n");
@@ -2093,11 +2208,13 @@ static void cnss_pci_dump_sram(struct cnss_pci_data *pci_priv)
 
 	cnss_pr_dbg("Dumping SRAM at 0x%lx\n", plat_priv->sram_dump);
 
-	for (i = 0; i < SRAM_DUMP_SIZE; i += sizeof(u32)) {
-		mem_addr = SRAM_START + i;
+	for (i = 0; i < plat_priv->sram_dump_size; i += sizeof(u32)) {
+		mem_addr = plat_priv->sram_dump_start_addr + i;
 		dump_ptr = (u32 *)(plat_priv->sram_dump + i);
-		if (cnss_pci_reg_read(pci_priv, mem_addr, dump_ptr)) {
-			cnss_pr_err("SRAM Dump failed at 0x%x\n", mem_addr);
+		ret = cnss_pci_reg_read(pci_priv, mem_addr, dump_ptr);
+		if (ret) {
+			cnss_pr_err("SRAM Dump failed at 0x%x, %d\n",
+				    mem_addr, ret);
 			break;
 		}
 		/* Relinquish CPU after dumping 256KB chunks*/
@@ -3696,13 +3813,13 @@ static void cnss_qca6290_crash_shutdown(struct cnss_pci_data *pci_priv)
 {
 	struct cnss_plat_data *plat_priv = pci_priv->plat_priv;
 
-	cnss_pci_sw_reset(pci_priv->pci_dev, false);
 	set_bit(CNSS_IN_PANIC, &plat_priv->driver_state);
 	cnss_pr_dbg("Crash shutdown with driver_state 0x%lx\n",
 		    plat_priv->driver_state);
 
 	cnss_pci_collect_dump_info(pci_priv, true);
 	clear_bit(CNSS_IN_PANIC, &plat_priv->driver_state);
+	cnss_pci_sw_reset(pci_priv->pci_dev, false);
 }
 
 static int cnss_qca6290_ramdump(struct cnss_pci_data *pci_priv)
@@ -3722,6 +3839,7 @@ static int cnss_qca6290_ramdump(struct cnss_pci_data *pci_priv)
 
 	cnss_pci_clear_dump_info(pci_priv);
 	cnss_pci_power_off_mhi(pci_priv);
+	cnss_pci_sw_reset(pci_priv->pci_dev, false);
 	cnss_suspend_pci_link(pci_priv);
 	cnss_pci_deinit_mhi(pci_priv);
 	cnss_power_off_device(plat_priv);
@@ -4166,6 +4284,29 @@ static int cnss_pci_resume_driver(struct cnss_pci_data *pci_priv)
 	return ret;
 }
 
+#ifndef CONFIG_NOT_SET_PCI_DSTATE
+static void
+cnss_pci_set_power_state(struct pci_dev *pci_dev, pci_power_t state)
+{
+	int ret = 0;
+
+	if (!pci_dev) {
+		cnss_pr_err("pci dev is NULL\n");
+		return;
+	}
+
+	ret = pci_set_power_state(pci_dev, state);
+	if (ret)
+		cnss_pr_err("Failed to set power state %s, err = %d\n",
+			    pci_power_name(state), ret);
+}
+#else
+static void
+cnss_pci_set_power_state(struct pci_dev *pci_dev, pci_power_t state)
+{
+}
+#endif
+
 int cnss_pci_suspend_bus(struct cnss_pci_data *pci_priv)
 {
 	struct pci_dev *pci_dev = pci_priv->pci_dev;
@@ -4185,10 +4326,7 @@ int cnss_pci_suspend_bus(struct cnss_pci_data *pci_priv)
 	pci_clear_master(pci_dev);
 	cnss_set_pci_config_space(pci_priv, SAVE_PCI_CONFIG_SPACE);
 	pci_disable_device(pci_dev);
-
-	ret = pci_set_power_state(pci_dev, PCI_D3hot);
-	if (ret)
-		cnss_pr_err("Failed to set D3Hot, err = %d\n", ret);
+	cnss_pci_set_power_state(pci_dev, PCI_D3hot);
 
 skip_disable_pci:
 	if (cnss_set_pci_link(pci_priv, PCI_LINK_DOWN)) {
@@ -5098,7 +5236,8 @@ retry:
 				CNSS_ASSERT(0);
 				return -ENOMEM;
 			}
-			if (plat_priv->fw_mem[i].type == CNSS_MEM_TYPE_DDR) {
+			if (plat_priv->fw_mem[i].type == CNSS_MEM_TYPE_DDR
+				|| plat_priv->fw_mem[i].type == CNSS_MEM_CAL_V01) {
 				cnss_qmi_set_remote_mem(plat_priv->remote_mem,
 							fw_mem[i].va,
 							fw_mem[i].size,
@@ -5350,6 +5489,12 @@ int cnss_pci_load_tme_opt_file(struct cnss_pci_data *pci_priv,
 		} else if (file == WLFW_TME_LITE_DPR_FILE_V01) {
 			tme_opt_filename = TME_DPR_FILE_NAME;
 			tme_lite_mem = &plat_priv->tme_opt_file_mem[2];
+		}
+		break;
+	case COLOGNE_DEVICE_ID:
+		if (file == WLFW_TME_LITE_OEM_FUSE_FILE_V01) {
+			tme_opt_filename = CGN_TME_OEM_FUSE_FILE_NAME;
+			tme_lite_mem = &plat_priv->tme_opt_file_mem[0];
 		}
 		break;
 	case QCA6174_DEVICE_ID:
@@ -7388,7 +7533,6 @@ static bool cnss_is_tme_supported(struct cnss_pci_data *pci_priv)
 }
 
 #ifdef CONFIG_ONE_MSI_VECTOR
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
 static void cnss_pci_set_mhi_event_config_for_one_msi(void)
 {
 	uint32_t i;
@@ -7402,21 +7546,6 @@ static void cnss_pci_set_mhi_event_config_for_one_msi(void)
 	for (i = 0; i < num_events; i++)
 		cnss_mhi_events[i].irq = 0;
 }
-#else
-static void cnss_pci_set_mhi_event_config_for_one_msi(void)
-{
-	/* The irq field value of cnss_mhi_events array should be set to 0, but when
-	 * the kernel version is older than 5.12, cnss_mhi_events is defined as const
-	 * type and irq field cannot be overwritten with the correct value. since the
-	 * kernel older than 5.12 is becoming outdated, this issue on the old kernel
-	 * will not be fixed for now.
-	 */
-	cnss_pr_err("Known issue: The irq field value of cnss_mhi_events should "
-		    "be an incorrect value in one msi mode, this may result in "
-		    "the host not being able to get interrupt. All rings should "
-		    "share the same vector 0 in one msi mode.");
-}
-#endif
 #else
 static void cnss_pci_set_mhi_event_config_for_one_msi(void)
 {
@@ -8608,7 +8737,11 @@ int cnss_pci_dump_fw_sram(struct cnss_pci_data *pci_priv)
 
 	for (io_offset = fw_sram_io_start;
 		io_offset < fw_sram_io_end; io_offset += sizeof(val)) {
-		cnss_pci_reg_read(pci_priv, io_offset, &val);
+		if (cnss_pci_reg_read(pci_priv, io_offset, &val)) {
+			cnss_pr_err("SRAM Dump failed at 0x%x\n", io_offset);
+			vfree(buf);
+			return -EIO;
+		}
 		memcpy(buf, &val, sizeof(val));
 		buf += sizeof(val);
 	}

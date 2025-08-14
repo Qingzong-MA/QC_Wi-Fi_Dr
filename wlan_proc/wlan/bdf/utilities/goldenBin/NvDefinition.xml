@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- NV Template File -->
-<!-- Derived from NvDefinition_QCC2072.xlsx on 01/15/2025 with version: 2.3.6 (DO NOT EDIT) -->
+<!-- Derived from NvDefinition_QCC2072.xlsx on 07/04/2025 with version: 2.4.12 (DO NOT EDIT) -->
 <NvDefinition>
 	<DataType name="uint8">
 		<Member type="uint8" sizeOf="1"/>
@@ -272,7 +272,15 @@
 		<Member type="uint8" sizeOf="1" name="mccLiteControlBits"/>
 		<Member type="uint8" sizeOf="1" name="auxAgileScanDisable"/>
 		<Member type="uint8" sizeOf="1" name="channel_priority_enable"/>
-		<Member type="uint8" sizeOf="152" name="baseFuture"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_2G_BW20"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_2G_BW40"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_5G_BW20"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_5G_BW40"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_5G_BW80"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_5G_BW160"/>
+		<Member type="uint8" sizeOf="1" name="su_sifs_offset_5G_BW320"/>
+		<Member type="uint8" sizeOf="1" name="RadioOffStatus"/>
+		<Member type="uint8" sizeOf="144" name="baseFuture"/>
 	</DataType>
 	<DataType name="HALPHY_BDF_FLAGS">
 		<Member type="uint32" sizeOf="1" name="opFlags"/>
@@ -298,7 +306,9 @@
 	</DataType>
 	<DataType name="DPD_CONFIG">
 		<Member type="uint8" sizeOf="1" name="dpdDebugMode"/>
-		<Member type="uint8" sizeOf="3" name="pad"/>
+		<Member type="uint8" sizeOf="1" name="nanDpdEnable"/>
+		<Member type="uint8" sizeOf="1" name="maxNdpChannels"/>
+		<Member type="uint8" sizeOf="1" name="nanTempThreshold"/>
 	</DataType>
 	<DataType name="DPD_CONFIG_EXT">
 		<Member type="uint16" sizeOf="1" name="dpdTempTimerDuration"/>
@@ -660,7 +670,9 @@
 		<Member type="uint8" sizeOf="1" name="DfsRssiThreshold160"/>
 		<Member type="RADAR_DET_CONFIG" sizeOf="2" name="radarDetConfig"/>
 		<Member type="uint16" sizeOf="1" name="autoMmseTxbf"/>
-		<Member type="uint8" sizeOf="129" name="baseFuture"/>
+		<Member type="uint16" sizeOf="32" name="Spur_freq_LP_synth_disable_EXT_5G"/>
+		<Member type="uint16" sizeOf="16" name="Spur_freq_LP_synth_disable_EXT_2G_40"/>
+		<Member type="uint8" sizeOf="33" name="baseFuture"/>
 	</DataType>
 	<DataType name="HWS_PER_PHY_SECTION">
 		<Member type="uint16" sizeOf="1" name="txMask2G"/>
@@ -1073,6 +1085,10 @@
 		<Member type="int8" sizeOf="1" name="minDacGainMargin"/>
 		<Member type="uint8" sizeOf="1" name="unused"/>
 	</DataType>
+	<DataType name="PRE_TXCAL_GUIDE_PER_BAND_EXT">
+		<Member type="uint8" sizeOf="15" name="pdetAttenProfile_32nddb_chain1"/>
+		<Member type="uint8" sizeOf="1" name="unused"/>
+	</DataType>
 	<DataType name="PER_RATE_POWER_OFFSET">
 		<Member type="int8" sizeOf="10" name="powerOffset_HT20"/>
 		<Member type="int8" sizeOf="10" name="powerOffset_HT40"/>
@@ -1162,10 +1178,6 @@
 		<Member type="uint32" sizeOf="1" name="CfrClipPerMcs5G_Ext_320"/>
 	</DataType>
 	<DataType name="CFR_POWER_OFFSETS">
-		<Member type="int8" sizeOf="1" name="PowerOffset_cck"/>
-		<Member type="int8" sizeOf="1" name="PowerOffset_low_mcs"/>
-		<Member type="int8" sizeOf="1" name="PowerOffset_mid_mcs"/>
-		<Member type="int8" sizeOf="1" name="PowerOffset_high_mcs"/>
 		<Member type="int8" sizeOf="1" name="PowerOffset_extended_range_su"/>
 		<Member type="uint8" sizeOf="1" name="PowerOffset_mcs_thr_high"/>
 		<Member type="uint8" sizeOf="1" name="PowerOffset_mcs_thr_mid"/>
@@ -1775,7 +1787,8 @@
 		<Member type="uint8" sizeOf="1" name="numDumRun"/>
 		<Member type="uint32" sizeOf="1" name="pdcGapWarConfig"/>
 		<Member type="uint16" sizeOf="1" name="pdcPaModeMask"/>
-		<Member type="uint8" sizeOf="3" name="reserved"/>
+		<Member type="uint8" sizeOf="1" name="pdcEnableDisableBits"/>
+		<Member type="uint8" sizeOf="2" name="reserved"/>
 	</DataType>
 	<DataType name="CGIM_CTRL_HIGH_INR">
 		<Member type="uint8" sizeOf="1" name="kpristep_db2"/>
@@ -1823,7 +1836,12 @@
 		<Member type="int8" sizeOf="80" name="refIssRef_RxTbl"/>
 		<Member type="uint8" sizeOf="80" name="RxGainRef_RxTbl"/>
 		<Member type="RSSI_DELTA_BW_5G_6G" sizeOf="5" name="RssiDeltaBW"/>
-		<Member type="uint8" sizeOf="106" name="reserved"/>
+		<Member type="int8" sizeOf="4" name="rssiOffsetdB2ForDTIM5G"/>
+		<Member type="uint16" sizeOf="16" name="chansBw40"/>
+		<Member type="uint16" sizeOf="8" name="chansBw80"/>
+		<Member type="uint16" sizeOf="8" name="chansBw160"/>
+		<Member type="uint16" sizeOf="4" name="chansBw320"/>
+		<Member type="uint8" sizeOf="30" name="reserved"/>
 	</DataType>
 	<DataType name="RSSI_COMP_TBL_2G">
 		<Member type="uint8" sizeOf="1" name="PktType"/>
@@ -1835,11 +1853,41 @@
 		<Member type="int8" sizeOf="16" name="refIssRef_RxTbl0"/>
 		<Member type="uint8" sizeOf="16" name="RxGainRef_RxTbl0"/>
 		<Member type="RSSI_DELTA_BW_2G" sizeOf="2" name="RssiDeltaBW"/>
-		<Member type="uint8" sizeOf="52" name="reserved"/>
+		<Member type="int8" sizeOf="4" name="rssiOffsetdB2ForDTIM2G"/>
+		<Member type="uint16" sizeOf="1" name="chansBw40"/>
+		<Member type="uint8" sizeOf="46" name="reserved"/>
 	</DataType>
 	<DataType name="PMIC_CAL_DATA">
 		<Member type="uint8" sizeOf="1" name="pmicCalValid"/>
 		<Member type="uint16" sizeOf="1" name="pmicTrimVal"/>
+	</DataType>
+	<DataType name="TGT_TEMP_OFFET_2G">
+		<Member type="uint8" sizeOf="1" name="DynTempOffsetEn2G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerHighTempThresh2G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerLowTempThresh2G"/>
+		<Member type="int8" sizeOf="2" name="targetPowerHighTempOffsetf2G_Ch01"/>
+		<Member type="int8" sizeOf="2" name="targetPowerLowTempOffsetf2G_Ch01"/>
+	</DataType>
+	<DataType name="TGT_TEMP_OFFET_5G6G">
+		<Member type="uint8" sizeOf="1" name="DynTempOffsetEn5G"/>
+		<Member type="uint8" sizeOf="1" name="DynTempOffsetEn6G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerHighTempThresh5G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerHighTempThresh6G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerLowTempThresh5G"/>
+		<Member type="int8" sizeOf="1" name="targetPowerLowTempThresh6G"/>
+		<Member type="int8" sizeOf="5" name="targetPowerHighTempOffsetf5G_Ch01"/>
+		<Member type="int8" sizeOf="5" name="targetPowerLowTempOffsetf5G_Ch01"/>
+		<Member type="int8" sizeOf="5" name="targetPowerHighTempOffsetf6G_Ch01"/>
+		<Member type="int8" sizeOf="5" name="targetPowerLowTempOffsetf6G_Ch01"/>
+	</DataType>
+	<DataType name="PDC_GB_CONFIG">
+		<Member type="uint16" sizeOf="6" name="p1Coef"/>
+		<Member type="uint16" sizeOf="6" name="p2Coef"/>
+		<Member type="uint16" sizeOf="6" name="p3Coef"/>
+		<Member type="int8" sizeOf="6" name="pLinearCoef"/>
+		<Member type="int8" sizeOf="1" name="tempCompBase"/>
+		<Member type="int16" sizeOf="1" name="tempCompSlope"/>
+		<Member type="uint8" sizeOf="3" name="pad"/>
 	</DataType>
 	<NvItem id="1" name="COMMON_BDF_HEADER">
 		<Member type="NV_HEADER" sizeOf="1" name="nvBase"/>
@@ -1922,7 +1970,9 @@
 		<Member type="uint16" sizeOf="1" name="TASMultiTxSingleTxICNIRP"/>
 		<Member type="uint8" sizeOf="1" name="SARSubSixBandInfo_U"/>
 		<Member type="uint8" sizeOf="10" name="SARSubSixBandMap"/>
-		<Member type="uint8" sizeOf="607" name="SAR6GFuture"/>
+		<Member type="uint32" sizeOf="1" name="NonTASEnableFlag"/>
+		<Member type="uint32" sizeOf="8" name="NonTASPowerLimitIndicator"/>
+		<Member type="uint8" sizeOf="571" name="SAR6GFuture"/>
 	</NvItem>
 	<NvItem id="6" name="BDF_ENABLE_DISABLE_FLAGS">
 		<Member type="NV_HEADER" sizeOf="1" name="nvBdfEnableDisableFlags"/>
@@ -1956,7 +2006,8 @@
 		<Member type="CALDB_CFG" sizeOf="1" name="calDbCfg2G"/>
 		<Member type="uint8" sizeOf="1" name="nvCaldbEnable"/>
 		<Member type="uint8" sizeOf="1" name="miniColdBoot"/>
-		<Member type="uint8" sizeOf="38" name="calDbFuture"/>
+		<Member type="uint32" sizeOf="1" name="skipFdmtLPflag"/>
+		<Member type="uint8" sizeOf="34" name="calDbFuture"/>
 	</NvItem>
 	<NvItem id="9" name="CHLIST_PER_PHY_PER_BAND_PER_BW">
 		<Member type="NV_HEADER" sizeOf="1" name="nvChListCbc"/>
@@ -2121,7 +2172,13 @@
 		<Member type="int8" sizeOf="16" name="HBSCh3Filterloss_olpc"/>
 		<Member type="int8" sizeOf="16" name="HBSCh2Filterloss_clpc"/>
 		<Member type="int8" sizeOf="16" name="HBSCh3Filterloss_clpc"/>
-		<Member type="uint8" sizeOf="406" name="hwsTpcConfigFuture"/>
+		<Member type="uint8" sizeOf="1" name="NonHtDupAckDisableFlag"/>
+		<Member type="int8" sizeOf="1" name="NonHtDupAck2G40Th"/>
+		<Member type="int8" sizeOf="4" name="NonHtDupAck5GTh"/>
+		<Member type="int8" sizeOf="4" name="NonHtDupAck6GTh"/>
+		<Member type="PRE_TXCAL_GUIDE_PER_BAND_EXT" sizeOf="1" name="preCalData2G_ext"/>
+		<Member type="PRE_TXCAL_GUIDE_PER_BAND_EXT" sizeOf="1" name="preCalData5G_ext"/>
+		<Member type="uint8" sizeOf="364" name="hwsTpcConfigFuture"/>
 	</NvItem>
 	<NvItem id="19" name="HWS_TPC_COMPENSATION">
 		<Member type="NV_HEADER" sizeOf="1" name="nvHwsTpcComp"/>
@@ -2129,7 +2186,9 @@
 		<Member type="uint8" sizeOf="2" name="alphaThermTbl2G"/>
 		<Member type="uint16" sizeOf="8" name="tempCompChans5G"/>
 		<Member type="uint8" sizeOf="8" name="alphaThermTbl5G"/>
-		<Member type="uint8" sizeOf="130" name="hwsTpcCompFuture"/>
+		<Member type="TGT_TEMP_OFFET_2G" sizeOf="1" name="tgtpwrTempOffset2G"/>
+		<Member type="TGT_TEMP_OFFET_5G6G" sizeOf="1" name="tgtpwrTempOffset5G6G"/>
+		<Member type="uint8" sizeOf="97" name="hwsTpcCompFuture"/>
 	</NvItem>
 	<NvItem id="20" name="HWS_TARGET_POWER_TABLES">
 		<Member type="NV_HEADER" sizeOf="1" name="nvHwsTargetPwr"/>
@@ -2178,7 +2237,13 @@
 		<Member type="uint8" sizeOf="1" name="minCcaPwrLpAdjDB2Ch0_1_2G"/>
 		<Member type="uint32" sizeOf="1" name="nfCalForcedOffset_320M_ch0"/>
 		<Member type="uint32" sizeOf="1" name="nfCalForcedOffset_320M_ch1"/>
-		<Member type="uint8" sizeOf="101" name="nfCalPerChainFuture"/>
+		<Member type="uint8" sizeOf="1" name="nfCalValMinDiff_2G"/>
+		<Member type="uint8" sizeOf="1" name="nfCalValMinDiff_5G"/>
+		<Member type="uint8" sizeOf="1" name="nfCalValMinDiff_6G"/>
+		<Member type="uint8" sizeOf="1" name="maxIterations"/>
+		<Member type="uint8" sizeOf="1" name="minIterations"/>
+		<Member type="uint8" sizeOf="1" name="minValid"/>
+		<Member type="uint8" sizeOf="95" name="nfCalPerChainFuture"/>
 	</NvItem>
 	<NvItem id="25" name="HWS_FEM_CONFIG">
 		<Member type="NV_HEADER" sizeOf="1" name="nvHwsFemConfig"/>
@@ -2255,6 +2320,7 @@
 		<Member type="NV_HEADER" sizeOf="1" name="nvHwsCfrData"/>
 		<Member type="CFR_CLIP_TABLE" sizeOf="1" name="cfrPreClipTbl"/>
 		<Member type="CFR_CLIP_TABLE" sizeOf="1" name="cfrClipTbl"/>
+		<Member type="CFR_POWER_OFFSETS_20" sizeOf="1" name="cfrOffsetsBW20Ofdma"/>
 		<Member type="CFR_POWER_OFFSETS" sizeOf="1" name="cfrOffsets"/>
 		<Member type="uint8" sizeOf="1" name="cfrDisable2G"/>
 		<Member type="uint8" sizeOf="1" name="cfrDisable56G"/>
@@ -2264,7 +2330,12 @@
 		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW80"/>
 		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW160"/>
 		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW320"/>
-		<Member type="uint8" sizeOf="14" name="cfrDataReserve"/>
+		<Member type="uint8" sizeOf="1" name="cfrflag"/>
+		<Member type="int8" sizeOf="1" name="PowerOffset_extended_range_su_2G"/>
+		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW40Ofdma"/>
+		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW80Ofdma"/>
+		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW160Ofdma"/>
+		<Member type="CFR_POWER_OFFSETS_40_80_160_320" sizeOf="1" name="cfrOffsetsBW320Ofdma"/>
 	</NvItem>
 	<NvItem id="32" name="HWS_CEB_CONFIG_SECTION">
 		<Member type="NV_HEADER" sizeOf="1" name="nvHwsCebConfig"/>
@@ -2393,8 +2464,14 @@
 		<Member type="PMIC_CAL_DATA" sizeOf="1" name="pmicCalData2G"/>
 		<Member type="uint8" sizeOf="2" name="pad_pmic"/>
 	</NvItem>
-	<NvItem id="48" name="RESERVED_NV">
+	<NvItem id="49" name="HWS_PDC_CONFIG_EXT">
+		<Member type="NV_HEADER" sizeOf="1" name="nvPDCConfigExt"/>
+		<Member type="PDC_GB_CONFIG" sizeOf="1" name="pdcGB2G"/>
+		<Member type="PDC_GB_CONFIG" sizeOf="1" name="pdcGB5G"/>
+		<Member type="PDC_GB_CONFIG" sizeOf="1" name="pdcGB6G"/>
+	</NvItem>
+	<NvItem id="50" name="RESERVED_NV">
 		<Member type="NV_HEADER" sizeOf="1" name="nvReserved"/>
-		<Member type="uint8" sizeOf="7074" name="reservedFuture"/>
+		<Member type="uint8" sizeOf="6922" name="reservedFuture"/>
 	</NvItem>
 </NvDefinition>

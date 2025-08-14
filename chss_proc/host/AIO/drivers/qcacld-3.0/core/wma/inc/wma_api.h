@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -982,4 +982,34 @@ static inline bool wma_is_epm_supported_fw(WMA_HANDLE handle)
 }
 #endif
 
+#ifdef FEATURE_WLAN_APF
+/**
+ * wma_get_fw_active_apf_mode() - convert active_apf_mode to WMI
+ * configurable APF mode
+ * @mode: APF mode
+ *
+ * Return: FW configurable APF mode
+ */
+enum wmi_host_active_apf_mode
+wma_get_fw_active_apf_mode(enum active_apf_mode mode);
+#else
+static inline enum wmi_host_active_apf_mode
+wma_get_fw_active_apf_mode(enum active_apf_mode mode)
+{
+	return WMI_HOST_ACTIVE_APF_DISABLED;
+}
+#endif /* FEATURE_WLAN_APF */
+
+/**
+ * wma_is_both_psd_eirp_support_present_for_sp() - FW can handle
+ * PSD and EIRP together or not
+ *
+ * @param: reg tpc power
+ * @value: true if FW can handle PSD and EIRP together or not
+ *
+ * Return: None
+ */
+void
+wma_is_both_psd_eirp_support_present_for_sp(struct reg_tpc_power_info *param,
+					    bool *value);
 #endif /* WMA_API_H */

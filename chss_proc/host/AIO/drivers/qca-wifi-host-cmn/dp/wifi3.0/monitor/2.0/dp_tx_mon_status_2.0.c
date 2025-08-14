@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -377,7 +377,7 @@ dp_tx_mon_generate_cts2self_frm(struct dp_pdev *pdev,
 	wh_min->i_dur[0] = (duration_le & 0xFF);
 
 	qdf_mem_copy(wh_min->i_addr1,
-		     TXMON_STATUS_INFO(tx_status_info, addr2),
+		     TXMON_STATUS_INFO(tx_status_info, addr1),
 		     QDF_MAC_ADDR_SIZE);
 
 	qdf_nbuf_set_pktlen(mpdu_nbuf, sizeof(*wh_min));
@@ -901,7 +901,6 @@ dp_tx_mon_generate_mu_block_ack_frm(struct dp_pdev *pdev,
  * dp_tx_mon_generate_block_ack_frm() - API to generate block ack frame
  * @pdev: pdev Handle
  * @tx_ppdu_info: pointer to tx ppdu info structure
- * @window_flag: frame generated window
  * @mac_id: LMAC ID
  *
  * Return: void
@@ -909,7 +908,6 @@ dp_tx_mon_generate_mu_block_ack_frm(struct dp_pdev *pdev,
 static void
 dp_tx_mon_generate_block_ack_frm(struct dp_pdev *pdev,
 				 struct dp_tx_ppdu_info *tx_ppdu_info,
-				 uint8_t window_flag,
 				 uint8_t mac_id)
 {
 	/* allocate and populate block ack frame */
@@ -996,21 +994,12 @@ dp_tx_mon_generate_block_ack_frm(struct dp_pdev *pdev,
 	/* duration */
 	*(u_int16_t *)(&wh_addr2->i_aidordur) = qdf_cpu_to_le16(0x0020);
 
-	if (window_flag) {
-		qdf_mem_copy(wh_addr2->i_addr2,
-			     TXMON_STATUS_INFO(tx_status_info, addr2),
-			     QDF_MAC_ADDR_SIZE);
-		qdf_mem_copy(wh_addr2->i_addr1,
-			     TXMON_STATUS_INFO(tx_status_info, addr1),
-			     QDF_MAC_ADDR_SIZE);
-	} else {
-		qdf_mem_copy(wh_addr2->i_addr2,
-			     TXMON_STATUS_INFO(tx_status_info, addr1),
-			     QDF_MAC_ADDR_SIZE);
-		qdf_mem_copy(wh_addr2->i_addr1,
-			     TXMON_STATUS_INFO(tx_status_info, addr2),
-			     QDF_MAC_ADDR_SIZE);
-	}
+	qdf_mem_copy(wh_addr2->i_addr2,
+		     TXMON_STATUS_INFO(tx_status_info, addr2),
+		     QDF_MAC_ADDR_SIZE);
+	qdf_mem_copy(wh_addr2->i_addr1,
+		     TXMON_STATUS_INFO(tx_status_info, addr1),
+		     QDF_MAC_ADDR_SIZE);
 
 	frm = (uint8_t *)&wh_addr2[1];
 	/* BA control */
@@ -1233,9 +1222,22 @@ dp_tx_mon_generated_response_frm(struct dp_pdev *pdev,
 		return QDF_STATUS_E_NOMEM;
 
 	tx_mon_be = dp_mon_pdev_get_tx_mon(mon_pdev_be, mac_id);
-
 	tx_status_info = &tx_mon_be->data_status_info;
 	gen_response = TXMON_STATUS_INFO(tx_status_info, generated_response);
+
+#ifdef WLAN_LOCAL_PKT_CAPTURE_SUBFILTER
+	if (TXMON_PPDU_COM(tx_ppdu_info, chan_freq) == 0) {
+		for (int i = 0; i < mon_pdev->num_links; i++) {
+			if (qdf_mem_cmp(TXMON_STATUS_INFO(tx_status_info, addr2),
+					mon_pdev->link_info[i].self_link_addr.raw,
+					QDF_MAC_ADDR_SIZE) == 0) {
+				TXMON_PPDU_COM(tx_ppdu_info, chan_freq) =
+				mon_pdev->link_info[i].freq;
+				break;
+			}
+		}
+	}
+#endif
 
 	switch (gen_response) {
 	case TXMON_GEN_RESP_SELFGEN_ACK:
@@ -1251,8 +1253,7 @@ dp_tx_mon_generated_response_frm(struct dp_pdev *pdev,
 	}
 	case TXMON_GEN_RESP_SELFGEN_BA:
 	{
-		dp_tx_mon_generate_block_ack_frm(pdev, tx_ppdu_info,
-						 RESPONSE_WINDOW, mac_id);
+		dp_tx_mon_generate_block_ack_frm(pdev, tx_ppdu_info, mac_id);
 		break;
 	}
 	case TXMON_GEN_RESP_SELFGEN_MBA:
@@ -1375,33 +1376,6 @@ dp_tx_mon_update_ppdu_info_status(struct dp_pdev *pdev,
 
 		/* based on medium protection type we need to generate frame */
 		dp_tx_mon_generate_prot_frm(pdev, tx_prot_ppdu_info, mac_id);
-		break;
-	}
-	case HAL_MON_RX_FRAME_BITMAP_ACK:
-	{
-		break;
-	}
-	case HAL_MON_RX_FRAME_BITMAP_BLOCK_ACK_256:
-	case HAL_MON_RX_FRAME_BITMAP_BLOCK_ACK_1K:
-	{
-		/*
-		 * this comes for each user
-		 * BlockAck is not same as ACK, single frame can hold
-		 * multiple BlockAck info
-		 */
-		tx_status_info = &tx_mon_be->data_status_info;
-
-		if (TXMON_PPDU_HAL(tx_data_ppdu_info, num_users) == 1)
-			dp_tx_mon_generate_block_ack_frm(pdev,
-							 tx_data_ppdu_info,
-							 INITIATOR_WINDOW,
-							 mac_id);
-		else
-			dp_tx_mon_generate_mu_block_ack_frm(pdev,
-							    tx_data_ppdu_info,
-							    INITIATOR_WINDOW,
-							    mac_id);
-
 		break;
 	}
 	case HAL_MON_TX_MPDU_START:
@@ -2241,33 +2215,31 @@ dp_tx_mon_process_status_tlv(struct dp_soc *soc,
 
 	tx_mon_be = dp_mon_pdev_get_tx_mon(mon_pdev_be, mac_id);
 
-	if (qdf_unlikely(tx_mon_be->last_frag_q_idx >
+	/* Flush all status buffer when receive end_reason 1 */
+	if (qdf_unlikely(mon_ring_desc->end_reason ==
+			 HAL_MON_FLUSH_DETECTED)) {
+		tx_mon_be->stats.ppdu_info_drop_flush++;
+		tx_mon_be->be_end_reason_bitmap = 0;
+		tx_mon_be->be_ppdu_id = mon_ring_desc->ppdu_id;
+		goto drop_queue_free_buf;
+	}
+
+	if (qdf_unlikely(tx_mon_be->last_frag_q_idx >=
 			 MAX_STATUS_BUFFER_IN_PPDU)) {
 		dp_mon_err("status frag queue for a ppdu[%d] exceed %d\n",
 			   tx_mon_be->be_ppdu_id,
 			   MAX_STATUS_BUFFER_IN_PPDU);
-		dp_tx_mon_status_queue_free(pdev, tx_mon_be, mon_desc_list_ref,
-					    mac_id);
-		goto free_status_buffer;
+		goto drop_queue_free_buf;
 	}
 
 	if (tx_mon_be->mode == TX_MON_BE_DISABLE &&
-	    !dp_lite_mon_is_tx_enabled(mon_pdev)) {
-		dp_tx_mon_status_queue_free(pdev, tx_mon_be,
-					    mon_desc_list_ref, mac_id);
-		goto free_status_buffer;
-	}
+	    !dp_lite_mon_is_tx_enabled(mon_pdev))
+		goto drop_queue_free_buf;
 
 	if (tx_mon_be->be_ppdu_id != mon_ring_desc->ppdu_id &&
 	    tx_mon_be->last_frag_q_idx) {
 		if (tx_mon_be->be_end_reason_bitmap &
-		    (1 << HAL_MON_FLUSH_DETECTED)) {
-			tx_mon_be->stats.ppdu_info_drop_flush++;
-			dp_tx_mon_status_queue_free(pdev, tx_mon_be,
-						    mon_desc_list_ref,
-						    mac_id);
-		} else if (tx_mon_be->be_end_reason_bitmap &
-			   (1 << HAL_MON_PPDU_TRUNCATED)) {
+		    (1 << HAL_MON_PPDU_TRUNCATED)) {
 			tx_mon_be->stats.ppdu_info_drop_trunc++;
 			dp_tx_mon_status_queue_free(pdev, tx_mon_be,
 						    mon_desc_list_ref,
@@ -2321,6 +2293,9 @@ dp_tx_mon_process_status_tlv(struct dp_soc *soc,
 
 	return QDF_STATUS_SUCCESS;
 
+drop_queue_free_buf:
+	dp_tx_mon_status_queue_free(pdev, tx_mon_be, mon_desc_list_ref,
+				    mac_id);
 free_status_buffer:
 	dp_tx_mon_status_free_packet_buf(pdev, status_frag, end_offset,
 					 mon_desc_list_ref, mac_id);

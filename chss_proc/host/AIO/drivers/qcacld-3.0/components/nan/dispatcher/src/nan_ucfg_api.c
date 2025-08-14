@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -74,6 +74,7 @@ static void nan_cfg_init(struct wlan_objmgr_psoc *psoc,
 				cfg_get(psoc, CFG_STA_P2P_NDP_CONCURRENCY);
 	nan_obj->cfg_param.prefer_nan_chan_for_p2p =
 				cfg_get(psoc, CFG_PREFER_NAN_CHAN_FOR_P2P);
+	nan_obj->cfg_param.nan_config = cfg_get(psoc, CFG_NAN_CONFIG);
 }
 
 /**
@@ -997,6 +998,13 @@ void ucfg_nan_disable_concurrency(struct wlan_objmgr_psoc *psoc)
 	nan_req.disable_2g_discovery = true;
 	nan_req.disable_5g_discovery = true;
 
+	status = ucfg_nan_cache_disable_req_info(psoc,
+						 NAN_DISABLE_REQ_INTERNAL);
+	if (QDF_IS_STATUS_ERROR(status)) {
+		nan_err("Unable to set disable req flag");
+		return;
+	}
+
 	status = ucfg_nan_discovery_req(&nan_req, NAN_DISABLE_REQ);
 	if (QDF_IS_STATUS_ERROR(status)) {
 		nan_err("Unable to disable NAN Discovery");
@@ -1826,4 +1834,10 @@ QDF_STATUS ucfg_nan_remove_ndp_peer_mac_addr(struct wlan_objmgr_psoc *psoc,
 bool ucfg_nan_is_allowed(struct wlan_objmgr_psoc *psoc)
 {
 	return nan_is_allowed(psoc);
+}
+
+QDF_STATUS
+ucfg_nan_cache_disable_req_info(struct wlan_objmgr_psoc *psoc, uint8_t value)
+{
+	return nan_cache_disable_req_info(psoc, value);
 }

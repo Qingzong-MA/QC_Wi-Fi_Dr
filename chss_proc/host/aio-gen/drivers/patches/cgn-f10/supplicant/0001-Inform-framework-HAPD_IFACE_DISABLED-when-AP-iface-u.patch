@@ -1,0 +1,29 @@
+From 60d4b4d5c56c282d48ecba742621583d622008d5 Mon Sep 17 00:00:00 2001
+From: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+Date: Wed, 5 Mar 2025 10:47:50 +0800
+Subject: [PATCH] Inform framework HAPD_IFACE_DISABLED when AP iface
+ unavailable
+
+This change adds callback to inform framework AP interface
+HAPD_IFACE_DISABLED when driver event INTERFACE_UNAVAILABLE.
+
+Signed-off-by: Zhiwei Yang <quic_zhiwyang@quicinc.com>
+---
+ src/ap/drv_callbacks.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ap/drv_callbacks.c b/src/ap/drv_callbacks.c
+index ba54fd792..c70768271 100644
+--- a/src/ap/drv_callbacks.c
++++ b/src/ap/drv_callbacks.c
+@@ -2227,6 +2227,7 @@ static void hostapd_event_iface_unavailable(struct hostapd_data *hapd)
+ 		hostapd_switch_channel_fallback(hapd->iface,
+ 						&hapd->cs_freq_params);
+ 	}
++	hostapd_disable_iface(hapd->iface);
+ }
+ 
+ 
+-- 
+2.25.1
+

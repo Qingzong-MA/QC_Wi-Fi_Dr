@@ -40,6 +40,10 @@ ifeq ($(CONFIG_DUMP_FW_BY_UMH),y)
 KBUILD_CPPFLAGS += -DCONFIG_DUMP_FW_BY_UMH
 endif
 
+ifeq ($(CONFIG_NOT_SET_PCI_DSTATE),y)
+KBUILD_CPPFLAGS += -DCONFIG_NOT_SET_PCI_DSTATE
+endif
+
 # CONFIG_CNSS_PLAT_IPC_QMI_SVC should never be "y" here since it
 # can be only compiled as a module from out-of-kernel-tree source.
 ifeq ($(CONFIG_CNSS_PLAT_IPC_QMI_SVC),m)
@@ -96,6 +100,14 @@ endif
 
 ifneq ($(CONFIG_PCIE_EMULATION),)
     KBUILD_CPPFLAGS += -DCONFIG_PCIE_EMULATION
+endif
+
+ifneq ($(CNSS2_PLATFORM_NAME),)
+	KBUILD_CPPFLAGS += -DCNSS2_PLATFORM_NAME=\"$(CNSS2_PLATFORM_NAME)\"
+endif
+
+ifneq ($(CONFIG_CNSS2_SLEEP_CLK),)
+	KBUILD_CPPFLAGS += -DCNSS2_SLEEP_CLK=$(CONFIG_CNSS2_SLEEP_CLK)
 endif
 
 ifneq ($(CONFIG_MHI_BUS),)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2021 The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -569,8 +569,8 @@ QDF_STATUS policy_mgr_update_connection_info(struct wlan_objmgr_psoc *psoc,
 	policy_mgr_dump_current_concurrency(psoc);
 	qdf_mutex_release(&pm_ctx->qdf_conc_list_lock);
 
-	if (mode == QDF_SAP_MODE || mode == QDF_P2P_GO_MODE ||
-	    mode == QDF_STA_MODE || mode == QDF_P2P_CLIENT_MODE)
+	if (mode == PM_SAP_MODE || mode == PM_P2P_GO_MODE ||
+	    mode == PM_STA_MODE || mode == PM_P2P_CLIENT_MODE)
 		policy_mgr_update_dfs_master_dynamic_enabled(psoc,
 							     false,
 							     NULL);
@@ -1939,7 +1939,7 @@ bool policy_mgr_is_sap_freq_allowed(struct wlan_objmgr_psoc *psoc,
 	 * STA+SAP SCC on LTE coex channel is allowed.
 	 */
 	if (policy_mgr_sta_sap_scc_on_lte_coex_chan(psoc) &&
-	    policy_mgr_is_sta_sap_scc(psoc, sap_freq)) {
+	    policy_mgr_is_sta_sap_scc(psoc, sap_freq, false)) {
 		policy_mgr_debug("unsafe freq %d for sap is allowed", sap_freq);
 		return true;
 	}
@@ -1984,6 +1984,7 @@ bool policy_mgr_is_sap_restart_required_after_sta_disconnect(
 	uint32_t sta_gc_present = 0;
 	qdf_freq_t user_config_freq = 0;
 	enum reg_wifi_band user_band, op_band;
+	qdf_freq_t ll_sap_freq;
 
 	if (intf_ch_freq)
 		*intf_ch_freq = 0;
@@ -1994,6 +1995,7 @@ bool policy_mgr_is_sap_restart_required_after_sta_disconnect(
 		return false;
 	}
 
+	ll_sap_freq = policy_mgr_get_ll_lt_sap_freq(psoc);
 	policy_mgr_get_sta_sap_scc_on_dfs_chnl(psoc, &sta_sap_scc_on_dfs_chnl_config_value);
 
 	if (!policy_mgr_is_hw_dbs_capable(psoc))
@@ -2083,7 +2085,7 @@ bool policy_mgr_is_sap_restart_required_after_sta_disconnect(
 		op_band = wlan_reg_freq_to_band(op_ch_freq_list[i]);
 		user_band = wlan_reg_freq_to_band(user_config_freq);
 
-		if (!sta_gc_present && user_config_freq &&
+		if (!ll_sap_freq && !sta_gc_present && user_config_freq &&
 		    op_band < user_band) {
 			curr_sap_freq = op_ch_freq_list[i];
 			policy_mgr_debug("Move sap to user configured freq: %d",
@@ -2117,6 +2119,13 @@ bool policy_mgr_is_sap_restart_required_after_sta_disconnect(
 
 	for (i = 0; i < pcl_len; i++) {
 		if (pcl_channels[i] == curr_sap_freq)
+			continue;
+
+		if (ll_sap_freq &&
+		    wlan_get_opmode_from_vdev_id(pm_ctx->pdev,
+						 sap_vdev_id) == QDF_SAP_MODE &&
+		    policy_mgr_are_2_freq_on_same_mac(psoc, pcl_channels[i],
+						      ll_sap_freq))
 			continue;
 
 		if (!policy_mgr_is_safe_channel(psoc, pcl_channels[i]) ||
@@ -3706,6 +3715,7 @@ policy_mgr_valid_sap_conc_channel_check(struct wlan_objmgr_psoc *psoc,
 	enum policy_mgr_con_mode con_mode;
 	uint32_t nan_2g_freq, nan_5g_freq;
 	uint8_t cc_mode;
+	uint8_t scc_vdev_id;
 
 	pm_ctx = policy_mgr_get_context(psoc);
 	if (!pm_ctx) {
@@ -3730,13 +3740,17 @@ policy_mgr_valid_sap_conc_channel_check(struct wlan_objmgr_psoc *psoc,
 	 * select other band channel if not.
 	 */
 	if (!ch_freq) {
+		scc_vdev_id =
+			policy_mgr_fetch_scc_vdev_id(psoc, sap_vdev_id,
+						     sap_ch_freq);
 		if (!policy_mgr_any_other_vdev_on_same_mac_as_freq(psoc,
 								   sap_ch_freq,
 								   sap_vdev_id)) {
 			return QDF_STATUS_SUCCESS;
 		} else if (con_mode == PM_SAP_MODE &&
 			   !policy_mgr_is_hw_dbs_capable(psoc) &&
-			   !policy_mgr_is_sta_sap_scc(psoc, sap_ch_freq) &&
+			   scc_vdev_id == WLAN_UMAC_VDEV_ID_MAX &&
+			   !policy_mgr_is_sta_sap_scc(psoc, sap_ch_freq, true) &&
 			   cc_mode != QDF_MCC_TO_SCC_WITH_SAME_LOWER_BAND_MCC_WITH_HIGHER_BAND) {
 			policymgr_nofl_debug("Mode %d MCC situation in non-dbs hw STA, no SCC freq found %d",
 					     con_mode, sap_ch_freq);
@@ -3749,7 +3763,7 @@ policy_mgr_valid_sap_conc_channel_check(struct wlan_objmgr_psoc *psoc,
 	if (!ch_freq)
 		return QDF_STATUS_SUCCESS;
 
-	is_sta_sap_scc = policy_mgr_is_sta_sap_scc(psoc, ch_freq);
+	is_sta_sap_scc = policy_mgr_is_sta_sap_scc(psoc, ch_freq, true);
 
 	nan_2g_freq =
 		policy_mgr_mode_specific_get_channel(psoc, PM_NAN_DISC_MODE);

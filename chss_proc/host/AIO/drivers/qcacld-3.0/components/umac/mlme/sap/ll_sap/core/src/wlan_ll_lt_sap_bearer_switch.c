@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -37,7 +37,7 @@ wlan_bs_req_id ll_lt_sap_bearer_switch_get_id(struct wlan_objmgr_psoc *psoc)
 	uint8_t vdev_id;
 
 	vdev_id = wlan_policy_mgr_get_ll_lt_sap_vdev_id(psoc);
-	if (vdev_id == WLAN_INVALID_VDEV_ID)
+	if (vdev_id >= WLAN_UMAC_PSOC_MAX_VDEVS)
 		return request_id;
 	vdev = wlan_objmgr_get_vdev_by_id_from_psoc(psoc, vdev_id,
 						    WLAN_LL_SAP_ID);
@@ -2119,10 +2119,14 @@ static void ll_lt_sap_deliver_non_wlan_audio_transport_switch_resp(
 	 * If there is no cached request in BS_SM, it means that some other
 	 * module has performed the bearer switch and it is not a response of
 	 * the wlan bearer switch request, so just update the current state of
-	 * the state machine
+	 * the state machine, in case status is completed, return if status is
+	 * not completed.
 	 */
-	ll_sap_debug("Bearer switch for non-wlan module's request");
-
+	if (status != WLAN_BS_STATUS_COMPLETED) {
+		ll_sap_debug("Vdev %d, Bearer switch to non-WLAN by other module failed %d",
+			     wlan_vdev_get_id(vdev), status);
+		return;
+	}
 	bs_sm_transition_to(bs_ctx, BEARER_NON_WLAN);
 }
 

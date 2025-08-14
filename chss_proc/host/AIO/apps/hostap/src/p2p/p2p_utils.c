@@ -98,6 +98,57 @@ static void p2p_reg_class_intersect(const struct p2p_reg_class *a,
 
 
 /**
+ * p2p_equivalent_op_class - Check whether two op classes equivalent
+ *
+ * Returns: 1 if op_class is equivalent or 0 if not
+ */
+static int p2p_equivalent_op_class(u8 a, u8 b) {
+	if (a == b)
+		return 1;
+
+	// EU and CN map channels in the range 149 to 161 to opclass 125,
+	// US maps these channels to opclass 124/125,
+	// thus op_class 124/125 are equivalent.
+	if ((a == 124 && b == 125) || (a == 125 && b == 124))
+		return 1;
+
+	return 0;
+}
+
+
+void p2p_channels_update_equivalent(const struct p2p_channels *a,
+				    struct p2p_channels *res)
+{
+	size_t i;
+	int cla = 0;
+
+	memset(res, 0, sizeof(*res));
+
+	// add equivalent channels
+	for (i = 0; i < a->reg_classes; i++) {
+		struct p2p_reg_class *c = &a->reg_class[i];
+
+		if (!c->channels)
+			continue;
+
+		if (c->reg_class == 124 || c->reg_class == 125) {
+			if (c->reg_class == 124)
+				res->reg_class[cla].reg_class = 125;
+			else
+				res->reg_class[cla].reg_class = 124;
+
+			memcpy(res->reg_class[cla].channel, c->channel, c->channels);
+			res->reg_class[cla].channels = c->channels;
+			cla ++;
+		}
+	}
+	res->reg_classes = cla;
+
+	p2p_channels_union_inplace(res, a);
+}
+
+
+/**
  * p2p_channels_intersect - Intersection of supported channel lists
  * @a: First set of supported channels
  * @b: Second set of supported channels
@@ -120,7 +171,8 @@ void p2p_channels_intersect(const struct p2p_channels *a,
 		const struct p2p_reg_class *a_reg = &a->reg_class[i];
 		for (j = 0; j < b->reg_classes; j++) {
 			const struct p2p_reg_class *b_reg = &b->reg_class[j];
-			if (a_reg->reg_class != b_reg->reg_class)
+			if (!p2p_equivalent_op_class(a_reg->reg_class,
+						     b_reg->reg_class))
 				continue;
 			p2p_reg_class_intersect(
 				a_reg, b_reg,

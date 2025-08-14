@@ -1,0 +1,88 @@
+From fc0aff51f88ddd0fc5352dee3c6b18db7b16f8ef Mon Sep 17 00:00:00 2001
+From: Zhiwei Yang <zhiwyang@qti.qualcomm.com>
+Date: Mon, 9 Jun 2025 15:38:17 +0800
+Subject: [PATCH] qcacld-3.0: Fix 20MHz STA mcs error when it connects to HE
+ 40MHz SAP
+
+When disable channel bonding of STA in INI, and connect STA to a
+HE 40MHz bandwidth SAP, the ch_width parameter in pe_session was
+overrode to 40MHz by the eht operation bandwidth in the beacon ie
+of the 40MHz SAP, resulting in no 20MHz mcs parameter being
+populated.
+
+To fix this issue, when overriding pe_session ch_width parameter,
+check if the channel bonding configuration is disabled.
+
+Signed-off-by: Zhiwei Yang <zhiwyang@qti.qualcomm.com>
+---
+ core/mac/src/pe/lim/lim_prop_exts_utils.c | 12 +++++++++---
+ core/mac/src/pe/lim/lim_prop_exts_utils.h |  6 ++++--
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/core/mac/src/pe/lim/lim_prop_exts_utils.c b/core/mac/src/pe/lim/lim_prop_exts_utils.c
+index 3f38ad6cd5..8c47720e66 100644
+--- a/core/mac/src/pe/lim/lim_prop_exts_utils.c
++++ b/core/mac/src/pe/lim/lim_prop_exts_utils.c
+@@ -346,7 +346,8 @@ void lim_update_he_mcs_12_13_map(struct wlan_objmgr_psoc *psoc,
+ 
+ #ifdef WLAN_FEATURE_11BE
+ void lim_extract_eht_op(struct pe_session *session,
+-			tSirProbeRespBeacon *beacon_struct)
++			tSirProbeRespBeacon *beacon_struct,
++			uint32_t cb_mode)
+ {
+ 	uint32_t max_eht_bw;
+ 
+@@ -383,7 +384,8 @@ void lim_extract_eht_op(struct pe_session *session,
+ 	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_80) {
+ 		session->ch_width = CH_WIDTH_80MHZ;
+ 		session->ch_center_freq_seg1 = 0;
+-	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_40) {
++	} else if (session->eht_op.channel_width == WLAN_EHT_CHWIDTH_40 &&
++		   cb_mode != WNI_CFG_CHANNEL_BONDING_MODE_DISABLE) {
+ 		session->ch_width = CH_WIDTH_40MHZ;
+ 		session->ch_center_freq_seg1 = 0;
+ 	} else {
+@@ -620,6 +622,10 @@ void lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
+ 	uint8_t sta_prefer_80mhz_over_160mhz;
+ 	struct mlme_vht_capabilities_info *mlme_vht_cap;
+ 	QDF_STATUS status;
++	uint32_t cb_mode;
++
++	cb_mode = lim_get_cb_mode_for_freq(mac_ctx, session,
++					   session->curr_op_freq);
+ 
+ 	beacon_struct = qdf_mem_malloc(sizeof(tSirProbeRespBeacon));
+ 	if (!beacon_struct)
+@@ -837,7 +843,7 @@ void lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
+ 	lim_check_is_he_mcs_valid(session, beacon_struct);
+ 	lim_check_peer_ldpc_and_update(session, beacon_struct);
+ 	lim_extract_he_op(session, beacon_struct);
+-	lim_extract_eht_op(session, beacon_struct);
++	lim_extract_eht_op(session, beacon_struct, cb_mode);
+ 	if (!mac_ctx->usr_eht_testbed_cfg)
+ 		lim_update_he_bw_cap_mcs(session, beacon_struct);
+ 	lim_update_eht_bw_cap_mcs(session, beacon_struct);
+diff --git a/core/mac/src/pe/lim/lim_prop_exts_utils.h b/core/mac/src/pe/lim/lim_prop_exts_utils.h
+index 92913058c3..b71a093d19 100644
+--- a/core/mac/src/pe/lim/lim_prop_exts_utils.h
++++ b/core/mac/src/pe/lim/lim_prop_exts_utils.h
+@@ -67,11 +67,13 @@ lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
+  * Return: None
+  */
+ void lim_extract_eht_op(struct pe_session *session,
+-			tSirProbeRespBeacon *beacon_struct);
++			tSirProbeRespBeacon *beacon_struct,
++			uint32_t cb_mode);
+ #else
+ static inline void
+ lim_extract_eht_op(struct pe_session *session,
+-		   tSirProbeRespBeacon *beacon_struct)
++		   tSirProbeRespBeacon *beacon_struct,
++		   uint32_t cb_mode)
+ {}
+ #endif
+ 
+-- 
+2.25.1
+

@@ -1,0 +1,125 @@
+From 795ca4e9f0bbefeb05b29ce42452092658557710 Mon Sep 17 00:00:00 2001
+From: Krupali Dhanvijay <kdhanvij@qti.qualcomm.com>
+Date: Tue, 24 Jun 2025 11:16:14 +0800
+Subject: [PATCH] Revert "qcacld-3.0: Fix discrepancy in HE Phy-cap and ML HE Phy-cap"
+
+This reverts commit cafe9f73f704416ff227f372c33dab2f25f5d3cc.
+
+Reason for revert: HE160 DL TPUT regression
+
+Signed-off-by: Zhiwei Yang <zhiwyang@qti.qualcomm.com>
+---
+ .../src/sys/legacy/src/utils/src/parser_api.c | 41 ++++++++-----------
+ core/sme/src/common/sme_api.c                 | 15 -------
+ 2 files changed, 18 insertions(+), 38 deletions(-)
+
+diff --git a/core/mac/src/sys/legacy/src/utils/src/parser_api.c b/core/mac/src/sys/legacy/src/utils/src/parser_api.c
+index fffd27f425..c3d3c1d70f 100644
+--- a/core/mac/src/sys/legacy/src/utils/src/parser_api.c
++++ b/core/mac/src/sys/legacy/src/utils/src/parser_api.c
+@@ -68,8 +68,6 @@
+ #endif
+ 
+ #include <wlan_vdev_mgr_utils_api.h>
+-#include "cfg_mlme_he_caps.h"
+-#include "cfg_ucfg_api.h"
+ 
+ #define BW_160 160
+ 
+@@ -8265,9 +8263,6 @@ populate_dot11f_he_caps_by_band(struct mac_context *mac_ctx,
+ 				tDot11fIEhe_cap *he_cap,
+ 				struct pe_session *session)
+ {
+-	uint8_t *ppet;
+-	uint32_t ppet_value = 0;
+-
+ 	if (is_2g) {
+ 		qdf_mem_copy(he_cap, &mac_ctx->he_cap_2g, sizeof(*he_cap));
+ 		if (session) {
+@@ -8283,23 +8278,6 @@ populate_dot11f_he_caps_by_band(struct mac_context *mac_ctx,
+ 	if (session)
+ 		populate_dot11f_twt_he_cap(mac_ctx, session, he_cap);
+ 
+-	if (he_cap->ppet_present) {
+-		ppet_value = WNI_CFG_HE_PPET_LEN;
+-		if (!is_2g)
+-			qdf_mem_copy(he_cap->ppet.ppe_threshold.ppe_th,
+-				     mac_ctx->mlme_cfg->he_caps.he_ppet_5g,
+-				     ppet_value);
+-		else
+-			qdf_mem_copy(he_cap->ppet.ppe_threshold.ppe_th,
+-				     mac_ctx->mlme_cfg->he_caps.he_ppet_2g,
+-				     ppet_value);
+-		ppet = he_cap->ppet.ppe_threshold.ppe_th;
+-		he_cap->ppet.ppe_threshold.num_ppe_th =
+-					lim_truncate_ppet(ppet, ppet_value);
+-	} else {
+-		he_cap->ppet.ppe_threshold.num_ppe_th = 0;
+-	}
+-
+ 	return QDF_STATUS_SUCCESS;
+ }
+ 
+@@ -13856,7 +13834,8 @@ QDF_STATUS populate_dot11f_assoc_req_mlo_ie(struct mac_context *mac_ctx,
+ 	struct wlan_mlo_eml_cap eml_cap = {0};
+ 	uint16_t presence_bitmap = 0;
+ 	bool is_2g;
+-	uint8_t cb_mode;
++	uint32_t value = 0;
++	uint8_t *ppet, cb_mode;
+ 	uint8_t *eht_cap_ie = NULL;
+ 	bool sta_prof_he_ie = false;
+ 
+@@ -14256,7 +14235,23 @@ QDF_STATUS populate_dot11f_assoc_req_mlo_ie(struct mac_context *mac_ctx,
+ 
+ 		populate_dot11f_he_caps_by_band(mac_ctx, is_2g, &he_caps,
+ 						pe_session);
++		if (he_caps.ppet_present) {
++			value = WNI_CFG_HE_PPET_LEN;
++			if (!is_2g)
++				qdf_mem_copy(he_caps.ppet.ppe_threshold.ppe_th,
++					mac_ctx->mlme_cfg->he_caps.he_ppet_5g,
++					value);
++			else
++				qdf_mem_copy(he_caps.ppet.ppe_threshold.ppe_th,
++					mac_ctx->mlme_cfg->he_caps.he_ppet_2g,
++					value);
+ 
++			ppet = he_caps.ppet.ppe_threshold.ppe_th;
++			he_caps.ppet.ppe_threshold.num_ppe_th =
++				lim_truncate_ppet(ppet, value);
++		} else {
++			he_caps.ppet.ppe_threshold.num_ppe_th = 0;
++		}
+ 		if ((he_caps.present && frm->he_cap.present &&
+ 		     qdf_mem_cmp(&he_caps, &frm->he_cap, sizeof(he_caps))) ||
+ 		     (he_caps.present && !frm->he_cap.present)) {
+diff --git a/core/sme/src/common/sme_api.c b/core/sme/src/common/sme_api.c
+index b2cc684fe2..ada820ba4e 100644
+--- a/core/sme/src/common/sme_api.c
++++ b/core/sme/src/common/sme_api.c
+@@ -11142,21 +11142,6 @@ void sme_update_tgt_he_cap(mac_handle_t mac_handle,
+ 		mac_ctx->he_cap_5g.tx_he_mcs_map_lt_80,
+ 		mac_ctx->mlme_cfg->he_caps.dot11_he_cap.tx_he_mcs_map_lt_80);
+ 
+-	/* Reset below params to default */
+-	mac_ctx->he_cap_5g.bfee_sts_gt_80 = 0;
+-
+-	mac_ctx->he_cap_2g.num_sounding_gt_80 = 0;
+-	mac_ctx->he_cap_5g.num_sounding_gt_80 = 0;
+-
+-	mac_ctx->he_cap_2g.he_ppdu_20_in_40Mhz_2G = 0;
+-	mac_ctx->he_cap_5g.he_ppdu_20_in_40Mhz_2G = 0;
+-
+-	mac_ctx->he_cap_2g.he_ppdu_20_in_160_80p80Mhz = 0;
+-	mac_ctx->he_cap_5g.he_ppdu_20_in_160_80p80Mhz = 0;
+-
+-	mac_ctx->he_cap_2g.he_ppdu_80_in_160_80p80Mhz = 0;
+-	mac_ctx->he_cap_5g.he_ppdu_80_in_160_80p80Mhz = 0;
+-
+ 	value = QDF_MIN(mac_ctx->he_cap_2g.fragmentation,
+ 			mac_ctx->mlme_cfg->he_caps.he_dynamic_fragmentation);
+ 
+-- 
+2.25.1
+
