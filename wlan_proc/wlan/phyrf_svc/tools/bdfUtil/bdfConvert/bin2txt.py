@@ -1,8 +1,9 @@
 '''
- * Copyright (c) 2019 Qualcomm Technologies, Inc.
- * All Rights Reserved.
- * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * 	Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ *  All rights reserved.
+ *  Confidential and Proprietary - Qualcomm Technologies, Inc.
 '''
+
 from sys import argv
 import struct
 import math
@@ -11,16 +12,16 @@ import sys
 
 
 def numerical_val(val,nBits,signVal):
-    a = nBits/8
+    a = nBits // 8  # Use integer division
     numVal = 0
     for b in range(a):
         numVal = numVal << 8
-        if(sys.byteorder == "little"):
-            numVal = numVal + ord(val[a-1-b])
+        if sys.byteorder == "little":
+            numVal = numVal + val[a - 1 - b]
         else:
-            numVal = numVal + ord(val[b])
-    if ((signVal == 'i') and (numVal > (1<< nBits)/2)):
-        return ((1<<nBits)-numVal)*(-1)
+            numVal = numVal + val[b]
+    if (signVal == 'i') and (numVal > (1 << nBits) / 2):
+        return ((1 << nBits) - numVal) * (-1)
     else:
         return numVal
 
@@ -50,7 +51,7 @@ def main(argv):
         script, binFile, txtFile = argv
     elif len(argv)==4:
         script, splArg, binFile, txtFile = argv
-        print "Currently not supported."
+        print ("Currently not supported.")
         if splArg not in splArgsList:
             exit()
         if splArg == "-h":
@@ -74,7 +75,7 @@ def main(argv):
         i=1
     while (i < len(txtLines)):
         txtLines[i] = txtLines[i].strip()
-        lineSet = txtLines[i].split('\t')
+        lineSet = txtLines[i].split() 
         if lineSet[0][(len(lineSet[0])-2):][0] == '_':
             f.seek(seekVal)
             seekVal += 1
@@ -85,9 +86,9 @@ def main(argv):
             val = numerical_val(val,8,'u')
             while s:
                 txtLines[i] = txtLines[i].strip()
-                lineSet = txtLines[i].split('\t')
+                lineSet = txtLines[i].split() # Use str.split()
                 byteOffset = lineSet[0][(len(lineSet[0])-3):]
-                num = (int(val) & (int(math.pow(2,(int(byteOffset[0]) + int(byteOffset[2])))) - 1))/(int(math.pow(2, int(byteOffset[0]))))
+                num = (int(val) & (int(math.pow(2, (int(byteOffset[0]) + int(byteOffset[2])))) - 1)) // (int(math.pow(2, int(byteOffset[0])))) 
                 if num >= 0:
                     lineSet[2] = ' ' + str(num)
                 else:
@@ -110,16 +111,18 @@ def main(argv):
                 lineSet[2] = str(fin)
             txtLines[i] = '\t'. join(lineSet)
         i += 1
-    txt.close
+    txt.close() # Add parentheses to call close method
 
 
     txt = open(txtFile+"_new.txt","w")
-    txt.truncate
+    # .truncate() is a method of the file object, not a standalone function
     for line in txtLines:
-        txt.writelines(line)
-        txt.writelines(" \n")
-    f.close
-    txt.close
+        #writelines expects a list of strings; writing one line at a time
+        txt.write(line + " \n") 
+    f.close()
+    txt.close()
+
+    print("\nGenerated {}_new.txt from {} ".format(txtFile, binFile))
 
 if __name__== "__main__":
     main(sys.argv)

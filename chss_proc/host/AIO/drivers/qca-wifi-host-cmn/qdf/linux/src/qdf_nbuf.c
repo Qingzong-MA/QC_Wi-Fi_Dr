@@ -121,7 +121,6 @@ struct qdf_track_timer {
 };
 
 static struct qdf_track_timer alloc_track_timer;
-static qdf_nbuf_queue_t invalid_nbuf_queue;
 
 #define QDF_NBUF_ALLOC_EXPIRE_TIMER_MS  5000
 #define QDF_NBUF_ALLOC_EXPIRE_CNT_THRESHOLD  50
@@ -339,27 +338,6 @@ void qdf_nbuf_set_state(qdf_nbuf_t nbuf, uint8_t current_state)
 					current_state);
 }
 qdf_export_symbol(qdf_nbuf_set_state);
-
-void qdf_nbuf_invalid_nbuf_queue_init(void)
-{
-       qdf_nbuf_queue_init(&invalid_nbuf_queue);
-}
-
-void qdf_nbuf_invalid_nbuf_queue_deinit(void)
-{
-       qdf_nbuf_t buf = NULL;
-
-       qdf_err("invalid nbuf to free:%u", qdf_nbuf_queue_len(&invalid_nbuf_queue));
-       while ((buf = qdf_nbuf_queue_remove(&invalid_nbuf_queue)) != NULL) {
-               if (qdf_likely(buf))
-                       dev_kfree_skb_any(buf);
-       }
-}
-
-void qdf_nbuf_invalid_nbuf_queue_add(struct sk_buff *skb)
-{
-       qdf_nbuf_queue_add(&invalid_nbuf_queue, skb);
-}
 
 #ifdef FEATURE_NBUFF_REPLENISH_TIMER
 /**
@@ -663,7 +641,6 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
 {
 	struct sk_buff *skb;
 	int flags = GFP_KERNEL;
-	uint32_t lowmem_alloc_tries = 0;
 
 	if (align)
 		size += (align - 1);
@@ -671,7 +648,6 @@ struct sk_buff *__qdf_nbuf_alloc(qdf_device_t osdev, size_t size, int reserve,
 	if (in_interrupt() || irqs_disabled() || in_atomic())
 		flags = GFP_ATOMIC;
 
-realloc:
 	skb =  alloc_skb(size, flags);
 
 	if (skb)
@@ -689,18 +665,6 @@ realloc:
 	__qdf_nbuf_stop_replenish_timer();
 
 skb_alloc:
-        if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
-                lowmem_alloc_tries++;
-               qdf_nofl_err("small address allocated, realloc");
-               qdf_nbuf_invalid_nbuf_queue_add(skb);
-                if (lowmem_alloc_tries > 100) {
-                        qdf_nofl_err("NBUF alloc failed %zuB @ %s:%d",
-                                     size, func, line);
-                        return NULL;
-                } else {
-                        goto realloc;
-                }
-        }
 	qdf_nbuf_set_defaults(skb, align, reserve);
 
 	return skb;
@@ -717,7 +681,6 @@ struct sk_buff *__qdf_nbuf_frag_alloc(qdf_device_t osdev, size_t size,
 	struct sk_buff *skb;
 	int flags = GFP_KERNEL & ~__GFP_DIRECT_RECLAIM;
 	bool atomic = false;
-	uint32_t lowmem_alloc_tries = 0;
 
 	if (align)
 		size += (align - 1);
@@ -736,7 +699,6 @@ struct sk_buff *__qdf_nbuf_frag_alloc(qdf_device_t osdev, size_t size,
 #endif
 	}
 
-realloc:
 	skb = __netdev_alloc_skb(NULL, size, flags);
 	if (skb)
 		goto skb_alloc;
@@ -761,19 +723,6 @@ realloc:
 	__qdf_nbuf_stop_replenish_timer();
 
 skb_alloc:
-        if (virt_to_phys(qdf_nbuf_data(skb)) < 0x2000) {
-                lowmem_alloc_tries++;
-               qdf_nofl_err("small address allocated, realloc");
-               qdf_nbuf_invalid_nbuf_queue_add(skb);
-                if (lowmem_alloc_tries > 100) {
-                        qdf_nofl_err("NBUF alloc failed %zuB @ %s:%d",
-                                     size, func, line);
-                        return NULL;
-                } else {
-                        goto realloc;
-                }
-        }
-
 	qdf_nbuf_set_defaults(skb, align, reserve);
 
 	return skb;

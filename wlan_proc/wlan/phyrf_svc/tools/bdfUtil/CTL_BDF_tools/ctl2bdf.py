@@ -1,5 +1,10 @@
+'''
+ * 	Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ *  All rights reserved.
+ *  Confidential and Proprietary - Qualcomm Technologies, Inc.
+'''
+
 #import pandas as pd
-from telnetlib import NOP
 from pandas import read_excel, read_csv, ExcelWriter
 from openpyxl import load_workbook
 from functools import reduce
@@ -18,6 +23,7 @@ import config_wcn7850
 import config_qcc2072
 import config_wcn7750
 import config_wcn7880
+import config_wcn8850
 import config_qcn9224
 import config_ipq5332_qcn6432
 
@@ -1157,11 +1163,9 @@ def read_Exception():
     global g_excp_mgmt_5g_startIdx, g_excp_mgmt_5g_endIdx
     global g_excp_mgmt_6g_startIdx, g_excp_mgmt_6g_endIdx
 
-    ## FIXME
-    '''
-    pandas\core\dtypes\cast.py:1429: DeprecationWarning: np.find_common_type is deprecated.  Please use `np.result_type` or `np.promote_types`.
-    See https://numpy.org/devdocs/release/1.25.0-notes.html and the docs for more information.  (Deprecated NumPy 1.25)
-    '''
+	#pandas\core\dtypes\cast.py:1429: DeprecationWarning: np.find_common_type is deprecated.  Please use `np.result_type` or `np.promote_types`.
+    #See https://numpy.org/devdocs/release/1.25.0-notes.html and the docs for more information.  (Deprecated NumPy 1.25)
+    
     warnings.simplefilter(action="ignore", category=DeprecationWarning)
     if custom_exp_file_name != "":
         try:
@@ -1319,7 +1323,7 @@ def read_Exception():
         if zeroExcep != False:
             print("ERROR: Zero Value for Exception is invalid.")
         if rangeExcep != False:
-            print("ERROR: Out of range Exception entries.")
+            print("ERROR: Exception entries are out of range. Entries should be in the range of", MIN_RANGE/MULTIPLIER_4, "and", MAX_RANGE/MULTIPLIER_4)
         if duplicateItem:
             print("ERROR: Duplicate Exception Entry found.")
         if subbandAbove80 != False:
@@ -1484,10 +1488,12 @@ if __name__ == '__main__':
     cmdParser.add_argument('-c', '--chip', action="store", default="wcn7850", help="[wcn7850/qcn9224/ipq5332/qcn6432]")
     cmdParser.add_argument('-e', '--expfile', action="store", default="", help="name of custom exceptions .csv file")
     cmdParser.add_argument("-ho", "--heavyclipOffset", dest="sheet_HC", help="expanded heavy clip excel file")
+    cmdParser.add_argument('--override-exception-limits', action="store", nargs=2, default=None, help="min and max limit of CTL exception values")
     args = cmdParser.parse_args()
 
     bdf_file_name = args.file
     custom_exp_file_name = args.expfile
+    new_limits = args.override_exception_limits
     print("Executing ctl2bdf script for chip - {}".format(args.chip))
 
     ## FIXME
@@ -1526,7 +1532,18 @@ if __name__ == '__main__':
         DictCtlGroup2G = config_wcn7880.CTL_GROUPS_2G
         DictPowerType6G = config_wcn7880.POWER_TYPE_6G
         enhanced_heavy_clip_import = None
-    if args.chip == 'wcn7850':
+    if args.chip == 'wcn8850':
+        DictCtlRegion = config_wcn8850.CTL_REGION
+        DictDevCategory = config_wcn8850.DEVICE_CATEGORY
+        DictFreqBand = config_wcn8850.FREQ_BAND
+        DictPowerRules = config_wcn8850.POWER_RULES
+        DictArrayGainRules = config_wcn8850.ARRAY_GAIN_RULES
+        DictSubBandExcp = config_wcn8850.SUBBAND_EXCEPTIONS
+        DictCtlGroup5G6G = config_wcn8850.CTL_GROUPS_5G_6G
+        DictCtlGroup2G = config_wcn8850.CTL_GROUPS_2G
+        DictPowerType6G = config_wcn8850.POWER_TYPE_6G
+        enhanced_heavy_clip_import = None
+    if args.chip == 'hmt' or args.chip == 'wcn7850':
         DictCtlRegion = config_wcn7850.CTL_REGION
         DictDevCategory = config_wcn7850.DEVICE_CATEGORY
         DictFreqBand = config_wcn7850.FREQ_BAND
@@ -1626,3 +1643,5 @@ if __name__ == '__main__':
             # Heavy clip MCS offset
             print("BDF \"{}\" used to update heavy clip MCS offset".format(bdf_file_new))
             enhanced_heavy_clip.main(enhanced_heavy_clip_import)
+            
+        print("\n{} is generated from excel".format(bdf_file_new))

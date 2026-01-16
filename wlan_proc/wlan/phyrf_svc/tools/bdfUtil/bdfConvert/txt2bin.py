@@ -1,7 +1,7 @@
 '''
- * Copyright (c) 2019 Qualcomm Technologies, Inc.
- * All Rights Reserved.
- * Confidential and Proprietary - Qualcomm Technologies, Inc.
+ * 	Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ *  All rights reserved.
+ *  Confidential and Proprietary - Qualcomm Technologies, Inc.
 '''
 from sys import argv
 #import binascii
@@ -25,13 +25,13 @@ def checksumCal(typeVal, checksumVal, byteSize, num):
     lenVal = (typeVal[(len(typeVal)-2):])
     res = 0
     if(lenVal == "t8"):
-        res = (int(math.pow(2, 8)) + num) if((num < 0) and (typeVal[0] == 'i')) else num
-    if(lenVal == "16"):
-        res = (int(math.pow(2, 16)) + num) if((num < 0) and (typeVal[0] == 'i')) else num
-    if(lenVal == "32"):
-        res = (int(math.pow(2, 32)) + num) if((num < 0) and (typeVal[0] == 'i')) else num
-    if(lenVal == "64"):
-        res = (int(math.pow(2, 64)) + num) if((num < 0) and (typeVal[0] == 'i')) else num
+        res = ((1 << 8) + num) if((num < 0) and (typeVal[0] == 'i')) else num
+    elif(lenVal == "16"): # Changed to elif for efficiency
+        res = ((1 << 16) + num) if((num < 0) and (typeVal[0] == 'i')) else num
+    elif(lenVal == "32"): # Changed to elif
+        res = ((1 << 32) + num) if((num < 0) and (typeVal[0] == 'i')) else num
+    elif(lenVal == "64"): # Changed to elif
+        res = ((1 << 64) + num) if((num < 0) and (typeVal[0] == 'i')) else num
     if(checksumVal == "checksum"):
         byteCount = byteCount + 2
         workCheck = byteCount % 2
@@ -43,7 +43,7 @@ def checksumCal(typeVal, checksumVal, byteSize, num):
             wordVal = res % 256 if(wordCheck == 1) else (wordVal | ((res % 256)*256))
             if(wordCheck == 0):
                 checkSum = checkSum ^ wordVal
-            res = res / 256
+            res = res // 256 # Changed to integer division
             byteSize -= 1
             
 def num_bytes(typeVal):
@@ -63,11 +63,11 @@ def data_type(typeVal):
     res = 'n'
     if(lenVal == "t8"):
         res = 'b' if(typeVal[0] == 'i') else 'B'
-    if(lenVal == "16"):
+    elif(lenVal == "16"): # Changed to elif
         res = 'h' if(typeVal[0] == 'i') else 'H'
-    if(lenVal == "32"):
+    elif(lenVal == "32"): # Changed to elif
         res = 'l' if(typeVal[0] == 'i') else 'L'
-    if(lenVal == "64"):
+    elif(lenVal == "64"): # Changed to elif
         res = 'q' if(typeVal[0] == 'i') else 'Q'
     if(res == 'n'):
         res = 'b'
@@ -81,8 +81,7 @@ def bit_pack(a, txtLines):
         txtLines[a] = txtLines[a].strip()
         lineSet = txtLines[a].split('\t')
         if lineSet[2][0] == ' ':
-            val = lineSet[2].split(' ')
-            val = val[1]
+            val = lineSet[2].split(' ')[1] # Accessing [1] directly
         else:
             val = lineSet[2]
         if val.find("0x") != -1:
@@ -131,7 +130,7 @@ def main(argv):
 
     if vercpy==True:
         version = txtLines[0].split(" ")[4]
-        print "Copying txt tpl version "+str(version)+" to binary."
+        print ("Copying txt tpl version "+str(version)+" to binary.")
         #exit()
         tplVer1=version.split(".")[0]
         tplVer2=version.split(".")[1]
@@ -168,7 +167,7 @@ def main(argv):
                     num=int(tplVer2)
                 if "bdfTemplateVer3" in lineSet[1]:
                     num=int(tplVer3)
-                    print "Copied BDF txt template version to binary."                
+					#print("Copied BDF txt template version to binary.")                
         f.seek(seekVal)
         seekVal += num_bytes(lineSet[0])
         if lineSet[0][(len(lineSet[0])-2):][0] == '_':
@@ -198,7 +197,7 @@ def main(argv):
         #print a
     f.close
     txt.close
-    #print "Generated "+binFile+" from "+txtFile+"."
+    print("\nGenerated {} from {} ".format(binFile, txtFile))
 
 if __name__== "__main__":
     main(sys.argv)

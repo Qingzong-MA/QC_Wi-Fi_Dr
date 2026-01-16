@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- NV Template File -->
-<!-- Derived from NvDefinition_QCC2072.xlsx on 07/04/2025 with version: 2.4.12 (DO NOT EDIT) -->
+<!-- Derived from NvDefinition_QCC2072.xlsx on 08/26/2025 with version: 2.5.2 (DO NOT EDIT) -->
 <NvDefinition>
 	<DataType name="uint8">
 		<Member type="uint8" sizeOf="1"/>
@@ -946,8 +946,9 @@
 		<Member type="uint16" sizeOf="5" name="dpdTrainMemSample"/>
 		<Member type="uint16" sizeOf="4" name="dpdCurveFitSmGain"/>
 		<Member type="uint8" sizeOf="20" name="ScalingEn"/>
-		<Member type="uint8" sizeOf="1" name="ScalinValue"/>
-		<Member type="uint8" sizeOf="45" name="dpdConfigPerBand5gFuture_1"/>
+		<Member type="uint8" sizeOf="1" name="ScalinFactor"/>
+		<Member type="uint8" sizeOf="8" name="ScalingOffset"/>
+		<Member type="uint8" sizeOf="37" name="dpdConfigPerBand5gFuture_1"/>
 		<Member type="int8" sizeOf="16" name="dpdWarmPktDacGain"/>
 		<Member type="int8" sizeOf="16" name="dpdWarmPktDacGainExt"/>
 		<Member type="uint8" sizeOf="4" name="dpdPostScalingValue"/>
@@ -957,7 +958,8 @@
 		<Member type="uint16" sizeOf="4" name="dpdPsatFreqThr1"/>
 		<Member type="uint16" sizeOf="4" name="dpdPsatFreqThr2"/>
 		<Member type="uint32" sizeOf="1" name="SingleTapGroup"/>
-		<Member type="uint8" sizeOf="28" name="dpdConfigPerBand5gFuture_2"/>
+		<Member type="uint8" sizeOf="8" name="ScalingChannelIdx"/>
+		<Member type="uint8" sizeOf="20" name="dpdConfigPerBand5gFuture_2"/>
 	</DataType>
 	<DataType name="HWS_PAC_CONFIG_BAND">
 		<Member type="uint8" sizeOf="1" name="pacDynamicGlut"/>
@@ -2462,7 +2464,8 @@
 		<Member type="NV_HEADER" sizeOf="1" name="nvPMICCal"/>
 		<Member type="PMIC_CAL_DATA" sizeOf="1" name="pmicCalData5G"/>
 		<Member type="PMIC_CAL_DATA" sizeOf="1" name="pmicCalData2G"/>
-		<Member type="uint8" sizeOf="2" name="pad_pmic"/>
+		<Member type="uint8" sizeOf="1" name="pmicCalFlag"/>
+		<Member type="uint8" sizeOf="1" name="pad_pmic"/>
 	</NvItem>
 	<NvItem id="49" name="HWS_PDC_CONFIG_EXT">
 		<Member type="NV_HEADER" sizeOf="1" name="nvPDCConfigExt"/>
@@ -2470,8 +2473,15 @@
 		<Member type="PDC_GB_CONFIG" sizeOf="1" name="pdcGB5G"/>
 		<Member type="PDC_GB_CONFIG" sizeOf="1" name="pdcGB6G"/>
 	</NvItem>
-	<NvItem id="50" name="RESERVED_NV">
+	<NvItem id="50" name="TEMP_TXPOWER_LIMIT">
+		<Member type="NV_HEADER" sizeOf="1" name="nvTemptxpwrlimit"/>
+		<Member type="int16" sizeOf="2" name="Temptxpwrlimit2Gchain"/>
+		<Member type="int16" sizeOf="2" name="Temptxpwrlimit5Gchain"/>
+		<Member type="int16" sizeOf="2" name="Temptxpwrlimit6Gchain"/>
+		<Member type="uint8" sizeOf="8" name="TemptxpwrlimitFuture"/>
+	</NvItem>
+	<NvItem id="51" name="RESERVED_NV">
 		<Member type="NV_HEADER" sizeOf="1" name="nvReserved"/>
-		<Member type="uint8" sizeOf="6922" name="reservedFuture"/>
+		<Member type="uint8" sizeOf="6894" name="reservedFuture"/>
 	</NvItem>
 </NvDefinition>

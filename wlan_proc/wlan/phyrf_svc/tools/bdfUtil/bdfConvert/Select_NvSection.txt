@@ -1,4 +1,4 @@
-####### BDF template version: 2.4.12 #######
+####### BDF template version: 2.5.2 #######
 0:COMMON_BDF_HEADER
 0:PER_PHY_SETTING
 0:TPC_CONFIG
@@ -48,4 +48,5 @@
 0:HWS_R2P_OFFSET
 0:HWS_PMIC_CAL_SECTION
 0:HWS_PDC_CONFIG_EXT
+0:TEMP_TXPOWER_LIMIT
 0:RESERVED_NV

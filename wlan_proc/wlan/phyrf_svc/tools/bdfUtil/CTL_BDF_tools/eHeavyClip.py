@@ -51,7 +51,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*\[(\d+)\]", field_need)
+        match = re.match(".*\\[(\\d+)\\]", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             value = self.hc_data_obj.ctl_domain[int(match.groups()[0])]
@@ -65,7 +65,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*_(\w+)\[(\d+)\]", field_need)
+        match = re.match(".*_(\\w+)\\[(\\d+)\\]", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             mcs_group = self.hc_data_obj.mcs_group_info[match.groups()[0]]
@@ -80,7 +80,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*_(\w+)", field_need)
+        match = re.match(".*_(\\w+)", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             value = self.hc_data_obj.ndp_info[match.groups()[0]]
@@ -94,7 +94,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*_(\w+)\[(\d+)\]", field_need)
+        match = re.match(".*_(\\w+)\\[(\\d+)\\]", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             band_chan_index = self.hc_data_obj.channel_index[match.groups()[0]]
@@ -125,7 +125,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*_(\w+)\[(\d+)\]", field_need)
+        match = re.match(".*_(\\w+)\\[(\\d+)\\]", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             band_channel_info = self.hc_data_obj.channel_info[match.groups()[0]]
@@ -140,7 +140,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*offset_([a-zA-Z0-9]+)_?([a-zA-Z0-9]+)?\[(\d+)\]\[(\d+)\]", field_need)
+        match = re.match(".*offset_([a-zA-Z0-9]+)_?([a-zA-Z0-9]+)?\\[(\\d+)\\]\\[(\\d+)\\]", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             band_phy_info = self.band_phy_rel[match.groups()[0]]
@@ -166,7 +166,7 @@ class BDF_utils:
         field_need = data_list[1].split('.')[1]
 
         # print("field - {}".format(field_need))
-        match = re.match(".*_(\w+)", field_need)
+        match = re.match(".*_(\\w+)", field_need)
         if match:
             # print("Group - {}, Groups - {}".format(match.group(), match.groups()))
             value = self.hc_data_obj.nonht_dup_info[match.groups()[0]]

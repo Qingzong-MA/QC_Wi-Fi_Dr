@@ -1,14 +1,11 @@
 #!/usr/bin/python
 #===============================================================================
-#
 # NVM Utility Script
-#
-# Copyright (c) 2019-2022,2024 Qualcomm Technologies, Inc.
-#               2017 by QUALCOMM Atheros, Incorporated.
-# All Rights Reserved
-# Confidential and Proprietary - Qualcomm Technologies International, Ltd.
-#
-# Notifications and licenses are retained for attribution purposes only
+#===============================================================================
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# All rights reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+# 2017 by QUALCOMM Atheros, Incorporated.
 #===============================================================================
 
 import binascii
@@ -16,7 +13,7 @@ import os
 import sys
 from datetime import datetime
 import re
-#For XML based formats
+import argparse
 from lxml import etree as ET
 
 Description = """
@@ -30,6 +27,7 @@ Description :
         - In all the cases it takes multiple input files of same type to generate a single Output file.
         - Working with NVMX files, needs corresponding TCFX file to be given as reference.
         - Converting Multi Bin file to Split nvm files as split_bt.nvm and split_fm.nvm from input.bin file.
+        - Split single binary file into multiple binary files based on file type in the header. New files are generated as split_bt/fm_#.bin
 
 Usage:
     %prog [--BT/FM] <input file list> [--TCF <input TCF files mandatory for NVMX operations>] -o <outputfilename.nvm/bin>
@@ -41,6 +39,9 @@ Usage:
     BT single bin->nvm conversion
         %prog input1.bin -o output.nvm
 
+    BT single bin-> multi bin conversion
+        %prog --bin_split input.bin
+        
     BT multiple nvm->bin conversion
         %prog --BT intput0.nvm input1.nvm [...] [-o output.bin]
         %prog --BT intput0.nvmx input1.nvmx [...] --TCF <input TCFX file> [-o output.bin]
@@ -71,13 +72,14 @@ Usage:
 
 """
 
-# use argparse for python version higher than 2.7
-# use optparse for python version lower than 2.7
-# argparse was added since 2.7
-PYTHON_VERSION = 0x02070000
+# script is upated to support for python 3.9 or higher version
+PYTHON_VERSION = (3, 9)
 
 # Debug flag to enable more log messages.
 DEBUG_INFO_FLAG = 0
+
+#binary file header size 
+NVM_TLV_HEADER_SIZE = 4
 
 # TLV values now handled as ints in bytearrays
 # TLV Types to identify or parse the Bin Format.
@@ -509,11 +511,29 @@ class NVMTag:
 
     def inputval(self, finput=None, valstr=None, index=None):
         if MERGER_MODE == BIN_MODE:
-            iLSB = int(binascii.b2a_hex(self.TagLengthLSB), 16)
-            iMSB = int(binascii.b2a_hex(self.TagLengthMSB), 16)
+           
+            if not isinstance(self.TagLengthLSB, bytes):
+                iLSB = int(binascii.b2a_hex(self.TagLengthLSB.to_bytes(1, 'big')), 16)
+            else:
+                iLSB = int(binascii.b2a_hex(self.TagLengthLSB), 16)
+            
+            if not isinstance(self.TagLengthMSB, bytes):
+                iMSB = int(binascii.b2a_hex(self.TagLengthMSB.to_bytes(1, 'big')), 16)
+            else:
+                iMSB = int(binascii.b2a_hex(self.TagLengthMSB), 16)
+                
             self.TagLength = iLSB + iMSB*16*16
-            nLSB = int(binascii.b2a_hex(self.TagNumLSB), 16)
-            nMSB = int(binascii.b2a_hex(self.TagNumMSB), 16)
+            
+            if not isinstance(self.TagNumLSB, bytes):
+                nLSB = int(binascii.b2a_hex(self.TagNumLSB.to_bytes(1, 'big')), 16)
+            else:
+                nLSB = int(binascii.b2a_hex(self.TagNumLSB), 16)
+            
+            if not isinstance(self.TagNumMSB, bytes):
+                nMSB = int(binascii.b2a_hex(self.TagNumMSB.to_bytes(1, 'big')), 16)
+            else:
+                nMSB = int(binascii.b2a_hex(self.TagNumMSB), 16)
+                
             self.TagNum = nLSB + nMSB*16*16
 
             if index is None:
@@ -579,6 +599,54 @@ def isCTMMode (files):
 
     return IsCTM
 
+def split_binary_file(input_file):
+    '''
+    This method reads a binary file with a specific header format and splits it into multiple binary files based on embedded sub-headers.
+    Iteratively reads each sub-header (4 bytes), extracts the file type and content length, and writes the corresponding content to a new binary file.
+    Supports file types 2 (saved as bt) and 3 (saved as fm).
+    '''
+  
+    with open(input_file, 'rb') as f:
+        # read the first 4 bytes (global header )
+        header = f.read(NVM_TLV_HEADER_SIZE)
+      
+        file_type = header[0]
+        file_size = int.from_bytes(header[1:][::-1], 'big')
+        print("Total file size", file_size + NVM_TLV_HEADER_SIZE)
+        if file_type != NVM_TLV_VERSION_BTFM :
+            print("The given binary file cannot be split into multiple binary files because it contains only a single header")
+            sys.exit()
+        
+        index = 0
+        while True:
+            # Read the next 4 bytes for the header
+            sub_header = f.read(NVM_TLV_HEADER_SIZE)
+            if len(sub_header) < NVM_TLV_HEADER_SIZE:
+                break  # End of file
+
+            file_type = sub_header[0]
+            if file_type == NVM_TLV_VERSION_BT:
+                file_type = 'bt'
+            elif file_type == NVM_TLV_VERSION_FM:
+                file_type = 'fm'
+            
+            file_length = int.from_bytes(sub_header[1:][::-1],'big')
+            #Read the content of the specified length
+            content = f.read(file_length)
+            if len(content) < file_length:
+                print("Incomplete content for file {0}, expected {1} bytes.".format(index, file_length))
+                sys.exit(1)
+
+            # Write to a new binary file
+            output_filename = "split_{0}_{1}.bin".format(file_type, index)
+            with open(output_filename, 'wb') as out_file:
+                out_file.write(sub_header)
+                out_file.write(content)
+
+            print("Created {0} with {1} bytes.".format(output_filename, file_length))
+            index += 1
+    sys.exit()
+
 # optParser #
 # command-line input processor
 def optParser():
@@ -586,184 +654,108 @@ def optParser():
     global BTFM_MODE, MERGER_MODE, SPLIT_MODE, BT_CNT, FM_CNT
     global VERIFY_MODE, NVM_CNT, TCF_CNT
     global IsCTM
-    py_ver = sys.hexversion
-    py_ver_str = str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
-    #print '\n*Your python version is ' + py_ver_str
 
-    #if py_ver < PYTHON_VERSION:
-    if py_ver >= PYTHON_VERSION:
-        import argparse
-        #print '*Use argparse module\n'
-        parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                        description = Description)
-        parser.add_argument('input_files', nargs='*', help='NVM bin/text files to merge')
-        #parser.add_argument('input_files', nargs='+', help='NVM bin/text files to merge')
-        parser.add_argument('-o', '--output', metavar='output_file',
-                type=str, help='NVM bin/text output file name after merger')
-        # for BTFM_MODE text-based merge
-        parser.add_argument('--BT', metavar='BT.nvm', nargs='*', help='BT NVM text-based input files')
-        parser.add_argument('--FM', metavar='FM.nvm', nargs='*', help='FM NVM text-based input files')
-        parser.add_argument('-s', action='store_true', help='To enable split mode')
-        parser.add_argument('--NVM', metavar='input.nvm', nargs='*', help='NVM text-based input file to verify')
-        parser.add_argument('--TCF', metavar='input.tcf', nargs='*', help='TCF text-based input file used to verify')
-        parser.add_argument('--BUILD_LABEL', metavar='BUILD_LABEL', type=str, help='Build Label String to be converted to template NVMX', default=None)
+    # Get current version
+    major = sys.version_info.major
+    minor = sys.version_info.minor
+    micro = sys.version_info.micro
 
-        args = parser.parse_args()
-        input_files = args.input_files
-        output_file = args.output
-        SPLIT_MODE = args.s
+    if (major, minor) < PYTHON_VERSION:
+        print("your current Python version: {}.{}.{}".format(major, minor, micro))
+        print("Your Python version is lower than 3.9.")
+        print("Please upgrade to Python 3.9 or higher for better compatibility and features.")
+        sys.exit(1)
 
-        if args.BUILD_LABEL:
-            BUILD_LABEL = args.BUILD_LABEL
-        elif os.getenv('BUILD_LABEL', None):
-            BUILD_LABEL = os.getenv('BUILD_LABEL')
-        else:
-            BUILD_LABEL = None
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description = Description)
+    parser.add_argument('input_files', nargs='*', help='NVM bin/text files to merge')
+    parser.add_argument('-o', '--output', metavar='output_file', type=str, help='NVM bin/text output file name after merger')
+    # for BTFM_MODE text-based merge
+    parser.add_argument('--BT', metavar='BT.nvm', nargs='*', help='BT NVM text-based input files')
+    parser.add_argument('--FM', metavar='FM.nvm', nargs='*', help='FM NVM text-based input files')
+    parser.add_argument('-s', action='store_true', help='To enable split mode')
+    parser.add_argument('--bin_split', metavar='input.bin', type=str, help='Path to the binary file to be split')
+    parser.add_argument('--NVM', metavar='input.nvm', nargs='*', help='NVM text-based input file to verify')
+    parser.add_argument('--TCF', metavar='input.tcf', nargs='*', help='TCF text-based input file used to verify')
+    parser.add_argument('--BUILD_LABEL', metavar='BUILD_LABEL', type=str, help='Build Label String to be converted to template NVMX', default=None)
 
-        if input_files:
-            isCTMMode(input_files)
-        if args.BT:
-            isCTMMode(args.BT)
-        if args.FM:
-            isCTMMode(args.FM)
+    args = parser.parse_args()
+    input_files = args.input_files
+    output_file = args.output
+    SPLIT_MODE = args.s
 
-        if len(input_files) == 0:  # imply non-binary mode, otherwise simply using positional argument
-            if not IsCTM and (args.NVM is not None or args.TCF is not None):
-                if args.NVM is None:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo NVM input file to verify')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                if args.TCF is None:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo TCF input file to verify against')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                VERIFY_MODE = True
-                NVM_CNT = len(args.NVM)
-                TCF_CNT = len(args.TCF)
-                if TCF_CNT != 1:
-                    if DEBUG_INFO_FLAG >= 1: print('\tPlease supply one, and only one, TCF file')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                input_files = [NVM_FILES, args.NVM, TCF_FILES, args.TCF]
-            else:
-                # imply NVM_MODE, otherwise simply using positional argument
-                MERGER_MODE = NVM_MODE
-                if SPLIT_MODE:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo input file to split')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                if args.BT is not None and args.FM is not None:
-                    BT_CNT = len(args.BT)
-                    FM_CNT = len(args.FM)
-                    input_files = [NVM_TLV_VERSION_BT, args.BT, NVM_TLV_VERSION_FM, args.FM]
-                    BTFM_MODE = True
-                elif args.BT is not None:
-                    BT_CNT = len(args.BT)
-                    input_files = [NVM_TLV_VERSION_BT, args.BT]
-                    if IsCTM and args.TCF is None:
-                       if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
-                       exit(EXIT_CODE_INVALID_PARAM)
-                    elif IsCTM:
-                        input_files.append(args.TCF)
-                elif args.FM is not None:
-                    FM_CNT = len(args.FM)
-                    input_files = [NVM_TLV_VERSION_FM, args.FM]
-                    if IsCTM and args.TCF is None:
-                       if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
-                       exit(EXIT_CODE_INVALID_PARAM)
-                    elif IsCTM:
-                        input_files.append(args.TCF)
-                else:
-                    parser.print_help()
-                    if DEBUG_INFO_FLAG >= 1: print('\n\tNo input files\t\n')
-                    exit(EXIT_CODE_INVALID_PARAM)
-        else:
-            if args.BT is not None or args.FM is not None:
-                parser.print_help()
-                if DEBUG_INFO_FLAG >= 1: print('\nFor BTFM-NVM merge:')
-                if DEBUG_INFO_FLAG >= 1: print('\tPlease append all BT-NVM text file after --BT, all FM-NVM text file after --FM')
-                exit(EXIT_CODE_INVALID_PARAM)
-
+    if args.bin_split:
+       try:
+          split_binary_file(args.bin_split.strip())
+       except Exception as e:
+           print("Error splitting binary input file {0}: {1}".format(args.bin_split, e))
+           sys.exit(1)
+           
+    if args.BUILD_LABEL:
+        BUILD_LABEL = args.BUILD_LABEL
+    elif os.getenv('BUILD_LABEL', None):
+        BUILD_LABEL = os.getenv('BUILD_LABEL')
     else:
-        #print '*Use optparse module\n'
-        from optparse import OptionParser
-        parser = OptionParser(usage = Description)
-        parser.add_option('-o', '--output', type='string',
-                help='NVM bin/text output file name after merger')
-        parser.add_option('--BT', help='BT NVM text-based input files', dest='BTFILES', action='callback', callback=vararg_cb)
-        parser.add_option('--FM', help='FM NVM text-based input files', dest='FMFILES', action='callback', callback=vararg_cb)
-        parser.add_option('-s', action='store_true', help='To enable split mode')
-        parser.add_option('--NVM', help='NVM text-based input file to verify', dest='NVMFILES', action='callback', callback=vararg_cb)
-        parser.add_option('--TCF', help='TCF text-based input file used to verify', dest='TCFFILES', action='callback', callback=vararg_cb)
-        parser.add_option('--BUILD_LABEL', help='Build Label String to be converted to template NVMX', dest='BUILD_LABEL', action='callback', callback=vararg_cb)
+        BUILD_LABEL = None
 
-        (options, args) = parser.parse_args()
-        input_files = args.input_files
-        output_file = options.output
-        SPLIT_MODE = options.s
+    if input_files:
+        isCTMMode(input_files)
+    if args.BT:
+        isCTMMode(args.BT)
+    if args.FM:
+        isCTMMode(args.FM)
 
-        if args.BUILD_LABEL:
-            BUILD_LABEL = args.BUILD_LABEL
-        elif os.getenv('BUILD_LABEL', None):
-            BUILD_LABEL = os.getenv('BUILD_LABEL')
-        else:
-            BUILD_LABEL = None
-
-        if input_files:
-            isCTMMode(input_files)
-        if args.BT:
-            isCTMMode(options.BTFILES)
-        if args.FM:
-            isCTMMode(options.FMFILES)
-
-        if len(input_files) == 0: # imply non-binary mode, otherwise simply using positional argument
-            if not IsCTM and (options.NVMFILES is not None or options.TCFFILES is not None):
-                if options.NVMFILES is None:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo NVM input file to verify')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                if options.TCFFILES is None:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo TCF input file to verify against')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                VERIFY_MODE = True
-                NVM_CNT = len(options.NVMFILES)
-                TCF_CNT = len(options.TCFFILES)
-                if TCF_CNT != 1:
-                    if DEBUG_INFO_FLAG >= 1: print('\tPlease supply one, and only one, TCF file')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                input_files = [NVM_FILES, options.NVMFILES, TCF_FILES, options.TCFFILES]
-            else:
-                # imply NVM_MODE, otherwise simply using positional argument
-                MERGER_MODE = NVM_MODE
-                if SPLIT_MODE:
-                    if DEBUG_INFO_FLAG >= 1: print('\tNo input file to split')
-                    exit(EXIT_CODE_INVALID_PARAM)
-                if options.BTFILES is not None and options.FMFILES is not None:
-                    BT_CNT = len(options.BTFILES)
-                    FM_CNT = len(options.FMFILES)
-                    input_files = [NVM_TLV_VERSION_BT, options.BTFILES, NVM_TLV_VERSION_FM, options.FMFILES]
-                    BTFM_MODE = True
-                elif options.BTFILES is not None:
-                    BT_CNT = len(options.BTFILES)
-                    input_files = [NVM_TLV_VERSION_BT, options.BTFILES]
-                    if IsCTM and options.TCFFILES is None:
-                       if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
-                       exit(EXIT_CODE_INVALID_PARAM)
-                    elif IsCTM:
-                        input_files.append(options.TCFFILES)
-                elif options.FMFILES is not None:
-                    FM_CNT = len(options.FMFILES)
-                    input_files = [NVM_TLV_VERSION_FM, options.FMFILES]
-                    if IsCTM and options.TCFFILES is None:
-                       if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
-                       exit(EXIT_CODE_INVALID_PARAM)
-                    elif IsCTM:
-                        input_files.append(options.TCFFILES)
-                else:
-                    parser.print_help()
-                    if DEBUG_INFO_FLAG >= 1: print('\n\tNo input files\t\n')
-                    exit(EXIT_CODE_INVALID_PARAM)
-        else:
-            if options.BTFILES is not None or options.FMFILES is not None:
-                parser.print_help()
-                if DEBUG_INFO_FLAG >= 1: print('\nFor BTFM-NVM merge:')
-                if DEBUG_INFO_FLAG >= 1: print('\tPlease append all BT-NVM text file after --BT, all FM-NVM text file after --FM')
+    if len(input_files) == 0:  # imply non-binary mode, otherwise simply using positional argument
+        if not IsCTM and (args.NVM is not None or args.TCF is not None):
+            if args.NVM is None:
+                if DEBUG_INFO_FLAG >= 1: print('\tNo NVM input file to verify')
                 exit(EXIT_CODE_INVALID_PARAM)
+            if args.TCF is None:
+                if DEBUG_INFO_FLAG >= 1: print('\tNo TCF input file to verify against')
+                exit(EXIT_CODE_INVALID_PARAM)
+            VERIFY_MODE = True
+            NVM_CNT = len(args.NVM)
+            TCF_CNT = len(args.TCF)
+            if TCF_CNT != 1:
+                if DEBUG_INFO_FLAG >= 1: print('\tPlease supply one, and only one, TCF file')
+                exit(EXIT_CODE_INVALID_PARAM)
+            input_files = [NVM_FILES, args.NVM, TCF_FILES, args.TCF]
+        else:
+            # imply NVM_MODE, otherwise simply using positional argument
+            MERGER_MODE = NVM_MODE
+            if SPLIT_MODE:
+                if DEBUG_INFO_FLAG >= 1: print('\tNo input file to split')
+                exit(EXIT_CODE_INVALID_PARAM)
+            if args.BT is not None and args.FM is not None:
+                BT_CNT = len(args.BT)
+                FM_CNT = len(args.FM)
+                input_files = [NVM_TLV_VERSION_BT, args.BT, NVM_TLV_VERSION_FM, args.FM]
+                BTFM_MODE = True
+            elif args.BT is not None:
+                BT_CNT = len(args.BT)
+                input_files = [NVM_TLV_VERSION_BT, args.BT]
+                if IsCTM and args.TCF is None:
+                   if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
+                   exit(EXIT_CODE_INVALID_PARAM)
+                elif IsCTM:
+                    input_files.append(args.TCF)
+            elif args.FM is not None:
+                FM_CNT = len(args.FM)
+                input_files = [NVM_TLV_VERSION_FM, args.FM]
+                if IsCTM and args.TCF is None:
+                   if DEBUG_INFO_FLAG >= 1: print('\nTCFX file is mandatory for NVMX files.')
+                   exit(EXIT_CODE_INVALID_PARAM)
+                elif IsCTM:
+                    input_files.append(args.TCF)
+            else:
+                parser.print_help()
+                if DEBUG_INFO_FLAG >= 1: print('\n\tNo input files\t\n')
+                exit(EXIT_CODE_INVALID_PARAM)
+    else:
+        if args.BT is not None or args.FM is not None:
+            parser.print_help()
+            if DEBUG_INFO_FLAG >= 1: print('\nFor BTFM-NVM merge:')
+            if DEBUG_INFO_FLAG >= 1: print('\tPlease append all BT-NVM text file after --BT, all FM-NVM text file after --FM')
+            exit(EXIT_CODE_INVALID_PARAM)
 
     if BUILD_LABEL is not None:
         #Stripping BUILD_LABEL to be max. 64 characters which is allowed in Firmware
@@ -1105,7 +1097,7 @@ def bin2list(flist, btlist=None, fmlist=None):
                 # loop for BT and FM sections
                 flen = getDataLength(fheader)
                 while(flen > 0):
-                    dh = bytarray(fobj.read(NVM_TLV_DATA_START))
+                    dh = bytearray(fobj.read(NVM_TLV_DATA_START))
                     dh_tlv = dh[0]
                     dlen = getDataLength(dh)
                     data = fobj.read(dlen)
@@ -1195,7 +1187,7 @@ def list2bin(dicts, fobj):
                 # strip CR and LF to avoid TypeError exception from binascii
                 valist = nvm.TagValue[0].strip('\r\n').split(' ')
                 for val in valist:
-                    #print val
+                    #print (val)
                     fobj.write(binascii.a2b_hex(val))
             tlv_len += (NVM_TLV_TAG + NVM_TLV_LEN + NVM_TLV_ZERO_PADDING + nvm.TagLength)
 
@@ -1253,10 +1245,10 @@ def list2NVMfile(nvm_list, fobj):
         elif MERGER_MODE == BIN_MODE:
             for i in nvm.TagValue: # a list of bytes
                 sTagValue += ' '
-                try: # python3, binascii.b2a_hex returns bytes so use hex
-                    sTagValue += i.hex().upper()
-                except AttributeError: # python2
-                    sTagValue += binascii.b2a_hex(i).upper()
+                if not isinstance(i, bytes):
+                    sTagValue += f'{i:02x}'
+                else:
+                    sTagValue += f'{i.hex()}'
             sTagValue += '\n'
             if nvm.TagIndex != len(nvm_list) - 1:
                 sTagValue += '\n'

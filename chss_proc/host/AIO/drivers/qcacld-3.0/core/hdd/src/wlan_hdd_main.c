@@ -7448,7 +7448,7 @@ free_net_dev:
 	return NULL;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 124) || \
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0) || \
 	(defined CFG80211_CHANGE_NETDEV_REGISTRATION_SEMANTICS))
 static int
 hdd_register_netdevice(struct hdd_adapter *adapter, struct net_device *dev,
@@ -8695,7 +8695,7 @@ static void hdd_sta_destroy_ctx_all(struct hdd_context *hdd_ctx)
 	}
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 124) || \
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0) || \
 	(defined CFG80211_CHANGE_NETDEV_REGISTRATION_SEMANTICS))
 static void
 hdd_unregister_netdevice(struct hdd_adapter *adapter, struct net_device *dev)
@@ -12586,8 +12586,6 @@ void hdd_wlan_exit(struct hdd_context *hdd_ctx)
 	hdd_driver_memdump_deinit();
 
 	qdf_nbuf_deinit_replenish_timer();
-
-	qdf_nbuf_invalid_nbuf_queue_deinit();
 
 	if (QDF_GLOBAL_MONITOR_MODE ==  hdd_get_conparam()) {
 		hdd_info("Release wakelock for monitor mode!");
@@ -18899,7 +18897,6 @@ int hdd_wlan_startup(struct hdd_context *hdd_ctx)
 
 	hdd_enter();
 
-	qdf_nbuf_invalid_nbuf_queue_init();
 	qdf_nbuf_init_replenish_timer();
 
 	status = wlan_hdd_cache_chann_mutex_create(hdd_ctx);

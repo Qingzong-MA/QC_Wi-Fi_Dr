@@ -67,13 +67,11 @@ lim_extract_ap_capability(struct mac_context *mac_ctx, uint8_t *p_ie,
  * Return: None
  */
 void lim_extract_eht_op(struct pe_session *session,
-			tSirProbeRespBeacon *beacon_struct,
-			uint32_t cb_mode);
+			tSirProbeRespBeacon *beacon_struct);
 #else
 static inline void
 lim_extract_eht_op(struct pe_session *session,
-		   tSirProbeRespBeacon *beacon_struct,
-		   uint32_t cb_mode)
+		   tSirProbeRespBeacon *beacon_struct)
 {}
 #endif
 

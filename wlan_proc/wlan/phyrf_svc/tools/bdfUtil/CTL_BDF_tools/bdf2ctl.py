@@ -1,3 +1,9 @@
+'''
+ * 	Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ *  All rights reserved.
+ *  Confidential and Proprietary - Qualcomm Technologies, Inc.
+'''
+
 #import pandas as pd
 from pickle import FALSE
 from pandas import DataFrame, ExcelWriter
@@ -12,6 +18,7 @@ from pyparsing import col
 #import chip specific headers
 import config_wcn7850
 import config_wcn7880
+import config_wcn8850
 import config_wcn7750
 import config_qcc2072
 
@@ -1524,10 +1531,10 @@ def read_bdf_ExceptionMgmt(line):
                 region = DictCtlRegion[key1]
                 ctl_group_2g = DictCtlGroup2G[key2]
                 # Populate the freqIdxStart
-                if "ctlExcp2G[{}].exceptionMgmt[{}].freqIdxStart".format(region, ctl_group_2g) in line:
+                if f"ctlExcp2G[{region}].exceptionMgmt[{ctl_group_2g}].freqIdxStart" in line:
                     g_excp_mgmt_2g_startIdx[region][ctl_group_2g] = int(line.split('\t')[2])
                 # Populate the freqIdxEnd
-                elif "ctlExcp2G[{}].exceptionMgmt[{}].freqIdxEnd".format(region, ctl_group_2g) in line:
+                elif f"ctlExcp2G[{region}].exceptionMgmt[{ctl_group_2g}].freqIdxEnd" in line:
                     g_excp_mgmt_2g_endIdx[region][ctl_group_2g] = int(line.split('\t')[2])
     elif "ctlExcp5G" in line:
         for (key1 , value1) in DictCtlRegion.items():
@@ -1535,10 +1542,10 @@ def read_bdf_ExceptionMgmt(line):
                 region = DictCtlRegion[key1]
                 ctl_group_5g = DictCtlGroup5G6G[key2]
                 # Populate the freqIdxStart
-                if "ctlExcp5G[{}].exceptionMgmt[{}].freqIdxStart".format(region, ctl_group_5g) in line:
+                if f"ctlExcp5G[{region}].exceptionMgmt[{ctl_group_5g}].freqIdxStart" in line:
                     g_excp_mgmt_5g_startIdx[region][ctl_group_5g] = int(line.split('\t')[2])
                 # Populate the freqIdxEnd
-                elif "ctlExcp5G[{}].exceptionMgmt[{}].freqIdxEnd".format(region, ctl_group_5g) in line:
+                elif f"ctlExcp5G[{region}].exceptionMgmt[{ctl_group_5g}].freqIdxEnd" in line:
                     g_excp_mgmt_5g_endIdx[region][ctl_group_5g] = int(line.split('\t')[2])
     elif "ctlExcp6G" in line:
         for (key1 , value1) in DictCtlRegion.items():
@@ -1546,10 +1553,10 @@ def read_bdf_ExceptionMgmt(line):
                 region = DictCtlRegion[key1]
                 ctl_group_6g = DictCtlGroup5G6G[key2]
                 # Populate the freqIdxStart
-                if "ctlExcp6G[{}].exceptionMgmt[{}].freqIdxStart".format(region, ctl_group_6g) in line:
+                if f"ctlExcp6G[{region}].exceptionMgmt[{ctl_group_6g}].freqIdxStart" in line:
                     g_excp_mgmt_6g_startIdx[region][ctl_group_6g] = int(line.split('\t')[2])
                 # Populate the freqIdxEnd
-                elif "ctlExcp6G[{}].exceptionMgmt[{}].freqIdxEnd".format(region, ctl_group_6g) in line:
+                elif f"ctlExcp6G[{region}].exceptionMgmt[{ctl_group_6g}].freqIdxEnd" in line:
                     g_excp_mgmt_6g_endIdx[region][ctl_group_6g] = int(line.split('\t')[2])
 
 
@@ -1592,6 +1599,16 @@ if __name__ == '__main__':
         DictCtlGroup5G6G = config_wcn7880.CTL_GROUPS_5G_6G
         DictCtlGroup2G = config_wcn7880.CTL_GROUPS_2G
         DictPowerType6G = config_wcn7880.POWER_TYPE_6G
+    if chip == 'cng':
+        DictCtlRegion = config_wcn8850.CTL_REGION
+        DictDevCategory = config_wcn8850.DEVICE_CATEGORY
+        DictFreqBand = config_wcn8850.FREQ_BAND
+        DictPowerRules = config_wcn8850.POWER_RULES
+        DictArrayGainRules = config_wcn8850.ARRAY_GAIN_RULES
+        DictSubBandExcp = config_wcn8850.SUBBAND_EXCEPTIONS
+        DictCtlGroup5G6G = config_wcn8850.CTL_GROUPS_5G_6G
+        DictCtlGroup2G = config_wcn8850.CTL_GROUPS_2G
+        DictPowerType6G = config_wcn8850.POWER_TYPE_6G
     if chip == 'hmt':
         DictCtlRegion = config_wcn7850.CTL_REGION
         DictDevCategory = config_wcn7850.DEVICE_CATEGORY
@@ -1603,12 +1620,20 @@ if __name__ == '__main__':
         DictCtlGroup2G = config_wcn7850.CTL_GROUPS_2G
         DictPowerType6G = config_wcn7850.POWER_TYPE_6G
     # populate the g_file_var global variable
-    fp = open(bdf_file_name, 'r')
-    g_file_var = fp.readlines()
-    fp.close()
+    try:
+        with open(bdf_file_name, 'r', encoding='utf-8') as fp: # Added encoding for Python 3
+            g_file_var = fp.readlines()
+    except FileNotFoundError:
+        print(f"Error: BDF file '{bdf_file_name}' not found.")
+        exit(1) # Exit if file is not found
+    except UnicodeDecodeError:
+        print(f"Error: Could not decode '{bdf_file_name}' with UTF-8. Try a different encoding (e.g., 'latin-1' or 'gbk').")
+        exit(1)
+    except Exception as e:
+        print(f"An error occurred while reading '{bdf_file_name}': {e}")
+        exit(1)
 
-    print("\nBDF File selected: {}\n".format(bdf_file_name))
-    print("chip is " + chip + "\n")
+    print(f"\nBDF File selected: {bdf_file_name}\n") # Use f-string for Python 3.6+
 
     # Parse the BDF and populate global variable (Reading in the CTL Engine Fields in BDF)
     for string in g_file_var:
@@ -1635,3 +1660,5 @@ if __name__ == '__main__':
     update_RegRules()
     # update the Exception Excel File
     update_Exception()
+
+    print("\nBDF Tool - CONFIG.xlsx,  BDF Tool - EXCEPTIONS.xlsx and BDF Tool - REGRULES.xlsx are updated from {}".format(bdf_file_name))

@@ -1322,10 +1322,6 @@ qdf_nbuf_set_send_complete_flag(qdf_nbuf_t buf, bool flag)
 	__qdf_nbuf_set_send_complete_flag(buf, flag);
 }
 
-void qdf_nbuf_invalid_nbuf_queue_init(void);
-void qdf_nbuf_invalid_nbuf_queue_deinit(void);
-void qdf_nbuf_invalid_nbuf_queue_add(qdf_nbuf_t buf);
-
 #define QDF_NBUF_QUEUE_WALK_SAFE(queue, var, tvar)	\
 		__qdf_nbuf_queue_walk_safe(queue, var, tvar)
 

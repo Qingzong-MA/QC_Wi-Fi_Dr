@@ -32,3 +32,4 @@ NOTE:
 4. Please generate bin file or elf file depending on chip from generated text files.
 5. Running ctl2bdf.exe with option -ho generated BDF text with name <bdf file>_new.txt
 6. All the CTL sheets are maintained based on MG team's (Corporate regulatory team) inputs.
+7. Runs with Python 3.12.0 and above.  
