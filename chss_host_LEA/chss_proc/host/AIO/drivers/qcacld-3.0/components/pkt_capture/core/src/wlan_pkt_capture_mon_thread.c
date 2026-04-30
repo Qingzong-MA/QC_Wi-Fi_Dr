@@ -23,7 +23,9 @@
 #include "wlan_pkt_capture_mon_thread.h"
 #include <linux/kthread.h>
 #ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/sched.h>
 #include <linux/sched/types.h>
+#include <uapi/linux/sched/types.h>
 #endif
 #include "cds_ieee80211_common.h"
 #include "wlan_mgmt_txrx_utils_api.h"

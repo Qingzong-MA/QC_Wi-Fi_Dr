@@ -22,6 +22,7 @@
 #ifdef WLAN_FEATURE_PREEMPT_RT
 #include <linux/sched.h>
 #include <linux/sched/types.h>
+#include <uapi/linux/sched/types.h>
 #endif
 
 static struct scheduler_ctx g_sched_ctx;

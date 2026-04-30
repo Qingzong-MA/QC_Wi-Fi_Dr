@@ -23,7 +23,9 @@
 #include <cdp_txrx_peer_ops.h>
 #include <cds_sched.h>
 #ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/sched.h>
 #include <linux/sched/types.h>
+#include <uapi/linux/sched/types.h>
 #endif
 
 /* Timeout in ms to wait for a DP rx thread */

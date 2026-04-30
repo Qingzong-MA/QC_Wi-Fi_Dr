@@ -38,13 +38,17 @@
 #include <linux/cpu.h>
 #ifdef RX_PERFORMANCE
 #include <linux/sched/types.h>
-#elif defined(WLAN_FEATURE_PREEMPT_RT)
+#endif
+#ifdef WLAN_FEATURE_PREEMPT_RT
 /*
- * cds_ol_rx_thread() needs struct sched_param for sched_setscheduler()
- * on PREEMPT_RT. The ARM/Tegra (and other non-MSM) builds do not enable
- * RX_PERFORMANCE, so pull the header in explicitly here.
+ * cds_ol_rx_thread() uses struct sched_param + sched_setscheduler() on
+ * PREEMPT_RT. <linux/sched/types.h> covers both stock and L4T/Tegra
+ * kernels, but on a few vendor trees the public include is gutted —
+ * pull the uapi header directly as well so the type is always visible.
  */
+#include <linux/sched.h>
 #include <linux/sched/types.h>
+#include <uapi/linux/sched/types.h>
 #endif
 
 static spinlock_t ssr_protect_lock;
