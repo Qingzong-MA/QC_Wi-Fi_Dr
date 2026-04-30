@@ -19,6 +19,10 @@
 #include <scheduler_core.h>
 #include <qdf_atomic.h>
 #include "qdf_flex_mem.h"
+#ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/sched.h>
+#include <linux/sched/types.h>
+#endif
 
 static struct scheduler_ctx g_sched_ctx;
 static struct scheduler_ctx *gp_sched_ctx;
@@ -435,7 +439,24 @@ int scheduler_thread(void *arg)
 		QDF_DEBUG_PANIC("arg is null");
 		return 0;
 	}
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	{
+		/*
+		 * The MC scheduler thread serialises control-plane work
+		 * (WMI, scan, association, beacons). On PREEMPT_RT it must
+		 * run at SCHED_FIFO so that it isn't starved by the threaded
+		 * IRQ / RX kthreads. Use one priority below the data-plane
+		 * RX thread to keep the data path preferred under contention.
+		 */
+		struct sched_param scheduler_params = {
+			.sched_priority = WLAN_RT_RX_THREAD_PRIO - 1,
+		};
+
+		sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+	}
+#else
 	qdf_set_user_nice(current, -2);
+#endif
 
 	/* Ack back to the context from which the main controller thread
 	 * has been created
