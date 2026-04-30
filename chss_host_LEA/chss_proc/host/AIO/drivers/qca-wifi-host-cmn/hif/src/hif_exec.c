@@ -765,6 +765,18 @@ static struct hif_exec_context *hif_exec_napi_create(uint32_t scale)
 #endif
 	napi_enable(&ctx->napi);
 
+#if defined(WLAN_FEATURE_PREEMPT_RT) && \
+	(LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
+	/*
+	 * On PREEMPT_RT, run NAPI poll in a dedicated kthread instead of
+	 * ksoftirqd. This eliminates the head-of-line blocking caused by
+	 * other softirq work (timers, networking) and gives NAPI poll a
+	 * scheduling entity that can be RT-prioritised by the admin via
+	 * the standard 'napi/<dev>-<id>' kthread.
+	 */
+	dev_set_threaded(&ctx->netdev, true);
+#endif
+
 	return &ctx->exec_ctx;
 }
 #else

@@ -272,11 +272,19 @@ static inline int __qdf_spin_is_locked(__qdf_spinlock_t *lock)
  * @lock: spinlock object
  *
  * Return: nonzero if lock is acquired
+ *
+ * On PREEMPT_RT, spinlock_t is a sleeping lock and softirqs are processed
+ * in their own kthread; the in_softirq()/in_irq()/irqs_disabled() shortcut
+ * used on stock kernels can mis-classify the caller context. Always go
+ * through spin_trylock_bh() on RT — the BH disable degrades to a per-task
+ * counter and is safe to call from any sleepable context.
  */
 static inline int __qdf_spin_trylock_bh(__qdf_spinlock_t *lock)
 {
+#if !IS_ENABLED(CONFIG_PREEMPT_RT)
 	if (likely(irqs_disabled() || in_irq() || in_softirq()))
 		return spin_trylock(&lock->spinlock);
+#endif
 
 	if (spin_trylock_bh(&lock->spinlock)) {
 		lock->flags |= QDF_LINUX_UNLOCK_BH;
@@ -302,15 +310,20 @@ static inline int __qdf_spin_trylock(__qdf_spinlock_t *lock)
  * @lock: Lock object
  *
  * Return: none
+ *
+ * See __qdf_spin_trylock_bh() for the PREEMPT_RT rationale of always
+ * taking the lock via spin_lock_bh() on RT kernels.
  */
 static inline void __qdf_spin_lock_bh(__qdf_spinlock_t *lock)
 {
+#if !IS_ENABLED(CONFIG_PREEMPT_RT)
 	if (likely(irqs_disabled() || in_irq() || in_softirq())) {
 		spin_lock(&lock->spinlock);
-	} else {
-		spin_lock_bh(&lock->spinlock);
-		lock->flags |= QDF_LINUX_UNLOCK_BH;
+		return;
 	}
+#endif
+	spin_lock_bh(&lock->spinlock);
+	lock->flags |= QDF_LINUX_UNLOCK_BH;
 }
 
 /**

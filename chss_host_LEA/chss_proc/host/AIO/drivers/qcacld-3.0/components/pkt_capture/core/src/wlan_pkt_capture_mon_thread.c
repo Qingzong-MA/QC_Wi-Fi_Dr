@@ -22,6 +22,9 @@
 
 #include "wlan_pkt_capture_mon_thread.h"
 #include <linux/kthread.h>
+#ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/sched/types.h>
+#endif
 #include "cds_ieee80211_common.h"
 #include "wlan_mgmt_txrx_utils_api.h"
 #include "cdp_txrx_ctrl.h"
@@ -282,7 +285,23 @@ static int pkt_capture_mon_thread(void *arg)
 		return 0;
 	}
 	mon_ctx = (struct pkt_capture_mon_context *)arg;
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	{
+		/*
+		 * Promote the packet-capture monitor kthread to SCHED_FIFO
+		 * on PREEMPT_RT so it isn't starved by IRQ threads while
+		 * draining the monitor queue (same rationale as the DP RX
+		 * kthreads in cds_sched.c / dp_rx_thread.c).
+		 */
+		struct sched_param scheduler_params = {
+			.sched_priority = WLAN_RT_RX_THREAD_PRIO,
+		};
+
+		sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+	}
+#else
 	set_user_nice(current, -1);
+#endif
 #ifdef MSM_PLATFORM
 	set_wake_up_idle(true);
 #endif

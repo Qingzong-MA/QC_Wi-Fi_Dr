@@ -22,6 +22,9 @@
 #include <cdp_txrx_cmn_struct.h>
 #include <cdp_txrx_peer_ops.h>
 #include <cds_sched.h>
+#ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/sched/types.h>
+#endif
 
 /* Timeout in ms to wait for a DP rx thread */
 #define DP_RX_THREAD_WAIT_TIMEOUT 1000
@@ -562,7 +565,23 @@ static int dp_rx_thread_loop(void *arg)
 
 	tm_handle_cmn = rx_thread->rtm_handle_cmn;
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	{
+		/*
+		 * Run DP RX kthread as SCHED_FIFO above the default kernel
+		 * IRQ-thread priority on PREEMPT_RT so that data-plane
+		 * softirq work scheduled by the threaded HIF IRQ is drained
+		 * with bounded latency.
+		 */
+		struct sched_param scheduler_params = {
+			.sched_priority = WLAN_RT_RX_THREAD_PRIO,
+		};
+
+		sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+	}
+#else
 	qdf_set_user_nice(qdf_get_current_task(), -1);
+#endif
 	qdf_set_wake_up_idle(true);
 
 	qdf_event_set(&rx_thread->start_event);

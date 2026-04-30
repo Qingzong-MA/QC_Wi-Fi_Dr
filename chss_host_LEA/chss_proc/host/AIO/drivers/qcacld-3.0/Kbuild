@@ -3175,6 +3175,22 @@ ifeq ($(CONFIG_RX_THREAD_PRIORITY), y)
 cppflags-y += -DRX_THREAD_PRIORITY
 endif
 
+# PREEMPT_RT (real-time Linux kernel) adaptation. Enables RT-friendly
+# scheduling priorities for the WLAN RX/MON kernel threads, RT-safe
+# bottom-half locking helpers, and threaded IRQ handling for HIF.
+# Auto-enables when the kernel itself is built with CONFIG_PREEMPT_RT.
+ifeq ($(CONFIG_PREEMPT_RT), y)
+CONFIG_WLAN_FEATURE_PREEMPT_RT := y
+endif
+
+ifeq ($(CONFIG_WLAN_FEATURE_PREEMPT_RT), y)
+cppflags-y += -DWLAN_FEATURE_PREEMPT_RT
+# RX kthread runs above kernel IRQ threads (default RT prio 50) by
+# default; override with CONFIG_WLAN_RT_RX_THREAD_PRIO if needed.
+CONFIG_WLAN_RT_RX_THREAD_PRIO ?= 51
+cppflags-y += -DWLAN_RT_RX_THREAD_PRIO=$(CONFIG_WLAN_RT_RX_THREAD_PRIO)
+endif
+
 ifeq ($(CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN), y)
 #sta support to tx P2P action frames
 cppflags-y += -DSUPPORT_P2P_BY_ONE_INTF_WLAN

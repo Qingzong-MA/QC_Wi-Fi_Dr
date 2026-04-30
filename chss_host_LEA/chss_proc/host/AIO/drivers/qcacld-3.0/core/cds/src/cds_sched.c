@@ -800,11 +800,29 @@ static int cds_ol_rx_thread(void *arg)
 	bool shutdown = false;
 	int status;
 
-#ifdef RX_THREAD_PRIORITY
-	struct sched_param scheduler_params = {0};
+#if defined(WLAN_FEATURE_PREEMPT_RT)
+	{
+		/*
+		 * On PREEMPT_RT a SCHED_FIFO priority of 1 is below the
+		 * kernel IRQ threads (default 50). The WLAN RX kthread must
+		 * out-prioritize them so that softirq/IRQ-thread driven
+		 * packet delivery is consumed in a deterministic time bound.
+		 * The Kbuild knob CONFIG_WLAN_RT_RX_THREAD_PRIO controls the
+		 * exact value (default 51 — just above kernel IRQ threads).
+		 */
+		struct sched_param scheduler_params = {
+			.sched_priority = WLAN_RT_RX_THREAD_PRIO,
+		};
 
-	scheduler_params.sched_priority = 1;
-	sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+		sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+	}
+#elif defined(RX_THREAD_PRIORITY)
+	{
+		struct sched_param scheduler_params = {0};
+
+		scheduler_params.sched_priority = 1;
+		sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+	}
 #else
 	set_user_nice(current, -1);
 #endif
