@@ -38,6 +38,13 @@
 #include <linux/cpu.h>
 #ifdef RX_PERFORMANCE
 #include <linux/sched/types.h>
+#elif defined(WLAN_FEATURE_PREEMPT_RT)
+/*
+ * cds_ol_rx_thread() needs struct sched_param for sched_setscheduler()
+ * on PREEMPT_RT. The ARM/Tegra (and other non-MSM) builds do not enable
+ * RX_PERFORMANCE, so pull the header in explicitly here.
+ */
+#include <linux/sched/types.h>
 #endif
 
 static spinlock_t ssr_protect_lock;
