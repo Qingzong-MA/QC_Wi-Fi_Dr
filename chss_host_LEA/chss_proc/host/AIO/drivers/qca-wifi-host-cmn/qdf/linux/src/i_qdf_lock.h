@@ -281,7 +281,7 @@ static inline int __qdf_spin_is_locked(__qdf_spinlock_t *lock)
  */
 static inline int __qdf_spin_trylock_bh(__qdf_spinlock_t *lock)
 {
-#if !IS_ENABLED(CONFIG_PREEMPT_RT)
+#if !IS_ENABLED(CONFIG_PREEMPT_RT) && !IS_ENABLED(CONFIG_PREEMPT_RT_FULL)
 	if (likely(irqs_disabled() || in_irq() || in_softirq()))
 		return spin_trylock(&lock->spinlock);
 #endif
@@ -316,7 +316,7 @@ static inline int __qdf_spin_trylock(__qdf_spinlock_t *lock)
  */
 static inline void __qdf_spin_lock_bh(__qdf_spinlock_t *lock)
 {
-#if !IS_ENABLED(CONFIG_PREEMPT_RT)
+#if !IS_ENABLED(CONFIG_PREEMPT_RT) && !IS_ENABLED(CONFIG_PREEMPT_RT_FULL)
 	if (likely(irqs_disabled() || in_irq() || in_softirq())) {
 		spin_lock(&lock->spinlock);
 		return;

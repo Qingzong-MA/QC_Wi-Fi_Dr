@@ -3178,8 +3178,14 @@ endif
 # PREEMPT_RT (real-time Linux kernel) adaptation. Enables RT-friendly
 # scheduling priorities for the WLAN RX/MON kernel threads, RT-safe
 # bottom-half locking helpers, and threaded IRQ handling for HIF.
-# Auto-enables when the kernel itself is built with CONFIG_PREEMPT_RT.
+# Auto-enables when the kernel itself is built with CONFIG_PREEMPT_RT
+# (mainline-merged RT, kernel >= 5.3) or CONFIG_PREEMPT_RT_FULL (older
+# out-of-tree -rt patches that still ship with some 4.x / early-5.x
+# distros, including some Linux-RT-5.10 vendor trees).
 ifeq ($(CONFIG_PREEMPT_RT), y)
+CONFIG_WLAN_FEATURE_PREEMPT_RT := y
+endif
+ifeq ($(CONFIG_PREEMPT_RT_FULL), y)
 CONFIG_WLAN_FEATURE_PREEMPT_RT := y
 endif
 
