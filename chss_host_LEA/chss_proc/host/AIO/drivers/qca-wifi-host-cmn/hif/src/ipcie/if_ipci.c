@@ -534,11 +534,20 @@ int hif_ipci_configure_grp_irq(struct hif_softc *scn,
 
 		hif_info("request_irq = %d for grp %d",
 			 irq, hif_ext_group->grp_id);
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		ret = pfrm_request_threaded_irq(scn->qdf_dev->dev, irq,
+				       hif_ext_group_interrupt_handler,
+				       hif_ext_group_thread_handler,
+				       IRQF_SHARED | IRQF_NO_SUSPEND,
+				       "wlan_EXT_GRP",
+				       hif_ext_group);
+#else
 		ret = pfrm_request_irq(scn->qdf_dev->dev, irq,
 				       hif_ext_group_interrupt_handler,
 				       IRQF_SHARED | IRQF_NO_SUSPEND,
 				       "wlan_EXT_GRP",
 				       hif_ext_group);
+#endif
 		if (ret) {
 			hif_err("request_irq failed ret = %d", ret);
 			return -EFAULT;

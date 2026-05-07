@@ -40,7 +40,12 @@
 #define HIF_USB_RX_BUFFER_SIZE  (1792 + 8)
 #define HIF_USB_RX_BUNDLE_ONE_PKT_SIZE  (1792 + 8)
 
-#ifdef HIF_USB_TASKLET
+#if defined(HIF_USB_TASKLET) && !defined(WLAN_FEATURE_PREEMPT_RT)
+/* Tasklet path retained for stock kernels that build with HIF_USB_TASKLET.
+ * On PREEMPT_RT we always take the workqueue branch below — tasklets are
+ * preemptible kthread work on RT anyway and the work_struct path is the
+ * same one HIF uses by default.
+ */
 #define HIF_USB_SCHEDULE_WORK(pipe)\
 	tasklet_schedule(&pipe->io_complete_tasklet)
 

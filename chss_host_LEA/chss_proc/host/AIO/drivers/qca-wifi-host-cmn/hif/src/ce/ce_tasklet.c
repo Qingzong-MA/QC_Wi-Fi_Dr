@@ -74,8 +74,19 @@ static void reschedule_ce_tasklet_work_handler(struct work_struct *work)
 		hif_err("wlan driver is unloaded");
 		return;
 	}
-	if (hif_ce_state->tasklets[ce_work->id].inited)
+	if (hif_ce_state->tasklets[ce_work->id].inited) {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		/*
+		 * SLUB-debug rescheduler runs in workqueue context — there
+		 * is no tasklet to drive on RT. Run the CE service inline
+		 * instead, matching ce_tasklet_threaded_handler().
+		 */
+		ce_tasklet((unsigned long)
+			   &hif_ce_state->tasklets[ce_work->id]);
+#else
 		tasklet_schedule(&hif_ce_state->tasklets[ce_work->id].intr_tq);
+#endif
+	}
 }
 
 static struct tasklet_work tasklet_workers[CE_ID_MAX];
@@ -362,6 +373,7 @@ static void ce_tasklet(unsigned long data)
 		QDF_BUG(0);
 	}
 
+ce_drain:
 	ce_per_engine_service(scn, tasklet_entry->ce_id);
 
 	if (ce_check_rx_pending(CE_state) && tasklet_entry->inited) {
@@ -373,6 +385,17 @@ static void ce_tasklet(unsigned long data)
 		hif_record_ce_desc_event(scn, tasklet_entry->ce_id,
 				HIF_CE_TASKLET_RESCHEDULE, NULL, NULL, -1, 0);
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		/*
+		 * On PREEMPT_RT we already run from the per-IRQ kthread
+		 * (ce_tasklet_threaded_handler). Instead of bouncing the
+		 * work back through tasklet_schedule()/ksoftirqd, drain the
+		 * CE inline. cond_resched() keeps the kernel preemptible
+		 * if the ring is deep so other RT threads can run.
+		 */
+		cond_resched();
+		goto ce_drain;
+#else
 		if (test_bit(TASKLET_STATE_SCHED,
 			     &tasklet_entry->intr_tq.state)) {
 			hif_info("ce_id%d tasklet was scheduled, return",
@@ -383,6 +406,7 @@ static void ce_tasklet(unsigned long data)
 
 		ce_schedule_tasklet(tasklet_entry);
 		return;
+#endif
 	}
 
 	if (scn->target_status != TARGET_STATUS_RESET)
@@ -654,13 +678,53 @@ irqreturn_t ce_dispatch_interrupt(int ce_id,
 
 	qdf_atomic_inc(&scn->active_tasklet_cnt);
 
-	if (hif_napi_enabled(hif_hdl, ce_id))
+	if (hif_napi_enabled(hif_hdl, ce_id)) {
 		hif_napi_schedule(hif_hdl, ce_id);
-	else
-		hif_tasklet_schedule(hif_hdl, tasklet_entry);
+		return IRQ_HANDLED;
+	}
+
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	/*
+	 * Two callers feed into us on PREEMPT_RT:
+	 *
+	 *   - MSI per-CE IRQs registered through request_threaded_irq() —
+	 *     we run as the primary handler in hard-IRQ context (in_task()
+	 *     == false) and ask genirq to wake the per-IRQ kthread, which
+	 *     then runs ce_tasklet_threaded_handler() and ce_tasklet().
+	 *
+	 *   - Legacy/shared PCI IRQ via pci_dispatch_interrupt() running
+	 *     inside hif_pci_legacy_ce_interrupt_handler()'s threaded
+	 *     handler (in_task() == true). There is no further IRQ thread
+	 *     to wake — execute ce_tasklet() inline.
+	 */
+	if (in_task()) {
+		ce_tasklet((unsigned long)tasklet_entry);
+		return IRQ_HANDLED;
+	}
+	return IRQ_WAKE_THREAD;
+#else
+	hif_tasklet_schedule(hif_hdl, tasklet_entry);
+	return IRQ_HANDLED;
+#endif
+}
+
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/**
+ * ce_tasklet_threaded_handler() - threaded-IRQ counterpart of ce_tasklet().
+ *
+ * Replaces the tasklet step on PREEMPT_RT: ce_dispatch_interrupt() returns
+ * IRQ_WAKE_THREAD, genirq wakes the per-IRQ kthread, and this function
+ * runs the same body that ce_tasklet() ran from softirq on stock kernels.
+ */
+irqreturn_t ce_tasklet_threaded_handler(int irq, void *context)
+{
+	struct ce_tasklet_entry *tasklet_entry = context;
+
+	ce_tasklet((unsigned long)tasklet_entry);
 
 	return IRQ_HANDLED;
 }
+#endif
 
 /**
  * const char *ce_name
@@ -752,10 +816,18 @@ QDF_STATUS ce_register_irq(struct HIF_CE_state *hif_ce_state, uint32_t mask)
 
 	for (id = 0; id < ce_count; id++) {
 		if ((mask & (1 << id)) && hif_ce_state->tasklets[id].inited) {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+			ret = pld_ce_request_threaded_irq(scn->qdf_dev->dev, id,
+				hif_snoc_interrupt_handler,
+				ce_tasklet_threaded_handler,
+				irqflags, ce_name[id],
+				&hif_ce_state->tasklets[id]);
+#else
 			ret = pld_ce_request_irq(scn->qdf_dev->dev, id,
 				hif_snoc_interrupt_handler,
 				irqflags, ce_name[id],
 				&hif_ce_state->tasklets[id]);
+#endif
 			if (ret) {
 				hif_err(
 					"cannot register CE %d irq handler, ret = %d",

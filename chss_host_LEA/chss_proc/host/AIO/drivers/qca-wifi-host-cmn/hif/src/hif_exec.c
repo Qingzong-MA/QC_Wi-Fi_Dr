@@ -1025,11 +1025,44 @@ irqreturn_t hif_ext_group_interrupt_handler(int irq, void *context)
 
 		qdf_atomic_inc(&scn->active_grp_tasklet_cnt);
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		/*
+		 * For HIF_EXEC_TASKLET_TYPE groups skip tasklet_schedule()
+		 * and ask genirq to wake our per-IRQ kthread, which runs
+		 * hif_ext_group_thread_handler() below. NAPI groups still
+		 * go through napi_schedule() — NAPI itself is set to
+		 * threaded mode on RT (dev_set_threaded()).
+		 */
+		if (hif_ext_group->type == HIF_EXEC_TASKLET_TYPE)
+			return IRQ_WAKE_THREAD;
+#endif
 		hif_ext_group->sched_ops->schedule(hif_ext_group);
 	}
 
 	return IRQ_HANDLED;
 }
+
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/**
+ * hif_ext_group_thread_handler() - threaded-IRQ counterpart for tasklet
+ * exec groups on PREEMPT_RT.
+ *
+ * Runs the same body that hif_exec_tasklet_fn() runs on stock kernels,
+ * but in the per-IRQ kthread instead of ksoftirqd.
+ */
+irqreturn_t hif_ext_group_thread_handler(int irq, void *context)
+{
+	struct hif_exec_context *hif_ext_group = context;
+
+	if (!hif_ext_group->irq_requested ||
+	    hif_ext_group->type != HIF_EXEC_TASKLET_TYPE)
+		return IRQ_HANDLED;
+
+	hif_exec_tasklet_fn((unsigned long)hif_ext_group);
+
+	return IRQ_HANDLED;
+}
+#endif
 
 /**
  * hif_exec_kill() - grp tasklet kill

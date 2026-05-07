@@ -144,6 +144,9 @@ int hif_configure_irq(struct hif_softc *sc);
 void hif_pci_cancel_deferred_target_sleep(struct hif_softc *scn);
 void wlan_tasklet(unsigned long data);
 irqreturn_t hif_pci_legacy_ce_interrupt_handler(int irq, void *arg);
+#ifdef WLAN_FEATURE_PREEMPT_RT
+irqreturn_t hif_pci_legacy_thread_handler(int irq, void *arg);
+#endif
 int hif_pci_addr_in_boundary(struct hif_softc *scn, uint32_t offset);
 
 /*

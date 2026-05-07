@@ -48,6 +48,29 @@ void __qdf_defer_func(struct work_struct *work)
 }
 qdf_export_symbol(__qdf_defer_func);
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/**
+ * __qdf_bh_work_func() - workqueue trampoline for qdf_bh_t on PREEMPT_RT.
+ *
+ * Mirrors __qdf_bh_func() but unwraps a work_struct instead of the
+ * tasklet's unsigned long argument. Lets qdf_create_bh() / qdf_sched_bh()
+ * deliver bottom-half work through a workqueue kthread on RT instead of
+ * routing it through ksoftirqd via tasklet_schedule().
+ */
+void __qdf_bh_work_func(struct work_struct *work)
+{
+	__qdf_bh_t *bh = container_of(work, __qdf_bh_t, bh);
+
+	if (!bh->fn) {
+		QDF_TRACE(QDF_MODULE_ID_QDF, QDF_TRACE_LEVEL_ERROR,
+			  "No bh callback registered !!");
+		return;
+	}
+	bh->fn(bh->arg);
+}
+qdf_export_symbol(__qdf_bh_work_func);
+#endif /* WLAN_FEATURE_PREEMPT_RT */
+
 #ifdef ENHANCED_OS_ABSTRACTION
 void
 qdf_create_bh(qdf_bh_t  *bh, qdf_defer_fn_t  func, void  *arg)

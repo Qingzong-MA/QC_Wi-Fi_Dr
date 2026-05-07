@@ -1087,6 +1087,44 @@ static inline int pfrm_request_irq(struct device *dev, unsigned int ce_id,
 	return pld_srng_request_irq(dev, ce_id, handler, flags, name, ctx);
 }
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+int pld_srng_request_threaded_irq(struct device *dev, int irq,
+				  irq_handler_t handler,
+				  irq_handler_t thread_fn,
+				  unsigned long irqflags,
+				  const char *devname,
+				  void *dev_data);
+
+/**
+ * pfrm_request_threaded_irq() - thread-fn variant of pfrm_request_irq().
+ *
+ * Used on PREEMPT_RT to push CE / DP-group interrupt processing into
+ * a per-IRQ kthread (irq/<n>-<name>) instead of ksoftirqd. The primary
+ * handler still runs in hard-IRQ context and is expected to return
+ * IRQ_WAKE_THREAD when the deferred work is needed.
+ */
+static inline int pfrm_request_threaded_irq(struct device *dev,
+					    unsigned int irq,
+					    irqreturn_t (*handler)(int,
+								   void *),
+					    irqreturn_t (*thread_fn)(int,
+								     void *),
+					    unsigned long flags,
+					    const char *name,
+					    void *ctx)
+{
+	return pld_srng_request_threaded_irq(dev, irq, handler, thread_fn,
+					     flags, name, ctx);
+}
+
+int pld_ce_request_threaded_irq(struct device *dev, unsigned int ce_id,
+				irq_handler_t handler,
+				irq_handler_t thread_fn,
+				unsigned long irqflags,
+				const char *name,
+				void *ctx);
+#endif /* WLAN_FEATURE_PREEMPT_RT */
+
 static inline int pfrm_free_irq(struct device *dev, int irq, void *ctx)
 {
 	return pld_srng_free_irq(dev, irq, ctx);

@@ -46,12 +46,17 @@ typedef struct {
 
 /**
  * typedef struct __qdf_bh_t - wrapper around the real task func
- * @bh: Instance of the bottom half
+ * @bh: Instance of the bottom half (tasklet on stock kernels, work_struct
+ *      on PREEMPT_RT — see __qdf_init_bh()/__qdf_sched_bh()).
  * @fn: function pointer to the handler
  * @arg: pointer to argument
  */
 typedef struct {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	struct work_struct bh;
+#else
 	struct tasklet_struct bh;
+#endif
 	qdf_defer_fn_t fn;
 	void *arg;
 } __qdf_bh_t;
@@ -200,11 +205,25 @@ static inline void __qdf_destroy_workqueue(__qdf_workqueue_t *wqueue)
 	destroy_workqueue(wqueue);
 }
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/* Workqueue trampoline used on PREEMPT_RT — extracts the qdf_bh_t and
+ * forwards to the registered handler. Defined alongside __qdf_defer_func
+ * in qdf_defer.c.
+ */
+void __qdf_bh_work_func(struct work_struct *work);
+#endif
+
 /**
  * __qdf_init_bh - creates the Bottom half deferred handler
  * @bh: pointer to bottom
  * @func: deferred function to run at bottom half interrupt context.
  * @arg: argument for the deferred function
+ *
+ * On stock kernels this is backed by a tasklet (softirq). On PREEMPT_RT
+ * we use a work_struct so the deferred body runs in a workqueue kthread
+ * (events_unbound by default) instead of ksoftirqd, matching the rest
+ * of the RT-friendly defer plumbing in this driver.
+ *
  * Return: none
  */
 static inline QDF_STATUS
@@ -212,7 +231,11 @@ __qdf_init_bh(__qdf_bh_t *bh, qdf_defer_fn_t func, void *arg)
 {
 	bh->fn = func;
 	bh->arg = arg;
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	INIT_WORK(&bh->bh, __qdf_bh_work_func);
+#else
 	tasklet_init(&bh->bh, __qdf_bh_func, (unsigned long)bh);
+#endif
 	return QDF_STATUS_SUCCESS;
 }
 
@@ -223,7 +246,11 @@ __qdf_init_bh(__qdf_bh_t *bh, qdf_defer_fn_t func, void *arg)
  */
 static inline QDF_STATUS __qdf_sched_bh(__qdf_bh_t *bh)
 {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	schedule_work(&bh->bh);
+#else
 	tasklet_schedule(&bh->bh);
+#endif
 	return QDF_STATUS_SUCCESS;
 }
 
@@ -247,7 +274,11 @@ static inline QDF_STATUS __qdf_disable_work(__qdf_work_t *work)
  */
 static inline QDF_STATUS __qdf_disable_bh(__qdf_bh_t *bh)
 {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	cancel_work_sync(&bh->bh);
+#else
 	tasklet_kill(&bh->bh);
+#endif
 	return QDF_STATUS_SUCCESS;
 }
 

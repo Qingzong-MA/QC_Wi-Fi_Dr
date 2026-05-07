@@ -159,6 +159,9 @@ void hif_exec_destroy(struct hif_exec_context *ctx);
 int hif_grp_irq_configure(struct hif_softc *scn,
 			  struct hif_exec_context *hif_exec);
 irqreturn_t hif_ext_group_interrupt_handler(int irq, void *context);
+#ifdef WLAN_FEATURE_PREEMPT_RT
+irqreturn_t hif_ext_group_thread_handler(int irq, void *context);
+#endif
 
 struct hif_exec_context *hif_exec_get_ctx(struct hif_opaque_softc *hif,
 					  uint8_t id);
