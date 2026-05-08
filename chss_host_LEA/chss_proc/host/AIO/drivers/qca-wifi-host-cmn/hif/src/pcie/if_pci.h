@@ -22,6 +22,9 @@
 #include <linux/version.h>
 #include <linux/semaphore.h>
 #include <linux/interrupt.h>
+#ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/workqueue.h>
+#endif
 
 #define ATH_DBG_DEFAULT   0
 #define DRAM_SIZE               0x000a8000
@@ -109,7 +112,14 @@ struct hif_pci_softc {
 	struct pci_dev *pdev;
 	int num_msi_intrs;      /* number of MSI interrupts granted */
 	/* 0 --> using legacy PCI line interrupts */
-	struct tasklet_struct intr_tq;  /* tasklet */
+	struct tasklet_struct intr_tq;  /* tasklet (stock kernels only) */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	/* PREEMPT_RT replaces @intr_tq with this workqueue handle. The
+	 * IRQ handler is auto-threaded by the RT kernel and queues this
+	 * work onto system_highpri_wq instead of scheduling the tasklet.
+	 */
+	struct work_struct intr_work;
+#endif
 	struct hif_msi_info msi_info;
 	int ce_msi_irq_num[CE_COUNT_MAX];
 	int irq;
@@ -145,7 +155,7 @@ void hif_pci_cancel_deferred_target_sleep(struct hif_softc *scn);
 void wlan_tasklet(unsigned long data);
 irqreturn_t hif_pci_legacy_ce_interrupt_handler(int irq, void *arg);
 #ifdef WLAN_FEATURE_PREEMPT_RT
-irqreturn_t hif_pci_legacy_thread_handler(int irq, void *arg);
+void wlan_tasklet_work_fn(struct work_struct *work);
 #endif
 int hif_pci_addr_in_boundary(struct hif_softc *scn, uint32_t offset);
 

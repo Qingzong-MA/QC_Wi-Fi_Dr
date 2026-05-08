@@ -22,6 +22,9 @@
 #include <hif.h>
 #include <hif_irq_affinity.h>
 #include <linux/cpumask.h>
+#ifdef WLAN_FEATURE_PREEMPT_RT
+#include <linux/workqueue.h>
+#endif
 /*Number of buckets for latency*/
 #define HIF_SCHED_LATENCY_BUCKETS 8
 
@@ -120,11 +123,15 @@ struct hif_exec_context {
 /**
  * struct hif_tasklet_exec_context - exec_context for tasklets
  * @exec_ctx: inherited data type
- * @tasklet: tasklet structure for scheduling
+ * @tasklet: tasklet structure for scheduling on stock kernels
+ * @work:    workqueue handle used on PREEMPT_RT instead of @tasklet
  */
 struct hif_tasklet_exec_context {
 	struct hif_exec_context exec_ctx;
 	struct tasklet_struct tasklet;
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	struct work_struct work;
+#endif
 };
 
 /**
@@ -159,9 +166,6 @@ void hif_exec_destroy(struct hif_exec_context *ctx);
 int hif_grp_irq_configure(struct hif_softc *scn,
 			  struct hif_exec_context *hif_exec);
 irqreturn_t hif_ext_group_interrupt_handler(int irq, void *context);
-#ifdef WLAN_FEATURE_PREEMPT_RT
-irqreturn_t hif_ext_group_thread_handler(int irq, void *context);
-#endif
 
 struct hif_exec_context *hif_exec_get_ctx(struct hif_opaque_softc *hif,
 					  uint8_t id);

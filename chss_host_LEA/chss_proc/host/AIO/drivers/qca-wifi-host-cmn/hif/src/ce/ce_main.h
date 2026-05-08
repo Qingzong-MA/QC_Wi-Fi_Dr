@@ -24,6 +24,10 @@
 #include "hif_main.h"
 #include "qdf_util.h"
 #include "hif_exec.h"
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/* struct work_struct used by PREEMPT_RT path in ce_tasklet_entry */
+#include <linux/workqueue.h>
+#endif
 
 #ifndef DATA_CE_SW_INDEX_NO_INLINE_UPDATE
 #define DATA_CE_UPDATE_SWINDEX(x, scn, addr)				\
@@ -137,7 +141,9 @@ struct HIF_CE_pipe_info {
 /**
  * struct ce_tasklet_entry
  *
- * @intr_tq: intr_tq
+ * @intr_tq: intr_tq (legacy softirq path; unused on PREEMPT_RT)
+ * @intr_work: workqueue handle used to defer CE service on
+ *             PREEMPT_RT (replaces @intr_tq)
  * @ce_id: ce_id
  * @inited: inited
  * @hif_ce_state: hif_ce_state
@@ -145,6 +151,9 @@ struct HIF_CE_pipe_info {
  */
 struct ce_tasklet_entry {
 	struct tasklet_struct intr_tq;
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	struct work_struct intr_work;
+#endif
 	enum ce_id_type ce_id;
 	bool inited;
 	void *hif_ce_state;

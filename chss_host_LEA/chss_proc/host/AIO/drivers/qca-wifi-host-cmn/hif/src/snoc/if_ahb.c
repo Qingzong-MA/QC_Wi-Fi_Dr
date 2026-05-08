@@ -130,10 +130,9 @@ void hif_ahb_disable_isr(struct hif_softc *scn)
 	hif_exec_kill(&scn->osc);
 	hif_nointrs(scn);
 	ce_tasklet_kill(scn);
-#ifndef WLAN_FEATURE_PREEMPT_RT
-	/* tasklet was never initialised on PREEMPT_RT — see
-	 * hif_ahb_configure_legacy_irq().
-	 */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	cancel_work_sync(&sc->intr_work);
+#else
 	tasklet_kill(&sc->intr_tq);
 #endif
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
@@ -233,7 +232,9 @@ int hif_ahb_configure_legacy_irq(struct hif_pci_softc *sc)
 	int irq = 0;
 
 	/* do not support MSI or MSI IRQ failed */
-#ifndef WLAN_FEATURE_PREEMPT_RT
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	INIT_WORK(&sc->intr_work, wlan_tasklet_work_fn);
+#else
 	tasklet_init(&sc->intr_tq, wlan_tasklet, (unsigned long)sc);
 #endif
 	qal_vbus_get_irq((struct qdf_pfm_hndl *)pdev, "legacy", &irq);
@@ -242,14 +243,8 @@ int hif_ahb_configure_legacy_irq(struct hif_pci_softc *sc)
 		ret = -EFAULT;
 		goto end;
 	}
-#ifdef WLAN_FEATURE_PREEMPT_RT
-	ret = request_threaded_irq(irq, hif_pci_legacy_ce_interrupt_handler,
-				   hif_pci_legacy_thread_handler,
-				   IRQF_DISABLED, "wlan_ahb", sc);
-#else
 	ret = request_irq(irq, hif_pci_legacy_ce_interrupt_handler,
 				IRQF_DISABLED, "wlan_ahb", sc);
-#endif
 	if (ret) {
 		dev_err(&pdev->dev, "ath_request_irq failed\n");
 		ret = -EFAULT;
@@ -302,20 +297,11 @@ int hif_ahb_configure_irq_by_ceid(struct hif_softc *scn, int ce_id)
 	}
 
 	ic_irqnum[HIF_IC_CE0_IRQ_OFFSET + ce_id] = irq;
-#ifdef WLAN_FEATURE_PREEMPT_RT
-	ret = pfrm_request_threaded_irq(&pdev->dev, irq,
-			       hif_ahb_interrupt_handler,
-			       ce_tasklet_threaded_handler,
-			       IRQF_TRIGGER_RISING,
-			       ic_irqname[HIF_IC_CE0_IRQ_OFFSET + ce_id],
-			       &hif_state->tasklets[ce_id]);
-#else
 	ret = pfrm_request_irq(&pdev->dev, irq,
 			       hif_ahb_interrupt_handler,
 			       IRQF_TRIGGER_RISING,
 			       ic_irqname[HIF_IC_CE0_IRQ_OFFSET + ce_id],
 			       &hif_state->tasklets[ce_id]);
-#endif
 	if (ret) {
 		dev_err(&pdev->dev, "ath_request_irq failed\n");
 		ret = -EFAULT;
@@ -385,20 +371,11 @@ int hif_ahb_configure_grp_irq(struct hif_softc *scn,
 	for (j = 0; j < hif_ext_group->numirq; j++) {
 		irq = hif_ext_group->os_irq[j];
 		qdf_dev_set_irq_status_flags(irq, QDF_IRQ_DISABLE_UNLAZY);
-#ifdef WLAN_FEATURE_PREEMPT_RT
-		ret = pfrm_request_threaded_irq(scn->qdf_dev->dev,
-				       irq, hif_ext_group_interrupt_handler,
-				       hif_ext_group_thread_handler,
-				       IRQF_TRIGGER_RISING,
-				       ic_irqname[hif_ext_group->irq[j]],
-				       hif_ext_group);
-#else
 		ret = pfrm_request_irq(scn->qdf_dev->dev,
 				       irq, hif_ext_group_interrupt_handler,
 				       IRQF_TRIGGER_RISING,
 				       ic_irqname[hif_ext_group->irq[j]],
 				       hif_ext_group);
-#endif
 		if (ret) {
 			dev_err(&pdev->dev, "ath_request_irq failed\n");
 			ret = -EFAULT;

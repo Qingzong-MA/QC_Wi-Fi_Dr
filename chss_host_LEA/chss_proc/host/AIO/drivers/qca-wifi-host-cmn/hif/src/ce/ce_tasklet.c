@@ -76,13 +76,8 @@ static void reschedule_ce_tasklet_work_handler(struct work_struct *work)
 	}
 	if (hif_ce_state->tasklets[ce_work->id].inited) {
 #ifdef WLAN_FEATURE_PREEMPT_RT
-		/*
-		 * SLUB-debug rescheduler runs in workqueue context — there
-		 * is no tasklet to drive on RT. Run the CE service inline
-		 * instead, matching ce_tasklet_threaded_handler().
-		 */
-		ce_tasklet((unsigned long)
-			   &hif_ce_state->tasklets[ce_work->id]);
+		queue_work(system_highpri_wq,
+			   &hif_ce_state->tasklets[ce_work->id].intr_work);
 #else
 		tasklet_schedule(&hif_ce_state->tasklets[ce_work->id].intr_tq);
 #endif
@@ -138,10 +133,19 @@ void deinit_tasklet_workers(struct hif_opaque_softc *scn)
  * @tasklet_entry: struct ce_tasklet_entry
  *
  * Return: N/A
+ *
+ * On PREEMPT_RT this schedules a work_struct on system_highpri_wq —
+ * the IRQ handler is auto-threaded by the RT kernel and inside that
+ * IRQ kthread we just queue deferred work to a kworker, replacing the
+ * tasklet→ksoftirqd hand-off used on stock kernels.
  */
 static inline void ce_schedule_tasklet(struct ce_tasklet_entry *tasklet_entry)
 {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	queue_work(system_highpri_wq, &tasklet_entry->intr_work);
+#else
 	tasklet_schedule(&tasklet_entry->intr_tq);
+#endif
 }
 
 #ifdef CE_TASKLET_DEBUG_ENABLE
@@ -387,11 +391,11 @@ ce_drain:
 
 #ifdef WLAN_FEATURE_PREEMPT_RT
 		/*
-		 * On PREEMPT_RT we already run from the per-IRQ kthread
-		 * (ce_tasklet_threaded_handler). Instead of bouncing the
-		 * work back through tasklet_schedule()/ksoftirqd, drain the
-		 * CE inline. cond_resched() keeps the kernel preemptible
-		 * if the ring is deep so other RT threads can run.
+		 * On PREEMPT_RT we are running from a kworker (system_
+		 * highpri_wq), a regular preemptible kthread. Drain the CE
+		 * inline rather than re-queuing the same work_struct —
+		 * cond_resched() keeps the kernel preemptible if the ring
+		 * is deep so other RT threads can still run.
 		 */
 		cond_resched();
 		goto ce_drain;
@@ -428,6 +432,25 @@ ce_drain:
  *
  * Return: N/A
  */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/**
+ * ce_tasklet_work_fn() - workqueue trampoline replacing the CE tasklet
+ *                        body on PREEMPT_RT.
+ *
+ * Resolves the &ce_tasklet_entry from the embedded &intr_work and
+ * forwards to the existing ce_tasklet() body. Runs in a system_highpri_wq
+ * kworker — clean preemptible kthread context — so the cond_resched()
+ * drain loop in ce_tasklet() is safe.
+ */
+static void ce_tasklet_work_fn(struct work_struct *work)
+{
+	struct ce_tasklet_entry *te =
+		container_of(work, struct ce_tasklet_entry, intr_work);
+
+	ce_tasklet((unsigned long)te);
+}
+#endif
+
 void ce_tasklet_init(struct HIF_CE_state *hif_ce_state, uint32_t mask)
 {
 	int i;
@@ -437,16 +460,10 @@ void ce_tasklet_init(struct HIF_CE_state *hif_ce_state, uint32_t mask)
 			hif_ce_state->tasklets[i].ce_id = i;
 			hif_ce_state->tasklets[i].inited = true;
 			hif_ce_state->tasklets[i].hif_ce_state = hif_ce_state;
-#ifndef WLAN_FEATURE_PREEMPT_RT
-			/*
-			 * On PREEMPT_RT the per-CE tasklet has been replaced
-			 * by a threaded IRQ (ce_tasklet_threaded_handler) —
-			 * skip tasklet_init() so the tasklet_struct stays
-			 * pristine and tasklet_kill() in ce_tasklet_kill()
-			 * is also skipped (matching #ifdef there). The other
-			 * fields (ce_id / inited / hif_ce_state) are still
-			 * required by ce_tasklet() and ce_dispatch_interrupt().
-			 */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+			INIT_WORK(&hif_ce_state->tasklets[i].intr_work,
+				  ce_tasklet_work_fn);
+#else
 			tasklet_init(&hif_ce_state->tasklets[i].intr_tq,
 				ce_tasklet,
 				(unsigned long)&hif_ce_state->tasklets[i]);
@@ -478,14 +495,13 @@ void ce_tasklet_kill(struct hif_softc *scn)
 			 * tasklet_disable() will take care of that.
 			 */
 			qdf_cancel_work(&tasklet_workers[i].reg_work);
-#ifndef WLAN_FEATURE_PREEMPT_RT
+#ifdef WLAN_FEATURE_PREEMPT_RT
 			/*
-			 * On PREEMPT_RT the tasklet was never initialised
-			 * (see ce_tasklet_init()) and the per-CE work runs
-			 * in a per-IRQ kthread; the IRQ has already been
-			 * freed by hif_nointrs() before we get here, so
-			 * there is nothing tasklet-shaped to tear down.
+			 * Wait for any in-flight system_highpri_wq work
+			 * draining this CE before tearing down state.
 			 */
+			cancel_work_sync(&hif_ce_state->tasklets[i].intr_work);
+#else
 			tasklet_kill(&hif_ce_state->tasklets[i].intr_tq);
 #endif
 		}
@@ -643,6 +659,18 @@ static inline bool hif_tasklet_schedule(struct hif_opaque_softc *hif_ctx,
 {
 	struct hif_softc *scn = HIF_GET_SOFTC(hif_ctx);
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	/*
+	 * Workqueue path on PREEMPT_RT — queue_work() naturally returns
+	 * false if @intr_work is already pending, mirroring the
+	 * TASKLET_STATE_SCHED guard used on stock kernels.
+	 */
+	if (!queue_work(system_highpri_wq, &tasklet_entry->intr_work)) {
+		hif_debug("CE %d work already pending", tasklet_entry->ce_id);
+		qdf_atomic_dec(&scn->active_tasklet_cnt);
+		return false;
+	}
+#else
 	if (test_bit(TASKLET_STATE_SCHED, &tasklet_entry->intr_tq.state)) {
 		hif_debug("tasklet scheduled, return");
 		qdf_atomic_dec(&scn->active_tasklet_cnt);
@@ -650,6 +678,7 @@ static inline bool hif_tasklet_schedule(struct hif_opaque_softc *hif_ctx,
 	}
 
 	tasklet_schedule(&tasklet_entry->intr_tq);
+#endif
 	if (scn->ce_latency_stats)
 		hif_record_tasklet_sched_entry_ts(scn, tasklet_entry->ce_id);
 
@@ -698,67 +727,13 @@ irqreturn_t ce_dispatch_interrupt(int ce_id,
 
 	qdf_atomic_inc(&scn->active_tasklet_cnt);
 
-	if (hif_napi_enabled(hif_hdl, ce_id)) {
+	if (hif_napi_enabled(hif_hdl, ce_id))
 		hif_napi_schedule(hif_hdl, ce_id);
-		return IRQ_HANDLED;
-	}
-
-#ifdef WLAN_FEATURE_PREEMPT_RT
-	/*
-	 * Three RT-relevant call sites land here:
-	 *
-	 *   1. MSI per-CE IRQ primary (request_threaded_irq() registered
-	 *      hif_ce_interrupt_handler). On stock RT this *also* runs
-	 *      via irq_forced_thread_fn(), which wraps the call in
-	 *      local_bh_disable() — that takes an RCU read-lock on
-	 *      PREEMPT_RT, so any sleeping/cond_resched() inside
-	 *      ce_tasklet() would BUG. Just ask genirq to schedule the
-	 *      secondary thread (ce_tasklet_threaded_handler).
-	 *
-	 *   2. SNOC / AHB CE primary (request_threaded_irq() with
-	 *      hif_snoc_interrupt_handler / hif_ahb_interrupt_handler) —
-	 *      same as case 1.
-	 *
-	 *   3. Legacy / shared PCI IRQ secondary thread:
-	 *      hif_pci_legacy_thread_handler() invokes
-	 *      pci_dispatch_interrupt() which calls us back per-CE. We
-	 *      run in irq_thread_fn() context (no local_bh_disable, no
-	 *      RCU lock) and there is no per-CE thread to wake — so
-	 *      execute ce_tasklet() inline.
-	 *
-	 * Discriminate via in_softirq(): true in case 1/2 because
-	 * irq_forced_thread_fn() called local_bh_disable(); false in
-	 * case 3 (clean IRQ-thread context). in_task() alone is
-	 * insufficient because PREEMPT_RT force-threads the primary too.
-	 */
-	if (!in_softirq() && !irqs_disabled() && !in_irq()) {
-		ce_tasklet((unsigned long)tasklet_entry);
-		return IRQ_HANDLED;
-	}
-	return IRQ_WAKE_THREAD;
-#else
-	hif_tasklet_schedule(hif_hdl, tasklet_entry);
-	return IRQ_HANDLED;
-#endif
-}
-
-#ifdef WLAN_FEATURE_PREEMPT_RT
-/**
- * ce_tasklet_threaded_handler() - threaded-IRQ counterpart of ce_tasklet().
- *
- * Replaces the tasklet step on PREEMPT_RT: ce_dispatch_interrupt() returns
- * IRQ_WAKE_THREAD, genirq wakes the per-IRQ kthread, and this function
- * runs the same body that ce_tasklet() ran from softirq on stock kernels.
- */
-irqreturn_t ce_tasklet_threaded_handler(int irq, void *context)
-{
-	struct ce_tasklet_entry *tasklet_entry = context;
-
-	ce_tasklet((unsigned long)tasklet_entry);
+	else
+		hif_tasklet_schedule(hif_hdl, tasklet_entry);
 
 	return IRQ_HANDLED;
 }
-#endif
 
 /**
  * const char *ce_name
@@ -850,18 +825,10 @@ QDF_STATUS ce_register_irq(struct HIF_CE_state *hif_ce_state, uint32_t mask)
 
 	for (id = 0; id < ce_count; id++) {
 		if ((mask & (1 << id)) && hif_ce_state->tasklets[id].inited) {
-#ifdef WLAN_FEATURE_PREEMPT_RT
-			ret = pld_ce_request_threaded_irq(scn->qdf_dev->dev, id,
-				hif_snoc_interrupt_handler,
-				ce_tasklet_threaded_handler,
-				irqflags, ce_name[id],
-				&hif_ce_state->tasklets[id]);
-#else
 			ret = pld_ce_request_irq(scn->qdf_dev->dev, id,
 				hif_snoc_interrupt_handler,
 				irqflags, ce_name[id],
 				&hif_ce_state->tasklets[id]);
-#endif
 			if (ret) {
 				hif_err(
 					"cannot register CE %d irq handler, ret = %d",

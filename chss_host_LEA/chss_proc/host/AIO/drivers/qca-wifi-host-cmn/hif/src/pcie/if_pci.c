@@ -384,28 +384,17 @@ irqreturn_t hif_pci_legacy_ce_interrupt_handler(int irq, void *arg)
 		qdf_atomic_inc(&scn->active_tasklet_cnt);
 #ifdef WLAN_FEATURE_PREEMPT_RT
 		/*
-		 * Defer wlan_tasklet body to the per-IRQ kthread instead
-		 * of scheduling a tasklet. hif_pci_legacy_thread_handler()
-		 * runs wlan_tasklet() inline.
+		 * Defer wlan_tasklet body via system_highpri_wq instead of
+		 * scheduling a tasklet. The IRQ handler itself has been
+		 * auto-threaded by PREEMPT_RT, so queue_work() here just
+		 * pushes work to a kworker.
 		 */
-		return IRQ_WAKE_THREAD;
+		queue_work(system_highpri_wq, &sc->intr_work);
 #else
 		tasklet_schedule(&sc->intr_tq);
 #endif
 	} else {
-#ifdef WLAN_FEATURE_PREEMPT_RT
-		/*
-		 * pci_dispatch_interrupt() in turn calls
-		 * ce_dispatch_interrupt() which now requests IRQ_WAKE_THREAD
-		 * on the per-CE MSI path. Under legacy/shared IRQ we own the
-		 * single line, so wake our own thread and let it re-run the
-		 * dispatch in task context where ce_dispatch_interrupt()
-		 * will execute ce_tasklet() inline.
-		 */
-		return IRQ_WAKE_THREAD;
-#else
 		pci_dispatch_interrupt(scn);
-#endif
 	}
 
 	return IRQ_HANDLED;
@@ -413,28 +402,18 @@ irqreturn_t hif_pci_legacy_ce_interrupt_handler(int irq, void *arg)
 
 #ifdef WLAN_FEATURE_PREEMPT_RT
 /**
- * hif_pci_legacy_thread_handler() - threaded-IRQ handler for the legacy
- * shared PCI IRQ on PREEMPT_RT.
+ * wlan_tasklet_work_fn() - workqueue trampoline replacing the legacy/
+ *                          shared PCI wlan_tasklet on PREEMPT_RT.
  *
- * Replaces both the wlan_tasklet (SSR/FW indication) and the per-CE
- * tasklet path on shared/legacy IRQs. The primary handler reads the
- * cause registers, ACKs them and returns IRQ_WAKE_THREAD; this routine
- * then runs the deferred work in process context.
+ * Shared with if_ahb.c via if_pci.h (the AHB legacy IRQ uses the same
+ * hif_pci_softc + wlan_tasklet pair).
  */
-irqreturn_t hif_pci_legacy_thread_handler(int irq, void *arg)
+void wlan_tasklet_work_fn(struct work_struct *work)
 {
-	struct hif_pci_softc *sc = (struct hif_pci_softc *)arg;
-	struct hif_softc *scn = HIF_GET_SOFTC(sc);
+	struct hif_pci_softc *sc =
+		container_of(work, struct hif_pci_softc, intr_work);
 
-	if (qdf_atomic_read(&scn->tasklet_from_intr)) {
-		/* SSR / FW-indication path — same body as wlan_tasklet. */
-		wlan_tasklet((unsigned long)sc);
-	} else {
-		/* CE work — ce_dispatch_interrupt() runs ce_tasklet inline. */
-		pci_dispatch_interrupt(scn);
-	}
-
-	return IRQ_HANDLED;
+	wlan_tasklet((unsigned long)sc);
 }
 #endif
 
@@ -1003,11 +982,7 @@ static void reschedule_tasklet_work_handler(void *arg)
 	}
 
 #ifdef WLAN_FEATURE_PREEMPT_RT
-	/*
-	 * Already in a workqueue worker — invoke wlan_tasklet body inline
-	 * rather than bouncing through ksoftirqd via tasklet_schedule().
-	 */
-	wlan_tasklet((unsigned long)sc);
+	queue_work(system_highpri_wq, &sc->intr_work);
 #else
 	tasklet_schedule(&sc->intr_tq);
 #endif
@@ -2074,21 +2049,13 @@ static int hif_pci_configure_legacy_irq(struct hif_pci_softc *sc)
 
 	/* do notn support MSI or MSI IRQ failed */
 #ifdef WLAN_FEATURE_PREEMPT_RT
-	/*
-	 * Skip tasklet init on PREEMPT_RT — the legacy/shared IRQ is
-	 * routed through a per-IRQ kthread (hif_pci_legacy_thread_handler)
-	 * and wlan_tasklet body is invoked inline from there.
-	 */
-	ret = request_threaded_irq(sc->pdev->irq,
-				   hif_pci_legacy_ce_interrupt_handler,
-				   hif_pci_legacy_thread_handler,
-				   IRQF_SHARED, "wlan_pci", sc);
+	INIT_WORK(&sc->intr_work, wlan_tasklet_work_fn);
 #else
 	tasklet_init(&sc->intr_tq, wlan_tasklet, (unsigned long)sc);
+#endif
 	ret = request_irq(sc->pdev->irq,
 			  hif_pci_legacy_ce_interrupt_handler, IRQF_SHARED,
 			  "wlan_pci", sc);
-#endif
 	if (ret) {
 		hif_err("request_irq failed, ret: %d", ret);
 		goto end;
@@ -2557,14 +2524,11 @@ void hif_pci_disable_isr(struct hif_softc *scn)
 	hif_exec_kill(&scn->osc);
 	hif_nointrs(scn);
 	hif_free_msi_ctx(scn);
-	/* Cancel the pending tasklet */
+	/* Cancel the pending tasklet / workqueue */
 	ce_tasklet_kill(scn);
-#ifndef WLAN_FEATURE_PREEMPT_RT
-	/*
-	 * On PREEMPT_RT the legacy/shared IRQ tasklet was never
-	 * initialised (see hif_pci_configure_legacy_irq()), so there is
-	 * nothing to kill here.
-	 */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	cancel_work_sync(&sc->intr_work);
+#else
 	tasklet_kill(&sc->intr_tq);
 #endif
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
@@ -2984,19 +2948,10 @@ int hif_ce_msi_configure_irq_by_ceid(struct hif_softc *scn, int ce_id)
 #else
 	irq_flags = IRQF_SHARED;
 #endif
-#ifdef WLAN_FEATURE_PREEMPT_RT
-	ret = pfrm_request_threaded_irq(scn->qdf_dev->dev,
-				       irq, hif_ce_interrupt_handler,
-				       ce_tasklet_threaded_handler,
-				       irq_flags,
-				       ce_irqname[pci_slot][ce_id],
-				       &ce_sc->tasklets[ce_id]);
-#else
 	ret = pfrm_request_irq(scn->qdf_dev->dev,
 			       irq, hif_ce_interrupt_handler, irq_flags,
 			       ce_irqname[pci_slot][ce_id],
 			       &ce_sc->tasklets[ce_id]);
-#endif
 	if (ret)
 		return -EINVAL;
 
@@ -3268,19 +3223,6 @@ int hif_pci_configure_grp_irq(struct hif_softc *scn,
 						     QDF_IRQ_DISABLE_UNLAZY);
 		hif_debug("request_irq = %d for grp %d",
 			  irq, hif_ext_group->grp_id);
-#ifdef WLAN_FEATURE_PREEMPT_RT
-		ret = pfrm_request_threaded_irq(
-				scn->qdf_dev->dev, irq,
-				hif_ext_group_interrupt_handler,
-				hif_ext_group_thread_handler,
-#ifdef WLAN_ONE_MSI_VECTOR
-				IRQF_SHARED | IRQF_NO_SUSPEND | IRQF_NOBALANCING,
-#else
-				IRQF_SHARED | IRQF_NO_SUSPEND,
-#endif
-				dp_irqname[pci_slot][hif_ext_group->grp_id],
-				hif_ext_group);
-#else
 		ret = pfrm_request_irq(
 				scn->qdf_dev->dev, irq,
 				hif_ext_group_interrupt_handler,
@@ -3291,7 +3233,6 @@ int hif_pci_configure_grp_irq(struct hif_softc *scn,
 #endif
 				dp_irqname[pci_slot][hif_ext_group->grp_id],
 				hif_ext_group);
-#endif /* WLAN_FEATURE_PREEMPT_RT */
 		if (ret) {
 			hif_err("request_irq failed ret = %d", ret);
 			return -EFAULT;

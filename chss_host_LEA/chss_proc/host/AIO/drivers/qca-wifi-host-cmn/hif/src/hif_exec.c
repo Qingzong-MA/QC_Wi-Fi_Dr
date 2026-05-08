@@ -497,7 +497,11 @@ static void hif_exec_tasklet_schedule(struct hif_exec_context *ctx)
 {
 	struct hif_tasklet_exec_context *t_ctx = hif_exec_get_tasklet(ctx);
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	queue_work(system_highpri_wq, &t_ctx->work);
+#else
 	tasklet_schedule(&t_ctx->tasklet);
+#endif
 }
 
 /**
@@ -527,12 +531,9 @@ exec_drain:
 	} else {
 #ifdef WLAN_FEATURE_PREEMPT_RT
 		/*
-		 * On PREEMPT_RT we run from hif_ext_group_thread_handler()
-		 * (the explicit thread_fn registered via
-		 * request_threaded_irq()) — a clean kthread context. Drain
-		 * inline instead of bouncing through tasklet_schedule()
-		 * /ksoftirqd. cond_resched() keeps latency bounded for
-		 * other RT threads when the ring is deep.
+		 * Running in a system_highpri_wq kworker — preemptible
+		 * kthread context. Keep draining inline rather than
+		 * re-queuing the same work_struct on every iteration.
 		 */
 		cond_resched();
 		goto exec_drain;
@@ -824,17 +825,11 @@ static void hif_exec_tasklet_kill(struct hif_exec_context *ctx)
 	qdf_semaphore_acquire(&ctx->tasklet_sem);
 
 	if (ctx->inited) {
-#ifndef WLAN_FEATURE_PREEMPT_RT
-		/*
-		 * On PREEMPT_RT the tasklet was never initialised in
-		 * hif_exec_tasklet_create() (we run via the per-IRQ
-		 * kthread + hif_ext_group_thread_handler() instead).
-		 * Skip the matching teardown.
-		 */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		cancel_work_sync(&t_ctx->work);
+#else
 		tasklet_disable(&t_ctx->tasklet);
 		tasklet_kill(&t_ctx->tasklet);
-#else
-		(void)t_ctx;
 #endif
 	}
 	ctx->inited = false;
@@ -851,6 +846,24 @@ struct hif_execution_ops tasklet_sched_ops = {
 /**
  * hif_exec_tasklet_schedule() -  allocate and initialize a tasklet exec context
  */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+/**
+ * hif_exec_work_fn() - workqueue trampoline replacing the tasklet body
+ *                      on PREEMPT_RT.
+ *
+ * Resolves the &hif_tasklet_exec_context from its embedded &work and
+ * forwards to the existing hif_exec_tasklet_fn() body. Runs in a
+ * system_highpri_wq kworker.
+ */
+static void hif_exec_work_fn(struct work_struct *work)
+{
+	struct hif_tasklet_exec_context *t_ctx =
+		container_of(work, struct hif_tasklet_exec_context, work);
+
+	hif_exec_tasklet_fn((unsigned long)&t_ctx->exec_ctx);
+}
+#endif
+
 static struct hif_exec_context *hif_exec_tasklet_create(void)
 {
 	struct hif_tasklet_exec_context *ctx;
@@ -860,15 +873,9 @@ static struct hif_exec_context *hif_exec_tasklet_create(void)
 		return NULL;
 
 	ctx->exec_ctx.sched_ops = &tasklet_sched_ops;
-#ifndef WLAN_FEATURE_PREEMPT_RT
-	/*
-	 * On PREEMPT_RT, HIF_EXEC_TASKLET_TYPE groups are serviced by the
-	 * per-IRQ kthread (request_threaded_irq() + hif_ext_group_thread_
-	 * handler()) so the tasklet_struct is never scheduled or killed.
-	 * Skip tasklet_init() to keep it pristine; tasklet_sched_ops's
-	 * .schedule path is short-circuited by hif_ext_group_interrupt_
-	 * handler() returning IRQ_WAKE_THREAD before sched_ops are used.
-	 */
+#ifdef WLAN_FEATURE_PREEMPT_RT
+	INIT_WORK(&ctx->work, hif_exec_work_fn);
+#else
 	tasklet_init(&ctx->tasklet, hif_exec_tasklet_fn,
 		     (unsigned long)ctx);
 #endif
@@ -1061,44 +1068,11 @@ irqreturn_t hif_ext_group_interrupt_handler(int irq, void *context)
 
 		qdf_atomic_inc(&scn->active_grp_tasklet_cnt);
 
-#ifdef WLAN_FEATURE_PREEMPT_RT
-		/*
-		 * For HIF_EXEC_TASKLET_TYPE groups skip tasklet_schedule()
-		 * and ask genirq to wake our per-IRQ kthread, which runs
-		 * hif_ext_group_thread_handler() below. NAPI groups still
-		 * go through napi_schedule() — NAPI itself is set to
-		 * threaded mode on RT (dev_set_threaded()).
-		 */
-		if (hif_ext_group->type == HIF_EXEC_TASKLET_TYPE)
-			return IRQ_WAKE_THREAD;
-#endif
 		hif_ext_group->sched_ops->schedule(hif_ext_group);
 	}
 
 	return IRQ_HANDLED;
 }
-
-#ifdef WLAN_FEATURE_PREEMPT_RT
-/**
- * hif_ext_group_thread_handler() - threaded-IRQ counterpart for tasklet
- * exec groups on PREEMPT_RT.
- *
- * Runs the same body that hif_exec_tasklet_fn() runs on stock kernels,
- * but in the per-IRQ kthread instead of ksoftirqd.
- */
-irqreturn_t hif_ext_group_thread_handler(int irq, void *context)
-{
-	struct hif_exec_context *hif_ext_group = context;
-
-	if (!hif_ext_group->irq_requested ||
-	    hif_ext_group->type != HIF_EXEC_TASKLET_TYPE)
-		return IRQ_HANDLED;
-
-	hif_exec_tasklet_fn((unsigned long)hif_ext_group);
-
-	return IRQ_HANDLED;
-}
-#endif
 
 /**
  * hif_exec_kill() - grp tasklet kill
