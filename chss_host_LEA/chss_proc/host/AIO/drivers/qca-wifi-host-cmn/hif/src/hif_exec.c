@@ -824,8 +824,18 @@ static void hif_exec_tasklet_kill(struct hif_exec_context *ctx)
 	qdf_semaphore_acquire(&ctx->tasklet_sem);
 
 	if (ctx->inited) {
+#ifndef WLAN_FEATURE_PREEMPT_RT
+		/*
+		 * On PREEMPT_RT the tasklet was never initialised in
+		 * hif_exec_tasklet_create() (we run via the per-IRQ
+		 * kthread + hif_ext_group_thread_handler() instead).
+		 * Skip the matching teardown.
+		 */
 		tasklet_disable(&t_ctx->tasklet);
 		tasklet_kill(&t_ctx->tasklet);
+#else
+		(void)t_ctx;
+#endif
 	}
 	ctx->inited = false;
 
@@ -850,8 +860,18 @@ static struct hif_exec_context *hif_exec_tasklet_create(void)
 		return NULL;
 
 	ctx->exec_ctx.sched_ops = &tasklet_sched_ops;
+#ifndef WLAN_FEATURE_PREEMPT_RT
+	/*
+	 * On PREEMPT_RT, HIF_EXEC_TASKLET_TYPE groups are serviced by the
+	 * per-IRQ kthread (request_threaded_irq() + hif_ext_group_thread_
+	 * handler()) so the tasklet_struct is never scheduled or killed.
+	 * Skip tasklet_init() to keep it pristine; tasklet_sched_ops's
+	 * .schedule path is short-circuited by hif_ext_group_interrupt_
+	 * handler() returning IRQ_WAKE_THREAD before sched_ops are used.
+	 */
 	tasklet_init(&ctx->tasklet, hif_exec_tasklet_fn,
 		     (unsigned long)ctx);
+#endif
 
 	ctx->exec_ctx.inited = true;
 

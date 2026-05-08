@@ -346,7 +346,12 @@ void hif_ipci_disable_isr(struct hif_softc *scn)
 	hif_nointrs(scn);
 	/* Cancel the pending tasklet */
 	ce_tasklet_kill(scn);
+#ifndef WLAN_FEATURE_PREEMPT_RT
+	/* iPCIE has no separate legacy/shared IRQ tasklet on RT — see
+	 * hif_ipci_configure_grp_irq() which uses request_threaded_irq().
+	 */
 	tasklet_kill(&sc->intr_tq);
+#endif
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
 	qdf_atomic_set(&scn->active_grp_tasklet_cnt, 0);
 }

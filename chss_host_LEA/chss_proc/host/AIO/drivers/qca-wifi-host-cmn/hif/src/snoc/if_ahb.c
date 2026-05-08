@@ -130,7 +130,12 @@ void hif_ahb_disable_isr(struct hif_softc *scn)
 	hif_exec_kill(&scn->osc);
 	hif_nointrs(scn);
 	ce_tasklet_kill(scn);
+#ifndef WLAN_FEATURE_PREEMPT_RT
+	/* tasklet was never initialised on PREEMPT_RT — see
+	 * hif_ahb_configure_legacy_irq().
+	 */
 	tasklet_kill(&sc->intr_tq);
+#endif
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
 	qdf_atomic_set(&scn->active_grp_tasklet_cnt, 0);
 }

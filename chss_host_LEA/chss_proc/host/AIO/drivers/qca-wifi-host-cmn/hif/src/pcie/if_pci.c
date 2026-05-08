@@ -2559,7 +2559,14 @@ void hif_pci_disable_isr(struct hif_softc *scn)
 	hif_free_msi_ctx(scn);
 	/* Cancel the pending tasklet */
 	ce_tasklet_kill(scn);
+#ifndef WLAN_FEATURE_PREEMPT_RT
+	/*
+	 * On PREEMPT_RT the legacy/shared IRQ tasklet was never
+	 * initialised (see hif_pci_configure_legacy_irq()), so there is
+	 * nothing to kill here.
+	 */
 	tasklet_kill(&sc->intr_tq);
+#endif
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
 	qdf_atomic_set(&scn->active_grp_tasklet_cnt, 0);
 }

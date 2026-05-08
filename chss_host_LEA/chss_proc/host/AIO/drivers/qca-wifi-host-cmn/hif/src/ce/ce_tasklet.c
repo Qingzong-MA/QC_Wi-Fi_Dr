@@ -437,9 +437,20 @@ void ce_tasklet_init(struct HIF_CE_state *hif_ce_state, uint32_t mask)
 			hif_ce_state->tasklets[i].ce_id = i;
 			hif_ce_state->tasklets[i].inited = true;
 			hif_ce_state->tasklets[i].hif_ce_state = hif_ce_state;
+#ifndef WLAN_FEATURE_PREEMPT_RT
+			/*
+			 * On PREEMPT_RT the per-CE tasklet has been replaced
+			 * by a threaded IRQ (ce_tasklet_threaded_handler) —
+			 * skip tasklet_init() so the tasklet_struct stays
+			 * pristine and tasklet_kill() in ce_tasklet_kill()
+			 * is also skipped (matching #ifdef there). The other
+			 * fields (ce_id / inited / hif_ce_state) are still
+			 * required by ce_tasklet() and ce_dispatch_interrupt().
+			 */
 			tasklet_init(&hif_ce_state->tasklets[i].intr_tq,
 				ce_tasklet,
 				(unsigned long)&hif_ce_state->tasklets[i]);
+#endif
 		}
 	}
 }
@@ -467,7 +478,16 @@ void ce_tasklet_kill(struct hif_softc *scn)
 			 * tasklet_disable() will take care of that.
 			 */
 			qdf_cancel_work(&tasklet_workers[i].reg_work);
+#ifndef WLAN_FEATURE_PREEMPT_RT
+			/*
+			 * On PREEMPT_RT the tasklet was never initialised
+			 * (see ce_tasklet_init()) and the per-CE work runs
+			 * in a per-IRQ kthread; the IRQ has already been
+			 * freed by hif_nointrs() before we get here, so
+			 * there is nothing tasklet-shaped to tear down.
+			 */
 			tasklet_kill(&hif_ce_state->tasklets[i].intr_tq);
+#endif
 		}
 	}
 	qdf_atomic_set(&scn->active_tasklet_cnt, 0);
