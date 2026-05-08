@@ -685,19 +685,33 @@ irqreturn_t ce_dispatch_interrupt(int ce_id,
 
 #ifdef WLAN_FEATURE_PREEMPT_RT
 	/*
-	 * Two callers feed into us on PREEMPT_RT:
+	 * Three RT-relevant call sites land here:
 	 *
-	 *   - MSI per-CE IRQs registered through request_threaded_irq() —
-	 *     we run as the primary handler in hard-IRQ context (in_task()
-	 *     == false) and ask genirq to wake the per-IRQ kthread, which
-	 *     then runs ce_tasklet_threaded_handler() and ce_tasklet().
+	 *   1. MSI per-CE IRQ primary (request_threaded_irq() registered
+	 *      hif_ce_interrupt_handler). On stock RT this *also* runs
+	 *      via irq_forced_thread_fn(), which wraps the call in
+	 *      local_bh_disable() — that takes an RCU read-lock on
+	 *      PREEMPT_RT, so any sleeping/cond_resched() inside
+	 *      ce_tasklet() would BUG. Just ask genirq to schedule the
+	 *      secondary thread (ce_tasklet_threaded_handler).
 	 *
-	 *   - Legacy/shared PCI IRQ via pci_dispatch_interrupt() running
-	 *     inside hif_pci_legacy_ce_interrupt_handler()'s threaded
-	 *     handler (in_task() == true). There is no further IRQ thread
-	 *     to wake — execute ce_tasklet() inline.
+	 *   2. SNOC / AHB CE primary (request_threaded_irq() with
+	 *      hif_snoc_interrupt_handler / hif_ahb_interrupt_handler) —
+	 *      same as case 1.
+	 *
+	 *   3. Legacy / shared PCI IRQ secondary thread:
+	 *      hif_pci_legacy_thread_handler() invokes
+	 *      pci_dispatch_interrupt() which calls us back per-CE. We
+	 *      run in irq_thread_fn() context (no local_bh_disable, no
+	 *      RCU lock) and there is no per-CE thread to wake — so
+	 *      execute ce_tasklet() inline.
+	 *
+	 * Discriminate via in_softirq(): true in case 1/2 because
+	 * irq_forced_thread_fn() called local_bh_disable(); false in
+	 * case 3 (clean IRQ-thread context). in_task() alone is
+	 * insufficient because PREEMPT_RT force-threads the primary too.
 	 */
-	if (in_task()) {
+	if (!in_softirq() && !irqs_disabled() && !in_irq()) {
 		ce_tasklet((unsigned long)tasklet_entry);
 		return IRQ_HANDLED;
 	}

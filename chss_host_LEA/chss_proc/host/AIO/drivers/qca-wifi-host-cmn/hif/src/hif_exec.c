@@ -513,6 +513,9 @@ static void hif_exec_tasklet_fn(unsigned long data)
 	struct hif_softc *scn = HIF_GET_SOFTC(hif_ext_group->hif);
 	unsigned int work_done;
 
+#ifdef WLAN_FEATURE_PREEMPT_RT
+exec_drain:
+#endif
 	work_done =
 		hif_ext_group->handler(hif_ext_group->context, HIF_MAX_BUDGET);
 
@@ -522,7 +525,20 @@ static void hif_exec_tasklet_fn(unsigned long data)
 		qdf_semaphore_release(&hif_ext_group->tasklet_sem);
 		hif_ext_group->irq_enable(hif_ext_group);
 	} else {
+#ifdef WLAN_FEATURE_PREEMPT_RT
+		/*
+		 * On PREEMPT_RT we run from hif_ext_group_thread_handler()
+		 * (the explicit thread_fn registered via
+		 * request_threaded_irq()) — a clean kthread context. Drain
+		 * inline instead of bouncing through tasklet_schedule()
+		 * /ksoftirqd. cond_resched() keeps latency bounded for
+		 * other RT threads when the ring is deep.
+		 */
+		cond_resched();
+		goto exec_drain;
+#else
 		hif_exec_tasklet_schedule(hif_ext_group);
+#endif
 	}
 }
 
